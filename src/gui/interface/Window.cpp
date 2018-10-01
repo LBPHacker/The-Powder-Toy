@@ -163,6 +163,7 @@ void Window::DoFocus()
 void Window::DoDraw()
 {
 	OnDraw();
+#if 0
 	for (int i = 0, sz = Components.size(); i < sz; ++i)
 		if (Components[i]->Visible && ((Components[i] != focusedComponent_ && Components[i] != hoverComponent) || Components[i]->GetParent()))
 		{
@@ -245,6 +246,7 @@ void Window::DoDraw()
 		return;
 	}
 #endif
+#endif
 
 }
 
@@ -255,6 +257,7 @@ void Window::DoTick(float dt)
 		return;
 #endif
 	//on mouse hover
+#if 0
 	for (int i = Components.size() - 1; i >= 0 && !halt; --i)
 	{
 		if (Components[i]->Enabled &&
@@ -273,6 +276,7 @@ void Window::DoTick(float dt)
 	{
 		Components[i]->Tick(dt);
 	}
+#endif
 
 	halt = false;
 	stop = false;
@@ -431,9 +435,10 @@ void Window::DoTextInput(String text)
 void Window::DoMouseDown(int x_, int y_, unsigned button)
 {
 	//on mouse click
-	int x = x_ - Position.X;
-	int y = y_ - Position.Y;
+	// int x = x_ - Position.X;
+	// int y = y_ - Position.Y;
 	bool clickState = false;
+#if 0
 	for (int i = Components.size() - 1; i > -1 && !halt; --i)
 	{
 		if (Components[i]->Enabled && Components[i]->Visible)
@@ -450,6 +455,7 @@ void Window::DoMouseDown(int x_, int y_, unsigned button)
 			}
 		}
 	}
+#endif
 
 	if (!clickState)
 		FocusComponent(NULL);
@@ -460,11 +466,13 @@ void Window::DoMouseDown(int x_, int y_, unsigned button)
 #endif
 
 	//on mouse down
+#if 0
 	for (int i = Components.size() - 1; i > -1 && !halt; --i)
 	{
 		if (Components[i]->Enabled && Components[i]->Visible)
 			Components[i]->OnMouseDown(x, y, button);
 	}
+#endif
 
 	if (!stop)
 		OnMouseDown(x_, y_, button);
@@ -479,12 +487,14 @@ void Window::DoMouseDown(int x_, int y_, unsigned button)
 void Window::DoMouseMove(int x_, int y_, int dx, int dy)
 {
 	//on mouse move (if true, and inside)
-	int x = x_ - Position.X;
-	int y = y_ - Position.Y;
+	// int x = x_ - Position.X;
+	// int y = y_ - Position.Y;
 #ifdef DEBUG
 	if (debugMode)
 		return;
 #endif
+
+#if 0
 	for (int i = Components.size() - 1; i > -1  && !halt; --i)
 	{
 		if (Components[i]->Enabled && Components[i]->Visible)
@@ -526,6 +536,7 @@ void Window::DoMouseMove(int x_, int y_, int dx, int dy)
 			}
 		}
 	}
+#endif
 
 	if (!stop)
 		OnMouseMove(x_, y_, dx, dy);
@@ -535,12 +546,13 @@ void Window::DoMouseMove(int x_, int y_, int dx, int dy)
 
 void Window::DoMouseUp(int x_, int y_, unsigned button)
 {
-	int x = x_ - Position.X;
-	int y = y_ - Position.Y;
+	// int x = x_ - Position.X;
+	// int y = y_ - Position.Y;
 #ifdef DEBUG
 	if (debugMode)
 		return;
 #endif
+#if 0
 	//on mouse unclick
 	for (int i = Components.size() - 1; i >= 0  && !halt; --i)
 	{
@@ -560,6 +572,7 @@ void Window::DoMouseUp(int x_, int y_, unsigned button)
 		if (Components[i]->Enabled && Components[i]->Visible)
 			Components[i]->OnMouseUp(x, y, button);
 	}
+#endif
 
 	if (!stop)
 		OnMouseUp(x_, y_, button);
@@ -569,13 +582,14 @@ void Window::DoMouseUp(int x_, int y_, unsigned button)
 
 void Window::DoMouseWheel(int x_, int y_, int d)
 {
-	int x = x_ - Position.X;
-	int y = y_ - Position.Y;
+	// int x = x_ - Position.X;
+	// int y = y_ - Position.Y;
 #ifdef DEBUG
 	if (debugMode)
 		return;
 #endif
 	//on mouse wheel focused
+#if 0
 	for (int i = Components.size() - 1; i >= 0  && !halt; --i)
 	{
 		if (x >= Components[i]->Position.X && y >= Components[i]->Position.Y && x < Components[i]->Position.X + Components[i]->Size.X && y < Components[i]->Position.Y + Components[i]->Size.Y)
@@ -592,6 +606,7 @@ void Window::DoMouseWheel(int x_, int y_, int d)
 		if (Components[i]->Enabled && Components[i]->Visible)
 			Components[i]->OnMouseWheel(x - Components[i]->Position.X, y - Components[i]->Position.Y, d);
 	}
+#endif
 
 	if (!stop)
 		OnMouseWheel(x_, y_, d);

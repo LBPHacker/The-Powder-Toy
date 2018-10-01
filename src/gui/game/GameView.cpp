@@ -1135,6 +1135,7 @@ void GameView::updateToolButtonScroll()
 
 void GameView::OnMouseMove(int x, int y, int dx, int dy)
 {
+#if 0
 	bool newMouseInZoom = c->MouseInZoom(ui::Point(x, y));
 	mousePosition = c->PointTranslate(ui::Point(x, y));
 	currentMouse = ui::Point(x, y);
@@ -1179,10 +1180,12 @@ void GameView::OnMouseMove(int x, int y, int dx, int dy)
 	}
 
 	updateToolButtonScroll();
+#endif
 }
 
 void GameView::OnMouseDown(int x, int y, unsigned button)
 {
+#if 0
 	currentMouse = ui::Point(x, y);
 	if (altBehaviour && !shiftBehaviour && !ctrlBehaviour)
 		button = SDL_BUTTON_MIDDLE;
@@ -1228,10 +1231,12 @@ void GameView::OnMouseDown(int x, int y, unsigned button)
 			}
 		}
 	}
+#endif
 }
 
 void GameView::OnMouseUp(int x, int y, unsigned button)
 {
+#if 0
 	currentMouse = ui::Point(x, y);
 	if (zoomEnabled && !zoomCursorFixed)
 	{
@@ -1325,6 +1330,7 @@ void GameView::OnMouseUp(int x, int y, unsigned button)
 	// update the drawing mode for the next line
 	// since ctrl/shift state may have changed since we started drawing
 	UpdateDrawMode();
+#endif
 }
 
 void GameView::ToolTip(ui::Point senderPosition, String toolTip)
@@ -1358,6 +1364,7 @@ void GameView::ToolTip(ui::Point senderPosition, String toolTip)
 
 void GameView::OnMouseWheel(int x, int y, int d)
 {
+#if 0
 	if (!d)
 		return;
 	if (selectMode != SelectNone)
@@ -1372,6 +1379,7 @@ void GameView::OnMouseWheel(int x, int y, int d)
 	{
 		c->AdjustBrushSize(d, false, shiftBehaviour, ctrlBehaviour);
 	}
+#endif
 }
 
 void GameView::BeginStampSelection()
@@ -1390,6 +1398,7 @@ void GameView::OnKeyPress(int key, int scan, bool repeat, bool shift, bool ctrl,
 		introText = 50;
 	}
 
+#if 0
 	if (selectMode != SelectNone)
 	{
 		if (selectMode == PlaceSave)
@@ -1671,10 +1680,12 @@ void GameView::OnKeyPress(int key, int scan, bool repeat, bool shift, bool ctrl,
 	{
 		c->LoadRenderPreset(key-'0');
 	}
+#endif
 }
 
 void GameView::OnKeyRelease(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt)
 {
+#if 0
 	if (repeat)
 		return;
 	switch(key)
@@ -1696,6 +1707,7 @@ void GameView::OnKeyRelease(int key, int scan, bool repeat, bool shift, bool ctr
 			c->SetZoomEnabled(false);
 		break;
 	}
+#endif
 }
 
 void GameView::OnBlur()
@@ -2103,6 +2115,7 @@ void GameView::OnDraw()
 		ren->clearScreen(1.0f);
 		ren->RenderBegin();
 		ren->SetSample(c->PointTranslate(currentMouse).X, c->PointTranslate(currentMouse).Y);
+#if 0
 		if (selectMode == SelectNone && (!zoomEnabled || zoomCursorFixed) && activeBrush && (isMouseDown || (currentMouse.X >= 0 && currentMouse.X < XRES && currentMouse.Y >= 0 && currentMouse.Y < YRES)))
 		{
 			ui::Point finalCurrentMouse = c->PointTranslate(currentMouse);
@@ -2219,6 +2232,7 @@ void GameView::OnDraw()
 				}
 			}
 		}
+#endif
 
 		ren->RenderEnd();
 
@@ -2243,6 +2257,7 @@ void GameView::OnDraw()
 			Client::Ref().WriteFile(data, filename);
 		}
 
+#if 0
 		if (logEntries.size())
 		{
 			int startX = 20;
@@ -2263,8 +2278,10 @@ void GameView::OnDraw()
 				(*iter).second -= 3;
 			}
 		}
+#endif
 	}
 
+#if 0
 	if(recording)
 	{
 		String sampleInfo = String::Build(recordingIndex, ". ", String(0xE00E), " REC");
@@ -2491,6 +2508,7 @@ void GameView::OnDraw()
 		g->fillrect(0, 0, WINDOWW, WINDOWH, 0, 0, 0, introText>51?102:introText*2);
 		g->drawtext(16, 20, introTextMessage, 255, 255, 255, introText>51?255:introText*5);
 	}
+#endif
 
 	// Clear menu areas, to ensure particle graphics don't overlap
 	memset(g->vid+((XRES+BARSIZE)*YRES), 0, (PIXELSIZE*(XRES+BARSIZE))*MENUSIZE);

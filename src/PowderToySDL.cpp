@@ -148,7 +148,7 @@ int SDLOpen()
 		flags = altFullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_FULLSCREEN_DESKTOP;
 	if (resizable)
 		flags |= SDL_WINDOW_RESIZABLE;
-	sdl_window = SDL_CreateWindow("The Powder Toy", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOWW * scale, WINDOWH * scale,
+	sdl_window = SDL_CreateWindow("The Telepathic Toy", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOWW * scale, WINDOWH * scale,
 	                              flags);
 	sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
 	SDL_RenderSetLogicalSize(sdl_renderer, WINDOWW, WINDOWH);

@@ -108,8 +108,8 @@
 #define MENUSIZE 0
 #define BARSIZE 0
 #else
-#define MENUSIZE 40
-#define BARSIZE 17
+#define MENUSIZE 0
+#define BARSIZE 0
 #endif
 #define XRES	612
 #define YRES	384

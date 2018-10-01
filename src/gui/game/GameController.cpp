@@ -632,6 +632,7 @@ bool GameController::MouseMove(int x, int y, int dx, int dy)
 bool GameController::MouseDown(int x, int y, unsigned button)
 {
 	bool ret = commandInterface->OnMouseDown(x, y, button);
+#if 0
 	if (ret && y<YRES && x<XRES && !gameView->GetPlacingSave() && !gameView->GetPlacingZoom())
 	{
 		ui::Point point = gameModel->AdjustZoomCoords(ui::Point(x, y));
@@ -648,12 +649,14 @@ bool GameController::MouseDown(int x, int y, unsigned button)
 			}
 		}
 	}
+#endif
 	return ret;
 }
 
 bool GameController::MouseUp(int x, int y, unsigned button, char type)
 {
 	bool ret = commandInterface->OnMouseUp(x, y, button, type);
+#if 0
 	if (type)
 		return ret;
 	if (ret && foundSignID != -1 && y<YRES && x<XRES && !gameView->GetPlacingSave())
@@ -706,6 +709,7 @@ bool GameController::MouseUp(int x, int y, unsigned button, char type)
 		}
 	}
 	foundSignID = -1;
+#endif
 	return ret;
 }
 
@@ -717,6 +721,7 @@ bool GameController::MouseWheel(int x, int y, int d)
 bool GameController::KeyPress(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt)
 {
 	bool ret = commandInterface->OnKeyPress(key, scan, repeat, shift, ctrl, alt);
+#if 0
 	if (repeat)
 		return ret;
 	if (ret)
@@ -790,12 +795,14 @@ bool GameController::KeyPress(int key, int scan, bool repeat, bool shift, bool c
 					ret = false;
 		}
 	}
+#endif
 	return ret;
 }
 
 bool GameController::KeyRelease(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt)
 {
 	bool ret = commandInterface->OnKeyRelease(key, scan, repeat, shift, ctrl, alt);
+#if 0
 	if (repeat)
 		return ret;
 	if (ret)
@@ -829,6 +836,7 @@ bool GameController::KeyRelease(int key, int scan, bool repeat, bool shift, bool
 			sim->player2.comm = (int)(sim->player2.comm)&7;
 		}
 	}
+#endif
 	return ret;
 }
 
