@@ -186,6 +186,7 @@ public:
 	virtual bool OnKeyRelease(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt);
 	virtual bool OnMouseTick();
 	virtual void OnTick();
+	virtual void OnExit();
 	virtual void Init();
 	virtual void SetWindow(ui::Window * window);
 	virtual int Command(String command);

@@ -196,6 +196,7 @@ public:
 	virtual void OnTick(float dt);
 	virtual void OnDraw();
 	virtual void OnBlur();
+	virtual void OnExit();
 
 	//Top-level handlers, for Lua interface
 	virtual void DoTick(float dt);

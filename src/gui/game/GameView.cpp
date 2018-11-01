@@ -1710,6 +1710,12 @@ void GameView::OnKeyRelease(int key, int scan, bool repeat, bool shift, bool ctr
 #endif
 }
 
+void GameView::OnExit()
+{
+	Window::OnExit();
+	c->Exit();
+}
+
 void GameView::OnBlur()
 {
 	disableAltBehaviour();

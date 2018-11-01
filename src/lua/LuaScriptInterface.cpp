@@ -168,6 +168,8 @@ LuaScriptInterface::LuaScriptInterface(GameController * c, GameModel * m):
 		{"delete", &luatpt_delete},
 		{"register_step", &luatpt_register_step},
 		{"unregister_step", &luatpt_unregister_step},
+		{"register_close", &luatpt_register_close},
+		{"unregister_close", &luatpt_unregister_close},
 		{"register_mouseclick", &luatpt_register_mouseclick},
 		{"unregister_mouseclick", &luatpt_unregister_mouseclick},
 		{"register_keypress", &luatpt_register_keypress},
@@ -3404,6 +3406,11 @@ void LuaScriptInterface::OnTick()
 	}
 	lua_pop(l, 1);
 	luacon_step(luacon_mousex, luacon_mousey);
+}
+
+void LuaScriptInterface::OnExit()
+{
+	luacon_close();
 }
 
 int LuaScriptInterface::Command(String command)

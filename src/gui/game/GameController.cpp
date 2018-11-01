@@ -870,6 +870,7 @@ void GameController::Tick()
 
 void GameController::Exit()
 {
+	commandInterface->OnExit();
 	gameView->CloseActiveWindow();
 	HasDone = true;
 }

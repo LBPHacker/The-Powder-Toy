@@ -354,6 +354,47 @@ int luacon_mouseevent(int mx, int my, int mb, int event, int mouse_wheel)
 	return mpcontinue;
 }
 
+void luacon_close()
+{
+	ui::Engine::Ref().LastTick(Platform::GetTime());
+	lua_State* l = luacon_ci->l;
+	lua_pushstring(l, "closefunctions");
+	lua_rawget(l, LUA_REGISTRYINDEX);
+	if (!lua_istable(l, -1))
+	{
+		lua_pop(l, 1);
+		lua_newtable(l);
+		lua_pushstring(l, "closefunctions");
+		lua_pushvalue(l, -2);
+		lua_rawset(l, LUA_REGISTRYINDEX);
+	}
+	int len = lua_objlen(l, -1);
+	for (int i = 1; i <= len; i++)
+	{
+		lua_rawgeti(l, -1, i);
+		int callret = lua_pcall(l, 0, 0, 0);
+		if (callret)
+		{
+			if (luacon_geterror() == "Error: Script not responding")
+			{
+				ui::Engine::Ref().LastTick(Platform::GetTime());
+				for (int j = i; j <= len-1; j++)
+				{
+					lua_rawgeti(l, -2, j+1);
+					lua_rawseti(l, -3, j);
+				}
+				lua_pushnil(l);
+				lua_rawseti(l, -3, len);
+				i--;
+			}
+			luacon_ci->Log(CommandInterface::LogError, luacon_geterror());
+			lua_pop(l, 1);
+		}
+		len = lua_objlen(l, -1);
+	}
+	lua_pop(l, 1);
+}
+
 int luacon_step(int mx, int my)
 {
 	ui::Engine::Ref().LastTick(Platform::GetTime());
@@ -1336,6 +1377,63 @@ int luatpt_unregister_step(lua_State* l)
 			lua_pop(l, -1);
 			lua_newtable(l);
 			lua_pushstring(l, "stepfunctions");
+			lua_pushvalue(l, -2);
+			lua_rawset(l, LUA_REGISTRYINDEX);
+		}
+		int len = lua_objlen(l, -1);
+		int adjust = 0;
+		for (int i = 1; i <= len; i++)
+		{
+			lua_rawgeti(l, -1, i+adjust);
+			//unregister the function
+			if (lua_equal(l, 1, -1))
+			{
+				lua_pop(l, 1);
+				adjust++;
+				i--;
+			}
+			//else, move everything down if we removed something earlier
+			else
+			{
+				lua_rawseti(l, -2, i);
+			}
+		}
+	}
+	return 0;
+}
+
+int luatpt_register_close(lua_State* l)
+{
+	if (lua_isfunction(l, 1))
+	{
+		lua_pushstring(l, "closefunctions");
+		lua_rawget(l, LUA_REGISTRYINDEX);
+		if (!lua_istable(l, -1))
+		{
+			lua_pop(l, 1);
+			lua_newtable(l);
+			lua_pushstring(l, "closefunctions");
+			lua_pushvalue(l, -2);
+			lua_rawset(l, LUA_REGISTRYINDEX);
+		}
+		int c = lua_objlen(l, -1);
+		lua_pushvalue(l, 1);
+		lua_rawseti(l, -2, c+1);
+	}
+	return 0;
+}
+
+int luatpt_unregister_close(lua_State* l)
+{
+	if (lua_isfunction(l, 1))
+	{
+		lua_pushstring(l, "closefunctions");
+		lua_rawget(l, LUA_REGISTRYINDEX);
+		if (!lua_istable(l, -1))
+		{
+			lua_pop(l, -1);
+			lua_newtable(l);
+			lua_pushstring(l, "closefunctions");
 			lua_pushvalue(l, -2);
 			lua_rawset(l, LUA_REGISTRYINDEX);
 		}

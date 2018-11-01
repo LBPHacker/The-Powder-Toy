@@ -29,6 +29,7 @@ public:
 	virtual bool OnKeyRelease(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt) {return true;}
 	virtual bool OnMouseTick() { return true; }
 	virtual void OnTick() { }
+	virtual void OnExit() { }
 	virtual int Command(String command);
 	virtual String FormatCommand(String command);
 	String GetLastError();

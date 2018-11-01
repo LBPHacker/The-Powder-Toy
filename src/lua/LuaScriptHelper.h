@@ -99,6 +99,8 @@ int luatpt_set_shortcuts(lua_State* l);
 int luatpt_delete(lua_State* l);
 int luatpt_register_step(lua_State* l);
 int luatpt_unregister_step(lua_State* l);
+int luatpt_register_close(lua_State* l);
+int luatpt_unregister_close(lua_State* l);
 int luatpt_register_keypress(lua_State* l);
 int luatpt_unregister_keypress(lua_State* l);
 int luatpt_register_mouseclick(lua_State* l);
