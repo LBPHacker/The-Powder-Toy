@@ -24,8 +24,6 @@ local function module_unload(name)
 		return nil, "not currently loaded"
 	end
 
-	-- * TODO: unload everything that needs [name]
-
 	-- * Unload dependents. 
 	for dependent in pairs(module_info.depends_on_this) do
 		module_unload(dependent)
