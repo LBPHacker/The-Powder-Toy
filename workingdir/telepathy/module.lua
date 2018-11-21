@@ -1,4 +1,4 @@
-local config = require("telepathy.config")
+local params = require("telepathy.params")
 local logger = require("telepathy.logger")
 
 local loaded_modules = {}
@@ -70,7 +70,7 @@ local function module_load(name)
 	-- * Load module chunk.
 	local ok
 	ok, module_info.exports = xpcall(function()
-		return config.require(name)
+		return params.require(name)
 	end, function(err)
 		module_info.status = "failed"
 		module_info.error_message = { "failed to load", err }
@@ -141,6 +141,34 @@ local function module_load(name)
 	return true
 end
 
+local function module_dependencies(name)
+	name = tostring(name)
+	local module_info = loaded_modules[name]
+	if not module_info then
+		return nil, "not currently loaded"
+	end
+	
+	local dependencies_array = {}
+	for dependency in pairs(module_info.this_depends_on) do
+		table.insert(dependencies_array, dependency)
+	end
+	return dependencies_array
+end
+
+local function module_dependents(name)
+	name = tostring(name)
+	local module_info = loaded_modules[name]
+	if not module_info then
+		return nil, "not currently loaded"
+	end
+	
+	local dependents_array = {}
+	for dependent in pairs(module_info.depends_on_this) do
+		table.insert(dependents_array, dependent)
+	end
+	return dependents_array
+end
+
 local function module_list()
 	local modules_array = {}
 	for module_name in pairs(loaded_modules) do
@@ -149,16 +177,12 @@ local function module_list()
 	return modules_array
 end
 
-local function module_reload(name)
-	module_unload(name)
-	return module_load(name)
-end
-
 return {
 	load = module_load,
 	unload = module_unload,
-	reload = module_reload,
 	list = module_list,
-	stasus = module_status
+	status = module_status,
+	dependencies = module_dependencies,
+	dependents = module_dependents
 }
 

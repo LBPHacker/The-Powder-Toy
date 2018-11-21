@@ -1,4 +1,4 @@
-local config = require("telepathy.config")
+local params = require("telepathy.params")
 local logger = require("telepathy.logger")
 local module = require("telepathy.module")
 
@@ -9,7 +9,7 @@ end
 local function init()
 	-- * TODO
 
-	local MODULES_DIR = config.modules_dir()
+	local MODULES_DIR = params.modules_dir()
 	if not fs.isDirectory(MODULES_DIR) then
 		fs.makeDirectory(MODULES_DIR)
 	end
@@ -32,7 +32,7 @@ end
 return {
 	init = init,
 	uninit = uninit,
-	require = config.require,
+	require = params.require,
 	compat = compat
 }
 

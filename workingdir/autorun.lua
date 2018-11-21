@@ -6,14 +6,24 @@ end, __newindex = function()
 end})
 
 -- * Replace ./?.lua with ./?.lua;./?/init.lua so require works better.
-local init_lua_pattern_extended
-package.path = package.path:gsub("(;?)(%./%?%.lua)(;?)", function(cap1, cap2, cap3)
-	init_lua_pattern_extended = true
-	return cap1 .. cap2 .. ";./?/init.lua" .. cap3
-end)
-if not init_lua_pattern_extended then
-	io.stderr:write("./?.lua not found in package.path\n")
-	os.exit(1)
+do
+	local stuff_in_package_path = {}
+	for stuff in package.path:gsub("[^;]+") do
+		table.insert(stuff_in_package_path, stuff)
+	end
+	local init_lua_pattern_extended
+	for ix_stuff, stuff in ipairs() do
+		if stuff == "./?.lua" then
+			table.insert(stuff_in_package_path, ix_stuff, "./?/init.lua")
+			init_lua_pattern_extended = true
+			package.path = table.concat(stuff_in_package_path, ";")
+			break
+		end
+	end
+	if not init_lua_pattern_extended then
+		io.stderr:write("./?.lua not found in package.path\n")
+		os.exit(1)
+	end
 end
 
 local telepathy = require("telepathy")
@@ -27,5 +37,4 @@ evt.register(evt.close, telepathy.uninit)
 --   does can be safely and completely undone.
 
 -- telepathy.compat("multi.lua")
-
 
