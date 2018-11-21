@@ -347,6 +347,9 @@ tpt.partsdata = nil");
 	lua_setmetatable(l, -2);
 
 	initLegacyProps();
+
+	ui::Engine::Ref().LastTick(Platform::GetTime());
+	luaopen_eventcompat(l);
 }
 
 void LuaScriptInterface::Init()
@@ -3315,15 +3318,15 @@ void LuaScriptInterface::initEventAPI()
 	lua_getglobal(l, "event");
 	lua_setglobal(l, "evt");
 
-	lua_pushinteger(l, EventTypes::keypress); lua_setfield(l, -2, "keypress");
-	lua_pushinteger(l, EventTypes::keyrelease); lua_setfield(l, -2, "keyrelease");
-	lua_pushinteger(l, EventTypes::textinput); lua_setfield(l, -2, "textinput");
-	lua_pushinteger(l, EventTypes::mousedown); lua_setfield(l, -2, "mousedown");
-	lua_pushinteger(l, EventTypes::mouseup); lua_setfield(l, -2, "mouseup");
-	lua_pushinteger(l, EventTypes::mousemove); lua_setfield(l, -2, "mousemove");
-	lua_pushinteger(l, EventTypes::mousewheel); lua_setfield(l, -2, "mousewheel");
-	lua_pushinteger(l, EventTypes::tick); lua_setfield(l, -2, "tick");
-	lua_pushinteger(l, EventTypes::terminate); lua_setfield(l, -2, "terminate");
+	lua_pushinteger(l, LuaEvents::keypress); lua_setfield(l, -2, "keypress");
+	lua_pushinteger(l, LuaEvents::keyrelease); lua_setfield(l, -2, "keyrelease");
+	lua_pushinteger(l, LuaEvents::textinput); lua_setfield(l, -2, "textinput");
+	lua_pushinteger(l, LuaEvents::mousedown); lua_setfield(l, -2, "mousedown");
+	lua_pushinteger(l, LuaEvents::mouseup); lua_setfield(l, -2, "mouseup");
+	lua_pushinteger(l, LuaEvents::mousemove); lua_setfield(l, -2, "mousemove");
+	lua_pushinteger(l, LuaEvents::mousewheel); lua_setfield(l, -2, "mousewheel");
+	lua_pushinteger(l, LuaEvents::tick); lua_setfield(l, -2, "tick");
+	lua_pushinteger(l, LuaEvents::close); lua_setfield(l, -2, "close");
 }
 
 int LuaScriptInterface::event_register(lua_State * l)
@@ -3348,7 +3351,7 @@ int LuaScriptInterface::event_getmodifiers(lua_State * l)
 	return 1;
 }
 
-bool LuaScriptInterface::HandleEvent(EventTypes eventType, Event * event)
+bool LuaScriptInterface::HandleEvent(LuaEvents::EventTypes eventType, Event * event)
 {
 	return LuaEvents::HandleEvent(this, event, ByteString::Build("tptevents-", eventType));
 }
@@ -3362,7 +3365,8 @@ void LuaScriptInterface::OnTick()
 		lua_setfield(l, -2, "NUM_PARTS");
 	}
 	lua_pop(l, 1);
-	HandleEvent(EventTypes::tick, new TickEvent());
+	TickEvent ev;
+	HandleEvent(LuaEvents::tick, &ev);
 }
 
 int LuaScriptInterface::Command(String command)

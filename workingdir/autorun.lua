@@ -19,7 +19,7 @@ end
 local telepathy = require("telepathy")
 telepathy.init()
 
-evt.register(evt.terminate, telepathy.uninit)
+evt.register(evt.close, telepathy.uninit)
 
 -- * Run other stuff here if you want to (e.g. TPT Multiplayer).
 -- * Use telepathy.compat to run scripts from cracker64's script manager

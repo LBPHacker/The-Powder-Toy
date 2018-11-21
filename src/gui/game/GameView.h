@@ -199,6 +199,7 @@ public:
 	virtual void OnExit();
 
 	//Top-level handlers, for Lua interface
+	virtual void DoExit();
 	virtual void DoDraw();
 	virtual void DoMouseMove(int x, int y, int dx, int dy);
 	virtual void DoMouseDown(int x, int y, unsigned button);

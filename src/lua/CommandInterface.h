@@ -25,7 +25,9 @@ public:
 	//void AttachGameModel(GameModel * m);
 
 	virtual void OnTick() { }
-	virtual bool HandleEvent(EventTypes eventType, Event * event) { return true; }
+
+	virtual bool HandleEvent(LuaEvents::EventTypes eventType, Event * event) { return true; }
+
 	virtual int Command(String command);
 	virtual String FormatCommand(String command);
 	String GetLastError();
