@@ -59,6 +59,11 @@ int Element_YEST::update(UPDATE_FUNC_ARGS)
 				{
 					sim->part_change_type(i,x,y,PT_DYST);
 				}
+				if (TYP(r)==PT_GEL && parts[ID(r)].tmp >= 50)
+				{
+					sim->part_change_type(i, x, y, PT_ALHL);
+					sim->part_change_type(ID(r), x, y, PT_CO2);
+				}
 			}
 	if (parts[i].temp > 303 && parts[i].temp < 317) {
 		sim->create_part(-1, x + RNG::Ref().between(-1, 1), y + RNG::Ref().between(-1, 1), PT_YEST);

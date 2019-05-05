@@ -86,7 +86,16 @@ int Element_ACID::update(UPDATE_FUNC_ARGS)
 							}
 							parts[i].temp += newtemp;
 							parts[i].life--;
-							sim->kill_part(ID(r));
+							switch (TYP(r))
+							{
+							case PT_ALHL:
+								sim->part_change_type(ID(r), x, y, PT_BIZR);
+								break;
+
+							default:
+								sim->kill_part(ID(r));
+								break;
+							}
 						}
 					}
 					else if (parts[i].life<=50)

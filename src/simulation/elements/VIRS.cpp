@@ -92,7 +92,7 @@ int Element_VIRS::update(UPDATE_FUNC_ARGS)
 					return 0;
 				}
 				//soap cures virus
-				else if (TYP(r) == PT_SOAP)
+				else if (TYP(r) == PT_SOAP || TYP(r) == PT_ALHL)
 				{
 					parts[i].pavg[0] += 10;
 					if (!(rndstore & 0x3))
