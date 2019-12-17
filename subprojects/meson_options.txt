@@ -1,0 +1,2 @@
+option('lua', type: 'combo', choices: [ 'none', 'lua5.1', 'lua5.2', 'luajit' ], value: 'lua5.1', description: 'Lua library to use (don\'t change this manually, let the superproject handle it)', yield: true)
+option('ssl', type: 'combo', choices: [ 'openssl' ], value: 'openssl', description: 'SSL library to use (don\'t change this manually, let the superproject handle it)', yield: true)
