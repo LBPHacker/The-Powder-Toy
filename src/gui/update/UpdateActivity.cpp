@@ -1,7 +1,5 @@
 #include "UpdateActivity.h"
 
-#include <bzlib.h>
-
 #include "gui/dialogues/ConfirmPrompt.h"
 #include "gui/interface/Engine.h"
 
@@ -11,6 +9,7 @@
 #include "client/Client.h"
 #include "client/http/Request.h"
 
+#include "bzip2/bzlib.h"
 #include "Update.h"
 #include "Config.h"
 #include "Platform.h"

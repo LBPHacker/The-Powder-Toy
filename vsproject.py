@@ -1,13 +1,168 @@
 #!/usr/bin/env python3
+
+import copy
 import os
 from pathlib import Path
+import shutil
+import subprocess
+from xml.etree import ElementTree
 import uuid
+
+if os.path.isdir('vsproject'):
+	shutil.rmtree('vsproject')
+if os.path.isdir('vsproject-temp-debug'):
+	shutil.rmtree('vsproject-temp-debug')
+if os.path.isdir('vsproject-temp-release'):
+	shutil.rmtree('vsproject-temp-release')
+if os.path.isdir('vsproject-temp-static'):
+	shutil.rmtree('vsproject-temp-static')
+os.makedirs('vsproject')
+
+subprocess.run([
+	'meson',
+	'--backend=vs',
+	'-Db_pch=false',
+	'vsproject-temp-debug',
+], check = True)
+subprocess.run([
+	'meson',
+	'--backend=vs',
+	'-Dbuildtype=release',
+	'-Dignore_updates=false',
+	'-Dinstall_check=true',
+	'vsproject-temp-release',
+], check = True)
+subprocess.run([
+	'meson',
+	'--backend=vs',
+	'-Dbuildtype=release',
+	'-Dignore_updates=false',
+	'-Dinstall_check=true',
+	'-Db_vscrt=mt',
+	'-Db_lto=true',
+	'-Dstatic=prebuilt',
+	'vsproject-temp-static',
+], check = True)
+
+os.makedirs(os.path.join('vsproject', 'src'))
+for header in [ 'Config.h', 'ElementNumbers.h', 'ToolNumbers.h' ]:
+	shutil.copy(os.path.join('vsproject-temp-release', 'src', header), os.path.join('vsproject', 'src', header))
+for basename in os.listdir('vsproject-temp-debug'):
+	if basename.endswith('.dll'):
+		shutil.copy(os.path.join('vsproject-temp-debug', basename), os.path.join('vsproject', basename))
+
+NS_MSBUILD = 'http://schemas.microsoft.com/developer/msbuild/2003'
+def default_ns(tag):
+	return '{{{0}}}{1}'.format(NS_MSBUILD, tag)
+NAMESPACES = { '': NS_MSBUILD }
+for key, value in NAMESPACES.items():
+	ElementTree.register_namespace(key, value)
+factored_out = [ default_ns('AdditionalOptions'), default_ns('PreprocessorDefinitions'), default_ns('AdditionalIncludeDirectories'), default_ns('ObjectFileName') ]
+
+input_projects = {}
+for config in [ 'debug', 'release', 'static' ]:
+	input_projects[config] = ElementTree.parse(os.path.join('vsproject-temp-' + config, 'powder@exe.vcxproj')).getroot()
+
+output_project = copy.deepcopy(input_projects['debug'])
+while len(output_project):
+	output_project.remove(output_project[0])
+
+output_filters = copy.deepcopy(output_project)
+del output_filters.attrib['DefaultTargets']
+
+sources_used = set()
+for property_group in input_projects['debug'].findall('./PropertyGroup', namespaces = NAMESPACES):
+	if 'Label' in property_group.attrib:
+		labelled_pg_clone = copy.deepcopy(property_group)
+		output_project.append(labelled_pg_clone)
+	else:
+		for config in [ 'debug', 'release', 'static' ]:
+			unlabelled_pg_clone = copy.deepcopy(property_group)
+			unlabelled_pg_clone.attrib['Condition'] = '\'$(Configuration)|$(Platform)\'==\'' + config + '|x64\''
+			unlabelled_pg_clone.find('./IntDir', namespaces = NAMESPACES).text = 'build\\' + config + '\\objects\\'
+			unlabelled_pg_clone.find('./OutDir', namespaces = NAMESPACES).text = 'build\\' + config + '\\'
+			output_project.append(unlabelled_pg_clone)
+for project_configs in input_projects['debug'].findall('./ItemGroup[@Label="ProjectConfigurations"]', namespaces = NAMESPACES):
+	proj_configs = copy.deepcopy(project_configs)
+	output_project.append(proj_configs)
+for project_configs in input_projects['release'].findall('./ItemGroup[@Label="ProjectConfigurations"]/*', namespaces = NAMESPACES):
+	proj_configs.append(copy.deepcopy(project_configs))
+for project_configs in input_projects['static'].findall('./ItemGroup[@Label="ProjectConfigurations"]/*', namespaces = NAMESPACES):
+	proj_configs_static = copy.deepcopy(project_configs)
+	proj_configs_static.attrib['Include'] = "static|x64"
+	proj_configs_static.find('./Configuration', namespaces = NAMESPACES).text = "static"
+	proj_configs.append(proj_configs_static)
+for imports in input_projects['debug'].findall('./Import', namespaces = NAMESPACES):
+	output_project.append(copy.deepcopy(imports))
+for item_group in input_projects['debug'].findall('./ItemGroup', namespaces = NAMESPACES):
+	if 'Label' in item_group.attrib and item_group.attrib['Label'] == 'ProjectConfigurations':
+		continue
+	if item_group.find('./Object', namespaces = NAMESPACES) != None:
+		continue
+	if item_group.find('./None[@Include=\'..\\meson.build\']', namespaces = NAMESPACES) != None:
+		continue
+	if item_group.find('./ProjectReference', namespaces = NAMESPACES) != None:
+		continue
+	project_reference = item_group.find('./ProjectReference', namespaces = NAMESPACES)
+	if project_reference and 'REGEN' in project_reference.attrib['Include']:
+		continue
+	ig_clone = copy.deepcopy(item_group)
+	for clcompile in ig_clone.findall('./CLCompile', namespaces = NAMESPACES):
+		clcompile.attrib['Include'] = clcompile.attrib['Include'].replace('/', '\\')
+		sources_used.add(clcompile.attrib['Include'])
+		to_remove = []
+		for clcompile_option in clcompile.findall('./*'):
+			if clcompile_option.tag in factored_out:
+				to_remove.append(clcompile_option)
+		for clcompile_option in to_remove:
+			clcompile.remove(clcompile_option)
+	output_project.append(ig_clone)
+for config in [ 'debug', 'release', 'static' ]:
+	factored_out_values = {}
+	for item_group in input_projects[config].findall('./ItemGroup', namespaces = NAMESPACES):
+		for clcompile in item_group.findall('./CLCompile', namespaces = NAMESPACES):
+			for clcompile_option in clcompile.findall('./*'):
+				if clcompile_option.tag in factored_out:
+					factored_out_values[clcompile_option.tag] = clcompile_option.text
+			break
+	for itemdef_group in input_projects[config].findall('./ItemDefinitionGroup', namespaces = NAMESPACES):
+		idg_clone = copy.deepcopy(itemdef_group)
+		for tag in factored_out:
+			clcompile_option = idg_clone.find('./ClCompile/' + tag, namespaces = NAMESPACES)
+			if clcompile_option != None:
+				option_name = '%({0})'.format(tag.split('}')[1])
+				clcompile_option.text = clcompile_option.text.replace(option_name, factored_out_values[tag])
+				if option_name == '%(PreprocessorDefinitions)' and config == 'debug':
+					clcompile_option.text += ';DEBUG;IGNORE_UPDATES;NO_INSTALL_CHECK'
+				if option_name == '%(PreprocessorDefinitions)' and config == 'static':
+					clcompile_option.text += ';CURL_STATICLIB;ZLIB_WINAPI'
+		idg_clone.attrib['Condition'] = '\'$(Configuration)|$(Platform)\'==\'' + config + '|x64\''
+		object_file_name = ElementTree.Element('ObjectFileName')
+		object_file_name.text = '$(IntDir)/%(RelativeDir)/'
+		idg_clone.find('./ClCompile', namespaces = NAMESPACES).append(object_file_name)
+		additional_options = ElementTree.Element('AdditionalOptions')
+		additional_options.text = factored_out_values[default_ns('AdditionalOptions')] + ' "/MP"'
+		idg_clone.find('./ClCompile', namespaces = NAMESPACES).append(additional_options)
+		resource_compile = ElementTree.Element('ResourceCompile')
+		resource_compile_projdef = ElementTree.Element('PreprocessorDefinitions')
+		resource_compile_projdef.text = '%(PreprocessorDefinitions)'
+		resource_compile.append(resource_compile_projdef)
+		resource_compile_incdirs = ElementTree.Element('AdditionalIncludeDirectories')
+		resource_compile_incdirs.text = '$(IntDir);%(AdditionalIncludeDirectories)'
+		resource_compile.append(resource_compile_incdirs)
+		idg_clone.append(resource_compile)
+		output_project.append(idg_clone)
+ig_resource_compile = ElementTree.Element('ItemGroup')
+ig_resource_compile_powder_res = ElementTree.Element('ResourceCompile')
+ig_resource_compile_powder_res.attrib['Include'] = '..\\resources\\powder-res.rc'
+ig_resource_compile.append(ig_resource_compile_powder_res)
+output_project.append(ig_resource_compile)
 
 cl_compile = []
 cl_include = []
 source_dirs = set()
 for root, subdirs, files in os.walk('src'):
-	for file in [os.path.join(root, f) for f in files]:
+	for file in [ os.path.join(root, f) for f in files ]:
 		lowerfile = file.lower()
 		add_source_dir = False
 		if lowerfile.endswith('.cpp') or lowerfile.endswith('.c'):
@@ -19,296 +174,125 @@ for root, subdirs, files in os.walk('src'):
 		if add_source_dir:
 			path = Path(root)
 			for i in range(len(path.parents) - 1):
-				parent = path.parents[i]
-				if not str(parent) in source_dirs:
-					source_dirs.add(str(parent))
+				parent = str(path.parents[i])
+				if not parent in source_dirs:
+					source_dirs.add(parent)
 			source_dirs.add(os.path.dirname(file))
 
-sln = open("The-Powder-Toy.sln", 'w')
-sln.write(r"""Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "The-Powder-Toy", "The-Powder-Toy.vcxproj", "{57F7954F-6975-4DEE-8C4F-F9B083E05985}"
+filter_records = ElementTree.Element('ItemGroup')
+for d in source_dirs | set([ 'data', 'resources' ]):
+	filter_record = ElementTree.Element('Filter')
+	filter_record.attrib['Include'] = d
+	filter_record_id = ElementTree.Element('UniqueIdentifier')
+	filter_record_id.text = '{{{0}}}'.format(str(uuid.uuid4()))
+	filter_record.append(filter_record_id)
+	filter_records.append(filter_record)
+output_filters.append(filter_records)
+
+nones_in_filters = ElementTree.Element('ItemGroup')
+clcompiles_in_filters = ElementTree.Element('ItemGroup')
+extra_nones_in_project = ElementTree.Element('ItemGroup')
+for real_path, filter_path in {
+	'..\\data\\font.cpp': 'data\\font.cpp',
+	'..\\data\\hmap.cpp': 'data\\hmap.cpp',
+	'..\\data\\icon.cpp': 'data\\icon.cpp',
+	'..\\data\\images.cpp': 'data\\images.cpp',
+	'..\\resources\\powder-res.rc': 'resources\\powder-res.rc',
+	'src\\Config.h': 'src\\Config.h',
+	'src\\ToolNumbers.h': 'src\\simulation\\ToolNumbers.h',
+	'src\\ElementNumbers.h': 'src\\simulation\\ElementNumbers.h',
+}.items():
+	filter_record = ElementTree.Element(real_path.endswith('.cpp') and 'ClCompile' or (real_path.endswith('.h') and 'ClInclude' or 'ResourceCompile'))
+	filter_record.attrib['Include'] = real_path
+	filter_record_path = ElementTree.Element('Filter')
+	filter_record_path.text = os.path.dirname(filter_path)
+	filter_record.append(filter_record_path)
+	nones_in_filters.append(filter_record)
+for f in cl_compile:
+	used = ('..\\' + f).replace('/', '\\') in sources_used
+	if used:
+		filter_record = ElementTree.Element('CLCompile')
+		filter_record.attrib['Include'] = '..\\' + f
+		clcompiles_in_filters.append(filter_record)
+	else:
+		extranone = ElementTree.Element('None')
+		extranone.attrib['Include'] = '..\\' + f
+		extra_nones_in_project.append(extranone)
+		filter_record = ElementTree.Element('None')
+		filter_record.attrib['Include'] = '..\\' + f
+		nones_in_filters.append(filter_record)
+	filter_record_path = ElementTree.Element('Filter')
+	filter_record_path.text = os.path.dirname(f)
+	filter_record.append(filter_record_path)
+output_filters.append(clcompiles_in_filters)
+output_filters.append(nones_in_filters)
+output_project.append(extra_nones_in_project)
+
+configured_header = {
+	'..\\src\\Config.template.h': 'src\\Config.h',
+	'..\\src\\simulation\\ToolNumbers.template.h': 'src\\ToolNumbers.h',
+	'..\\src\\simulation\\ElementNumbers.template.h': 'src\\ElementNumbers.h',
+}
+clincludes_in_filters = ElementTree.Element('ItemGroup')
+clincludes_in_project = ElementTree.Element('ItemGroup')
+for f in cl_include:
+	filter_record = ElementTree.Element('ClInclude')
+	cl_include_path = '..\\' + f
+	if cl_include_path in configured_header:
+		cl_include_path = configured_header[cl_include_path]
+	filter_record.attrib['Include'] = cl_include_path
+	clinclude = copy.deepcopy(filter_record)
+	filter_record_path = ElementTree.Element('Filter')
+	filter_record_path.text = os.path.dirname(f)
+	filter_record.append(filter_record_path)
+	clincludes_in_filters.append(filter_record)
+	clincludes_in_project.append(clinclude)
+output_filters.append(clincludes_in_filters)
+output_project.append(clincludes_in_project)
+
+ElementTree.ElementTree(output_project).write(os.path.join('vsproject' , 'powder.vcxproj'), xml_declaration = True, encoding = 'utf-8', method = 'xml')
+
+ElementTree.ElementTree(output_filters).write(os.path.join('vsproject' , 'powder.vcxproj.filters'), xml_declaration = True, encoding = 'utf-8', method = 'xml')
+
+with open(os.path.join('vsproject' , 'the-powder-toy.sln'), 'w') as sln:
+	sln.write("""Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2017
+Project("{{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}}") = "powder", "powder.vcxproj", "{0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Win32 = Debug|Win32
-		Release|Win32 = Release|Win32
-		Static|Win32 = Static|Win32
+		debug|x64 = debug|x64
+		release|x64 = release|x64
+		static|x64 = static|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{57F7954F-6975-4DEE-8C4F-F9B083E05985}.Debug|Win32.ActiveCfg = Debug|Win32
-		{57F7954F-6975-4DEE-8C4F-F9B083E05985}.Debug|Win32.Build.0 = Debug|Win32
-		{57F7954F-6975-4DEE-8C4F-F9B083E05985}.Release|Win32.ActiveCfg = Release|Win32
-		{57F7954F-6975-4DEE-8C4F-F9B083E05985}.Release|Win32.Build.0 = Release|Win32
-		{57F7954F-6975-4DEE-8C4F-F9B083E05985}.Static|Win32.ActiveCfg = Static|Win32
-		{57F7954F-6975-4DEE-8C4F-F9B083E05985}.Static|Win32.Build.0 = Static|Win32
+		{0}.debug|x64.ActiveCfg = debug|x64
+		{0}.debug|x64.Build.0 = debug|x64
+		{0}.release|x64.ActiveCfg = release|x64
+		{0}.release|x64.Build.0 = release|x64
+		{0}.static|x64.ActiveCfg = static|x64
+		{0}.static|x64.Build.0 = static|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
-""")
-sln.close()
+""".format(output_project.find('./PropertyGroup[@Label=\'Globals\']/ProjectGuid', namespaces = NAMESPACES).text))
 
-vcxproj = open("The-Powder-Toy.vcxproj", 'w')
-vcxproj.write(r"""<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Static|Win32">
-      <Configuration>Static</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <ProjectGuid>{57F7954F-6975-4DEE-8C4F-F9B083E05985}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Static|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Static|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)Build\</OutDir>
-    <TargetName>Powder</TargetName>
-    <IncludePath>$(ProjectDir)includes;$(ProjectDir)includes/SDL2;$(ProjectDir)includes/luajit-2.0;$(ProjectDir)data;$(ProjectDir)src;$(ProjectDir)resources;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)Libraries;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)Build\</OutDir>
-    <TargetName>Powder</TargetName>
-    <IncludePath>$(ProjectDir)includes;$(ProjectDir)includes/SDL2;$(ProjectDir)includes/luajit-2.0;$(ProjectDir)data;$(ProjectDir)src;$(ProjectDir)resources;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)Libraries;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Static|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)Build\</OutDir>
-    <TargetName>Powder</TargetName>
-    <IncludePath>$(ProjectDir)includes;$(ProjectDir)includes/SDL2;$(ProjectDir)includes/luajit-2.0;$(ProjectDir)data;$(ProjectDir)src;$(ProjectDir)resources;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)Staticlibs;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN;X86;X86_SSE2;USE_SDL;STABLE;GRAVFFT;LUACONSOLE;_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <WarningLevel>Level1</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <Optimization>Disabled</Optimization>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <ObjectFileName>$(IntDir)\%(RelativeDir)</ObjectFileName>
-    </ClCompile>
-    <Link>
-      <TargetMachine>MachineX86</TargetMachine>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;shell32.lib;libbz2.lib;pthreadVC2.lib;luajit2.0.lib;libfftw3f-3.lib;zlib.lib;libcurl.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN;X86;X86_SSE2;USE_SDL;STABLE;GRAVFFT;LUACONSOLE;_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <WarningLevel>Level1</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <ObjectFileName>$(IntDir)\%(RelativeDir)</ObjectFileName>
-    </ClCompile>
-    <Link>
-      <TargetMachine>MachineX86</TargetMachine>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;shell32.lib;libbz2.lib;pthreadVC2.lib;luajit2.0.lib;libfftw3f-3.lib;zlib.lib;libcurl.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Static|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN;X86;X86_SSE2;USE_SDL;STABLE;GRAVFFT;LUACONSOLE;ZLIB_WINAPI;_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;PTW32_STATIC_LIB;CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <WarningLevel>Level1</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <ObjectFileName>$(IntDir)\%(RelativeDir)</ObjectFileName>
-    </ClCompile>
-    <Link>
-      <TargetMachine>MachineX86</TargetMachine>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;shell32.lib;libbz2.lib;pthreadVC2.lib;luajit2.0.lib;libfftw3f-3.lib;zlib.lib;libcurl.lib;ws2_32.lib;Wldap32.lib;crypt32.lib;winmm.lib;dxguid.lib;imm32.lib;version.lib;SetupApi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <IgnoreSpecificDefaultLibraries>
-      </IgnoreSpecificDefaultLibraries>
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="data\font.cpp" />
-    <ClCompile Include="data\hmap.cpp" />
-    <ClCompile Include="data\icon.cpp" />
-    <ClCompile Include="data\images.cpp" />
-    """)
-vcxproj.write('\n    '.join([('<ClCompile Include="' + p + '" />') for p in cl_compile]))
-vcxproj.write(r"""
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="data\font.h" />
-    <ClInclude Include="data\hmap.h" />
-    <ClInclude Include="data\icon.h" />
-    <ClInclude Include="data\icondoc.h" />
-    <ClInclude Include="data\images.h" />
-    <ClInclude Include="data\IntroText.h" />
-    <ClInclude Include="data\Shaders.h" />
-    <ClInclude Include="resources\resource.h" />
-    """)
-vcxproj.write('\n    '.join([('<ClInclude Include="' + p + '" />') for p in cl_include]))
-vcxproj.write(r"""
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="resources\powder-res.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="vsproject.py" />
-    <None Include="README.md" />
-    <None Include="SConscript" />
-    <None Include="SConstruct" />
-    <None Include="src\graphics\DrawMethodsDef.inc" />
-    <None Include="src\graphics\OpenGLDrawMethods.inl" />
-    <None Include="src\graphics\RasterDrawMethods.inl" />
-    <None Include="src\lua\socket\socket.lua" />
-    <None Include="src\SDLMain.m" />
-  </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
-</Project>
-""")
-vcxproj.close()
+config_h = os.path.join('vsproject', 'src', 'Config.h')
+with open(config_h) as config:
+	config_str = config.read()
+for nuke in [ 'CURL_STATICLIB', 'ZLIB_WINAPI', 'DEBUG', 'IGNORE_UPDATES', 'NO_INSTALL_CHECK' ]:
+	config_str = config_str.replace('#undef {0}'.format(nuke), '')
+with open(config_h, 'w') as config:
+	config.write(config_str)
 
-filters = open("The-Powder-Toy.vcxproj.filters", 'w')
-filters.write(r"""<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup>
-    <Filter Include="src">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="resources">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
-    </Filter>
-    <Filter Include="data">
-      <UniqueIdentifier>{fc5911e1-d5ba-4da3-9cfa-5631c6914487}</UniqueIdentifier>
-    </Filter>
-    """)
-filters.write('\n    '.join([('<Filter Include="' + p + '">\n      <UniqueIdentifier>{' + str(uuid.uuid4()) + '}</UniqueIdentifier>\n    </Filter>') for p in source_dirs]))
-filters.write(r"""
-  </ItemGroup>
-  <ItemGroup>
-    """)
-filters.write('\n    '.join([('<ClCompile Include="' + p + '">\n      <Filter>' + os.path.dirname(p) + '</Filter>\n    </ClCompile>') for p in cl_compile]))
-filters.write(r"""
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\simulation\elements\Element.h">
-      <Filter>src\simulation</Filter>
-    </ClInclude>
-    <ClInclude Include="data\font.h">
-      <Filter>data</Filter>
-    </ClInclude>
-    <ClInclude Include="data\hmap.h">
-      <Filter>data</Filter>
-    </ClInclude>
-    <ClInclude Include="data\icon.h">
-      <Filter>data</Filter>
-    </ClInclude>
-    <ClInclude Include="data\icondoc.h">
-      <Filter>data</Filter>
-    </ClInclude>
-    <ClInclude Include="data\images.h">
-      <Filter>data</Filter>
-    </ClInclude>
-    <ClInclude Include="data\IntroText.h">
-      <Filter>data</Filter>
-    </ClInclude>
-    <ClInclude Include="data\Shaders.h">
-      <Filter>data</Filter>
-    </ClInclude>
-    """)
-filters.write('\n    '.join([('<ClInclude Include="' + p + '">\n      <Filter>' + os.path.dirname(p) + '</Filter>\n    </ClInclude>') for p in cl_include]))
-filters.write(r"""
-    <ClInclude Include="resources\resource.h">
-      <Filter>resources</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="resources\powder-res.rc">
-      <Filter>resources</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\graphics\DrawMethodsDef.inc">
-      <Filter>src\graphics</Filter>
-    </None>
-    <None Include="src\graphics\OpenGLDrawMethods.inl">
-      <Filter>src\graphics</Filter>
-    </None>
-    <None Include="src\graphics\RasterDrawMethods.inl">
-      <Filter>src\graphics</Filter>
-    </None>
-    <None Include="vsproject.py" />
-    <None Include="SConstruct" />
-    <None Include="SConscript" />
-    <None Include="README.md" />
-    <None Include="src\SDLMain.m" />
-	<None Include="src\lua\socket\socket.lua">
-      <Filter>src\lua\socket</Filter>
-    </None>
-  </ItemGroup>
-</Project>
+with open(os.path.join('vsproject', '.gitignore'), 'w') as ign:
+	ign.write(""".vs/
+build/
+*.vcxproj.user
 """)
-filters.close()
+
+shutil.rmtree('vsproject-temp-debug')
+shutil.rmtree('vsproject-temp-release')
+shutil.rmtree('vsproject-temp-static')

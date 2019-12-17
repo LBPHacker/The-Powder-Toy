@@ -5,15 +5,17 @@
 #include <climits>
 #include <memory>
 #include <set>
-#include <bzlib.h>
 #include <cmath>
 
+#include "bzip2/bzlib.h"
 #include "Config.h"
 #include "Format.h"
 #include "hmap.h"
 
 #include "simulation/Simulation.h"
 #include "simulation/ElementClasses.h"
+
+#include "common/tpt-minmax.h"
 
 GameSave::GameSave(GameSave & save):
     majorVersion(save.majorVersion),
