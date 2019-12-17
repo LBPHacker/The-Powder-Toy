@@ -1,6 +1,6 @@
-#ifndef RENDERER
-
+#include "Config.h"
 #include "common/tpt-minmax.h"
+
 #include <map>
 #include <ctime>
 #include <climits>
@@ -28,8 +28,8 @@
 #include <unistd.h>
 #endif
 #ifdef MACOSX
-#include <CoreServices/CoreServices.h>
-#include <sys/stat.h>
+# include "common/macosx.h"
+# include "MacUtils.hh"
 #endif
 
 #include "Format.h"
@@ -44,7 +44,6 @@
 
 #include "gui/game/GameController.h"
 #include "gui/game/GameView.h"
-#include "gui/font/FontEditor.h"
 #include "gui/dialogues/ErrorMessage.h"
 #include "gui/dialogues/ConfirmPrompt.h"
 #include "gui/interface/Keys.h"
@@ -288,12 +287,17 @@ std::map<ByteString, ByteString> readArguments(int argc, char * argv[])
 	arguments["open"] = "";
 	arguments["ddir"] = "";
 	arguments["ptsave"] = "";
+	arguments["font"] = "";
 
 	for (int i=1; i<argc; i++)
 	{
 		if (!strncmp(argv[i], "scale:", 6) && argv[i]+6)
 		{
 			arguments["scale"] = argv[i]+6;
+		}
+		if (!strncmp(argv[i], "font:", 5) && argv[i]+5)
+		{
+			arguments["font"] = argv[i]+5;
 		}
 		else if (!strncmp(argv[i], "proxy:", 6))
 		{
@@ -620,17 +624,7 @@ void SigHandler(int signal)
 void ChdirToDataDirectory()
 {
 #ifdef MACOSX
-	FSRef ref;
-	OSType folderType = kApplicationSupportFolderType;
-	char path[PATH_MAX];
-
-	FSFindFolder( kUserDomain, folderType, kCreateFolder, &ref );
-
-	FSRefMakePath( &ref, (UInt8*)&path, PATH_MAX );
-
-	std::string tptPath = std::string(path) + "/The Powder Toy";
-	mkdir(tptPath.c_str(), 0755);
-	chdir(tptPath.c_str());
+	MacUtils_ChdirToDataDirectory();
 #endif
 }
 
@@ -783,7 +777,6 @@ int main(int argc, char * argv[])
 	try {
 #endif
 
-#ifndef FONTEDITOR
 		gameController = new GameController();
 		engine->ShowWindow(gameController->GetView());
 
@@ -871,28 +864,8 @@ int main(int argc, char * argv[])
 			}
 		}
 
-#else // FONTEDITOR
-		if(argc <= 1)
-			throw std::runtime_error("Usage: \n"
-				"    Edit the font:\n"
-				"        " + ByteString(argv[0]) + " ./data/font.cpp\n"
-				"    Copy characters from source to target:\n"
-				"        " + ByteString(argv[0]) + " <target/font.cpp> <source/font.cpp>\n");
-		if(argc <= 2)
-		{
-			engine->ShowWindow(new FontEditor(argv[1]));
-			EngineProcess();
-			SaveWindowPosition();
-		}
-		else
-		{
-			FontEditor(argv[1], argv[2]);
-		}
-#endif
-#ifndef FONTEDITOR
 		EngineProcess();
 		SaveWindowPosition();
-#endif
 
 #if !defined(DEBUG) && !defined(_DEBUG)
 	}
@@ -909,5 +882,3 @@ int main(int argc, char * argv[])
 	Client::Ref().Shutdown();
 	return 0;
 }
-
-#endif

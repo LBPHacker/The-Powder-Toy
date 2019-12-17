@@ -4,6 +4,7 @@
 #include "OptionsModel.h"
 
 #include <cstdio>
+#include <cstring>
 #ifdef WIN
 #include <direct.h>
 #define getcwd _getcwd
@@ -293,7 +294,7 @@ OptionsView::OptionsView():
 //one of these should always be defined
 #ifdef WIN
 		const char* openCommand = "explorer ";
-#elif MACOSX
+#elif defined(MACOSX)
 		const char* openCommand = "open ";
 //#elif LIN
 #else

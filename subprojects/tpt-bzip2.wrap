@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-bzip2
+
+source_url = https://trigraph.net/powdertoy/tpt-bzip2.zip
+source_filename = tpt-bzip2.zip
+source_hash = 1135eba51e21cbdeff03e36f7a3cb4f821f9826c4b059ed654769fa6461991c1

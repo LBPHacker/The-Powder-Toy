@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-win32-static
+
+source_url = https://trigraph.net/powdertoy/tpt-libs-prebuilt-win32-static.zip
+source_filename = tpt-libs-prebuilt-win32-static.zip
+source_hash = b1d00efcfaf9ca1a12a507558f671296f34395a27464d8b1c609c51ac8140c5a

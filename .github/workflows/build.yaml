@@ -1,0 +1,33 @@
+name: build
+
+on:
+  push:
+    branches: [meson]
+  pull_request:
+    branches: [meson]
+  release:
+    types: [published, created, edited]
+
+jobs:
+  build-lin:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      CXX: g++
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - run: python -m pip install meson ninja
+      - run: meson -Dbuildtype=release -Dstatic=prebuilt build
+      - run: cd build && ninja
+  build-win:
+    runs-on: windows-latest
+    env:
+      CC: cl # meson finds some random gcc otherwise :/
+      CXX: cl # meson finds some random gcc otherwise :/
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - run: python -m pip install meson ninja
+      - run: .\build-win-meson.bat # we have to call vcvarsall.bat :/
+      - run: .\build-win-ninja.bat # we have to call vcvarsall.bat :/
