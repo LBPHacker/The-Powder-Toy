@@ -51,6 +51,8 @@
 #include "gui/Style.h"
 #include "gui/interface/Engine.h"
 
+#include "graphics/FontReader.h"
+
 #define INCLUDE_SYSWM
 #include "SDLCompat.h"
 
@@ -660,6 +662,7 @@ int main(int argc, char * argv[])
 	currentWidth = WINDOWW;
 	currentHeight = WINDOWH;
 
+	FontReader::MergeExternal("automerge.bdf");
 
 	std::map<ByteString, ByteString> arguments = readArguments(argc, argv);
 

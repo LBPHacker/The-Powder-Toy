@@ -57,4 +57,6 @@ public:
 		data >>= 2;
 		return old & 0x3;
 	}
+
+	static bool MergeExternal(ByteString path);
 };
