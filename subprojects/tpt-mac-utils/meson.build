@@ -1,4 +1,4 @@
-project('tpt-mac-utils', [ 'c', 'objcpp' ])
+project('tpt-mac-utils', [ 'c', 'objc' ])
 
 subdir('src')
 

@@ -25,9 +25,11 @@
 #include <stdexcept>
 
 #ifndef WIN
-#include <unistd.h>
+# include <unistd.h>
 #endif
 #ifdef MACOSX
+# include <sys/stat.h>
+# include <unistd.h>
 # include "common/macosx.h"
 # include "MacUtils.hh"
 #endif
@@ -624,7 +626,9 @@ void SigHandler(int signal)
 void ChdirToDataDirectory()
 {
 #ifdef MACOSX
-	MacUtils_ChdirToDataDirectory();
+	auto tptPath = MacUtils_GetDataDirectory() + std::string("/The Powder Toy");
+	mkdir(tptPath.c_str(), 0755);
+	chdir(tptPath.c_str());
 #endif
 }
 
