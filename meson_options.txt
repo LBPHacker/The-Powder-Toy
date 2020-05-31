@@ -1,7 +1,7 @@
 option('static', type: 'combo', choices: [ 'none', 'system', 'prebuilt' ], value: 'none', description: 'Build statically using libraries present on the system (\'system\') or using prebuilt libraries official builds use (\'prebuilt\')')
 option('beta', type: 'boolean', value: false, description: 'Beta build')
 option('ignore_updates', type: 'boolean', value: true, description: 'Don\'t show notifications about available updates')
-option('install_check', type: 'boolean', value: true, description: 'Do install check on startup')
+option('install_check', type: 'boolean', value: false, description: 'Do install check on startup')
 option('http', type: 'boolean', value: true, description: 'Enable HTTP (libcurl)')
 option('gravfft', type: 'boolean', value: true, description: 'Enable FFT gravity (libfftw3)')
 option('snapshot', type: 'boolean', value: false, description: 'Snapshot build')

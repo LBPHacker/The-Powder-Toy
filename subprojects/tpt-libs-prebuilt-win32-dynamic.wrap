@@ -1,6 +1,0 @@
-[wrap-file]
-directory = tpt-libs-prebuilt-win32-dynamic
-
-source_url = https://trigraph.net/powdertoy/tpt-libs-prebuilt-win32-dynamic.zip
-source_filename = tpt-libs-prebuilt-win32-dynamic.zip
-source_hash = cd071b5fb183d6c31ebeab732125a25ccf480d6828347ba1dd7354289f682489

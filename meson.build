@@ -1,4 +1,4 @@
-project('the-powder-toy', [ 'c', 'cpp' ], version: '95.0.345', default_options: [
+project('the-powder-toy', [ 'c', 'cpp' ], version: 'the.cake.is.a.lie', default_options: [
 	'cpp_std=c++11'
 ])
 
