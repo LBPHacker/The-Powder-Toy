@@ -3,9 +3,7 @@
 #include "Config.h"
 
 #include "common/String.h"
-#if defined(OGLI)
-#include "OpenGLHeaders.h"
-#endif
+#include "Config.h"
 #include "common/tpt-inline.h"
 #include "Pixel.h"
 #include "Icons.h"
@@ -92,14 +90,6 @@ class Graphics
 public:
 	pixel *vid;
 	int sdl_scale;
-#ifdef OGLI
-	//OpenGL specific instance variables
-	GLuint vidBuf, textTexture;
-	void Reset();
-	void LoadDefaults();
-	void InitialiseTextures();
-	void DestroyTextures();
- #endif
 
 	//Common graphics methods in Graphics.cpp
 	static char * GenerateGradient(pixel * colours, float * points, int pointcount, int size);

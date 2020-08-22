@@ -18,10 +18,12 @@ protected:
 	AnyType tptS_bubble(std::deque<String> * words);
 	AnyType tptS_quit(std::deque<String> * words);
 	ValueType testType(String word);
+	bool closeConsole;
 public:
-	TPTScriptInterface(GameController * c, GameModel * m);
-	int Command(String command) override;
-	String FormatCommand(String command) override;
+	using CommandInterface::CommandInterface;
+	
+	CommandInterface::CommandResult Execute(const String &command) override;
+	String FormatCommand(const String &command) override;
 	virtual ~TPTScriptInterface();
 };
 

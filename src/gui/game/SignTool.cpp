@@ -164,13 +164,17 @@ void SignWindow::DoDraw()
 {
 	for (auto &currentSign : sim->signs)
 	{
-		int x, y, w, h, dx, dy;
+		int dx, dy;
 		Graphics * g = GetGraphics();
 
-		String text = currentSign.getDisplayText(sim, x, y, w, h);
+		auto info = currentSign.GetInfo(sim);
+		int x = info.x;
+		int y = info.y;
+		int w = info.w;
+		int h = info.h;
 		g->clearrect(x, y, w+1, h);
 		g->drawrect(x, y, w+1, h, 192, 192, 192, 255);
-		g->drawtext(x+3, y+4, text, 255, 255, 255, 255);
+		g->drawtext(x+3, y+4, info.text, 255, 255, 255, 255);
 
 		if (currentSign.ju != sign::None)
 		{
@@ -178,20 +182,12 @@ void SignWindow::DoDraw()
 			y = currentSign.y;
 			dx = 1 - currentSign.ju;
 			dy = (currentSign.y > 18) ? -1 : 1;
-#ifdef OGLR
-			glBegin(GL_LINES);
-			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			glVertex2i(x, y);
-			glVertex2i(x+(dx*4), y+(dy*4));
-			glEnd();
-#else
 			for (int j=0; j<4; j++)
 			{
 				g->blendpixel(x, y, 192, 192, 192, 255);
 				x+=dx;
 				y+=dy;
 			}
-#endif
 		}
 	}
 	if(!signMoving)
@@ -252,11 +248,11 @@ VideoBuffer * SignTool::GetIcon(int toolID, int width, int height)
 
 void SignTool::Click(Simulation * sim, Brush * brush, ui::Point position)
 {
-	int signX, signY, signW, signH, signIndex = -1;
+	int signIndex = -1;
 	for (size_t i = 0; i < sim->signs.size(); i++)
 	{
-		sim->signs[i].getDisplayText(sim, signX, signY, signW, signH);
-		if (position.X > signX && position.X < signX+signW && position.Y > signY && position.Y < signY+signH)
+		auto info = sim->signs[i].GetInfo(sim);
+		if (position.X > info.x && position.X < info.x+info.w && position.Y > info.y && position.Y < info.y+info.h)
 		{
 			signIndex = i;
 			break;

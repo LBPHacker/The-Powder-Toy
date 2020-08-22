@@ -1035,6 +1035,7 @@ void Simulation::SetEdgeMode(int newEdgeMode)
 }
 
 #ifndef RENDERER
+// * TODO-REDO_UI: get rid of this
 void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, int colA_, int mode)
 {
 	int rp;
@@ -1206,6 +1207,7 @@ void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, 
 	parts[ID(rp)].dcolour = ((colA_<<24)|(colR_<<16)|(colG_<<8)|colB_);
 }
 
+// * TODO-REDO_UI: get rid of this
 void Simulation::ApplyDecorationPoint(int positionX, int positionY, int colR, int colG, int colB, int colA, int mode, Brush * cBrush)
 {
 	if(cBrush)
@@ -1226,6 +1228,7 @@ void Simulation::ApplyDecorationPoint(int positionX, int positionY, int colR, in
 	}
 }
 
+// * TODO-REDO_UI: get rid of this
 void Simulation::ApplyDecorationLine(int x1, int y1, int x2, int y2, int colR, int colG, int colB, int colA, int mode, Brush * cBrush)
 {
 	bool reverseXY = abs(y2-y1) > abs(x2-x1);
@@ -1286,6 +1289,7 @@ void Simulation::ApplyDecorationLine(int x1, int y1, int x2, int y2, int colR, i
 	}
 }
 
+// * TODO-REDO_UI: get rid of this
 void Simulation::ApplyDecorationBox(int x1, int y1, int x2, int y2, int colR, int colG, int colB, int colA, int mode)
 {
 	int i, j;
@@ -1307,6 +1311,7 @@ void Simulation::ApplyDecorationBox(int x1, int y1, int x2, int y2, int colR, in
 			ApplyDecoration(i, j, colR, colG, colB, colA, mode);
 }
 
+// * TODO-REDO_UI: get rid of this
 bool Simulation::ColorCompare(Renderer *ren, int x, int y, int replaceR, int replaceG, int replaceB)
 {
 	pixel pix = ren->vid[x+y*WINDOWW];
@@ -1317,6 +1322,7 @@ bool Simulation::ColorCompare(Renderer *ren, int x, int y, int replaceR, int rep
 	return diff < 15;
 }
 
+// * TODO-REDO_UI: get rid of this
 void Simulation::ApplyDecorationFill(Renderer *ren, int x, int y, int colR, int colG, int colB, int colA, int replaceR, int replaceG, int replaceB)
 {
 	int x1, x2;
@@ -1386,6 +1392,7 @@ void Simulation::ApplyDecorationFill(Renderer *ren, int x, int y, int colR, int 
 }
 #endif
 
+// * TODO-REDO_UI: get rid of this
 int Simulation::Tool(int x, int y, int tool, int brushX, int brushY, float strength)
 {
 	Particle * cpart = NULL;
@@ -1398,6 +1405,7 @@ int Simulation::Tool(int x, int y, int tool, int brushX, int brushY, float stren
 }
 
 #ifndef RENDERER
+// * TODO-REDO_UI: get rid of this
 int Simulation::ToolBrush(int positionX, int positionY, int tool, Brush * cBrush, float strength)
 {
 	if(cBrush)
@@ -1412,6 +1420,7 @@ int Simulation::ToolBrush(int positionX, int positionY, int tool, Brush * cBrush
 	return 0;
 }
 
+// * TODO-REDO_UI: get rid of this
 void Simulation::ToolLine(int x1, int y1, int x2, int y2, int tool, Brush * cBrush, float strength)
 {
 	bool reverseXY = abs(y2-y1) > abs(x2-x1);
@@ -1464,6 +1473,7 @@ void Simulation::ToolLine(int x1, int y1, int x2, int y2, int tool, Brush * cBru
 		}
 	}
 }
+// * TODO-REDO_UI: get rid of this
 void Simulation::ToolBox(int x1, int y1, int x2, int y2, int tool, float strength)
 {
 	int brushX, brushY;
@@ -1488,6 +1498,7 @@ void Simulation::ToolBox(int x1, int y1, int x2, int y2, int tool, float strengt
 }
 #endif
 
+// * TODO-REDO_UI: get rid of this
 int Simulation::CreateWalls(int x, int y, int rx, int ry, int wall, Brush * cBrush)
 {
 	if(cBrush)
@@ -1548,6 +1559,7 @@ int Simulation::CreateWalls(int x, int y, int rx, int ry, int wall, Brush * cBru
 	return 1;
 }
 
+// * TODO-REDO_UI: get rid of this
 void Simulation::CreateWallLine(int x1, int y1, int x2, int y2, int rx, int ry, int wall, Brush * cBrush)
 {
 	int x, y, dx, dy, sy;
@@ -1601,6 +1613,7 @@ void Simulation::CreateWallLine(int x1, int y1, int x2, int y2, int rx, int ry, 
 	}
 }
 
+// * TODO-REDO_UI: get rid of this
 void Simulation::CreateWallBox(int x1, int y1, int x2, int y2, int wall)
 {
 	int i, j;
@@ -1621,6 +1634,7 @@ void Simulation::CreateWallBox(int x1, int y1, int x2, int y2, int wall)
 			CreateWalls(i, j, 0, 0, wall, NULL);
 }
 
+// * TODO-REDO_UI: get rid of this
 int Simulation::FloodWalls(int x, int y, int wall, int bm)
 {
 	int x1, x2, dy = CELL;
@@ -1679,6 +1693,7 @@ int Simulation::FloodWalls(int x, int y, int wall, int bm)
 }
 
 #ifndef RENDERER
+// * TODO-REDO_UI: get rid of this
 int Simulation::CreateParts(int positionX, int positionY, int c, Brush * cBrush, int flags)
 {
 	if (flags == -1)
@@ -1722,6 +1737,7 @@ int Simulation::CreateParts(int positionX, int positionY, int c, Brush * cBrush,
 	return 0;
 }
 
+// * TODO-REDO_UI: get rid of this
 int Simulation::CreateParts(int x, int y, int rx, int ry, int c, int flags)
 {
 	bool created = false;
@@ -1756,6 +1772,7 @@ int Simulation::CreateParts(int x, int y, int rx, int ry, int c, int flags)
 	return !created;
 }
 
+// * TODO-REDO_UI: get rid of this
 void Simulation::CreateLine(int x1, int y1, int x2, int y2, int c, Brush * cBrush, int flags)
 {
 	int x, y, dx, dy, sy, rx = cBrush->GetRadius().X, ry = cBrush->GetRadius().Y;
@@ -1810,6 +1827,7 @@ void Simulation::CreateLine(int x1, int y1, int x2, int y2, int c, Brush * cBrus
 }
 #endif
 
+// * TODO-REDO_UI: get rid of this
 int Simulation::CreatePartFlags(int x, int y, int c, int flags)
 {
 	if (x < 0 || y < 0 || x >= XRES || y >= YRES)
@@ -1865,6 +1883,7 @@ int Simulation::CreatePartFlags(int x, int y, int c, int flags)
 }
 
 //Now simply creates a 0 pixel radius line without all the complicated flags / other checks
+// * TODO-REDO_UI: get rid of this
 void Simulation::CreateLine(int x1, int y1, int x2, int y2, int c)
 {
 	bool reverseXY = abs(y2-y1) > abs(x2-x1);
@@ -1922,6 +1941,7 @@ void Simulation::CreateLine(int x1, int y1, int x2, int y2, int c)
 }
 
 #ifndef RENDERER
+// * TODO-REDO_UI: get rid of this
 void Simulation::CreateBox(int x1, int y1, int x2, int y2, int c, int flags)
 {
 	int i, j;
@@ -1942,6 +1962,7 @@ void Simulation::CreateBox(int x1, int y1, int x2, int y2, int c, int flags)
 			CreateParts(i, j, 0, 0, c, flags);
 }
 
+// * TODO-REDO_UI: get rid of this
 int Simulation::FloodParts(int x, int y, int fullc, int cm, int flags)
 {
 	int c = TYP(fullc);
@@ -2647,7 +2668,7 @@ int Simulation::try_move(int i, int x, int y, int nx, int ny)
 		return 0;
 	}
 
-	int Element_FILT_interactWavelengths(Particle* cpart, int origWl);
+	int Element_FILT_interactWavelengths(const Particle *cpart, int origWl);
 	if (e == 2) //if occupy same space
 	{
 		switch (parts[i].type)
@@ -5350,7 +5371,7 @@ void Simulation::SetCustomGOL(std::vector<CustomGOLData> newCustomGol)
 	customGol = newCustomGol;
 }
 
-String Simulation::ElementResolve(int type, int ctype)
+String Simulation::ElementResolve(int type, int ctype) const
 {
 	if (type == PT_LIFE)
 	{
@@ -5370,7 +5391,7 @@ String Simulation::ElementResolve(int type, int ctype)
 	return "Empty";
 }
 
-String Simulation::BasicParticleInfo(Particle const &sample_part)
+String Simulation::BasicParticleInfo(Particle const &sample_part) const
 {
 	StringBuilder sampleInfo;
 	int type = sample_part.type;

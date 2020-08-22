@@ -8,19 +8,20 @@
 #include <sys/stat.h>
 
 #ifdef WIN
-#define NOMINMAX
-#include <direct.h>
-#include <io.h>
-#include <shlobj.h>
-#include <shlwapi.h>
-#include <windows.h>
+# define NOMINMAX
+# include <io.h>
+# include <shlobj.h>
+# include <shlwapi.h>
+# include <windows.h>
+# include <direct.h>
+# define getcwd _getcwd
 #else
-#include <unistd.h>
-#include <ctime>
-#include <sys/time.h>
+# include <unistd.h>
+# include <ctime>
+# include <sys/time.h>
 #endif
 #ifdef MACOSX
-#include <mach-o/dyld.h>
+# include <mach-o/dyld.h>
 #endif
 
 #include "Misc.h"
@@ -110,7 +111,7 @@ void DoRestart()
 		else
 		{
 #if !defined(RENDERER) && !defined(FONTEDITOR)
-			Client::Ref().Shutdown(); // very ugly hack; will fix soon(tm)
+			// Client::Ref().Shutdown(); // very ugly hack; will fix soon(tm)
 #endif
 			exit(0);
 		}
@@ -364,7 +365,7 @@ ByteString WinNarrow(const std::wstring &source)
 	{
 		return "";
 	}
-	std::string output(buffer_size, 0);
+	ByteString output(buffer_size, 0);
 	if (!WideCharToMultiByte(CP_UTF8, 0, source.c_str(), source.size(), &output[0], buffer_size, NULL, NULL))
 	{
 		return "";
@@ -387,6 +388,19 @@ std::wstring WinWiden(const ByteString &source)
 	return output;
 }
 #endif
+
+void OpenDataFolder()
+{
+	auto *cwd = getcwd(NULL, 0);
+	if (cwd)
+	{
+		Platform::OpenURI(cwd);
+	}
+	else
+	{
+		fprintf(stderr, "cannot open data folder: getcwd(...) failed\n");
+	}
+}
 
 }
 

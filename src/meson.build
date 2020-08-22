@@ -2,13 +2,14 @@ config_template = files('Config.template.h')
 subdir('config')
 
 powder_files = files(
+	'GameMain.cpp',
+	'PowderToySDL.cpp',
 	'SDLCompat.cpp',
 	'Update.cpp',
-	'PowderToySDL.cpp',
 	'lua/CommandInterface.cpp',
-	'lua/LuaEvents.cpp',
 	'lua/TPTScriptInterface.cpp',
 	'lua/TPTSTypes.cpp',
+	'lua/LuaEvents.cpp',
 )
 
 render_files = files(
@@ -25,6 +26,7 @@ common_files = files(
 	'Probability.cpp',
 )
 
+subdir('activities')
 subdir('bson')
 subdir('bzip2')
 subdir('client')

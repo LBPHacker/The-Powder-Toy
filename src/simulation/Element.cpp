@@ -216,12 +216,12 @@ int Element::defaultGraphics(GRAPHICS_FUNC_ARGS)
 {
 	int t = cpart->type;
 	//Property based defaults
-	if(ren->sim->elements[t].Properties & PROP_RADIOACTIVE) *pixel_mode |= PMODE_GLOW;
-	if(ren->sim->elements[t].Properties & TYPE_LIQUID)
+	if(sim->elements[t].Properties & PROP_RADIOACTIVE) *pixel_mode |= PMODE_GLOW;
+	if(sim->elements[t].Properties & TYPE_LIQUID)
 	{
 		*pixel_mode |= PMODE_BLUR;
 	}
-	if(ren->sim->elements[t].Properties & TYPE_GAS)
+	if(sim->elements[t].Properties & TYPE_GAS)
 	{
 		*pixel_mode &= ~PMODE;
 		*pixel_mode |= FIRE_BLEND;

@@ -10,16 +10,23 @@ class GameModel;
 class GameController;
 class Tool;
 
+namespace activities
+{
+namespace game
+{
+	class Game;
+}
+}
+
 class CommandInterface
 {
 protected:
 	String lastError;
-	GameModel * m;
-	GameController * c;
+	activities::game::Game *game;
 public:
 	enum LogType { LogError, LogWarning, LogNotice };
 	enum FormatType { FormatInt, FormatString, FormatChar, FormatFloat, FormatElement };
-	CommandInterface(GameController * c, GameModel * m);
+	CommandInterface(activities::game::Game *game);
 	int GetPropertyOffset(ByteString key, FormatType & format);
 	void Log(LogType type, String message);
 	//void AttachGameModel(GameModel * m);
@@ -28,8 +35,18 @@ public:
 
 	virtual bool HandleEvent(LuaEvents::EventTypes eventType, Event * event) { return true; }
 
-	virtual int Command(String command);
-	virtual String FormatCommand(String command);
+	enum CommandResult
+	{
+		commandOk,
+		commandOkCloseConsole,
+		commandNoInterpreter,
+		commandWantMore,
+		commandSyntaxError,
+		commandRuntimeError,
+	};
+	virtual CommandResult Validate(const String &command);
+	virtual CommandResult Execute(const String &command);
+	virtual String FormatCommand(const String &command);
 	void SetLastError(String err)
 	{
 		lastError = err;

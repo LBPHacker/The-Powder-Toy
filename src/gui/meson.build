@@ -1,5 +1,20 @@
 gui_files = files(
+	'Button.cpp',
+	'ButtonMenu.cpp',
+	'CheckBox.cpp',
+	'Component.cpp',
+	'DropDown.cpp',
+	'LinearDelayAnimation.cpp',
+	'ModalWindow.cpp',
+	'MomentumAnimation.cpp',
+	'PopupWindow.cpp',
+	'ScrollPanel.cpp',
+	'SDLWindow.cpp',
+	'Separator.cpp',
+	'Static.cpp',
 	'Style.cpp',
+	'TextBox.cpp',
+	'TextWrapper.cpp',
 )
 
 subdir('colourpicker')

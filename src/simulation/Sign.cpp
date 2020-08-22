@@ -11,20 +11,21 @@ sign::sign(String text_, int x_, int y_, Justification justification_):
 {
 }
 
-String sign::getDisplayText(Simulation *sim, int &x0, int &y0, int &w, int &h, bool colorize, bool *v95)
+sign::Info sign::GetInfo(const Simulation *sim) const
 {
-	String drawable_text;
+	Info info;
+	info.v95 = false;
 	auto si = std::make_pair(0, Type::Normal);
 	if (text.find('{') == text.npos)
 	{
-		drawable_text = text;
+		info.text = text;
 	}
 	else
 	{
 		si = split();
 		if (si.first)
 		{
-			drawable_text = text.Between(si.first + 1, text.size() - 1);
+			info.text = text.Between(si.first + 1, text.size() - 1);
 		}
 		else
 		{
@@ -62,50 +63,42 @@ String sign::getDisplayText(Simulation *sim, int &x0, int &y0, int &w, int &h, b
 						//   keyword "temp" or if the text was more than just "{t}", but 95.0
 						//   upgrades such signs at load time anyway.
 						// * The same applies to "{p}" and "{aheat}" signs.
-						if (v95)
-							*v95 = true;
+						info.v95 = true;
 					}
 					else if (between_curlies == "p" || between_curlies == "pres")
 					{
 						formatted_text << Format::Precision(Format::ShowPoint(pressure), 2);
-						if (v95)
-							*v95 = true;
+						info.v95 = true;
 					}
 					else if (between_curlies == "a" || between_curlies == "aheat")
 					{
 						formatted_text << Format::Precision(Format::ShowPoint(aheat), 2);
-						if (v95)
-							*v95 = true;
+						info.v95 = true;
 					}
 					else if (between_curlies == "type")
 					{
 						formatted_text << (part ? sim->BasicParticleInfo(*part) : (formatted_text.Size() ? String::Build("empty") : String::Build("Empty")));
-						if (v95)
-							*v95 = true;
+						info.v95 = true;
 					}
 					else if (between_curlies == "ctype")
 					{
 						formatted_text << (part ? (sim->IsElementOrNone(part->ctype) ? sim->ElementResolve(part->ctype, -1) : String::Build(part->ctype)) : (formatted_text.Size() ? String::Build("empty") : String::Build("Empty")));
-						if (v95)
-							*v95 = true;
+						info.v95 = true;
 					}
 					else if (between_curlies == "life")
 					{
 						formatted_text << (part ? part->life : 0);
-						if (v95)
-							*v95 = true;
+						info.v95 = true;
 					}
 					else if (between_curlies == "tmp")
 					{
 						formatted_text << (part ? part->tmp : 0);
-						if (v95)
-							*v95 = true;
+						info.v95 = true;
 					}
 					else if (between_curlies == "tmp2")
 					{
 						formatted_text << (part ? part->tmp2 : 0);
-						if (v95)
-							*v95 = true;
+						info.v95 = true;
 					}
 					else
 					{
@@ -118,31 +111,28 @@ String sign::getDisplayText(Simulation *sim, int &x0, int &y0, int &w, int &h, b
 				}
 			}
 			formatted_text << remaining_text;
-			drawable_text = formatted_text.Build();
+			info.text = formatted_text.Build();
 		}
 	}
 
-	if (colorize)
+	switch (si.second)
 	{
-		switch (si.second)
-		{
-		case Normal: break;
-		case Save:   drawable_text = "\bt" + drawable_text; break;
-		case Thread: drawable_text = "\bl" + drawable_text; break;
-		case Button: drawable_text = "\bo" + drawable_text; break;
-		case Search: drawable_text = "\bu" + drawable_text; break;
-		}
+	case Normal: info.r = 255; info.g = 255; info.b = 255; break;
+	case Save:   info.r =  32; info.g = 170; info.b = 255; break;
+	case Thread: info.r = 255; info.g =  75; info.b =  75; break;
+	case Button: info.r = 255; info.g = 216; info.b =  32; break;
+	case Search: info.r = 147; info.g =  83; info.b = 211; break;
 	}
 
-	w = Graphics::textwidth(drawable_text.c_str()) + 5;
-	h = 15;
-	x0 = (ju == Right) ? x - w : (ju == Left) ? x : x - w/2;
-	y0 = (y > 18) ? y - 18 : y + 4;
+	info.w = Graphics::textwidth(info.text.c_str()) + 5;
+	info.h = 15;
+	info.x = (ju == Right) ? (x - info.w) : ((ju == Left) ? x : (x - info.w / 2));
+	info.y = (y > 18) ? (y - 18) : (y + 4);
 
-	return drawable_text;
+	return info;
 }
 
-std::pair<int, sign::Type> sign::split()
+std::pair<int, sign::Type> sign::split() const
 {
 	String::size_type pipe = 0;
 	if (text.size() >= 4 && text.front() == '{' && text.back() == '}')

@@ -1,4 +1,5 @@
 #include "simulation/ElementCommon.h"
+#include "graphics/SimulationRenderer.h"
 
 static int graphics(GRAPHICS_FUNC_ARGS);
 static void create(ELEMENT_CREATE_FUNC_ARGS);
@@ -57,7 +58,7 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		colour1 = PIXPACK(0xFFFFFF);
 	}
 	auto ruleset = cpart->ctype;
-	bool renderDeco = !ren->blackDecorations;
+	bool renderDeco = !ren->BlackDecorations();
 	if (ruleset >= 0 && ruleset < NGOL)
 	{
 		if (!renderDeco)

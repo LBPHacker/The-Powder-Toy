@@ -9,7 +9,17 @@ struct wall_type
 {
 	pixel colour;
 	pixel eglow; // if emap set, add this to fire glow
-	int drawstyle;
+	enum DrawStyle
+	{
+		SOLIDDOT,
+		SPARSEDOT,
+		HEXAGONAL,
+		POWERED0,
+		POWERED1,
+		DIAGONAL,
+		SPECIAL,
+	};
+	DrawStyle drawstyle;
 	VideoBuffer * (*textureGen)(int, int, int);
 	String name;
 	ByteString identifier;

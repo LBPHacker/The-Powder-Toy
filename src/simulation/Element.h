@@ -7,6 +7,7 @@
 #include "StructProperty.h"
 
 class Simulation;
+class SimulationRenderer;
 class Renderer;
 class VideoBuffer;
 struct Particle;

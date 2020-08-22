@@ -107,7 +107,7 @@ static int update(UPDATE_FUNC_ARGS)
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
-	const float MELTING_POINT = ren->sim->elements[PT_TUNG].HighTemperature;
+	const float MELTING_POINT = sim->elements[PT_TUNG].HighTemperature;
 	double startTemp = (MELTING_POINT - 1500.0);
 	double tempOver = (((cpart->temp - startTemp)/1500.0)*M_PI) - (M_PI/2.0);
 	if(tempOver > -(M_PI/2.0))

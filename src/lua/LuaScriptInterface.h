@@ -12,6 +12,14 @@
 
 #include <map>
 
+namespace activities
+{
+namespace game
+{
+	class Game;
+}
+}
+
 namespace ui
 {
 	class Window;
@@ -36,7 +44,6 @@ class Tool;
 
 class Simulation;
 class TPTScriptInterface;
-class LuaComponent;
 
 class LuaScriptInterface: public CommandInterface
 {
@@ -116,7 +123,9 @@ class LuaScriptInterface: public CommandInterface
 	//Renderer
 	void initRendererAPI();
 	static int renderer_renderModes(lua_State * l);
+	static int renderer_renderMode(lua_State * l);
 	static int renderer_displayModes(lua_State * l);
+	static int renderer_displayMode(lua_State * l);
 	static int renderer_colourMode(lua_State * l);
 	static int renderer_decorations(lua_State * l);
 	static int renderer_grid(lua_State * l);
@@ -137,13 +146,6 @@ class LuaScriptInterface: public CommandInterface
 
 	//Interface
 	void initInterfaceAPI();
-	static int interface_showWindow(lua_State * l);
-	static int interface_closeWindow(lua_State * l);
-	static int interface_addComponent(lua_State * l);
-	static int interface_removeComponent(lua_State * l);
-	static int interface_grabTextInput(lua_State * l);
-	static int interface_dropTextInput(lua_State * l);
-	static int interface_textInputRect(lua_State * l);
 
 	void initGraphicsAPI();
 	static int graphics_textSize(lua_State * l);
@@ -200,8 +202,7 @@ public:
 
 	ui::Window * Window;
 	lua_State *l;
-	std::map<LuaComponent *, LuaSmartRef> grabbed_components;
-	LuaScriptInterface(GameController * c, GameModel * m);
+	LuaScriptInterface(activities::game::Game *game);
 
 	char custom_can_move[PT_NUM][PT_NUM];
 	void custom_init_can_move();
@@ -210,9 +211,8 @@ public:
 	bool HandleEvent(LuaEvents::EventTypes eventType, Event * event) override;
 
 	void Init();
-	void SetWindow(ui::Window * window);
-	int Command(String command) override;
-	String FormatCommand(String command) override;
+	CommandInterface::CommandResult Execute(const String &command) override;
+	String FormatCommand(const String &command) override;
 	virtual ~LuaScriptInterface();
 };
 

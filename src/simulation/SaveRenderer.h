@@ -1,9 +1,5 @@
 #ifndef SAVERENDERER_H_
 #define SAVERENDERER_H_
-#include "Config.h"
-#ifdef OGLI
-#include "graphics/OpenGLHeaders.h"
-#endif
 #include "common/Singleton.h"
 #include <mutex>
 
@@ -25,9 +21,6 @@ public:
 	virtual ~SaveRenderer();
 
 private:
-#if defined(OGLR) || defined(OGLI)
-	GLuint fboTex, fbo;
-#endif
 };
 
 #endif /* SAVERENDERER_H_ */

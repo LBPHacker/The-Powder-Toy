@@ -44,6 +44,8 @@ namespace Platform
 	ByteString WinNarrow(const std::wstring &source);
 	std::wstring WinWiden(const ByteString &source);
 #endif
+
+	void OpenDataFolder();
 }
 
 #endif

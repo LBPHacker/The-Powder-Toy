@@ -160,12 +160,6 @@ void CalculateMousePosition(int *x, int *y)
 		*y = (globalMy - windowY) / scale;
 }
 
-#ifdef OGLI
-void blit()
-{
-	SDL_GL_SwapWindow(sdl_window);
-}
-#else
 void blit(pixel * vid)
 {
 	SDL_UpdateTexture(sdl_texture, NULL, vid, WINDOWW * sizeof (Uint32));
@@ -175,7 +169,6 @@ void blit(pixel * vid)
 	SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
 	SDL_RenderPresent(sdl_renderer);
 }
-#endif
 
 bool RecreateWindow();
 void SDLOpen()
@@ -603,11 +596,7 @@ void EngineProcess()
 							 engine->GetForceIntegerScaling());
 			}
 
-#ifdef OGLI
-			blit();
-#else
 			blit(engine->g->vid);
-#endif
 		}
 
 		int frameTime = SDL_GetTicks() - frameStart;
@@ -674,11 +663,7 @@ void BlueScreen(String detailMessage)
 		while (SDL_PollEvent(&event))
 			if(event.type == SDL_QUIT)
 				exit(-1);
-#ifdef OGLI
-		blit();
-#else
 		blit(engine->g->vid);
-#endif
 	}
 }
 
@@ -722,7 +707,7 @@ int GuessBestScale()
 # undef main // thank you sdl
 #endif
 
-int main(int argc, char * argv[])
+int main_(int argc, char * argv[])
 {
 #if defined(_DEBUG) && defined(_MSC_VER)
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
@@ -856,18 +841,6 @@ int main(int argc, char * argv[])
 		}
 	}
 
-#ifdef OGLI
-	SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
-	//glScaled(2.0f, 2.0f, 1.0f);
-#endif
-#if defined(OGLI) && !defined(MACOSX)
-	int status = glewInit();
-	if(status != GLEW_OK)
-	{
-		fprintf(stderr, "Initializing Glew: %d\n", status);
-		exit(-1);
-	}
-#endif
 	ui::Engine::Ref().g = new Graphics();
 	ui::Engine::Ref().Scale = scale;
 	ui::Engine::Ref().SetResizable(resizable);
@@ -946,11 +919,7 @@ int main(int argc, char * argv[])
 			engine->g->drawrect((engine->GetWidth()/2)-100, (engine->GetHeight()/2)-25, 200, 50, 255, 255, 255, 180);
 			engine->g->drawtext((engine->GetWidth()/2)-(Graphics::textwidth("Loading save...")/2), (engine->GetHeight()/2)-5, "Loading save...", style::Colour::InformationTitle.Red, style::Colour::InformationTitle.Green, style::Colour::InformationTitle.Blue, 255);
 
-#ifdef OGLI
-			blit();
-#else
 			blit(engine->g->vid);
-#endif
 			ByteString ptsaveArg = arguments["ptsave"];
 			try
 			{
@@ -1003,7 +972,7 @@ int main(int argc, char * argv[])
 	ui::Engine::Ref().CloseWindow();
 	delete gameController;
 	delete ui::Engine::Ref().g;
-	Client::Ref().Shutdown();
+	// Client::Ref().Shutdown();
 	if (SDL_GetWindowFlags(sdl_window) & SDL_WINDOW_OPENGL)
 	{
 		// * nvidia-460 egl registers callbacks with x11 that end up being called

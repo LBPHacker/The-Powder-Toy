@@ -1,18 +1,18 @@
 #include "CommandInterface.h"
 
+#include <iostream>
 #include <cstring>
 #include <cstddef>
 #if !defined(WIN) || defined(__GNUC__)
 #include <strings.h>
 #endif
 
-#include "gui/game/GameModel.h"
+#include "activities/game/Game.h"
 
 #include "simulation/Particle.h"
 
-CommandInterface::CommandInterface(GameController * c, GameModel * m) {
-	this->m = m;
-	this->c = c;
+CommandInterface::CommandInterface(activities::game::Game *game) {
+	this->game = game;
 }
 
 /*void CommandInterface::AttachGameModel(GameModel * m)
@@ -20,20 +20,35 @@ CommandInterface::CommandInterface(GameController * c, GameModel * m) {
 	this->m = m;
 }*/
 
-int CommandInterface::Command(String command)
+CommandInterface::CommandResult CommandInterface::Validate(const String &command)
 {
 	lastError = "No interpreter";
-	return -1;
+	return commandNoInterpreter;
 }
 
-String CommandInterface::FormatCommand(String command)
+CommandInterface::CommandResult CommandInterface::Execute(const String &command)
+{
+	lastError = "No interpreter";
+	return commandNoInterpreter;
+}
+
+String CommandInterface::FormatCommand(const String &command)
 {
 	return command;
 }
 
 void CommandInterface::Log(LogType type, String message)
 {
-	m->Log(message, type == LogError || type == LogNotice);
+	if (type == LogError || type == LogNotice)
+	{
+		std::cerr << message.ToUtf8() << std::endl;
+	}
+	auto split = message.SplitBy('\n');
+	if (split)
+	{
+		message = split.Before() + String(" \bg[subsequent lines truncated]");
+	}
+	game->Log(message);
 }
 
 int CommandInterface::GetPropertyOffset(ByteString key, FormatType & format)

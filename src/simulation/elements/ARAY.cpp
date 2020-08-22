@@ -128,7 +128,7 @@ static int update(UPDATE_FUNC_ARGS)
 							{
 								if (parts[r].tmp != 6)
 								{
-									int Element_FILT_interactWavelengths(Particle* cpart, int origWl);
+									int Element_FILT_interactWavelengths(const Particle *cpart, int origWl);
 									colored = Element_FILT_interactWavelengths(&parts[r], colored);
 									if (!colored)
 										break;

@@ -32,8 +32,17 @@ struct sign
 	String text;
 
 	sign(String text_, int x_, int y_, Justification justification_);
-	String getDisplayText(Simulation *sim, int &x, int &y, int &w, int &h, bool colorize = true, bool *v95 = nullptr);
-	std::pair<int, Type> split();
+
+	struct Info
+	{
+		bool v95;
+		int x, y, w, h;
+		int r, g, b;
+		String text;
+	};
+
+	Info GetInfo(const Simulation *sim) const;
+	std::pair<int, Type> split() const;
 };
 
 #endif

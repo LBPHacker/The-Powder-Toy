@@ -84,11 +84,7 @@ RenderView::RenderView():
 	addDisplayModeCheckbox(DISPLAY_AIRH, IconHeat      , ui::Point(167, 22), "Displays the temperature of the air like heat display does");
 	line2 = 200;
 	addDisplayModeCheckbox(DISPLAY_WARP, IconWarp      , ui::Point(205, 22), "Gravity lensing, Newtonian Gravity bends light with this on");
-#ifdef OGLR
-# define TOOLTIP "Some type of OpenGL effect ... maybe"
-#else
-# define TOOLTIP "Enables moving solids, stickmen guns, and premium(tm) graphics"
-#endif
+#define TOOLTIP "Enables moving solids, stickmen guns, and premium(tm) graphics"
 	addDisplayModeCheckbox(DISPLAY_EFFE, IconEffect    , ui::Point(205,  4), TOOLTIP);
 #undef TOOLTIP
 	addDisplayModeCheckbox(DISPLAY_PERS, IconPersistant, ui::Point(237,  4), "Element paths persist on the screen for a while");

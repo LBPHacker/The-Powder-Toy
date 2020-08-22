@@ -375,8 +375,8 @@ void OptionsView::UpdateAirTemp(String temp, bool isDefocus)
 	bool isValid;
 	try
 	{
-		void ParseFloatProperty(String value, float &out);
-		ParseFloatProperty(temp, airTemp);
+		float ParseFloatProperty(String value);
+		airTemp = ParseFloatProperty(temp);
 		isValid = true;
 	}
 	catch (const std::exception &ex)

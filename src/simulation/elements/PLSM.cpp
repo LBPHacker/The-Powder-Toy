@@ -1,8 +1,12 @@
 #include "simulation/ElementCommon.h"
+#include "graphics/SimulationRenderer.h"
+#include "graphics/Pix.h"
 
 int Element_FIRE_update(UPDATE_FUNC_ARGS);
 static int graphics(GRAPHICS_FUNC_ARGS);
 static void create(ELEMENT_CREATE_FUNC_ARGS);
+
+extern const char *plasmaData;
 
 void Element::Element_PLSM()
 {
@@ -52,10 +56,13 @@ void Element::Element_PLSM()
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
-	int caddress = int(restrict_flt(float(cpart->life), 0, 199)) * 3;
-	*colr = (unsigned char)ren->plasma_data[caddress];
-	*colg = (unsigned char)ren->plasma_data[caddress+1];
-	*colb = (unsigned char)ren->plasma_data[caddress+2];
+	auto &ptbl = ren->PlasmaTable();
+	unsigned int caddress = cpart->life;
+	if (caddress >= ptbl.size()) caddress = ptbl.size() - 1U;
+	auto col = ptbl[caddress];
+	*colr = PixR(col);
+	*colg = PixG(col);
+	*colb = PixB(col);
 
 	*firea = 255;
 	*firer = *colr;

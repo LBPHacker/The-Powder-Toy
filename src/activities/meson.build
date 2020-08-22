@@ -1,0 +1,5 @@
+subdir('console')
+subdir('game')
+subdir('login')
+subdir('options')
+subdir('toolsearch')

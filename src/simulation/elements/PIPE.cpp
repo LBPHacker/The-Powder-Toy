@@ -1,4 +1,5 @@
 #include "simulation/ElementCommon.h"
+#include "graphics/SimulationRenderer.h"
 //Temp particle used for graphics
 Particle tpart;
 
@@ -333,21 +334,22 @@ int Element_PIPE_update(UPDATE_FUNC_ARGS)
 int Element_PIPE_graphics(GRAPHICS_FUNC_ARGS)
 {
 	int t = TYP(cpart->ctype);
-	if (t>0 && t<PT_NUM && ren->sim->elements[t].Enabled)
+	if (t>0 && t<PT_NUM && sim->elements[t].Enabled)
 	{
 		if (t == PT_STKM || t == PT_STKM2 || t == PT_FIGH)
 			return 0;
-		if (ren->graphicscache[t].isready)
+		auto &gcache = ren->GraphicsCache();
+		if (gcache[t].ready)
 		{
-			*pixel_mode = ren->graphicscache[t].pixel_mode;
-			*cola = ren->graphicscache[t].cola;
-			*colr = ren->graphicscache[t].colr;
-			*colg = ren->graphicscache[t].colg;
-			*colb = ren->graphicscache[t].colb;
-			*firea = ren->graphicscache[t].firea;
-			*firer = ren->graphicscache[t].firer;
-			*fireg = ren->graphicscache[t].fireg;
-			*fireb = ren->graphicscache[t].fireb;
+			*pixel_mode = gcache[t].pixelMode;
+			*cola = gcache[t].colA;
+			*colr = gcache[t].colR;
+			*colg = gcache[t].colG;
+			*colb = gcache[t].colB;
+			*firea = gcache[t].firA;
+			*firer = gcache[t].firR;
+			*fireg = gcache[t].firG;
+			*fireb = gcache[t].firB;
 		}
 		else
 		{
@@ -360,16 +362,16 @@ int Element_PIPE_graphics(GRAPHICS_FUNC_ARGS)
 			if (t == PT_PHOT && tpart.ctype == 0x40000000)
 				tpart.ctype = 0x3FFFFFFF;
 
-			*colr = PIXR(ren->sim->elements[t].Colour);
-			*colg = PIXG(ren->sim->elements[t].Colour);
-			*colb = PIXB(ren->sim->elements[t].Colour);
-			if (ren->sim->elements[t].Graphics)
+			*colr = PIXR(sim->elements[t].Colour);
+			*colg = PIXG(sim->elements[t].Colour);
+			*colb = PIXB(sim->elements[t].Colour);
+			if (sim->elements[t].Graphics)
 			{
-				(*(ren->sim->elements[t].Graphics))(ren, &tpart, nx, ny, pixel_mode, cola, colr, colg, colb, firea, firer, fireg, fireb);
+				sim->elements[t].Graphics(ren, sim, &tpart, nx, ny, pixel_mode, cola, colr, colg, colb, firea, firer, fireg, fireb);
 			}
 			else
 			{
-				Element::defaultGraphics(ren, &tpart, nx, ny, pixel_mode, cola, colr, colg, colb, firea, firer, fireg, fireb);
+				Element::defaultGraphics(ren, sim, &tpart, nx, ny, pixel_mode, cola, colr, colg, colb, firea, firer, fireg, fireb);
 			}
 		}
 		//*colr = PIXR(elements[t].pcolors);

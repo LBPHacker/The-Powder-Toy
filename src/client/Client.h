@@ -6,7 +6,7 @@
 #include <list>
 
 #include "common/String.h"
-#include "common/Singleton.h"
+#include "common/ExplicitSingleton.h"
 #include "json/json.h"
 
 #include "User.h"
@@ -47,7 +47,7 @@ namespace http
 {
 	class Request;
 }
-class Client: public Singleton<Client> {
+class Client: public ExplicitSingleton<Client> {
 private:
 	String messageOfTheDay;
 	std::vector<std::pair<String, ByteString> > serverNotifications;
@@ -160,7 +160,6 @@ public:
 	RequestStatus ParseServerReturn(ByteString &result, int status, bool json);
 	void Tick();
 	bool CheckUpdate(http::Request *updateRequest, bool checkSession);
-	void Shutdown();
 
 	// preferences functions
 	void WritePrefs();

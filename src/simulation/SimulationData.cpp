@@ -10,6 +10,108 @@
 
 #include "graphics/Renderer.h"
 
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+
+// * TODO-REDO_UI: (re)move
+const char *flmData = nullptr;
+const char *plasmaData = nullptr;
+std::vector<char> flmVec;
+std::vector<char> plasmaVec;
+unsigned int fireAlpha[CELL * 3][CELL * 3];
+
+// * TODO-REDO_UI: (re)move
+struct GradientStop
+{
+	int color;
+	float point;
+
+	bool operator <(const GradientStop &other) const
+	{
+		return point < other.point;
+	}
+};
+
+// * TODO-REDO_UI: (re)move
+std::vector<char> Gradient(std::vector<GradientStop> stops, int resolution)
+{
+	std::vector<char> table(resolution * 3, 0);
+	if (stops.size() >= 2)
+	{
+		std::sort(stops.begin(), stops.end());
+		auto stop = -1;
+		for (auto i = 0; i < resolution; ++i)
+		{
+			auto point = i / (float)resolution;
+			while (stop < (int)stops.size() - 1 && stops[stop + 1].point <= point)
+			{
+				++stop;
+			}
+			if (stop < 0 || stop >= (int)stops.size() - 1)
+			{
+				continue;
+			}
+			auto &left = stops[stop];
+			auto &right = stops[stop + 1];
+			auto f = (point - left.point) / (right.point - left.point);
+			table[i * 3    ] = char(PIXR(left.color) * (1.0f - f) + PIXR(right.color) * f);
+			table[i * 3 + 1] = char(PIXG(left.color) * (1.0f - f) + PIXG(right.color) * f);
+			table[i * 3 + 2] = char(PIXB(left.color) * (1.0f - f) + PIXB(right.color) * f);
+		}
+	}
+	return table;
+}
+
+// * TODO-REDO_UI: (re)move
+void InitGraphicsTables()
+{
+	static bool initDone = false;
+	if (!initDone)
+	{
+		initDone = true;
+		flmVec = Gradient({
+			{ PIXPACK(0xAF9F0F), 1.0f },
+			{ PIXPACK(0xDFBF6F), 0.9f },
+			{ PIXPACK(0x60300F), 0.5f },
+			{ PIXPACK(0x000000), 0.0f },
+		}, 200);
+		flmData = flmVec.data();
+		plasmaVec = Gradient({
+			{ PIXPACK(0xAFFFFF),  1.0f },
+			{ PIXPACK(0xAFFFFF),  0.9f },
+			{ PIXPACK(0x301060),  0.5f },
+			{ PIXPACK(0x301040), 0.25f },
+			{ PIXPACK(0x000000),  0.0f },
+		}, 200);
+		plasmaData = plasmaVec.data();
+
+		float temp[CELL * 3][CELL * 3] = {};
+		float multiplier = 255.0f;
+		for (int x = 0; x < CELL; ++x)
+		{
+			for (int y = 0; y < CELL; ++y)
+			{
+				for (int i = -CELL; i < CELL; ++i)
+				{
+					for (int j = -CELL; j < CELL; ++j)
+					{
+						temp[y + CELL + j][x + CELL + i] += expf(-0.1f * (i * i + j * j));
+					}
+				}
+			}
+		}
+		for (int x = 0; x < CELL * 3; ++x)
+		{
+			for (int y = 0; y < CELL * 3; ++y)
+			{
+				fireAlpha[y][x] = (int)(multiplier * temp[y][x] / (CELL * CELL));
+			}
+		}
+	}
+}
+
+// * TODO-REDO_UI: (re)move
 const BuiltinGOL builtinGol[NGOL] = {
 	// * Ruleset:
 	//   * bits x = 8..0: stay if x neighbours present
@@ -47,32 +149,34 @@ const BuiltinGOL builtinGol[NGOL] = {
 	{ "BRAN", GT_BRAN, 0x25440, PIXPACK(0xFFFF00), PIXPACK(0x969600), NGT_BRAN, String("Brian 6: B246/S6/3" )}
 };
 
+// * TODO-REDO_UI: (re)move
 std::vector<wall_type> LoadWalls()
 {
 	return
 	std::vector<wall_type>{
-		{PIXPACK(0x808080), PIXPACK(0x000000), 0, Renderer::WallIcon, String("ERASE"),           "DEFAULT_WL_ERASE",  String("Erases walls.")},
-		{PIXPACK(0xC0C0C0), PIXPACK(0x101010), 0, Renderer::WallIcon, String("CONDUCTIVE WALL"), "DEFAULT_WL_CNDTW",  String("Blocks everything. Conductive.")},
-		{PIXPACK(0x808080), PIXPACK(0x808080), 0, Renderer::WallIcon, String("EWALL"),           "DEFAULT_WL_EWALL",  String("E-Wall. Becomes transparent when electricity is connected.")},
-		{PIXPACK(0xFF8080), PIXPACK(0xFF2008), 1, Renderer::WallIcon, String("DETECTOR"),        "DEFAULT_WL_DTECT",  String("Detector. Generates electricity when a particle is inside.")},
-		{PIXPACK(0x808080), PIXPACK(0x000000), 0, Renderer::WallIcon, String("STREAMLINE"),      "DEFAULT_WL_STRM",   String("Streamline. Set start point of a streamline.")},
-		{PIXPACK(0x8080FF), PIXPACK(0x000000), 1, Renderer::WallIcon, String("FAN"),             "DEFAULT_WL_FAN",    String("Fan. Accelerates air. Use the line tool to set direction and strength.")},
-		{PIXPACK(0xC0C0C0), PIXPACK(0x101010), 2, Renderer::WallIcon, String("LIQUID WALL"),     "DEFAULT_WL_LIQD",   String("Allows liquids, blocks all other particles. Conductive.")},
-		{PIXPACK(0x808080), PIXPACK(0x000000), 1, Renderer::WallIcon, String("ABSORB WALL"),     "DEFAULT_WL_ABSRB",  String("Absorbs particles but lets air currents through.")},
-		{PIXPACK(0x808080), PIXPACK(0x000000), 3, Renderer::WallIcon, String("WALL"),            "DEFAULT_WL_WALL",   String("Basic wall, blocks everything.")},
-		{PIXPACK(0x3C3C3C), PIXPACK(0x000000), 1, Renderer::WallIcon, String("AIRONLY WALL"),    "DEFAULT_WL_AIR",    String("Allows air, but blocks all particles.")},
-		{PIXPACK(0x575757), PIXPACK(0x000000), 1, Renderer::WallIcon, String("POWDER WALL"),     "DEFAULT_WL_POWDR",  String("Allows powders, blocks all other particles.")},
-		{PIXPACK(0xFFFF22), PIXPACK(0x101010), 2, Renderer::WallIcon, String("CONDUCTOR"),       "DEFAULT_WL_CNDTR",  String("Conductor. Allows all particles to pass through and conducts electricity.")},
-		{PIXPACK(0x242424), PIXPACK(0x101010), 0, Renderer::WallIcon, String("EHOLE"),           "DEFAULT_WL_EHOLE",  String("E-Hole. absorbs particles, releases them when powered.")},
-		{PIXPACK(0x579777), PIXPACK(0x000000), 1, Renderer::WallIcon, String("GAS WALL"),        "DEFAULT_WL_GAS",    String("Allows gases, blocks all other particles.")},
-		{PIXPACK(0xFFEE00), PIXPACK(0xAA9900), 4, Renderer::WallIcon, String("GRAVITY WALL"),    "DEFAULT_WL_GRVTY",  String("Gravity wall. Newtonian Gravity has no effect inside a box drawn with this.")},
-		{PIXPACK(0xFFAA00), PIXPACK(0xAA5500), 4, Renderer::WallIcon, String("ENERGY WALL"),     "DEFAULT_WL_ENRGY",  String("Allows energy particles, blocks all other particles.")},
-		{PIXPACK(0xDCDCDC), PIXPACK(0x000000), 1, Renderer::WallIcon, String("AIRBLOCK WALL"),   "DEFAULT_WL_NOAIR",  String("Allows all particles, but blocks air.")},
-		{PIXPACK(0x808080), PIXPACK(0x000000), 0, Renderer::WallIcon, String("ERASEALL"),        "DEFAULT_WL_ERASEA", String("Erases walls, particles, and signs.")},
-		{PIXPACK(0x800080), PIXPACK(0x000000), 0, Renderer::WallIcon, String("STASIS WALL"),     "DEFAULT_WL_STASIS", String("Freezes particles inside the wall in place until powered.")},
+		{PIXPACK(0x808080), PIXPACK(0x000000), wall_type::SPECIAL  , Renderer::WallIcon, String("ERASE"),           "DEFAULT_WL_ERASE",  String("Erases walls.")},
+		{PIXPACK(0xC0C0C0), PIXPACK(0x101010), wall_type::SOLIDDOT , Renderer::WallIcon, String("CONDUCTIVE WALL"), "DEFAULT_WL_CNDTW",  String("Blocks everything. Conductive.")},
+		{PIXPACK(0x808080), PIXPACK(0x808080), wall_type::POWERED1 , Renderer::WallIcon, String("EWALL"),           "DEFAULT_WL_EWALL",  String("E-Wall. Becomes transparent when electricity is connected.")},
+		{PIXPACK(0xFF8080), PIXPACK(0xFF2008), wall_type::HEXAGONAL, Renderer::WallIcon, String("DETECTOR"),        "DEFAULT_WL_DTECT",  String("Detector. Generates electricity when a particle is inside.")},
+		{PIXPACK(0x808080), PIXPACK(0x000000), wall_type::SPECIAL  , Renderer::WallIcon, String("STREAMLINE"),      "DEFAULT_WL_STRM",   String("Streamline. Set start point of a streamline.")},
+		{PIXPACK(0x8080FF), PIXPACK(0x000000), wall_type::HEXAGONAL, Renderer::WallIcon, String("FAN"),             "DEFAULT_WL_FAN",    String("Fan. Accelerates air. Use the line tool to set direction and strength.")},
+		{PIXPACK(0xC0C0C0), PIXPACK(0x101010), wall_type::SPARSEDOT, Renderer::WallIcon, String("LIQUID WALL"),     "DEFAULT_WL_LIQD",   String("Allows liquids, blocks all other particles. Conductive.")},
+		{PIXPACK(0x808080), PIXPACK(0x000000), wall_type::HEXAGONAL, Renderer::WallIcon, String("ABSORB WALL"),     "DEFAULT_WL_ABSRB",  String("Absorbs particles but lets air currents through.")},
+		{PIXPACK(0x808080), PIXPACK(0x000000), wall_type::SOLIDDOT , Renderer::WallIcon, String("WALL"),            "DEFAULT_WL_WALL",   String("Basic wall, blocks everything.")},
+		{PIXPACK(0x3C3C3C), PIXPACK(0x000000), wall_type::HEXAGONAL, Renderer::WallIcon, String("AIRONLY WALL"),    "DEFAULT_WL_AIR",    String("Allows air, but blocks all particles.")},
+		{PIXPACK(0x575757), PIXPACK(0x000000), wall_type::HEXAGONAL, Renderer::WallIcon, String("POWDER WALL"),     "DEFAULT_WL_POWDR",  String("Allows powders, blocks all other particles.")},
+		{PIXPACK(0xFFFF22), PIXPACK(0x101010), wall_type::SPARSEDOT, Renderer::WallIcon, String("CONDUCTOR"),       "DEFAULT_WL_CNDTR",  String("Conductor. Allows all particles to pass through and conducts electricity.")},
+		{PIXPACK(0x242424), PIXPACK(0x101010), wall_type::POWERED0 , Renderer::WallIcon, String("EHOLE"),           "DEFAULT_WL_EHOLE",  String("E-Hole. absorbs particles, releases them when powered.")},
+		{PIXPACK(0x579777), PIXPACK(0x000000), wall_type::HEXAGONAL, Renderer::WallIcon, String("GAS WALL"),        "DEFAULT_WL_GAS",    String("Allows gases, blocks all other particles.")},
+		{PIXPACK(0xFFEE00), PIXPACK(0xAA9900), wall_type::DIAGONAL , Renderer::WallIcon, String("GRAVITY WALL"),    "DEFAULT_WL_GRVTY",  String("Gravity wall. Newtonian Gravity has no effect inside a box drawn with this.")},
+		{PIXPACK(0xFFAA00), PIXPACK(0xAA5500), wall_type::DIAGONAL , Renderer::WallIcon, String("ENERGY WALL"),     "DEFAULT_WL_ENRGY",  String("Allows energy particles, blocks all other particles.")},
+		{PIXPACK(0xDCDCDC), PIXPACK(0x000000), wall_type::HEXAGONAL, Renderer::WallIcon, String("AIRBLOCK WALL"),   "DEFAULT_WL_NOAIR",  String("Allows all particles, but blocks air.")},
+		{PIXPACK(0x808080), PIXPACK(0x000000), wall_type::SPECIAL  , Renderer::WallIcon, String("ERASEALL"),        "DEFAULT_WL_ERASEA", String("Erases walls, particles, and signs.")},
+		{PIXPACK(0x800080), PIXPACK(0x000000), wall_type::POWERED0 , Renderer::WallIcon, String("STASIS WALL"),     "DEFAULT_WL_STASIS", String("Freezes particles inside the wall in place until powered.")},
 	};
 }
 
+// * TODO-REDO_UI: (re)move
 std::vector<menu_section> LoadMenus()
 {
 	return

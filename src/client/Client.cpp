@@ -804,7 +804,7 @@ void Client::WritePrefs()
 	}
 }
 
-void Client::Shutdown()
+Client::~Client()
 {
 	if (versionCheckRequest)
 	{
@@ -821,10 +821,6 @@ void Client::Shutdown()
 
 	//Save config
 	WritePrefs();
-}
-
-Client::~Client()
-{
 }
 
 

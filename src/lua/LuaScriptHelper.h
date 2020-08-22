@@ -9,16 +9,23 @@
 class GameModel;
 class GameController;
 class Simulation;
+class SimulationRenderer;
 class LuaScriptInterface;
 class Graphics;
 class Renderer;
 
-extern GameModel * luacon_model;
-extern GameController * luacon_controller;
+namespace activities
+{
+namespace game
+{
+	class Game;
+}
+}
+
+extern activities::game::Game *luacon_game;
 extern Simulation * luacon_sim;
 extern LuaScriptInterface * luacon_ci;
-extern Graphics * luacon_g;
-extern Renderer * luacon_ren;
+extern SimulationRenderer * luacon_ren;
 
 extern bool *luacon_currentCommand;
 extern String *luacon_lastError;

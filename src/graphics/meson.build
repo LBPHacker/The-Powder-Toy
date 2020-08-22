@@ -1,8 +1,18 @@
+powder_files += files(
+	'SimulationRenderer.cpp',
+	'FontData.cpp',
+)
+
+render_files += files(
+	'SimulationRenderer.cpp',
+	'FontData.cpp',
+)
+
 graphics_files = files(
-	'Graphics.cpp',
-	#'OpenGLGraphics.cpp', # this is defunct right now
-	'RasterGraphics.cpp',
 	'FontReader.cpp',
+	'FontData.cpp',
+	'Graphics.cpp',
+	'RasterGraphics.cpp',
 	'Renderer.cpp',
 )
 

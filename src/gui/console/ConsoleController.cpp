@@ -25,7 +25,7 @@ void ConsoleController::EvaluateCommand(String command)
 	{
 		if (command.BeginsWith("!load "))
 			CloseConsole();
-		int returnCode = commandInterface->Command(command);
+		int returnCode = commandInterface->Execute(command);
 		consoleModel->AddLastCommand(ConsoleCommand(command, returnCode, commandInterface->GetLastError()));
 	}
 	else

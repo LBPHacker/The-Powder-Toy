@@ -47,10 +47,6 @@ else
 	copt_platform = 'lin'
 endif
 
-if get_option('ogli') or get_option('oglr')
-	error('OpenGL features are currently unavailable')
-endif
-
 uopt_static = get_option('static')
 use_tpt_libs = 'no'
 tpt_libs_vtag = 'v20210409104352'
@@ -255,9 +251,6 @@ conf_data.set('X86_SSE2', uopt_x86_sse_level >= 20)
 conf_data.set('X86_SSE', uopt_x86_sse_level >= 10)
 conf_data.set('NATIVE', uopt_native)
 conf_data.set('_64BIT', copt_64bit)
-conf_data.set('OGLI', get_option('ogli'))
-conf_data.set('OGLR', get_option('oglr'))
-conf_data.set('PIX32OGL', get_option('ogli'))
 conf_data.set('BETA', get_option('beta'))
 conf_data.set('NO_INSTALL_CHECK', not get_option('install_check'))
 conf_data.set('IGNORE_UPDATES', get_option('ignore_updates'))

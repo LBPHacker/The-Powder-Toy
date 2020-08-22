@@ -94,11 +94,11 @@ GameController::GameController():
 
 	gameView->SetDebugHUD(Client::Ref().GetPrefBool("Renderer.DebugMode", false));
 
-#ifdef LUACONSOLE
-	commandInterface = new LuaScriptInterface(this, gameModel);
-#else
-	commandInterface = new TPTScriptInterface(this, gameModel);
-#endif
+// #ifdef LUACONSOLE
+// 	commandInterface = new LuaScriptInterface(this, gameModel);
+// #else
+// 	commandInterface = new TPTScriptInterface(this, gameModel);
+// #endif
 
 	Client::Ref().AddListener(this);
 
@@ -252,9 +252,8 @@ int GameController::GetSignAt(int x, int y)
 	Simulation * sim = gameModel->GetSimulation();
 	for (int i = sim->signs.size()-1; i >= 0; i--)
 	{
-		int signx, signy, signw, signh;
-		sim->signs[i].getDisplayText(sim, signx, signy, signw, signh);
-		if (x>=signx && x<=signx+signw && y>=signy && y<=signy+signh)
+		auto info = sim->signs[i].GetInfo(sim);
+		if (x>=info.x && x<=info.x+info.w && y>=info.y && y<=info.y+info.h)
 			return i;
 	}
 	return -1;
