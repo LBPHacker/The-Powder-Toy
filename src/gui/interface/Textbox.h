@@ -53,6 +53,7 @@ public:
 	void OnVKeyPress(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt);
 	void OnKeyRelease(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt) override;
 	void OnTextInput(String text) override;
+	void OnTextEditing(String text, int start, int length) override;
 	void Draw(const Point& screenPos) override;
 
 protected:
@@ -67,6 +68,15 @@ protected:
 	TextboxAction actionCallback;
 	String backingText;
 	String placeHolder;
+
+	void StartComposition();
+	void StopComposition();
+	void UpdateCursor();
+
+	bool compositionInProgress;
+	String preCompositionText;
+	TextWrapper::Index preCompositionLSB;
+	TextWrapper::Index preCompositionHSB;
 
 	virtual void cutSelection();
 	virtual void pasteIntoSelection();

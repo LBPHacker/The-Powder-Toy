@@ -32,7 +32,7 @@ namespace ui
 		bool autoHeight;
 
 		void updateTextWrapper();
-		void updateSelection();
+		void updateSelection(bool skipTextBoundChecks = false);
 
 		int getLowerSelectionBound();
 		int getHigherSelectionBound();

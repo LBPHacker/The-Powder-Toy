@@ -45,6 +45,7 @@ namespace ui
 		Point Size;
 		bool Enabled;
 		bool Visible;
+		bool WantsTextInput;
 
 		ui::Appearance Appearance;
 		//virtual void SetAppearance(ui::Appearance);
@@ -204,5 +205,6 @@ namespace ui
 		virtual void OnKeyRelease(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt);
 
 		virtual void OnTextInput(String text);
+		virtual void OnTextEditing(String text, int start, int lenght);
 	};
 }

@@ -198,12 +198,15 @@ void Label::selectAll()
 	updateSelection();
 }
 
-void Label::updateSelection()
+void Label::updateSelection(bool skipTextBoundChecks)
 {
-	if (selectionIndexL.raw_index <                  0) selectionIndexL = textWrapper.IndexBegin();
-	if (selectionIndexL.raw_index > (int)text.length()) selectionIndexL = textWrapper.IndexEnd();
-	if (selectionIndexH.raw_index <                  0) selectionIndexH = textWrapper.IndexBegin();
-	if (selectionIndexH.raw_index > (int)text.length()) selectionIndexH = textWrapper.IndexEnd();
+	if (!skipTextBoundChecks)
+	{
+		if (selectionIndexL.raw_index <                  0) selectionIndexL = textWrapper.IndexBegin();
+		if (selectionIndexL.raw_index > (int)text.length()) selectionIndexL = textWrapper.IndexEnd();
+		if (selectionIndexH.raw_index <                  0) selectionIndexH = textWrapper.IndexBegin();
+		if (selectionIndexH.raw_index > (int)text.length()) selectionIndexH = textWrapper.IndexEnd();
+	}
 
 	displayTextWithSelection = displayTextWrapper.WrappedText();
 	if (HasSelection())

@@ -121,6 +121,10 @@ void Engine::ShowWindow(Window * window)
 		state_->DoBlur();
 
 	state_ = window;
+	if (state_)
+	{
+		state_->UpdateTextInput();
+	}
 
 }
 
@@ -142,7 +146,10 @@ int Engine::CloseWindow()
 		windows.pop();
 
 		if(state_)
+		{
 			state_->DoFocus();
+			state_->UpdateTextInput();
+		}
 
 		ui::Point mouseState = mousePositions.top();
 		mousePositions.pop();
@@ -262,6 +269,12 @@ void Engine::onTextInput(String text)
 {
 	if (state_ && !ignoreEvents)
 		state_->DoTextInput(text);
+}
+
+void Engine::onTextEditing(String text, int start, int length)
+{
+	if (state_ && !ignoreEvents)
+		state_->DoTextEditing(text, start, length);
 }
 
 void Engine::onMouseClick(int x, int y, unsigned button)

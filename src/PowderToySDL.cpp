@@ -413,6 +413,9 @@ void EventProcess(SDL_Event event)
 	case SDL_TEXTINPUT:
 		engine->onTextInput(ByteString(event.text.text).FromUtf8());
 		break;
+	case SDL_TEXTEDITING:
+		engine->onTextEditing(ByteString(event.edit.text).FromUtf8(), event.edit.start, event.edit.length);
+		break;
 	case SDL_MOUSEWHEEL:
 	{
 		int x = event.wheel.x;

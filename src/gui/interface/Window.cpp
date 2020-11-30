@@ -74,7 +74,7 @@ void Window::RemoveComponent(Component* c)
 			//Make sure any events don't continue
 			halt = true;
 			if (Components[i] == focusedComponent_)
-				focusedComponent_ = NULL;
+				FocusComponent(NULL);
 			if (Components[i] == hoverComponent)
 				hoverComponent = NULL;
 
@@ -104,7 +104,7 @@ void Window::RemoveComponent(unsigned idx)
 	halt = true;
 	// free component and remove it.
 	if (Components[idx] == focusedComponent_)
-		focusedComponent_ = NULL;
+		FocusComponent(NULL);
 	if (Components[idx] == hoverComponent)
 		hoverComponent = NULL;
 	delete Components[idx];
@@ -118,7 +118,8 @@ bool Window::IsFocused(const Component* c) const
 
 void Window::FocusComponent(Component* c)
 {
-	this->focusedComponent_ = c;
+	focusedComponent_ = c;
+	UpdateTextInput();
 }
 
 void Window::MakeActiveWindow()
@@ -435,6 +436,25 @@ void Window::DoTextInput(String text)
 		finalise();
 }
 
+void Window::DoTextEditing(String text, int start, int length)
+{
+#ifdef DEBUG
+	if (debugMode)
+		return;
+#endif
+	//on key unpress
+	if (focusedComponent_ != NULL)
+	{
+		if (focusedComponent_->Enabled && focusedComponent_->Visible)
+			focusedComponent_->OnTextEditing(text, start, length);
+	}
+
+	if (!stop)
+		OnTextEditing(text, start, length);
+	if (destruct)
+		finalise();
+}
+
 void Window::DoMouseDown(int x_, int y_, unsigned button)
 {
 	//on mouse click
@@ -623,5 +643,17 @@ void Window::Halt()
 {
 	stop = true;
 	halt = true;
+}
+
+void Window::UpdateTextInput()
+{
+	if (focusedComponent_ && focusedComponent_->WantsTextInput)
+	{
+		SDL_StartTextInput();
+	}
+	else
+	{
+		SDL_StopTextInput();
+	}
 }
 
