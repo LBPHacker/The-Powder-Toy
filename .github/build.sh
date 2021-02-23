@@ -53,13 +53,18 @@ if [ $PLATFORM_SHORT == "lin" ]; then
 		other_flags+=$'\t-Dbuild_render=true\t-Dbuild_font=true'
 	fi
 fi
-if [ $PLATFORM_SHORT == "win" ]; then
+if [ $PLATFORM_SHORT == "win" ] || [ $PLATFORM_SHORT == "mingw" ]; then
 	bin_suffix=$bin_suffix.exe
 fi
 if echo $RELTYPECFG | base64 -d | grep snapshot; then
 	other_flags+=$'\t-Dupdate_server=starcatcher.us/TPT'
 fi
-meson -Dbuildtype=release -Db_pie=false -Db_staticpic=false -Db_lto=true $static_flag -Dinstall_check=true $other_flags `echo $RELTYPECFG | base64 -d` build
+if [ $PLATFORM_SHORT != "mingw" ]; then
+	# The version of GCC used in the MinGW package we recommend (and also the one GitHub
+	# seems to use) is unable to compile an LTO build that actually runs.
+	static_flag+=$'\t-Db_lto=true'
+fi
+meson -Dbuildtype=release -Db_pie=false -Db_staticpic=false $static_flag -Dinstall_check=true $other_flags `echo $RELTYPECFG | base64 -d` build
 cd build
 ninja
 if [ $PLATFORM_SHORT == "lin" ] || [ $PLATFORM_SHORT == "mac" ]; then

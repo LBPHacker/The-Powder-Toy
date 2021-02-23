@@ -8,6 +8,16 @@
 #include "inet.h"
 #include <string.h>
 
+#if defined(WSAAPI) && !defined(_MSC_VER)
+// For some reason, the MinGW version we recommend doesn't have this declaration.
+//   -- LBPHacker, 2021-02-23
+INT WSAAPI inet_pton(
+  INT   Family,
+  PCSTR pszAddrString,
+  PVOID pAddrBuf
+);
+#endif
+
 /*=========================================================================*\
 * Internal functions prototypes
 \*=========================================================================*/

@@ -26,7 +26,9 @@
 # else
 // >= VS2013
 #  include <algorithm>
-#  define NOMINMAX
+#  ifndef NOMINMAX
+#   define NOMINMAX
+#  endif
 #  ifdef min
 #   undef min
 #  endif

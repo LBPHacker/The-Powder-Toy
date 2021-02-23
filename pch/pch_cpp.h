@@ -1,5 +1,13 @@
 #include "Config.h"
 
+#ifdef WIN
+# include <winsock2.h>
+# include <winsock.h>
+# include <shlobj.h>
+# include <shlwapi.h>
+# include <windows.h>
+#endif
+
 #include "common/Format.h"
 #include "common/Singleton.h"
 #include "common/String.h"
@@ -73,13 +81,6 @@
 # include <sys/time.h>
 # include <sys/types.h>
 # include <sys/un.h>
-#endif
-
-#ifdef WIN
-# include <shlobj.h>
-# include <shlwapi.h>
-# include <windows.h>
-# include <winsock.h>
 #endif
 
 #include <curl/curl.h>

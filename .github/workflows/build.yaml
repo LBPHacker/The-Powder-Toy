@@ -39,7 +39,7 @@ jobs:
     needs: [release]
     strategy:
       matrix:
-        platform_short: [lin, mac, win]
+        platform_short: [lin, mac, win, mingw]
         static_dynamic: [static, dynamic]
         include:
           - platform_short: lin
@@ -49,6 +49,9 @@ jobs:
             os: macos-latest
             suffix: ''
           - platform_short: win
+            os: windows-latest
+            suffix: '.exe'
+          - platform_short: mingw
             os: windows-latest
             suffix: '.exe'
     steps:

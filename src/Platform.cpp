@@ -5,17 +5,19 @@
 #include <cstdio>
 #include <cassert>
 #ifdef WIN
-#define NOMINMAX
-#include <shlobj.h>
-#include <shlwapi.h>
-#include <windows.h>
+# ifndef NOMINMAX
+#  define NOMINMAX
+# endif
+# include <shlobj.h>
+# include <shlwapi.h>
+# include <windows.h>
 #else
-#include <unistd.h>
-#include <ctime>
-#include <sys/time.h>
+# include <unistd.h>
+# include <ctime>
+# include <sys/time.h>
 #endif
 #ifdef MACOSX
-#include <mach-o/dyld.h>
+# include <mach-o/dyld.h>
 #endif
 
 #include "Misc.h"
@@ -29,7 +31,7 @@ ByteString ExecutableName()
 	ByteString ret;
 #if defined(WIN)
 	using Char = wchar_t;
-#else
+#elif defined(LIN)
 	using Char = char;
 #endif
 #if defined(WIN)
@@ -209,3 +211,24 @@ std::wstring WinWiden(const ByteString &source)
 #endif
 
 }
+
+#ifdef WIN
+# undef main // thank you sdl
+int main(int argc, char *argv[]);
+int WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+{
+	int argc;
+	wchar_t **wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
+	std::vector<ByteString> argv;
+	for (auto i = 0; i < argc; ++i)
+	{
+		argv.push_back(Platform::WinNarrow(std::wstring(wargv[i])));
+	}
+	std::vector<char *> argp;
+	for (auto &arg : argv)
+	{
+		argp.push_back(&arg[0]);
+	}
+	return main(argc, &argp[0]);
+}
+#endif

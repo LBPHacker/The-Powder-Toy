@@ -418,6 +418,10 @@ void EngineProcess()
 #endif
 }
 
+#ifdef main
+# undef main // thank you sdl
+#endif
+
 int main(int argc, char * argv[])
 {
 	currentWidth = WINDOWW;

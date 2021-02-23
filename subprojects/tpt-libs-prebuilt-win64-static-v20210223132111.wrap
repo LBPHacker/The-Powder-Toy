@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-win64-static-v20210223132111
+
+source_url = https://github.com/The-Powder-Toy/tpt-libs/releases/download/v20210223132111/tpt-libs-prebuilt-win64-static-v20210223132111.zip
+source_filename = tpt-libs-prebuilt-win64-static-v20210223132111.zip
+source_hash = 3749312906a23ce2c6fa0228dffc5e970e08840352cba87a3a3da71fbc2692a1

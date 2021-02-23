@@ -32,9 +32,13 @@ if get_option('ogli') or get_option('oglr')
 	error('OpenGL features are currently unavailable')
 endif
 
+project_link_args = []
+project_c_args = []
+project_cpp_args = []
+
 uopt_static = get_option('static')
 use_tpt_libs = 'no'
-tpt_libs_vtag = 'v20210103095432'
+tpt_libs_vtag = 'v20210223132111'
 if uopt_static == 'system'
 	if copt_platform == 'win'
 		error('no way to find static system libraries on windows')
@@ -50,7 +54,17 @@ if use_tpt_libs != 'no'
 	if host_machine.cpu_family() != 'x86_64'
 		error('we do not currently provide prebuilt @0@ libraries for @1@ on @2@'.format(use_tpt_libs, host_machine.system(), host_machine.cpu_family()))
 	endif
-	tpt_libs = subproject('tpt-libs-prebuilt-@0@64-@1@-@2@'.format(copt_platform, use_tpt_libs, tpt_libs_vtag))
+	lib_platform = copt_platform
+	if copt_platform == 'win' and not copt_msvc and use_tpt_libs == 'static'
+		lib_platform = 'mingw'
+		project_link_args += [
+			'-static',
+			'-static-libgcc',
+			'-static-libstdc++',
+			'-Wl,-Bstatic', '-lstdc++', '-lpthread', '-Wl,-Bdynamic',
+		]
+	endif
+	tpt_libs = subproject('tpt-libs-prebuilt-@0@64-@1@-@2@'.format(lib_platform, use_tpt_libs, tpt_libs_vtag))
 endif
 
 uopt_native = get_option('native')
@@ -99,9 +113,6 @@ threads_dep = dependency('threads')
 zlib_dep = use_tpt_libs != 'no' ? tpt_libs.get_variable('zlib_dep') : dependency('zlib', static: uopt_static == 'system')
 sdl2_dep = use_tpt_libs != 'no' ? tpt_libs.get_variable('sdl2_dep') : dependency('sdl2', static: uopt_static == 'system')
 
-project_link_args = []
-project_c_args = []
-project_cpp_args = []
 if copt_msvc
 	if uopt_x86_sse_level >= 30
 		message('SSE3 configured to be enabled but unavailable in msvc')
@@ -179,7 +190,6 @@ endif
 
 if copt_platform == 'win'
 	other_dep = tpt_libs.get_variable('other_dep')
-	sdl2main_dep = tpt_libs.get_variable('sdl2main_dep')
 	args_ccomp_win = [ '-D_WIN32_WINNT=0x0501' ]
 	project_c_args   += args_ccomp_win
 	project_cpp_args += args_ccomp_win
@@ -252,7 +262,6 @@ if get_option('build_powder')
 	]
 	if copt_platform == 'win'
 		powder_deps += other_dep
-		powder_deps += sdl2main_dep
 	endif
 	executable(
 		'powder',
@@ -292,7 +301,6 @@ if get_option('build_font')
 	]
 	if copt_platform == 'win'
 		font_deps += other_dep
-		font_deps += sdl2main_dep
 	endif
 	executable(
 		'font',
