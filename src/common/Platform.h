@@ -39,6 +39,7 @@ namespace Platform
 	 */
 	bool MakeDirectory(ByteString dir);
 	std::vector<ByteString> DirectorySearch(ByteString directory, ByteString search, std::vector<ByteString> extensions);
+	String DoMigration(ByteString fromDir, ByteString toDir);
 
 #ifdef WIN
 	ByteString WinNarrow(const std::wstring &source);
@@ -46,6 +47,9 @@ namespace Platform
 #endif
 
 	void OpenDataFolder();
+
+	extern std::string originalCwd;
+	extern std::string sharedCwd;
 }
 
 #endif

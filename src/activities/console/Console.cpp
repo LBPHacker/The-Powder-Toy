@@ -29,32 +29,6 @@ namespace console
 		Size(gui::Point{ gameSize.x, windowHeight });
 		Position(gui::Point{ 0, 0 });
 
-		{
-			auto ok = EmplaceChild<gui::Button>();
-			ok->Visible(false);
-			ok->DrawBody(false);
-			ok->ActiveText(gui::Button::activeTextDarkened);
-			ok->Click([this]() {
-				auto input = inputBox->Text();
-				if (!input.size())
-				{
-					Quit();
-					return;
-				}
-				String output;
-				auto cr = Execute(input, output);
-				HistoryPush(cr, input, output, FormatInput(input), FormatOutput(output));
-				UpdateEntryLayout();
-				ScrollEntryIntoView(&history.back());
-				inputBox->Text("");
-				if (cr == commandOkCloseConsole)
-				{
-					Quit();
-				}
-			});
-			OkayButton(ok);
-		}
-
 		sp = EmplaceChild<gui::ScrollPanel>().get();
 		sp->Position(gui::Point{ 0, 0 });
 		sp->AlignBottom(true);
@@ -148,6 +122,23 @@ namespace console
 				++editing;
 				inputBox->Text(editing == history.end() ? inputEditingBackup : editing->input);
 				inputBox->Cursor(int(inputBox->Text().size()));
+			}
+			return true;
+
+		case SDLK_RETURN:
+			if (inputBox->Text().size())
+			{
+				auto input = inputBox->Text();
+				String output;
+				auto cr = Execute(input, output);
+				HistoryPush(cr, input, output, FormatInput(input), FormatOutput(output));
+				UpdateEntryLayout();
+				ScrollEntryIntoView(&history.back());
+				inputBox->Text("");
+				if (cr == commandOkCloseConsole)
+				{
+					Quit();
+				}
 			}
 			return true;
 

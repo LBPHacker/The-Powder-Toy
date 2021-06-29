@@ -503,7 +503,7 @@ namespace game
 		brushes[TRI_BRUSH] = std::make_unique<brush::TriangleBrush>();
 		for (auto &bf : Platform::DirectorySearch(BRUSH_DIR, "", { ".ptb" }))
 		{
-			auto data = Client::Ref().ReadFile(bf);
+			auto data = Client::Ref().ReadFile(ByteString(BRUSH_DIR "/") + bf);
 			if (!data.size())
 			{
 				std::cerr << "Skipping brush " << bf << ": failed to open" << std::endl;
@@ -547,22 +547,19 @@ namespace game
 		ModalWindow::Tick();
 		auto pos = gui::SDLWindow::Ref().MousePosition();
 
-		if (activeToolIndex != -1)
+		switch (activeToolMode)
 		{
-			switch (activeToolMode)
-			{
-			case toolModeFree:
-				ToolDrawWithBrush(toolStartPos, pos);
-				toolStartPos = pos;
-				break;
+		case toolModeFree:
+			ToolDrawWithBrush(toolStartPos, pos);
+			toolStartPos = pos;
+			break;
 
-			case toolModeFill:
-				currentTools[activeToolIndex]->Fill(pos);
-				break;
+		case toolModeFill:
+			currentTools[activeToolIndex]->Fill(pos);
+			break;
 
-			default:
-				break;
-			}
+		default:
+			break;
 		}
 
 		BuildToolPanel();
@@ -600,7 +597,7 @@ namespace game
 					std::copy(data + y * simulationSize.x, data + (y + 1) * simulationSize.x, reinterpret_cast<uint32_t *>(reinterpret_cast<char *>(pixels) + y * pitch));
 				}
 			}
-			if (drawHUD && (activeToolIndex != -1 || (g.UnderMouse() && gui::Rect{ gui::Point{ 0, 0 }, simulationSize }.Contains(g.MousePosition()))))
+			if (drawHUD && (activeToolMode != toolModeNone || (g.UnderMouse() && gui::Rect{ gui::Point{ 0, 0 }, simulationSize }.Contains(g.MousePosition()))))
 			{
 				DrawBrush(pixels, pitch);
 			}
@@ -625,23 +622,20 @@ namespace game
 	
 	bool Game::MouseMove(gui::Point current, gui::Point delta)
 	{
-		if (activeToolIndex != -1)
+		auto pos = gui::SDLWindow::Ref().MousePosition();
+		switch (activeToolMode)
 		{
-			auto pos = gui::SDLWindow::Ref().MousePosition();
-			switch (activeToolMode)
-			{
-			case toolModeFree:
-				ToolDrawWithBrush(toolStartPos, pos);
-				toolStartPos = pos;
-				break;
+		case toolModeFree:
+			ToolDrawWithBrush(toolStartPos, pos);
+			toolStartPos = pos;
+			break;
 
-			case toolModeFill:
-				currentTools[activeToolIndex]->Fill(pos);
-				break;
+		case toolModeFill:
+			currentTools[activeToolIndex]->Fill(pos);
+			break;
 
-			default:
-				break;
-			}
+		default:
+			break;
 		}
 		return false;
 	}
@@ -790,50 +784,47 @@ namespace game
 			}
 		}
 
-		if (activeToolIndex != -1)
+		switch (activeToolMode)
 		{
-			switch (activeToolMode)
-			{
-			case toolModeLine:
-				BrushLine(toolStartPos.x, toolStartPos.y, pos.x, pos.y, brushPixel);
-				break;
+		case toolModeLine:
+			BrushLine(toolStartPos.x, toolStartPos.y, pos.x, pos.y, brushPixel);
+			break;
 
-			case toolModeRect:
+		case toolModeRect:
+			{
+				auto rect = gui::Rect::FromCorners(toolStartPos, pos);
+				if (rect.size.x == 1)
 				{
-					auto rect = gui::Rect::FromCorners(toolStartPos, pos);
-					if (rect.size.x == 1)
+					for (auto y = rect.pos.y; y < rect.pos.y + rect.size.y; ++y)
 					{
-						for (auto y = rect.pos.y; y < rect.pos.y + rect.size.y; ++y)
-						{
-							brushPixel(rect.pos.x, y);
-						}
-					}
-					else if (rect.size.y == 1)
-					{
-						for (auto x = rect.pos.x; x < rect.pos.x + rect.size.x; ++x)
-						{
-							brushPixel(x, rect.pos.y);
-						}
-					}
-					else
-					{
-						for (auto x = rect.pos.x; x < rect.pos.x + rect.size.x; ++x)
-						{
-							brushPixel(x, rect.pos.y);
-							brushPixel(x, rect.pos.y + rect.size.y - 1);
-						}
-						for (auto y = rect.pos.y + 1; y < rect.pos.y + rect.size.y - 1; ++y)
-						{
-							brushPixel(rect.pos.x, y);
-							brushPixel(rect.pos.x + rect.size.x - 1, y);
-						}
+						brushPixel(rect.pos.x, y);
 					}
 				}
-				break;
-
-			default:
-				break;
+				else if (rect.size.y == 1)
+				{
+					for (auto x = rect.pos.x; x < rect.pos.x + rect.size.x; ++x)
+					{
+						brushPixel(x, rect.pos.y);
+					}
+				}
+				else
+				{
+					for (auto x = rect.pos.x; x < rect.pos.x + rect.size.x; ++x)
+					{
+						brushPixel(x, rect.pos.y);
+						brushPixel(x, rect.pos.y + rect.size.y - 1);
+					}
+					for (auto y = rect.pos.y + 1; y < rect.pos.y + rect.size.y - 1; ++y)
+					{
+						brushPixel(rect.pos.x, y);
+						brushPixel(rect.pos.x + rect.size.x - 1, y);
+					}
+				}
 			}
+			break;
+
+		default:
+			break;
 		}
 	}
 
@@ -1687,7 +1678,7 @@ namespace game
 		{
 			return;
 		}
-		if (activeToolIndex != -1)
+		if (activeToolMode != toolModeNone)
 		{
 			ToolCancel(activeToolIndex);
 		}
@@ -1721,16 +1712,16 @@ namespace game
 
 	void Game::ToolCancel(int index)
 	{
-		if (activeToolIndex != index)
+		if (activeToolMode == toolModeNone)
 		{
 			return;
 		}
-		activeToolIndex = -1;
+		activeToolMode = toolModeNone;
 	}
 
 	void Game::ToolFinish(int index)
 	{
-		if (activeToolIndex != index)
+		if (activeToolMode == toolModeNone)
 		{
 			return;
 		}
@@ -1757,7 +1748,7 @@ namespace game
 		default:
 			break;
 		}
-		activeToolIndex = -1;
+		activeToolMode = toolModeNone;
 	}
 
 	void Game::AdjustBrushOrZoomSize(int sign)
@@ -1800,8 +1791,9 @@ namespace game
 
 	void Game::CurrentBrush(int newCurrentBrush)
 	{
+		brushes[newCurrentBrush]->RequestedRadius(BrushRadius());
 		currentBrush = newCurrentBrush;
-		brushes[currentBrush]->RequestedRadius(BrushRadius());
+		UpdateLastBrush(activeToolIndex);
 	}
 
 	void Game::OpenToolSearch()
@@ -1836,10 +1828,7 @@ namespace game
 		auto gz = false;
 		for (auto *tool : currentTools)
 		{
-			if (tool)
-			{
-				gz |= tool->EnablesGravityZones();
-			}
+			gz |= tool && tool->EnablesGravityZones();
 		}
 		simulationRenderer->GravityZonesEnabled(gz);
 		UpdateLastBrush(index);
@@ -1849,7 +1838,7 @@ namespace game
 	{
 		if (newFavorite != Favorite(identifier))
 		{
-			if (newFavorite && tools.find(identifier) != tools.end())
+			if (newFavorite)
 			{
 				favorites.insert(identifier);
 			}

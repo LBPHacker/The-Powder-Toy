@@ -107,6 +107,7 @@ namespace brush
 
 	enum ToolMode
 	{
+		toolModeNone,
 		toolModeFree,
 		toolModeLine,
 		toolModeRect,
@@ -223,8 +224,8 @@ namespace brush
 		void ToggleDrawHUD();
 		void ToggleDebugHUD();
 
-		int activeToolIndex = -1;
-		ToolMode activeToolMode;
+		int activeToolIndex = 0;
+		ToolMode activeToolMode = toolModeNone;
 		std::map<String, std::unique_ptr<tool::Tool>> tools;
 		void InitTools();
 		gui::Point toolStartPos;

@@ -74,10 +74,6 @@ namespace gui
 		{
 			okayButton->TriggerClick();
 		}
-		else
-		{
-			Quit();
-		}
 	}
 
 	bool ModalWindow::MouseDown(Point current, int button)
