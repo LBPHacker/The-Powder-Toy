@@ -58,10 +58,10 @@ namespace options
 		sp->Position(gui::Point{ 1, 23 });
 		sp->Size(windowSize - sp->Position() - gui::Point{ 1, 16 });
 
-		auto spi = sp->Interior(); // * It's bigger on the inside.
+		auto *spi = sp->Interior().get(); // * It's bigger on the inside.
 		auto interorHeight = 8;
 
-		auto simCheck = [&interorHeight, &spi](String name, String introduced, String description, bool value, gui::CheckBox::ChangeCallback cb) {
+		auto simCheck = [&interorHeight, spi](String name, String introduced, String description, bool value, gui::CheckBox::ChangeCallback cb) {
 			auto checkbox = spi->EmplaceChild<gui::CheckBox>();
 			checkbox->Position(gui::Point{ 10, interorHeight });
 			checkbox->Size(gui::Point{ windowSize.x - 20, 14 });
@@ -75,7 +75,7 @@ namespace options
 			interorHeight += 30;
 		};
 
-		auto simDrop = [&interorHeight, &spi](String name, std::vector<String> options, int value, gui::DropDown::ChangeCallback cb) {
+		auto simDrop = [&interorHeight, spi](String name, std::vector<String> options, int value, gui::DropDown::ChangeCallback cb) {
 			auto label = spi->EmplaceChild<gui::Static>();
 			label->Position(gui::Point{ 10, interorHeight });
 			label->Size(gui::Point{ windowSize.x - 29 - simDropWidth, 14 });
@@ -89,14 +89,14 @@ namespace options
 			interorHeight += 20;
 		};
 
-		auto separator = [&interorHeight, &spi]() {
+		auto separator = [&interorHeight, spi]() {
 			auto sep = spi->EmplaceChild<gui::Separator>();
 			sep->Position(gui::Point{ 0, interorHeight - 4 });
 			sep->Size(gui::Point{ windowSize.x - 2, 1 });
 			interorHeight += 8;
 		};
 
-		auto otherCheck = [&interorHeight, &spi](int indent, String name, String description, bool value, gui::CheckBox::ChangeCallback cb) {
+		auto otherCheck = [&interorHeight, spi](int indent, String name, String description, bool value, gui::CheckBox::ChangeCallback cb) {
 			indent *= 15;
 			auto checkbox = spi->EmplaceChild<gui::CheckBox>();
 			checkbox->Position(gui::Point{ 10 + indent, interorHeight });
@@ -107,7 +107,7 @@ namespace options
 			interorHeight += 20;
 		};
 
-		auto otherDrop = [&interorHeight, &spi](int indent, int width, String description, std::vector<String> options, int value, gui::DropDown::ChangeCallback cb) {
+		auto otherDrop = [&interorHeight, spi](int indent, int width, String description, std::vector<String> options, int value, gui::DropDown::ChangeCallback cb) {
 			auto label = spi->EmplaceChild<gui::Static>();
 			label->Position(gui::Point{ 15 + width, interorHeight });
 			label->Size(gui::Point{ windowSize.x - 30 - width, 14 });
@@ -121,7 +121,7 @@ namespace options
 			interorHeight += 20;
 		};
 
-		auto otherButton = [&interorHeight, &spi](int indent, int width, String title, String description, gui::Button::ClickCallback cb) {
+		auto otherButton = [&interorHeight, spi](int indent, int width, String title, String description, gui::Button::ClickCallback cb) {
 			auto label = spi->EmplaceChild<gui::Static>();
 			label->Position(gui::Point{ 15 + width, interorHeight });
 			label->Size(gui::Point{ windowSize.x - 30 - width, 14 });

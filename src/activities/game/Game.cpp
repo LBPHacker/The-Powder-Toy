@@ -55,6 +55,7 @@ namespace game
 	constexpr auto logFadeTicks = 1000;
 	constexpr auto windowSize = gui::Point{ WINDOWW, WINDOWH };
 	constexpr auto simulationSize = gui::Point{ XRES, YRES };
+	constexpr auto simulationRect = gui::Rect{ gui::Point{ 0, 0 }, simulationSize };
 
 	static ActionKey actionKeyWithoutMod(ActionSource source, int code)
 	{
@@ -123,18 +124,18 @@ namespace game
 		return false;
 	}
 
-	class CategoryButton : public gui::Button
+	class MenuSectionButton : public gui::Button
 	{
 		int id;
 
 	public:
-		CategoryButton(int id) : id(id)
+		MenuSectionButton(int id) : id(id)
 		{
 		}
 
 		void Tick() final override
 		{
-			Stuck(Game::Ref().CurrentCategory() == id);
+			Stuck(Game::Ref().CurrentMenuSection() == id);
 		}
 
 		void MouseEnter(gui::Point current) final override
@@ -242,9 +243,23 @@ namespace game
 			return addButtonHorizAny(right, text, width, alignLeft, windowSize.y - 16, cb, EmplaceChild<gui::Button>(), abhlNextX, abhrNextX);
 		};
 
+		auto addToolTipHoriz = [](gui::Button *button, String toolTip) {
+			button->ToolTip(gui::ToolTipInfo{ toolTip, gui::Point{ 12, simulationSize.y - 12 } });
+		};
+
+		auto addToolTipVert = [](gui::Button *button, String toolTip) {
+			auto pos = gui::Point{ simulationSize.x - gui::SDLWindow::Ref().TextSize(toolTip).x - 9, button->AbsolutePosition().y + 2 };
+			if (pos.y > simulationSize.y - 12)
+			{
+				pos.y = simulationSize.y - 12;
+			}
+			button->ToolTip(gui::ToolTipInfo{ toolTip, pos });
+		};
+
 		pauseButton = addButtonHoriz(true, gui::IconString(gui::Icons::pause, gui::Point{ -1, -2 }), 15, false, [this]() {
 			TogglePaused();
 		}).get();
+		addToolTipHoriz(pauseButton, "Pause/resume simulation");
 		rendererButton = addButtonHoriz(true,
 			gui::BlendAddString() + gui::ColorString(gui::Color{ 0xFF, 0x00, 0x00 }) + gui::IconString(gui::Icons::gradient1, gui::Point{ 0, -1 }) +
 			gui::StepBackString() + gui::ColorString(gui::Color{ 0x00, 0xFF, 0x00 }) + gui::IconString(gui::Icons::gradient2, gui::Point{ 0, -1 }) +
@@ -254,6 +269,7 @@ namespace game
 				UpdateGroups();
 			}
 		).get(); // * TODO-REDO_UI: reapply add blend mode somehow
+		addToolTipHoriz(rendererButton, "Renderer options");
 
 		auto abhlNextXSave = abhlNextX;
 		auto abhrNextXSave = abhrNextX;
@@ -281,24 +297,27 @@ namespace game
 		// * TODO-REDO_UI
 		})->Enabled(false);
 
-		addButtonHorizSave(true, gui::IconString(gui::Icons::settings, gui::Point{ 0, -1 }), 15, false, []() {
+		auto *optionsButton = addButtonHorizSave(true, gui::IconString(gui::Icons::settings, gui::Point{ 0, -1 }), 15, false, []() {
 			gui::SDLWindow::Ref().EmplaceBack<options::Options>();
-		});
+		}).get();
+		addToolTipHoriz(optionsButton, "Simulation options");
 
 		profileButton = groupSave->EmplaceChild<gui::Button>().get();
 		profileButton->Align(gui::Alignment::horizLeft | gui::Alignment::vertCenter);
 		loginButton = addButtonHorizSave(true, "", 92, true, []() {
 			gui::SDLWindow::Ref().EmplaceBack<login::Login>();
 		}).get();
+		addToolTipHoriz(loginButton, "Sign into simulation server");
 		{
 			auto diff = gui::Point{ 19, 0 };
 			profileButton->Position(loginButton->Position() + diff);
 			profileButton->Size(loginButton->Size() - diff);
 		}
 
-		addButtonHorizSave(true, gui::IconString(gui::Icons::empty, gui::Point{ -1, -2 }), 17, false, [this]() {
+		auto *clearButton = addButtonHorizSave(true, gui::IconString(gui::Icons::empty, gui::Point{ -1, -2 }), 17, false, [this]() {
 			simulation->clear_sim();
-		});
+		}).get();
+		addToolTipHoriz(clearButton, "Clear simulation");
 
 		addButtonHorizSave(false, gui::IconString(gui::Icons::tag, gui::Point{ 2, -2 }) + gui::OffsetString(7) + String("[no tags set]"), abhrNextXSave - abhlNextXSave - 1, true, []() {
 		// * TODO-REDO_UI
@@ -312,51 +331,55 @@ namespace game
 			button->Text(text);
 			button->Click(cb);
 			abvNextY -= 16;
+			return button;
 		};
 
-		currentCategory = SC_POWDERS;
-		addButtonVert(gui::IconString(gui::Icons::search, gui::Point{ 0, -2 }), [this]() {
+		currentMenuSection = SC_POWDERS;
+		auto *searchButton = addButtonVert(gui::IconString(gui::Icons::search, gui::Point{ 0, -2 }), [this]() {
 			OpenToolSearch();
-		});
+		}).get();
+		addToolTipVert(searchButton, "Element search");
 		for (auto i = 0; i < SC_TOTAL; ++i)
 		{
 			auto &ms = menuSections[i];
-			auto button = EmplaceChild<CategoryButton>(i);
+			auto button = EmplaceChild<MenuSectionButton>(i);
 			button->Size(gui::Point{ 15, 15 });
 			button->Position(gui::Point{ windowSize.x - 16, abvNextY - (SC_TOTAL - i - 1) * 16 });
 			button->Text(gui::IconString(ms.icon, gui::Point{ 0, -2 }));
 			button->Click([this, i]() {
-				currentCategory = i;
+				currentMenuSection = i;
 			});
+			addToolTipVert(button.get(), ms.name);
 		}
 
 		auto aboNextY = 1;
-		auto addButtonOption = [this, &aboNextY](String text, gui::Button::ClickCallback cb) {
+		auto addButtonOption = [this, &aboNextY, addToolTipVert](String text, String toolTip, gui::Button::ClickCallback cb) {
 			auto button = EmplaceChild<gui::Button>();
 			button->Size(gui::Point{ 15, 15 });
 			button->Position(gui::Point{ windowSize.x - 16, aboNextY });
 			button->Text(text);
 			button->Click(cb);
+			addToolTipVert(button.get(), toolTip);
 			aboNextY += 16;
 			return button;
 		};
 
-		sandEffectButton = addButtonOption("P", [this]() {
-			ToggleSandEffect();
+		prettyPowdersButton = addButtonOption("P", "Pretty powders", [this]() {
+			TogglePrettyPowders();
 		}).get();
-		drawGravityButton = addButtonOption("G", [this]() {
+		drawGravityButton = addButtonOption("G", "Draw gravity field", [this]() {
 			ToggleDrawGravity();
 		}).get();
-		drawDecoButton = addButtonOption("D", [this]() {
+		drawDecoButton = addButtonOption("D", "Draw decorations", [this]() {
 			ToggleDrawDeco();
 		}).get();
-		newtonianGravityButton = addButtonOption("N", [this]() {
+		newtonianGravityButton = addButtonOption("N", "Newtonian gravity", [this]() {
 			ToggleNewtonianGravity();
 		}).get();
-		ambientHeatButton = addButtonOption("A", [this]() {
+		ambientHeatButton = addButtonOption("A", "Ambient heat simulation", [this]() {
 			ToggleAmbientHeat();
 		}).get();
-		addButtonOption("C", [this]() {
+		addButtonOption("C", "Open console", [this]() {
 			OpenConsole();
 		});
 
@@ -369,15 +392,15 @@ namespace game
 			return addButtonHorizAny(right, text, width, alignLeft, 0, cb, groupRender->EmplaceChild<gui::Button>(), abhlNextXRender, abhrNextXRender);
 		};
 
-		auto addRenderModeCheckbox = [this, addButtonHorizRender](int flag, String text, String toolTip) {
-			auto button = addButtonHorizRender(false, text, 17, false, nullptr);
+		auto addRenderModeCheckbox = [this, addButtonHorizRender, addToolTipHoriz](int flag, String text, String toolTip) {
+			auto *button = addButtonHorizRender(false, text, 17, false, nullptr).get();
 			button->Click([this, button]() {
 				button->Stuck(!button->Stuck());
 				ApplyRendererSettings();
 			});
-			button->ToolTip(gui::ToolTipInfo{ toolTip, gui::Point{ 12, simulationSize.y - 12 } });
 			button->ActiveText(gui::Button::activeTextDarkened);
-			renderModeButtons.push_back(std::make_tuple(flag, button.get()));
+			addToolTipHoriz(button, toolTip);
+			renderModeButtons.push_back(std::make_tuple(flag, button));
 		};
 
 		abhlNextXRender += 2;
@@ -392,15 +415,15 @@ namespace game
 		addRenderModeCheckbox(RENDER_SPRK, gui::ColorString(gui::Color({ 0xFF, 0xFF, 0xA0 })) + gui::IconString(gui::Icons::effect, gui::Point{  0, -1 }), "Glow effect on sparks");
 		abhlNextXRender += 10;
 
-		auto addDisplayModeCheckbox = [this, addButtonHorizRender](int flag, String text, String toolTip) {
-			auto button = addButtonHorizRender(false, text, 17, false, nullptr);
+		auto addDisplayModeCheckbox = [this, addButtonHorizRender, addToolTipHoriz](int flag, String text, String toolTip) {
+			auto *button = addButtonHorizRender(false, text, 17, false, nullptr).get();
 			button->Click([this, button]() {
 				button->Stuck(!button->Stuck());
 				ApplyRendererSettings();
 			});
-			button->ToolTip(gui::ToolTipInfo{ toolTip, gui::Point{ 12, simulationSize.y - 12 } });
 			button->ActiveText(gui::Button::activeTextDarkened);
-			displayModeButtons.push_back(std::make_tuple(flag, button.get()));
+			addToolTipHoriz(button, toolTip);
+			displayModeButtons.push_back(std::make_tuple(flag, button));
 		};
 
 		addDisplayModeCheckbox(DISPLAY_AIRC, gui::ColorString(gui::Color({ 0xFF, 0x37, 0x37 })) + gui::IconString(gui::Icons::alterairbg, gui::Point{  0, -1 }) + gui::StepBackString() +
@@ -414,15 +437,15 @@ namespace game
 		addDisplayModeCheckbox(DISPLAY_PERS, gui::ColorString(gui::Color({ 0xD4, 0xD4, 0xD4 })) + gui::IconString(gui::Icons::persistent, gui::Point{  0, -1 }), "Element paths persist on the screen for a while");
 		abhlNextXRender += 10;
 
-		auto addColourModeCheckbox = [this, addButtonHorizRender](int flag, String text, String toolTip) {
-			auto button = addButtonHorizRender(false, text, 17, false, nullptr);
+		auto addColourModeCheckbox = [this, addButtonHorizRender, addToolTipHoriz](int flag, String text, String toolTip) {
+			auto *button = addButtonHorizRender(false, text, 17, false, nullptr).get();
 			button->Click([this, button]() {
 				button->Stuck(!button->Stuck());
 				ApplyRendererSettings();
 			});
-			button->ToolTip(gui::ToolTipInfo{ toolTip, gui::Point{ 12, simulationSize.y - 12 } });
 			button->ActiveText(gui::Button::activeTextDarkened);
-			colorModeButtons.push_back(std::make_tuple(flag, button.get()));
+			addToolTipHoriz(button, toolTip);
+			colorModeButtons.push_back(std::make_tuple(flag, button));
 		};
 
 		addColourModeCheckbox(COLOUR_HEAT, gui::ColorString(gui::Color({ 0xFF, 0x00, 0x00 })) + gui::IconString(gui::Icons::heatbg  ,  gui::Point{ 0, -2 }) + gui::StepBackString() +
@@ -431,13 +454,13 @@ namespace game
 		addColourModeCheckbox(COLOUR_GRAD, gui::ColorString(gui::Color({ 0xCD, 0x32, 0xCD })) + gui::IconString(gui::Icons::gradient,  gui::Point{ 0, -1 }), "Changes colors of elements slightly to show heat diffusing through them");
 		addColourModeCheckbox(COLOUR_BASC, gui::ColorString(gui::Color({ 0xC0, 0xC0, 0xC0 })) + gui::IconString(gui::Icons::basic   ,  gui::Point{ 0, -1 }), "No special effects at all for anything, overrides all other options and deco");
 
-		auto addPresetButton = [this, addButtonHorizRender](int preset, String text, String toolTip) {
-			auto button = addButtonHorizRender(true, text, 17, false, [this, preset]() {
+		auto addPresetButton = [this, addButtonHorizRender, addToolTipHoriz](int preset, String text, String toolTip) {
+			auto *button = addButtonHorizRender(true, text, 17, false, [this, preset]() {
 				RendererPreset(preset);
-			});
-			button->ToolTip(gui::ToolTipInfo{ toolTip, gui::Point{ 12, simulationSize.y - 12 } });
+			}).get();
 			button->ActiveText(gui::Button::activeTextDarkened);
-			rendererPresetButtons.push_back(std::make_tuple(preset, button.get()));
+			addToolTipHoriz(button, toolTip);
+			rendererPresetButtons.push_back(std::make_tuple(preset, button));
 		};
 
 		addPresetButton(10, gui::ColorString(gui::Color({ 0xFF, 0xFF, 0xFF })) + gui::IconString(gui::Icons::life      , gui::Point{  0, -1 }), "Life display mode preset");
@@ -520,7 +543,7 @@ namespace game
 		cellAlignedBrush = std::make_unique<brush::CellAlignedBrush>();
 	}
 
-	void Game::BuildToolPanel()
+	void Game::MaybeBuildToolPanel()
 	{
 		if (shouldBuildToolPanel)
 		{
@@ -532,6 +555,8 @@ namespace game
 
 	void Game::ToolDrawWithBrush(gui::Point from, gui::Point to)
 	{
+		from = simulationRect.Clamp(from);
+		to = simulationRect.Clamp(to);
 		auto *tool = currentTools[activeToolIndex];
 		auto *brush = tool->CellAligned() ? cellAlignedBrush.get() : brushes[currentBrush].get();
 		if (lastBrush->CellAligned())
@@ -562,7 +587,7 @@ namespace game
 			break;
 		}
 
-		BuildToolPanel();
+		MaybeBuildToolPanel();
 
 		simulation->BeforeSim();
 		if (!simulation->sys_pause || simulation->framerender)
@@ -597,7 +622,7 @@ namespace game
 					std::copy(data + y * simulationSize.x, data + (y + 1) * simulationSize.x, reinterpret_cast<uint32_t *>(reinterpret_cast<char *>(pixels) + y * pitch));
 				}
 			}
-			if (drawHUD && (activeToolMode != toolModeNone || (g.UnderMouse() && gui::Rect{ gui::Point{ 0, 0 }, simulationSize }.Contains(g.MousePosition()))))
+			if (drawHUD && (activeToolMode != toolModeNone || (g.UnderMouse() && simulationRect.Contains(g.MousePosition()))))
 			{
 				DrawBrush(pixels, pitch);
 			}
@@ -738,7 +763,7 @@ namespace game
 	void Game::DrawBrush(void *pixels, int pitch) const
 	{
 		auto brushPixel = [this, pixels, pitch](int x, int y) {
-			if (gui::Rect{ gui::Point{ 0, 0 }, simulationSize }.Contains(gui::Point{ x, y }))
+			if (simulationRect.Contains(gui::Point{ x, y }))
 			{
 				auto &pix = *reinterpret_cast<uint32_t *>(reinterpret_cast<char *>(pixels) + y * pitch + x * sizeof(uint32_t));
 				pix = (PixB(pix) + 3 * PixG(pix) + 2 * PixR(pix) < 512) ? 0xC0C0C0U : 0x404040U;
@@ -746,7 +771,7 @@ namespace game
 		};
 
 		auto &g = gui::SDLWindow::Ref();
-		auto pos = g.MousePosition();
+		auto pos = simulationRect.Clamp(g.MousePosition());
 
 		// * TODO-REDO_UI: Do this with a texture instead or something.
 		if ((g.Mod() & gui::SDLWindow::mod0) && (g.Mod() & gui::SDLWindow::mod1))
@@ -762,14 +787,13 @@ namespace game
 		}
 		else
 		{
-			auto rsim = gui::Rect{ gui::Point{ 0, 0 }, simulationSize };
 			auto pmid = pos;
 			if (lastBrush->CellAligned())
 			{
 				pmid = gui::Point{ pos.x / CELL * CELL + CELL / 2, pos.y / CELL * CELL + CELL / 2 };
 			}
 			auto rbru = gui::Rect{ pmid - lastBrush->EffectiveRadius(), lastBrush->EffectiveSize() };
-			auto rcom = rbru.Intersect(rsim);
+			auto rcom = rbru.Intersect(simulationRect);
 			auto tl = rcom.pos;
 			auto br = rcom.pos + rcom.size;
 			for (auto y = tl.y; y < br.y; ++y)
@@ -880,11 +904,11 @@ namespace game
 		simulationTexture = NULL;
 	}
 
-	void Game::SandEffect(bool newSandEffect)
+	void Game::PrettyPowders(bool newPrettyPowders)
 	{
-		sandEffect = newSandEffect;
-		sandEffectButton->Stuck(sandEffect);
-		simulation->pretty_powder = sandEffect ? 1 : 0;
+		prettyPowders = newPrettyPowders;
+		prettyPowdersButton->Stuck(prettyPowders);
+		simulation->pretty_powder = prettyPowders ? 1 : 0;
 	}
 
 	void Game::DrawGravity(bool newDrawGravity)
@@ -1112,7 +1136,7 @@ namespace game
 
 	bool Game::HandlePress(ActionSource source, int code, int mod, int multiplier)
 	{
-		RehashAvailableActions();
+		MaybeRehashAvailableActions();
 		actionMultiplier = multiplier;
 		auto keyWithoutMod = actionKeyWithoutMod(source, code);
 		auto keyWithMod = actionKeyWithMod(source, code, mod);
@@ -1134,7 +1158,7 @@ namespace game
 
 	bool Game::HandleRelease(ActionSource source, int code)
 	{
-		RehashAvailableActions();
+		MaybeRehashAvailableActions();
 		auto keyWithoutMod = actionKeyWithoutMod(source, code);
 		auto removed = std::remove_if(activeActions.begin(), activeActions.end(), [keyWithoutMod](std::pair<ActionKey, Action *> &active) {
 			return active.first == keyWithoutMod;
@@ -1259,7 +1283,7 @@ namespace game
 		shouldBuildToolPanel = true;
 	}
 
-	void Game::RehashAvailableActions()
+	void Game::MaybeRehashAvailableActions()
 	{
 		if (shouldRehashAvailableActions)
 		{
@@ -1338,9 +1362,9 @@ namespace game
 		Paused(!Paused());
 	}
 
-	void Game::ToggleSandEffect()
+	void Game::TogglePrettyPowders()
 	{
-		SandEffect(!SandEffect());
+		PrettyPowders(!PrettyPowders());
 	}
 
 	void Game::ToggleDrawGravity()
@@ -1432,8 +1456,8 @@ namespace game
 		auto propFreedom = gui::SDLWindow::mod0;
 		std::vector<Action> gameActions = {
 			{ "DEFAULT_AC_NONE"             , "No action"              , 0,    0,                                nullptr,  nullptr },
-			{ "DEFAULT_AC_TOGGLEPAUSED"     , "Pause/Resume simulation", 0, 1000, [this]() { TogglePaused();           },  nullptr },
-			{ "DEFAULT_AC_TOGGLESANDEFFECT" , "Sand effect"            , 0, 2000, [this]() { ToggleSandEffect();       },  nullptr },
+			{ "DEFAULT_AC_TOGGLEPAUSED"     , "Pause/resume simulation", 0, 1000, [this]() { TogglePaused();           },  nullptr },
+			{ "DEFAULT_AC_TOGGLEPRETTYPOWDERS", "Pretty powders"         , 0, 2000, [this]() { TogglePrettyPowders();    },  nullptr },
 			{ "DEFAULT_AC_TOGGLEDRAWGRAV"   , "Draw gravity field"     , 0, 2001, [this]() { ToggleDrawGravity();      },  nullptr },
 			{ "DEFAULT_AC_TOGGLEDRAWDECO"   , "Draw decorations"       , 0, 2002, [this]() { ToggleDrawDeco();         },  nullptr },
 			{ "DEFAULT_AC_TOGGLENEWTONIAN"  , "Newtonian gravity"      , 0, 2003, [this]() { ToggleNewtonianGravity(); },  nullptr },
@@ -1445,7 +1469,7 @@ namespace game
 			{ "DEFAULT_AC_TOGGLEHUD"        , "Toggle HUD"             , 0,    0, [this]() { ToggleDrawHUD();          },  nullptr },
 			{ "DEFAULT_AC_TOGGLEDEBUG"      , "Toggle Debug HUD"       , 0,    0, [this]() { ToggleDebugHUD();         },  nullptr },
 			{ "DEFAULT_AC_TOOLSEARCH"       , "Open tool search"       , 0,    0, [this]() { OpenToolSearch();         },  nullptr },
-			{ "DEFAULT_AC_SHOWCONSOLE"      , ""                       , 0,    0,                                nullptr,  nullptr }, // * TODO-REDO_UI
+			{ "DEFAULT_AC_SHOWCONSOLE"      , "Open console"           , 0,    0, [this]() { OpenConsole();            },  nullptr },
 			{ "DEFAULT_AC_RELOADSIM"        , ""                       , 0,    0,                                nullptr,  nullptr }, // * TODO-REDO_UI
 			{ "DEFAULT_AC_AUTHORINFO"       , ""                       , 0,    0,                                nullptr,  nullptr }, // * TODO-REDO_UI
 			{ "DEFAULT_AC_TOOLFIND"         , ""                       , 0,    0,                                nullptr,  nullptr }, // * TODO-REDO_UI

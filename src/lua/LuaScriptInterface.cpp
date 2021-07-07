@@ -1727,10 +1727,10 @@ int LuaScriptInterface::simulation_prettyPowders(lua_State * l)
 	int acount = lua_gettop(l);
 	if (acount == 0)
 	{
-		lua_pushnumber(l, luacon_game->SandEffect() ? 1 : 0);
+		lua_pushnumber(l, luacon_game->PrettyPowders() ? 1 : 0);
 		return 1;
 	}
-	luacon_game->SandEffect(luaL_optint(l, 1, 0));
+	luacon_game->PrettyPowders(luaL_optint(l, 1, 0));
 	return 0;
 }
 

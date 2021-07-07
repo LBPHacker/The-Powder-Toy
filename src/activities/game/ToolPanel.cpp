@@ -31,7 +31,7 @@ namespace game
 
 		void Tick() final override
 		{
-			if (Game::Ref().CurrentCategory() == index)
+			if (Game::Ref().CurrentMenuSection() == index)
 			{
 				Visible(true);
 				auto scroll = (gui::SDLWindow::Ref().MousePosition() - Parent()->AbsolutePosition()).x;

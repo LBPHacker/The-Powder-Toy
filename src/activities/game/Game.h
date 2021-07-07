@@ -129,13 +129,13 @@ namespace brush
 		std::unique_ptr<Simulation> simulation;
 		std::unique_ptr<SimulationRenderer> simulationRenderer;
 
-		gui::Button *sandEffectButton = nullptr;
+		gui::Button *prettyPowdersButton = nullptr;
 		gui::Button *drawGravityButton = nullptr;
 		gui::Button *drawDecoButton = nullptr;
 		gui::Button *newtonianGravityButton = nullptr;
 		gui::Button *ambientHeatButton = nullptr;
 		gui::Button *pauseButton = nullptr;
-		bool sandEffect = false;
+		bool prettyPowders = false;
 		bool drawGravity = false;
 		bool drawDeco = false;
 		bool newtonianGravity = false;
@@ -155,9 +155,9 @@ namespace brush
 		void InitWindow();
 
 		ToolPanel *toolPanel = nullptr;
-		int currentCategory = 0;
+		int currentMenuSection = 0;
 		bool shouldBuildToolPanel = true;
-		void BuildToolPanel();
+		void MaybeBuildToolPanel();
 		bool stickyCategories;
 
 		std::array<tool::Tool *, 4> currentTools = { { nullptr, nullptr, nullptr, nullptr } };
@@ -208,11 +208,11 @@ namespace brush
 		std::vector<ActionContext *> activeContexts;
 		bool shouldRehashAvailableActions = true;
 		void ShouldRehashAvailableActions();
-		void RehashAvailableActions();
+		void MaybeRehashAvailableActions();
 		void InitActions();
 
 		void TogglePaused();
-		void ToggleSandEffect();
+		void TogglePrettyPowders();
 		void ToggleDrawGravity();
 		void ToggleDrawDeco();
 		void ToggleNewtonianGravity();
@@ -258,10 +258,10 @@ namespace brush
 		bool EnterContext(ActionContext *context);
 		bool LeaveContext(ActionContext *context);
 
-		void SandEffect(bool newSandEffect);
-		bool SandEffect() const
+		void PrettyPowders(bool newPrettyPowders);
+		bool PrettyPowders() const
 		{
-			return sandEffect;
+			return prettyPowders;
 		}
 
 		void DrawGravity(bool newDrawGravity);
@@ -330,9 +330,9 @@ namespace brush
 			return decoSpace;
 		}
 
-		int CurrentCategory() const
+		int CurrentMenuSection() const
 		{
-			return currentCategory;
+			return currentMenuSection;
 		}
 
 		void CurrentTool(int index, tool::Tool *tool);
