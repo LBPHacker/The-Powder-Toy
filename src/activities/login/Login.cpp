@@ -16,6 +16,7 @@ namespace activities
 {
 namespace login
 {
+	constexpr auto parentSize = gui::Point{ WINDOWW, WINDOWH };
 	constexpr auto windowSize = gui::Point{ 200, 93 };
 	constexpr auto maxStatusLines = 8;
 
@@ -193,7 +194,7 @@ namespace login
 			signInButton->Size(gui::Point{ targetSize.x, 16 });
 		}
 		Size(targetSize);
-		Position((game::Game::Ref().Size() - targetSize) / 2);
+		Position((parentSize - targetSize) / 2);
 	}
 }
 }

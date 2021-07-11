@@ -22,6 +22,7 @@ namespace activities
 {
 namespace options
 {
+	constexpr auto parentSize = gui::Point{ WINDOWW, WINDOWH };
 	constexpr auto windowSize = gui::Point{ 320, 340 };
 	constexpr auto simDropWidth = 80;
 
@@ -32,7 +33,7 @@ namespace options
 
 		auto &gm = game::Game::Ref();
 		Size(windowSize);
-		Position((gm.Size() - windowSize) / 2);
+		Position((parentSize - windowSize) / 2);
 
 		{
 			auto title = EmplaceChild<gui::Static>();

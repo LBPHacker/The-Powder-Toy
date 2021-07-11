@@ -114,7 +114,7 @@ namespace gui
 			return multiline;
 		}
 
-		void Text(String newText);
+		virtual void Text(String newText);
 		const String &Text() const
 		{
 			return text;

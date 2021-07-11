@@ -5,6 +5,7 @@
 #include "activities/console/Console.h"
 #include "activities/login/Login.h"
 #include "activities/options/Options.h"
+#include "activities/profile/Profile.h"
 #include "activities/toolsearch/ToolSearch.h"
 #include "simulation/Simulation.h"
 #include "simulation/ElementGraphics.h"
@@ -303,6 +304,9 @@ namespace game
 		addToolTipHoriz(optionsButton, "Simulation options");
 
 		profileButton = groupSave->EmplaceChild<gui::Button>().get();
+		profileButton->Click([]() {
+			gui::SDLWindow::Ref().EmplaceBack<profile::Profile>(true);
+		});
 		profileButton->Align(gui::Alignment::horizLeft | gui::Alignment::vertCenter);
 		loginButton = addButtonHorizSave(true, "", 92, true, []() {
 			gui::SDLWindow::Ref().EmplaceBack<login::Login>();

@@ -6,11 +6,10 @@ namespace gui
 {
 	class Label : public TextBox
 	{
+		String formattedText;
+
 	public:
-		Label()
-		{
-			DrawBody(false);
-			Editable(false);
-		}
+		Label();
+		void Text(String newText) final override;
 	};
 }

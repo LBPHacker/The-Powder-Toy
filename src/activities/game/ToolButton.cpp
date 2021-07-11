@@ -23,34 +23,34 @@ namespace game
 		UpdateFavorite();
 	}
 
-	void ToolButton::UpdateTexture()
+	void ToolButton::UpdateTexture(bool rendererUp)
 	{
 		if (texture)
 		{
 			SDL_DestroyTexture(texture);
 			texture = nullptr;
 		}
-		if (Renderer() && tool->CanGenerateTexture())
+		if (rendererUp && tool->CanGenerateTexture())
 		{
 			texture = SDL_CreateTexture(Renderer(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, bodySize.x, bodySize.y);
-			std::vector<uint32_t> pixels(bodySize.x * bodySize.y, 0xFFFF00FF);
-			tool->GenerateTexture(bodySize, &pixels[0]);
-			SDL_UpdateTexture(texture, NULL, &pixels[0], bodySize.x * sizeof(uint32_t));
 			if (!texture)
 			{
 				throw std::runtime_error(ByteString("SDL_CreateTexture failed\n") + SDL_GetError());
 			}
+			std::vector<uint32_t> pixels(bodySize.x * bodySize.y, 0xFFFF00FF);
+			tool->GenerateTexture(bodySize, &pixels[0]);
+			SDL_UpdateTexture(texture, NULL, &pixels[0], bodySize.x * sizeof(uint32_t));
 		}
 	}
 
 	void ToolButton::RendererUp()
 	{
-		UpdateTexture();
+		UpdateTexture(true);
 	}
 
 	void ToolButton::RendererDown()
 	{
-		UpdateTexture();
+		UpdateTexture(false);
 	}
 
 	void ToolButton::Select(int toolIndex)

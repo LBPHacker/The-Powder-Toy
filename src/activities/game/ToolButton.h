@@ -21,7 +21,7 @@ namespace tool
 		gui::Color fg;
 
 		SDL_Texture *texture = nullptr;
-		void UpdateTexture();
+		void UpdateTexture(bool rendererUp);
 		void UpdateFavorite();
 
 	public:

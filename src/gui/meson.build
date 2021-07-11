@@ -4,6 +4,8 @@ gui_files = files(
 	'CheckBox.cpp',
 	'Component.cpp',
 	'DropDown.cpp',
+	'ImageButton.cpp',
+	'Label.cpp',
 	'LinearDelayAnimation.cpp',
 	'ModalWindow.cpp',
 	'MomentumAnimation.cpp',

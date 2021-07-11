@@ -16,6 +16,7 @@ namespace activities
 {
 namespace toolsearch
 {
+	constexpr auto parentSize = gui::Point{ WINDOWW, WINDOWH };
 	constexpr auto simulationSize = gui::Point{ XRES, YRES };
 	constexpr auto windowSize = gui::Point{ 236, 298 };
 
@@ -39,9 +40,8 @@ namespace toolsearch
 
 	ToolSearch::ToolSearch()
 	{
-		auto &gm = game::Game::Ref();
 		Size(windowSize);
-		Position((gm.Size() - windowSize) / 2);
+		Position((parentSize - windowSize) / 2);
 
 		{
 			auto title = EmplaceChild<gui::Static>();

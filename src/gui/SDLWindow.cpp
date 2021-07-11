@@ -1,10 +1,11 @@
 #include "SDLWindow.h"
 
-#include "ModalWindow.h"
+#include "Config.h"
+#include "Appearance.h"
 #include "Event.h"
+#include "ModalWindow.h"
 #include "icon.h"
 #include "graphics/FontData.h"
-#include "Config.h"
 
 #include <SDL2/SDL.h>
 #include <stdexcept>
@@ -764,14 +765,14 @@ namespace gui
 				auto escape = *(++it);
 				switch (escape)
 				{
-				case 'w': setColor(Color{ 0xFF, 0xFF, 0xFF }); break;
-				case 'g': setColor(Color{ 0xC0, 0xC0, 0xC0 }); break;
-				case 'o': setColor(Color{ 0xFF, 0xD8, 0x20 }); break;
-				case 'r': setColor(Color{ 0xFF, 0x00, 0x00 }); break;
-				case 'l': setColor(Color{ 0xFF, 0x4B, 0x4B }); break;
-				case 'b': setColor(Color{ 0x00, 0x00, 0xFF }); break;
-				case 't': setColor(Color{ 0x20, 0xAA, 0xFF }); break;
-				case 'u': setColor(Color{ 0x93, 0x53, 0xD3 }); break;
+				case 'w': setColor(Appearance::commonWhite    ); break;
+				case 'g': setColor(Appearance::commonLightGray); break;
+				case 'o': setColor(Appearance::commonYellow   ); break;
+				case 'r': setColor(Appearance::commonRed      ); break;
+				case 'l': setColor(Appearance::commonLightRed ); break;
+				case 'b': setColor(Appearance::commonBlue     ); break;
+				case 't': setColor(Appearance::commonLightBlue); break;
+				case 'u': setColor(Appearance::commonPurple   ); break;
 
 				case 'd':
 					bold = true;
