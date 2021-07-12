@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-x86_64-lin-gcc-static-v20210712201911
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20210712201911/tpt-libs-prebuilt-x86_64-lin-gcc-static-v20210712201911.zip
+source_filename = tpt-libs-prebuilt-x86_64-lin-gcc-static-v20210712201911.zip
+source_hash = d90249c5d862e573fbdeb9d49707b778c3ec4bf89cdb731061be2f377c6bf64a

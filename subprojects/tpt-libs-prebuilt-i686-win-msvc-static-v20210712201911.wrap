@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-i686-win-msvc-static-v20210712201911
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20210712201911/tpt-libs-prebuilt-i686-win-msvc-static-v20210712201911.zip
+source_filename = tpt-libs-prebuilt-i686-win-msvc-static-v20210712201911.zip
+source_hash = 5a38acf414bb63a98af4fb7ca7ddd2df4f05d953300cd0b7c6bb6940fed97056

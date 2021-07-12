@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-x86_64-mac-gcc-static-v20210712201911
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20210712201911/tpt-libs-prebuilt-x86_64-mac-gcc-static-v20210712201911.zip
+source_filename = tpt-libs-prebuilt-x86_64-mac-gcc-static-v20210712201911.zip
+source_hash = 61646ec60b24df779e4b5acd615b198211fefc0bc8c324c42bdd8b01c2031294
