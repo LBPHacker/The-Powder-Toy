@@ -97,6 +97,7 @@ public:
 	int gravityMode;
 	int airMode;
 	float ambientAirTemp;
+	float ambientAirPress;
 	int edgeMode;
 
 	//Signs

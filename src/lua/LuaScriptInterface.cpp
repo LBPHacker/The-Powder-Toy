@@ -844,6 +844,7 @@ void LuaScriptInterface::initSimulationAPI()
 		{"waterEqualisation", simulation_waterEqualisation},
 		{"waterEqualization", simulation_waterEqualisation},
 		{"ambientAirTemp", simulation_ambientAirTemp},
+		{"ambientAirPress", simulation_ambientAirPress},
 		{"elementCount", simulation_elementCount},
 		{"can_move", simulation_canMove},
 		{"brush", simulation_brush},
@@ -1987,6 +1988,19 @@ int LuaScriptInterface::simulation_ambientAirTemp(lua_State * l)
 	}
 	float ambientAirTemp = restrict_flt(luaL_optnumber(l, 1, R_TEMP + 273.15f), MIN_TEMP, MAX_TEMP);
 	luacon_model->SetAmbientAirTemperature(ambientAirTemp);
+	return 0;
+}
+
+int LuaScriptInterface::simulation_ambientAirPress(lua_State * l)
+{
+	int acount = lua_gettop(l);
+	if (acount == 0)
+	{
+		lua_pushnumber(l, luacon_sim->air->ambientAirPress);
+		return 1;
+	}
+	float ambientAirPress = restrict_flt(luaL_optnumber(l, 1, 0), -256.f, 256.f);
+	luacon_model->SetAmbientAirPressure(ambientAirPress);
 	return 0;
 }
 

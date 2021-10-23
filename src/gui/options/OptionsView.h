@@ -24,7 +24,9 @@ class OptionsView: public ui::Window
 	ui::Checkbox * waterEqualisation;
 	ui::DropDown * airMode;
 	ui::Textbox * ambientAirTemp;
+	ui::Textbox * ambientAirPress;
 	ui::Button * ambientAirTempPreview;
+	ui::Button * ambientAirPressPreview;
 	ui::DropDown * gravityMode;
 	ui::DropDown * edgeMode;
 	ui::DropDown * scale;
@@ -43,6 +45,9 @@ class OptionsView: public ui::Window
 	bool initializedAirTempPreview = false;
 	void UpdateAmbientAirTempPreview(float airTemp, bool isValid);
 	void UpdateAirTemp(String temp, bool isDefocus);
+	bool initializedAirPressPreview = false;
+	void UpdateAmbientAirPressurePreview(float airPress, bool isValid);
+	void UpdateAmbientAirPressure(String temp, bool isDefocus);
 public:
 	OptionsView();
 	void NotifySettingsChanged(OptionsModel * sender);

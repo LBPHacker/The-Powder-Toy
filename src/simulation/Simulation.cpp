@@ -556,6 +556,7 @@ void Simulation::SaveSimOptions(GameSave * gameSave)
 	gameSave->gravityMode = gravityMode;
 	gameSave->airMode = air->airMode;
 	gameSave->ambientAirTemp = air->ambientAirTemp;
+	gameSave->ambientAirPress = air->ambientAirPress;
 	gameSave->edgeMode = edgeMode;
 	gameSave->legacyEnable = legacy_enable;
 	gameSave->waterEEnabled = water_equal_test;

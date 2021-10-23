@@ -41,7 +41,7 @@ void Air::make_kernel(void) //used for velocity
 
 void Air::Clear()
 {
-	std::fill(&pv[0][0], &pv[0][0]+((XRES/CELL)*(YRES/CELL)), 0.0f);
+	std::fill(&pv[0][0], &pv[0][0]+((XRES/CELL)*(YRES/CELL)), ambientAirPress);
 	std::fill(&vy[0][0], &vy[0][0]+((XRES/CELL)*(YRES/CELL)), 0.0f);
 	std::fill(&vx[0][0], &vx[0][0]+((XRES/CELL)*(YRES/CELL)), 0.0f);
 }
@@ -139,11 +139,11 @@ void Air::update_air(void)
 
 		for (i=0; i<YRES/CELL; i++) //reduces pressure/velocity on the edges every frame
 		{
-			pv[i][0] = pv[i][0]*0.8f;
-			pv[i][1] = pv[i][1]*0.8f;
-			pv[i][2] = pv[i][2]*0.8f;
-			pv[i][XRES/CELL-2] = pv[i][XRES/CELL-2]*0.8f;
-			pv[i][XRES/CELL-1] = pv[i][XRES/CELL-1]*0.8f;
+			pv[i][0] -= (pv[i][0] - ambientAirPress)*0.2f;
+			pv[i][1] -= (pv[i][1] - ambientAirPress)*0.2f;
+			pv[i][2] -= (pv[i][2] - ambientAirPress)*0.2f;
+			pv[i][XRES/CELL-2] -= (pv[i][XRES/CELL-2] - ambientAirPress)*0.2f;
+			pv[i][XRES/CELL-1] -= (pv[i][XRES/CELL-1] - ambientAirPress)*0.2f;
 			vx[i][0] = vx[i][0]*0.9f;
 			vx[i][1] = vx[i][1]*0.9f;
 			vx[i][XRES/CELL-2] = vx[i][XRES/CELL-2]*0.9f;
@@ -155,11 +155,11 @@ void Air::update_air(void)
 		}
 		for (i=0; i<XRES/CELL; i++) //reduces pressure/velocity on the edges every frame
 		{
-			pv[0][i] = pv[0][i]*0.8f;
-			pv[1][i] = pv[1][i]*0.8f;
-			pv[2][i] = pv[2][i]*0.8f;
-			pv[YRES/CELL-2][i] = pv[YRES/CELL-2][i]*0.8f;
-			pv[YRES/CELL-1][i] = pv[YRES/CELL-1][i]*0.8f;
+			pv[0][i] -= (pv[0][i] - ambientAirPress)*0.2f;
+			pv[1][i] -= (pv[1][i] - ambientAirPress)*0.2f;
+			pv[2][i] -= (pv[2][i] - ambientAirPress)*0.2f;
+			pv[YRES/CELL-2][i] -= (pv[YRES/CELL-2][i] - ambientAirPress)*0.2f;
+			pv[YRES/CELL-1][i] -= (pv[YRES/CELL-1][i] - ambientAirPress)*0.2f;
 			vx[0][i] = vx[0][i]*0.9f;
 			vx[1][i] = vx[1][i]*0.9f;
 			vx[YRES/CELL-2][i] = vx[YRES/CELL-2][i]*0.9f;
@@ -385,7 +385,8 @@ void Air::RecalculateBlockAirMaps()
 Air::Air(Simulation & simulation):
 	sim(simulation),
 	airMode(0),
-	ambientAirTemp(R_TEMP + 273.15f)
+	ambientAirTemp(R_TEMP + 273.15f),
+	ambientAirPress(0)
 {
 	//Simulation should do this.
 	make_kernel();

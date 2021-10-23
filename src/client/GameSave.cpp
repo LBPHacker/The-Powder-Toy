@@ -28,6 +28,7 @@ GameSave::GameSave(const GameSave & save):
 	gravityMode(save.gravityMode),
 	airMode(save.airMode),
 	ambientAirTemp(save.ambientAirTemp),
+	ambientAirPress(save.ambientAirPress),
 	edgeMode(save.edgeMode),
 	signs(save.signs),
 	stkm(save.stkm),
@@ -176,6 +177,7 @@ void GameSave::InitVars()
 	gravityMode = 0;
 	airMode = 0;
 	ambientAirTemp = R_TEMP + 273.15f;
+	ambientAirPress = 0;
 	edgeMode = 0;
 	translated.x = translated.y = 0;
 	pmapbits = 8; // default to 8 bits for older saves
@@ -687,6 +689,7 @@ void GameSave::readOPS(char * data, int dataLength)
 		CheckBsonFieldInt(iter, "gravityMode", &gravityMode);
 		CheckBsonFieldInt(iter, "airMode", &airMode);
 		CheckBsonFieldFloat(iter, "ambientAirTemp", &ambientAirTemp);
+		CheckBsonFieldFloat(iter, "ambientAirPress", &ambientAirPress);
 		CheckBsonFieldInt(iter, "edgeMode", &edgeMode);
 		CheckBsonFieldInt(iter, "pmapbits", &pmapbits);
 		if (!strcmp(bson_iterator_key(&iter), "signs"))
@@ -2568,6 +2571,11 @@ char * GameSave::serialiseOPS(unsigned int & dataLength)
 	{
 		bson_append_double(&b, "ambientAirTemp", double(ambientAirTemp));
 		RESTRICTVERSION(96, 0);
+	}
+	if (fabsf(ambientAirPress) > 0.0001f)
+	{
+		bson_append_double(&b, "ambientAirPress", double(ambientAirPress));
+		RESTRICTVERSION(97, 0);
 	}
 	bson_append_int(&b, "edgeMode", edgeMode);
 

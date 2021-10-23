@@ -101,6 +101,17 @@ void OptionsModel::SetAmbientAirTemperature(float ambientAirTemp)
 	notifySettingsChanged();
 }
 
+float OptionsModel::GetAmbientAirPressure()
+{
+	return gModel->GetSimulation()->air->ambientAirPress;
+}
+void OptionsModel::SetAmbientAirPressure(float ambientAirPress)
+{
+	Client::Ref().SetPref("Simulation.AmbientAirPress", ambientAirPress);
+	gModel->SetAmbientAirPressure(ambientAirPress);
+	notifySettingsChanged();
+}
+
 int OptionsModel::GetGravityMode()
 {
 	return sim->gravityMode;

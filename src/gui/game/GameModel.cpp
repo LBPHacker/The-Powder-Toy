@@ -56,6 +56,7 @@ GameModel::GameModel():
 	colour(255, 0, 0, 255),
 	edgeMode(0),
 	ambientAirTemp(R_TEMP + 273.15f),
+	ambientAirPress(0),
 	decoSpace(0)
 {
 	sim = new Simulation();
@@ -109,7 +110,16 @@ GameModel::GameModel():
 			ambientAirTemp = temp;
 		}
 	}
+	ambientAirPress = 0;
+	{
+		auto press = Client::Ref().GetPrefNumber("Simulation.AmbientAirPress", ambientAirPress);
+		if (-256.f <= press && 256.f >= press)
+		{
+			ambientAirPress = press;
+		}
+	}
 	sim->air->ambientAirTemp = ambientAirTemp;
+	sim->air->ambientAirPress = ambientAirPress;
 	decoSpace = Client::Ref().GetPrefInteger("Simulation.DecoSpace", 0);
 	sim->SetDecoSpace(decoSpace);
 	int ngrav_enable = Client::Ref().GetPrefInteger("Simulation.NewtonianGravity", 0);
@@ -546,6 +556,17 @@ float GameModel::GetAmbientAirTemperature()
 	return this->ambientAirTemp;
 }
 
+void GameModel::SetAmbientAirPressure(float ambientAirPress)
+{
+	this->ambientAirPress = ambientAirPress;
+	sim->air->ambientAirPress = ambientAirPress;
+}
+
+float GameModel::GetAmbientAirPressure()
+{
+	return this->ambientAirPress;
+}
+
 void GameModel::SetDecoSpace(int decoSpace)
 {
 	sim->SetDecoSpace(decoSpace);
@@ -957,6 +978,7 @@ void GameModel::SetSave(SaveInfo * newSave, bool invertIncludePressure)
 		sim->gravityMode = saveData->gravityMode;
 		sim->air->airMode = saveData->airMode;
 		sim->air->ambientAirTemp = saveData->ambientAirTemp;
+		sim->air->ambientAirPress = saveData->ambientAirPress;
 		sim->edgeMode = saveData->edgeMode;
 		sim->legacy_enable = saveData->legacyEnable;
 		sim->water_equal_test = saveData->waterEEnabled;
@@ -1019,6 +1041,7 @@ void GameModel::SetSaveFile(SaveFile * newSave, bool invertIncludePressure)
 		sim->gravityMode = saveData->gravityMode;
 		sim->air->airMode = saveData->airMode;
 		sim->air->ambientAirTemp = saveData->ambientAirTemp;
+		sim->air->ambientAirPress = saveData->ambientAirPress;
 		sim->edgeMode = saveData->edgeMode;
 		sim->legacy_enable = saveData->legacyEnable;
 		sim->water_equal_test = saveData->waterEEnabled;
@@ -1335,6 +1358,7 @@ void GameModel::ClearSimulation()
 	sim->water_equal_test = false;
 	sim->SetEdgeMode(edgeMode);
 	sim->air->ambientAirTemp = ambientAirTemp;
+	sim->air->ambientAirPress = ambientAirPress;
 
 	sim->clear_sim();
 	ren->ClearAccumulation();

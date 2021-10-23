@@ -120,6 +120,24 @@ OptionsView::OptionsView():
 	scrollPanel->AddChild(tempLabel);
 
 	currentY+=20;
+	ambientAirPress = new ui::Textbox(ui::Point(Size.X-95, currentY), ui::Point(60, 16));
+	ambientAirPress->SetActionCallback({ [this] {
+		UpdateAmbientAirPressure(ambientAirPress->GetText(), false);
+	} });
+	ambientAirPress->SetDefocusCallback({ [this] {
+		UpdateAmbientAirPressure(ambientAirPress->GetText(), true);
+	}});
+	scrollPanel->AddChild(ambientAirPress);
+
+	ambientAirPressPreview = new ui::Button(ui::Point(Size.X-31, currentY), ui::Point(16, 16), "", "Preview");
+	scrollPanel->AddChild(ambientAirPressPreview);
+
+	tempLabel = new ui::Label(ui::Point(8, currentY), ui::Point(Size.X-96, 16), "Ambient Air Pressure");
+	tempLabel->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
+	tempLabel->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
+	scrollPanel->AddChild(tempLabel);
+
+	currentY+=20;
 	ambientAirTemp = new ui::Textbox(ui::Point(Size.X-95, currentY), ui::Point(60, 16));
 	ambientAirTemp->SetActionCallback({ [this] {
 		UpdateAirTemp(ambientAirTemp->GetText(), false);
@@ -414,6 +432,72 @@ void OptionsView::UpdateAirTemp(String temp, bool isDefocus)
 	UpdateAmbientAirTempPreview(airTemp, isValid);
 }
 
+void OptionsView::UpdateAmbientAirPressurePreview(float airPress, bool isValid)
+{
+	if (isValid)
+	{
+		int PressureToColour(float press);
+		int c = PressureToColour(airPress);
+		ambientAirPressPreview->Appearance.BackgroundInactive = ui::Colour(PIXR(c), PIXG(c), PIXB(c));
+		ambientAirPressPreview->SetText("");
+	}
+	else
+	{
+		ambientAirPressPreview->Appearance.BackgroundInactive = ui::Colour(0, 0, 0);
+		ambientAirPressPreview->SetText("?");
+	}
+	ambientAirPressPreview->Appearance.BackgroundHover = ambientAirPressPreview->Appearance.BackgroundInactive;
+}
+
+void OptionsView::UpdateAmbientAirPressure(String temp, bool isDefocus)
+{
+	// Parse air temp and determine validity
+	float press;
+	bool isValid;
+	try
+	{
+		void ParseFloatProperty(String value, float &out);
+		ParseFloatProperty(temp, press);
+		isValid = true;
+	}
+	catch (const std::exception &ex)
+	{
+		isValid = false;
+	}
+
+	// While defocusing, correct out of range temperatures and empty textboxes
+	if (isDefocus)
+	{
+		if (temp.empty())
+		{
+			isValid = true;
+			press = 0;
+		}
+		else if (!isValid)
+			return;
+		else if (press < -256.f)
+			press = -256.f;
+		else if (press > 256.f)
+			press = 256.f;
+		else
+			return;
+
+		// Update textbox with the new value
+		StringBuilder sb;
+		sb << Format::Precision(2) << press;
+		ambientAirPress->SetText(sb.Build());
+	}
+	// Out of range temperatures are invalid, preview should go away
+	else if (press < -256.f || press > 256.f)
+		isValid = false;
+
+	// If valid, set temp
+	if (isValid)
+		c->SetAmbientAirPressure(press);
+
+	UpdateAmbientAirPressurePreview(press, isValid);
+}
+
 void OptionsView::NotifySettingsChanged(OptionsModel * sender)
 {
 	heatSimulation->SetChecked(sender->GetHeatSimulation());
@@ -430,6 +514,15 @@ void OptionsView::NotifySettingsChanged(OptionsModel * sender)
 		StringBuilder sb;
 		sb << Format::Precision(2) << airTemp;
 		ambientAirTemp->SetText(sb.Build());
+	}
+	if (!initializedAirPressPreview)
+	{
+		initializedAirPressPreview = true;
+		float press = sender->GetAmbientAirPressure();
+		UpdateAmbientAirPressurePreview(press, true);
+		StringBuilder sb;
+		sb << Format::Precision(2) << press;
+		ambientAirPress->SetText(sb.Build());
 	}
 	gravityMode->SetOption(sender->GetGravityMode());
 	decoSpace->SetOption(sender->GetDecoSpace());

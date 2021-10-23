@@ -2376,6 +2376,14 @@ int HeatToColour(float temp)
 	return PIXRGB((int)(color_data[caddress]*0.7f), (int)(color_data[caddress+1]*0.7f), (int)(color_data[caddress+2]*0.7f));
 }
 
+int PressureToColour(float press)
+{
+	if (press > 0.0f)
+		return PIXRGB(clamp_flt(press, 0.0f, 8.0f), 0, 0);//positive pressure is red!
+	else
+		return PIXRGB(0, 0, clamp_flt(-press, 0.0f, 8.0f));//negative pressure is blue!
+}
+
 void Renderer::draw_air()
 {
 	if(!sim->aheat_enable && (display_mode & DISPLAY_AIRH))
@@ -2394,10 +2402,7 @@ void Renderer::draw_air()
 		{
 			if (display_mode & DISPLAY_AIRP)
 			{
-				if (pv[y][x] > 0.0f)
-					c  = PIXRGB(clamp_flt(pv[y][x], 0.0f, 8.0f), 0, 0);//positive pressure is red!
-				else
-					c  = PIXRGB(0, 0, clamp_flt(-pv[y][x], 0.0f, 8.0f));//negative pressure is blue!
+				c = PressureToColour(pv[y][x]);
 			}
 			else if (display_mode & DISPLAY_AIRV)
 			{

@@ -89,6 +89,7 @@ private:
 
 	int edgeMode;
 	float ambientAirTemp;
+	float ambientAirPress;
 	int decoSpace;
 
 	String infoTip;
@@ -125,6 +126,8 @@ public:
 	int GetEdgeMode();
 	void SetAmbientAirTemperature(float ambientAirTemp);
 	float GetAmbientAirTemperature();
+	void SetAmbientAirPressure(float ambientAirPress);
+	float GetAmbientAirPressure();
 	void SetDecoSpace(int decoSpace);
 	int GetDecoSpace();
 
