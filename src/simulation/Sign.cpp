@@ -2,6 +2,7 @@
 
 #include "simulation/Simulation.h"
 #include "gui/SDLWindow.h"
+#include "language/Language.h"
 
 sign::sign(String text_, int x_, int y_, Justification justification_):
 	x(x_),
@@ -77,12 +78,24 @@ sign::Info sign::GetInfo(const Simulation *sim) const
 					}
 					else if (between_curlies == "type")
 					{
-						formatted_text << (part ? sim->BasicParticleInfo(*part) : (formatted_text.Size() ? String::Build("empty") : String::Build("Empty")));
+						auto str = part ? sim->ElementResolveDeep(part->type, part->ctype, part->tmp4) : "DEFAULT_LS_GAME_HUD_EMPTY"_Ls();
+						if (!formatted_text.Size() && str.size())
+						{
+							// TODO-REDO_UI: Might not work in all locales, idk.
+							str[0] = std::toupper(str[0]);
+						}
+						formatted_text << str;
 						info.v95 = true;
 					}
 					else if (between_curlies == "ctype")
 					{
-						formatted_text << (part ? (sim->IsElementOrNone(part->ctype) ? sim->ElementResolve(part->ctype, -1) : String::Build(part->ctype)) : (formatted_text.Size() ? String::Build("empty") : String::Build("Empty")));
+						auto str = part ? (sim->IsElementOrNone(part->ctype) ? sim->ElementResolve(part->ctype, -1) : String::Build(part->ctype)) : "DEFAULT_LS_GAME_HUD_EMPTY"_Ls();
+						if (!formatted_text.Size() && str.size())
+						{
+							// TODO-REDO_UI: Might not work in all locales, idk.
+							str[0] = std::toupper(str[0]);
+						}
+						formatted_text << str;
 						info.v95 = true;
 					}
 					else if (between_curlies == "life")

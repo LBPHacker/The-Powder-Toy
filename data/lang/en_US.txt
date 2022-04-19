@@ -33,6 +33,25 @@ Contributors: \bgStanislaw K Skowronek (Designed the original Powder Toy),
 ## HUD
 DEFAULT_LS_GAME_HUD_DEBUG  = "FPS: {0} Parts: {1}"
 DEFAULT_LS_GAME_HUD_NORMAL = "FPS: {0}"
+## Particle HUD
+DEFAULT_LS_GAME_HUD_EMPTY                  = "empty"
+DEFAULT_LS_GAME_HUD_PREFIX_DEFAULT_PT_LAVA = "molten {0}"
+DEFAULT_LS_GAME_HUD_PREFIX_DEFAULT_PT_ICE  = "frozen {0}"
+DEFAULT_LS_GAME_HUD_PIPELIKE_WITH          = "{0} with {1}"
+## Filt Modes
+DEFAULT_LS_GAME_HUD_FILT_MODE_0       = "set colour"
+DEFAULT_LS_GAME_HUD_FILT_MODE_1       = "AND"
+DEFAULT_LS_GAME_HUD_FILT_MODE_2       = "OR"
+DEFAULT_LS_GAME_HUD_FILT_MODE_3       = "subtract colour"
+DEFAULT_LS_GAME_HUD_FILT_MODE_4       = "red shift"
+DEFAULT_LS_GAME_HUD_FILT_MODE_5       = "blue shift"
+DEFAULT_LS_GAME_HUD_FILT_MODE_6       = "no effect"
+DEFAULT_LS_GAME_HUD_FILT_MODE_7       = "XOR"
+DEFAULT_LS_GAME_HUD_FILT_MODE_8       = "NOT"
+DEFAULT_LS_GAME_HUD_FILT_MODE_9       = "old QRTZ scattering"
+DEFAULT_LS_GAME_HUD_FILT_MODE_10      = "variable red shift"
+DEFAULT_LS_GAME_HUD_FILT_MODE_11      = "variable blue shift"
+DEFAULT_LS_GAME_HUD_FILT_MODE_UNKNOWN = "unknown mode"
 ## Menu sections
 DEFAULT_LS_GAME_SECTION_WALL      = "Walls"
 DEFAULT_LS_GAME_SECTION_ELEC      = "Electronics"

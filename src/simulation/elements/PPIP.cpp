@@ -33,6 +33,7 @@ void Element::Element_PPIP()
 	HeatConduct = 0;
 
 	Properties = TYPE_SOLID|PROP_LIFE_DEC;
+	HudProperties = HUD_PIPELIKE | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

@@ -9,6 +9,7 @@
 #include <strings.h>
 #endif
 #include <cassert>
+#include <language/Language.h>
 
 #include "Air.h"
 #include "Config.h"
@@ -5141,11 +5142,12 @@ void Simulation::SetCustomGOL(std::vector<CustomGOLData> newCustomGol)
 
 String Simulation::ElementResolve(int type, int ctype) const
 {
-	if (type == PT_LIFE)
+	auto ctypeMode = IsElement(type) ? (elements[type].HudProperties & HUD_CTYPE_BITS) : HUD_CTYPE_NOTHING;
+	if (ctypeMode == HUD_CTYPE_GOLNAME)
 	{
 		if (ctype >= 0 && ctype < NGOL)
 		{
-			return builtinGol[ctype].name; 
+			return builtinGol[ctype].name;
 		}
 		auto *cgol = GetCustomGOLByRule(ctype);
 		if (cgol)
@@ -5154,37 +5156,20 @@ String Simulation::ElementResolve(int type, int ctype) const
 		}
 		return SerialiseGOLRule(ctype);
 	}
-	else if (type >= 0 && type < PT_NUM)
-		return elements[type].Name;
-	return "Empty";
+	if (ctypeMode == HUD_CTYPE_PREFIXED && IsElement(ctype))
+	{
+		return language::Template{ "DEFAULT_LS_GAME_HUD_PREFIX_" + elements[type].Identifier.FromUtf8() }(elements[ctype].Name);
+	}
+	return elements[type].Name;
 }
 
-String Simulation::BasicParticleInfo(Particle const &sample_part) const
+String Simulation::ElementResolveDeep(int type, int ctype, int tmp4) const
 {
-	StringBuilder sampleInfo;
-	int type = sample_part.type;
-	int ctype = sample_part.ctype;
-	int storedCtype = sample_part.tmp4;
-	if (type == PT_LAVA && IsElement(ctype))
+	if (IsElement(type) && (elements[type].HudProperties & HUD_PIPELIKE) && ctype)
 	{
-		sampleInfo << "Molten " << ElementResolve(ctype, -1);
+		return "DEFAULT_LS_GAME_HUD_PIPELIKE_WITH"_Ls(elements[type].Name, ElementResolve(ctype, tmp4));
 	}
-	else if ((type == PT_PIPE || type == PT_PPIP) && IsElement(ctype))
-	{
-		if (ctype == PT_LAVA && IsElement(storedCtype))
-		{
-			sampleInfo << ElementResolve(type, -1) << " with molten " << ElementResolve(storedCtype, -1);
-		}
-		else
-		{
-			sampleInfo << ElementResolve(type, -1) << " with " << ElementResolve(ctype, storedCtype);
-		}
-	}
-	else
-	{
-		sampleInfo << ElementResolve(type, ctype);
-	}
-	return sampleInfo.Build();
+	return ElementResolve(type, ctype);
 }
 
 bool Simulation::InBounds(int x, int y)

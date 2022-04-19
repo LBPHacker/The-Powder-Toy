@@ -33,6 +33,7 @@ void Element::Element_CBNW()
 	HeatConduct = 29;
 
 	Properties = TYPE_LIQUID|PROP_CONDUCTS|PROP_LIFE_DEC|PROP_NEUTPENETRATE;
+	HudProperties = HUD_CTYPE_TYPEORNUM | HUD_TMP_NUM | HUD_TMP2_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

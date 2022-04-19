@@ -31,6 +31,7 @@ void Element::Element_BCLN()
 	HeatConduct = 251;
 
 	Properties = TYPE_SOLID | PROP_LIFE_DEC | PROP_LIFE_KILL_DEC | PROP_NOCTYPEDRAW;
+	HudProperties = HUD_CTYPE_TYPEVINTMP | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

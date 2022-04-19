@@ -33,6 +33,7 @@ void Element::Element_BIZRG()
 	HeatConduct = 42;
 
 	Properties = TYPE_GAS;
+	HudProperties = HUD_CTYPE_WAVELENGTH | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

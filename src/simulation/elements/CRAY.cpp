@@ -33,6 +33,7 @@ void Element::Element_CRAY()
 	HeatConduct = 0;
 
 	Properties = TYPE_SOLID;
+	HudProperties = HUD_CTYPE_TYPEVINHIGH | HUD_TMP_NUM | HUD_TMP2_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

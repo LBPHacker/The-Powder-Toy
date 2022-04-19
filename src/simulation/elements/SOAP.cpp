@@ -34,6 +34,7 @@ void Element::Element_SOAP()
 	HeatConduct = 29;
 
 	Properties = TYPE_LIQUID|PROP_NEUTPENETRATE|PROP_LIFE_DEC;
+	HudProperties = HUD_CTYPE_NUM | HUD_TMP_NUM | HUD_TMP2_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

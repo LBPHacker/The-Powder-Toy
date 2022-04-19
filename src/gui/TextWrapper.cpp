@@ -51,11 +51,11 @@ namespace gui
 		int charWidth = 0;
 		int clearCount = 0;
 
-		for (auto i = 0; i < initialInset; i += 15)
+		for (auto i = 0; i < initialInset; i += 127)
 		{
 			// * See gui::OffsetString(int offset).
-			auto offset = Min(initialInset - i, 15);
-			auto offsetChar = String::value_type(0xB0 | offset);
+			auto offset = Min(initialInset - i, 127);
+			auto offsetChar = String::value_type(0x100 | offset);
 			records.push_back(WrapRecord{
 				'\b',  // * Character; makes the line wrap when rendered.
 				0,     // * Width; fools the clickmap generator into not seeing this newline.

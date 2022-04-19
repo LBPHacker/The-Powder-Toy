@@ -32,6 +32,7 @@ void Element::Element_ICEI()
 	HeatConduct = 46;
 
 	Properties = TYPE_SOLID|PROP_LIFE_DEC|PROP_NEUTPASS;
+	HudProperties = HUD_CTYPE_PREFIXED | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

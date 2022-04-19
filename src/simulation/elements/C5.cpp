@@ -32,6 +32,7 @@ void Element::Element_C5()
 	HeatConduct = 88;
 
 	Properties = TYPE_SOLID | PROP_NEUTPENETRATE | PROP_LIFE_DEC;
+	HudProperties = HUD_CTYPE_WAVELENGTH | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

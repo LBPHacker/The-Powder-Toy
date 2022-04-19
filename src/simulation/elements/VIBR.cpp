@@ -33,6 +33,7 @@ void Element::Element_VIBR()
 	HeatConduct = 251;
 
 	Properties = TYPE_SOLID|PROP_LIFE_DEC;
+	HudProperties = HUD_CTYPE_TYPEORNUM | HUD_TMP_NUM | HUD_TMP2_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

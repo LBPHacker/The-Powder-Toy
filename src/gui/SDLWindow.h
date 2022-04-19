@@ -73,7 +73,7 @@ namespace gui
 
 	inline String OffsetString(int offset)
 	{
-		return String(0x08) + String(0xB0 + (offset & 15));
+		return String(0x08) + String(0x100 | (offset & 0xFF));
 	}
 
 	inline String ResetString()
@@ -275,11 +275,12 @@ namespace gui
 		void DrawTexture(const Texture &texture, Rect rect);
 		void DrawTexture(const Texture &texture, Rect rect, Rect source);
 
-		static constexpr uint32_t drawTextBold           =    1U;
-		static constexpr uint32_t drawTextInvert         =    2U;
-		static constexpr uint32_t drawTextDarken         =    4U;
-		static constexpr uint32_t drawTextMonospaceShift =    4U;
-		static constexpr uint32_t drawTextMonospaceMask  = 0xF0U;
+		static constexpr uint32_t drawTextBold           =     1U;
+		static constexpr uint32_t drawTextInvert         =     2U;
+		static constexpr uint32_t drawTextDarken         =     4U;
+		static constexpr uint32_t drawTextMonospaceShift =     4U;
+		static constexpr uint32_t drawTextMonospaceMask  =  0xF0U;
+		static constexpr uint32_t drawTextShaded         = 0x100U;
 		static uint32_t DrawTextMonospace(int spacing)
 		{
 			return ((uint32_t(spacing)) << drawTextMonospaceShift) & drawTextMonospaceMask;

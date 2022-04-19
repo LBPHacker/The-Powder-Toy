@@ -33,6 +33,7 @@ void Element::Element_VIRS()
 	HeatConduct = 251;
 
 	Properties = TYPE_LIQUID|PROP_DEADLY;
+	HudProperties = HUD_CTYPE_TYPEORNUM | HUD_TMP_NUM | HUD_TMP2_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

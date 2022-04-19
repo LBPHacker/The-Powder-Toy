@@ -33,6 +33,7 @@ void Element::Element_GLOW()
 	HeatConduct = 44;
 
 	Properties = TYPE_LIQUID | PROP_LIFE_DEC;
+	HudProperties = HUD_CTYPE_NUM | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

@@ -41,6 +41,7 @@ public:
 	int Weight;
 	unsigned char HeatConduct;
 	unsigned int Properties;
+	unsigned int HudProperties;
 
 	float LowPressure;
 	int LowPressureTransition;

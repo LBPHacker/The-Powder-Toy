@@ -32,6 +32,7 @@ void Element::Element_BIZR()
 	HeatConduct = 29;
 
 	Properties = TYPE_LIQUID;
+	HudProperties = HUD_CTYPE_WAVELENGTH | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

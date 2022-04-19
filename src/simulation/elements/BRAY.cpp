@@ -31,6 +31,7 @@ void Element::Element_BRAY()
 	HeatConduct = 251;
 
 	Properties = TYPE_SOLID|PROP_LIFE_DEC|PROP_LIFE_KILL;
+	HudProperties = HUD_CTYPE_WAVELENGTH | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

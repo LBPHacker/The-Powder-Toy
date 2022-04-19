@@ -31,6 +31,7 @@ void Element::Element_CONV()
 	HeatConduct = 251;
 
 	Properties = TYPE_SOLID | PROP_NOCTYPEDRAW;
+	HudProperties = HUD_CTYPE_TYPEVINHIGH | HUD_TMP_TYPEORNUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

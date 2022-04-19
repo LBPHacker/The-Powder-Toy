@@ -34,6 +34,7 @@ void Element::Element_FILT()
 	HeatConduct = 251;
 
 	Properties = TYPE_SOLID | PROP_NOAMBHEAT | PROP_LIFE_DEC;
+	HudProperties = HUD_CTYPE_WAVELENGTH | HUD_TMP_FILTMODE;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -48,26 +49,30 @@ void Element::Element_FILT()
 	Create = &create;
 }
 
+void Element_FILT_renderWavelengths(int &colr, int &colg, int &colb, int wl)
+{
+	colg = 0;
+	colb = 0;
+	colr = 0;
+	for (auto i = 0; i < 12; ++i)
+	{
+		colr += (wl >> (i + 18)) & 1;
+		colg += (wl >> (i +  9)) & 1;
+		colb += (wl >>  i      ) & 1;
+	}
+	auto x = 624 / (colr + colg + colb + 1);
+	colr *= x;
+	colg *= x;
+	colb *= x;
+}
+
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
-	int x, wl = Element_FILT_getWavelengths(cpart);
-	*colg = 0;
-	*colb = 0;
-	*colr = 0;
-	for (x=0; x<12; x++) {
-		*colr += (wl >> (x+18)) & 1;
-		*colb += (wl >>  x)     & 1;
-	}
-	for (x=0; x<12; x++)
-		*colg += (wl >> (x+9))  & 1;
-	x = 624/(*colr+*colg+*colb+1);
+	Element_FILT_renderWavelengths(*colr, *colg, *colb, Element_FILT_getWavelengths(cpart));
 	if (cpart->life>0 && cpart->life<=4)
 		*cola = 127+cpart->life*30;
 	else
 		*cola = 127;
-	*colr *= x;
-	*colg *= x;
-	*colb *= x;
 	*pixel_mode &= ~PMODE;
 	*pixel_mode |= PMODE_BLEND;
 	return 0;

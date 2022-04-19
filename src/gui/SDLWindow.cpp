@@ -875,6 +875,11 @@ namespace gui
 
 	void SDLWindow::DrawText(Point position, const String &text, Color initial, uint32_t flags)
 	{
+		if (flags & drawTextShaded)
+		{
+			auto size = TextSize(text);
+			DrawRect({ position - gui::Point{ 4, 2 }, size + gui::Point{ 7, 3 } }, { 0, 0, 0, initial.a * 160 / 255 });
+		}
 		SDLASSERTZERO(SDL_SetTextureBlendMode(fontTexture, SDL_BLENDMODE_BLEND));
 		SDLASSERTZERO(SDL_SetTextureAlphaMod(fontTexture, initial.a));
 		Point drawAt = position;
@@ -963,21 +968,23 @@ namespace gui
 					break;
 
 				default:
-					if (escape >= 0x100)
-					{
-					}
-					else if (escape >= 0xC0)
+					if (escape >= 0xC0 && escape < 0x100)
 					{
 						nextOffset.x = escape & 7;
 						nextOffset.y = (escape & 56) >> 3;
 						if (nextOffset.x & 4) nextOffset.x |= ~7;
 						if (nextOffset.y & 4) nextOffset.y |= ~7;
 					}
-					else if (escape >= 0xB0)
+					if (escape >= 0x100 && escape < 0x200)
 					{
-						drawAt.x += escape & 15;
+						int offset = escape & 0xFF;
+						if (offset & 0x80)
+						{
+							offset -= 0x100;
+						}
+						drawAt.x += offset;
 					}
-					else if (escape >= 0xA0)
+					if (escape >= 0xA0 && escape < 0xB0)
 					{
 						monospace = escape & 15;
 					}
@@ -1079,15 +1086,14 @@ namespace gui
 					break;
 
 				default:
-					if (escape >= 0x100)
+					if (escape >= 0x100 && escape < 0x200)
 					{
-					}
-					else if (escape >= 0xC0)
-					{
-					}
-					else if (escape >= 0xB0)
-					{
-						lineWidth += escape & 15;
+						int offset = escape & 0xFF;
+						if (offset & 0x80)
+						{
+							offset -= 0x100;
+						}
+						lineWidth += offset;
 						if (limit >= 0 && limit < lineWidth)
 						{
 							breakLoop = true;
@@ -1098,7 +1104,7 @@ namespace gui
 							boxWidth = lineWidth;
 						}
 					}
-					else if (escape >= 0xA0)
+					if (escape >= 0xA0 && escape < 0xB0)
 					{
 						monospace = escape & 15;
 					}

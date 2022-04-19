@@ -33,6 +33,7 @@ void Element::Element_LITH()
 	HeatConduct = 70;
 
 	Properties = TYPE_PART | PROP_LIFE_DEC;
+	HudProperties = HUD_CTYPE_NUM | HUD_TMP_NUM | HUD_TMP2_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

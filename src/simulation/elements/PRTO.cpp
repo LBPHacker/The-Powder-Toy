@@ -32,6 +32,7 @@ void Element::Element_PRTO()
 	HeatConduct = 0;
 
 	Properties = TYPE_SOLID;
+	HudProperties = HUD_CTYPE_NOTHING | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

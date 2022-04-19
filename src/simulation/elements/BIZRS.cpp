@@ -33,6 +33,7 @@ void Element::Element_BIZRS()
 	HeatConduct = 251;
 
 	Properties = TYPE_SOLID;
+	HudProperties = HUD_CTYPE_WAVELENGTH | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

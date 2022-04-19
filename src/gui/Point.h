@@ -29,6 +29,11 @@ namespace gui
 			return { x / scale, y / scale };
 		}
 
+		constexpr XPoint operator -() const
+		{
+			return { -x, -y };
+		}
+
 		XPoint &operator +=(XPoint other)
 		{
 			*this = *this + other;
@@ -63,7 +68,7 @@ namespace gui
 			return !(*this == other);
 		}
 
-		friend XPoint operator *(Type scale, XPoint point)
+		friend constexpr XPoint operator *(Type scale, XPoint point)
 		{
 			return point * scale;
 		}
@@ -76,6 +81,12 @@ namespace gui
 
 		template<class Index>
 		const Type &operator [](Index index) const
+		{
+			return index ? y : x;
+		}
+
+		template<class Index>
+		constexpr Type operator [](Index index) const
 		{
 			return index ? y : x;
 		}

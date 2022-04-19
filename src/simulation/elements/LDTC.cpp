@@ -32,6 +32,7 @@ void Element::Element_LDTC()
 	HeatConduct = 0;
 
 	Properties = TYPE_SOLID | PROP_NOCTYPEDRAW;
+	HudProperties = HUD_CTYPE_TYPEVINHIGH | HUD_TMP_NUM | HUD_TMP2_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

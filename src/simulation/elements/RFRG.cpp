@@ -31,6 +31,7 @@ void Element::Element_RFRG()
 	HeatConduct = 3;
 
 	Properties = TYPE_GAS|PROP_DEADLY;
+	HudProperties = HUD_TMP_NOTHING;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

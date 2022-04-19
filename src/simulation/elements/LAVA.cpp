@@ -35,6 +35,7 @@ void Element::Element_LAVA()
 	HeatConduct = 60;
 
 	Properties = TYPE_LIQUID|PROP_LIFE_DEC;
+	HudProperties = HUD_CTYPE_PREFIXED | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

@@ -34,6 +34,7 @@ void Element::Element_EMBR()
 	HeatConduct = 29;
 
 	Properties = TYPE_PART|PROP_LIFE_DEC|PROP_LIFE_KILL|PROP_SPARKSETTLE;
+	HudProperties = HUD_CTYPE_NOTHING | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

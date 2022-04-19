@@ -147,7 +147,12 @@ namespace gui
 				auto alphaInt = int(alpha * 255);
 				if (alphaInt && !toolTipToDraw->aboveSource)
 				{
-					g.DrawText(toolTipToDraw->pos, toolTipToDraw->text, { c.text.r, c.text.g, c.text.b, alphaInt });
+					uint32_t flags = 0U;
+					if (shadedToolTips)
+					{
+						flags |= gui::SDLWindow::drawTextShaded;
+					}
+					g.DrawText(toolTipToDraw->pos, toolTipToDraw->text, { c.text.r, c.text.g, c.text.b, alphaInt }, flags);
 				}
 			}
 		}

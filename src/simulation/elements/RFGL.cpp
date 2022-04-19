@@ -31,6 +31,7 @@ void Element::Element_RFGL()
 	HeatConduct = 3;
 
 	Properties = TYPE_LIQUID|PROP_DEADLY;
+	HudProperties = HUD_TMP_NOTHING;
 
 	LowPressure = 2;
 	LowPressureTransition = PT_RFRG;

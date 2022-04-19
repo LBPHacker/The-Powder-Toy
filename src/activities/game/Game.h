@@ -1,6 +1,6 @@
 #pragma once
-
 #include "Config.h"
+
 #include "common/ExplicitSingleton.h"
 #include "common/Path.h"
 #include "common/tpt-compat.h"

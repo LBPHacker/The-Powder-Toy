@@ -207,8 +207,7 @@ public:
 	static float remainder_p(float x, float y);
 
 	String ElementResolve(int type, int ctype) const;
-	String BasicParticleInfo(Particle const &sample_part) const;
-
+	String ElementResolveDeep(int type, int ctype, int tmp4) const;
 
 	struct CustomGOLData
 	{

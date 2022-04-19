@@ -31,6 +31,7 @@ void Element::Element_CLNE()
 	HeatConduct = 251;
 
 	Properties = TYPE_SOLID | PROP_NOCTYPEDRAW;
+	HudProperties = HUD_CTYPE_TYPEVINTMP | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

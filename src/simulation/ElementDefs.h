@@ -32,6 +32,25 @@
 #define PROP_NOAMBHEAT		0x40000  //2^18 Don't transfer or receive heat from ambient heat.
 #define PROP_NOCTYPEDRAW	0x100000 // 2^20 When this element is drawn upon with, do not set ctype (like BCLN for CLNE)
 
+#define HUD_CTYPE_NOTHING     0x0000
+#define HUD_CTYPE_PREFIXED    0x0001
+#define HUD_CTYPE_GOLNAME     0x0002
+#define HUD_CTYPE_WAVELENGTH  0x0003
+#define HUD_CTYPE_TYPEVINHIGH 0x0004
+#define HUD_CTYPE_TYPEVINTMP  0x0005
+#define HUD_CTYPE_NUM         0x0006
+#define HUD_CTYPE_TYPEORNUM   0x0007
+#define HUD_CTYPE_BITS        0x000F
+#define HUD_TMP_NOTHING       0x0000
+#define HUD_TMP_NUM           0x0010
+#define HUD_TMP_TYPEORNUM     0x0020
+#define HUD_TMP_FILTMODE      0x0030
+#define HUD_TMP_BITS          0x00F0
+#define HUD_TMP2_NOTHING      0x0000
+#define HUD_TMP2_NUM          0x0100
+#define HUD_TMP2_BITS         0x0F00
+#define HUD_PIPELIKE          0x1000
+
 #define FLAG_STAGNANT	0x1
 #define FLAG_SKIPMOVE  0x2 // skip movement for one frame, only implemented for PHOT
 //#define FLAG_WATEREQUAL 0x4 //if a liquid was already checked during equalization

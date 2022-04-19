@@ -42,6 +42,7 @@ void Element::Element_PIPE()
 	HeatConduct = 0;
 
 	Properties = TYPE_SOLID|PROP_LIFE_DEC;
+	HudProperties = HUD_PIPELIKE | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

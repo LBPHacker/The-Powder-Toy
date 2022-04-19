@@ -122,7 +122,7 @@ namespace activities::game
 				auto &name = sections[i][j - 1].first;
 				auto *tool = sections[i][j - 1].second;
 				auto button = panel->EmplaceChild<ToolButton>(name, tool);
-				button->ToolTipPosition({ simulationSize.x - gui::SDLWindow::Ref().TextSize(tool->Description()).x - 9, simulationSize.y - 12 });
+				button->ToolTipPosition({ simulationSize.x - gui::SDLWindow::Ref().TextSize(tool->Description()).x - 11, simulationSize.y - 12 });
 				button->Position({ width - int(buttonShade.size()) + 1, 0 });
 				width += button->Size().x + 1;
 			}

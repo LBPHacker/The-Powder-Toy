@@ -35,6 +35,7 @@ void Element::Element_LIFE()
 	HeatConduct = 40;
 
 	Properties = TYPE_SOLID|PROP_LIFE;
+	HudProperties = HUD_CTYPE_GOLNAME | HUD_TMP_NOTHING;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

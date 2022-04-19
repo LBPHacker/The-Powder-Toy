@@ -23,6 +23,7 @@ namespace gui
 		bool quittable = true;
 		bool wantBackdrop = false;
 		bool drawToolTips = true;
+		bool shadedToolTips = true;
 		bool pushed = false;
 		int fpsLimit = 60;
 		int rpsLimit = 0;
@@ -106,6 +107,15 @@ namespace gui
 		bool DrawToolTips() const
 		{
 			return drawToolTips;
+		}
+
+		void ShadedToolTips(bool newShadedToolTips)
+		{
+			shadedToolTips = newShadedToolTips;
+		}
+		bool ShadedToolTips() const
+		{
+			return shadedToolTips;
 		}
 	};
 }

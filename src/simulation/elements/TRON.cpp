@@ -38,6 +38,7 @@ void Element::Element_TRON()
 	HeatConduct = 40;
 
 	Properties = TYPE_SOLID|PROP_LIFE_DEC|PROP_LIFE_KILL;
+	HudProperties = HUD_CTYPE_TYPEORNUM | HUD_TMP_NUM | HUD_TMP2_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

@@ -1,7 +1,5 @@
 #include "Game.h"
 
-#include "Config.h"
-
 #include "activities/console/Console.h"
 #include "activities/login/Login.h"
 #include "activities/options/Options.h"
@@ -29,9 +27,11 @@
 #include "gui/SDLAssert.h"
 #include "gui/SDLWindow.h"
 #include "gui/Button.h"
+#include "gui/SDLWindow.h"
 #include "gui/Texture.h"
 #include "gui/Icons.h"
 #include "gui/Appearance.h"
+#include "graphics/FontData.h"
 #include "simulation/GameSave.h"
 #include "simulation/Simulation.h"
 #include "simulation/SimTool.h"
@@ -65,6 +65,8 @@
 #ifdef DEBUG
 # include <iostream>
 #endif
+
+void Element_FILT_renderWavelengths(int &colr, int &colg, int &colb, int wl);
 
 namespace activities::game
 {
@@ -227,6 +229,7 @@ namespace activities::game
 
 	Game::Game()
 	{
+		ShadedToolTips(true);
 		simulation = std::make_unique<Simulation>();
 		simulationRenderer = std::make_unique<SimulationRenderer>();
 		InitActions();
@@ -341,7 +344,7 @@ namespace activities::game
 		};
 
 		auto addToolTipVert = [](gui::Button *button, String toolTip) {
-			auto pos = gui::Point{ simulationSize.x - gui::SDLWindow::Ref().TextSize(toolTip).x - 9, button->AbsolutePosition().y + 2 };
+			auto pos = gui::Point{ simulationSize.x - gui::SDLWindow::Ref().TextSize(toolTip).x - 11, button->AbsolutePosition().y + 2 };
 			if (pos.y > simulationSize.y - 12)
 			{
 				pos.y = simulationSize.y - 12;
@@ -1061,8 +1064,7 @@ namespace activities::game
 				}
 				alpha -= 255 * (now - starsFadingAt) / logFadeTicks;
 			}
-			g.DrawRect({ start - gui::Point{ 3, 3 }, { g.TextSize(entry.message).x + 6, 14 } }, { 0, 0, 0, 100 });
-			g.DrawText(start, entry.message, { 255, 255, 255, alpha });
+			g.DrawText(start, entry.message, { 255, 255, 255, alpha }, gui::SDLWindow::drawTextShaded);
 			start.y -= 14;
 		}
 	}
@@ -1071,28 +1073,180 @@ namespace activities::game
 	{
 		auto alpha = introTextAnim.Current();
 		if (alpha > 1.f) alpha = 1.f;
-		auto alphaIntRect = 128 - int(alpha * 128);
-		auto alphaIntText = 192 - int(alpha * 192);
-		if (alphaIntRect)
+		auto alphaInt = 255 - int(alpha * 255);
+		if (alphaInt)
 		{
 			auto &g = gui::SDLWindow::Ref();
-			auto fpsStr = String::Build(Format::Precision(2), g.GetFPS());
-			String hud;
+			auto fpsStr = String::Build(Format::Precision(g.GetFPS(), 2));
+			String fpsInfo;
 			if (debugHUD)
 			{
-				hud = "DEFAULT_LS_GAME_HUD_DEBUG"_Ls(fpsStr, simulationSample.NumParts);
+				fpsInfo = "DEFAULT_LS_GAME_HUD_DEBUG"_Ls(fpsStr, simulationSample.NumParts);
 			}
 			else
 			{
-				hud = "DEFAULT_LS_GAME_HUD_NORMAL"_Ls(fpsStr);
+				fpsInfo = "DEFAULT_LS_GAME_HUD_NORMAL"_Ls(fpsStr);
 			}
-			g.DrawRect({ { 12, 12 }, { g.TextSize(hud).x + 8, 15 } }, { 0, 0, 0, alphaIntRect });
-			g.DrawText({ 16, 14 }, hud, { 32, 216, 255, alphaIntText });
+			g.DrawText({ 12, 10 }, fpsInfo, { 32, 216, 255, alphaInt }, gui::SDLWindow::drawTextShaded);
 		}
 	}
 
 	void Game::DrawSampleInfo() const
 	{
+		// We assume that simulationSample doesn't contain nonsense data, so we don't need to
+		// do checks here like simulation->IsElement(part.type); checking if part.type is non-zero is enough.
+		auto &part = simulationSample.particle;
+		std::vector<String> lines;
+
+		// TODO-REDO_UI: Make this configurable.
+		auto formatTemperature = [](StringBuilder &sb, float temp) {
+			sb << temp - 273.15f << "C";
+		};
+
+		{
+			StringBuilder sampleInfo;
+			sampleInfo << Format::Precision(2);
+			String displayType;
+			if (part.type)
+			{
+				displayType = simulation->ElementResolveDeep(part.type, part.ctype, part.tmp4);
+			}
+			else
+			{
+				displayType = "DEFAULT_LS_GAME_HUD_EMPTY"_Ls();
+			}
+			if (displayType.size())
+			{
+				// TODO-REDO_UI: Might not work in all locales, idk.
+				displayType[0] = std::toupper(displayType[0]);
+			}
+			if (part.type)
+			{
+				auto hudProp = simulation->elements[part.type].HudProperties;
+				auto ctypeBits = hudProp & HUD_CTYPE_BITS;
+				auto tmpBits = hudProp & HUD_TMP_BITS;
+				auto tmp2Bits = hudProp & HUD_TMP2_BITS;
+				if (debugHUD && ctypeBits == HUD_CTYPE_WAVELENGTH && (part.ctype & 0x3FFFFFFF))
+				{
+					using Ch = String::value_type;
+					for (auto i = 29; i >= 0; --i)
+					{
+						auto color = gui::Color{ 0x40, 0x40, 0x40 };
+						if (part.ctype & (1 << i))
+						{
+							Element_FILT_renderWavelengths(color.r, color.g, color.b, (i > 2) ? (0x1F << (i - 2)) : (0x1F >> (2 - i)));
+							if (color.r > 255) color.r = 255;
+							if (color.g > 255) color.g = 255;
+							if (color.b > 255) color.b = 255;
+						}
+						sampleInfo << gui::ColorString(color) << gui::AlignString({ 0, -4 }) << Ch(0xE06A);
+					}
+					sampleInfo << gui::OffsetString(-27) << gui::ResetString();
+				}
+				sampleInfo << displayType;
+				if (debugHUD)
+				{
+					if (tmpBits == HUD_TMP_FILTMODE)
+					{
+						String filtMode = "DEFAULT_LS_GAME_HUD_FILT_MODE_UNKNOWN"_Ls();
+						if (part.tmp >= 0 && part.tmp <= 11)
+						{
+							filtMode = language::Template{ String::Build("DEFAULT_LS_GAME_HUD_FILT_MODE_", part.tmp) }();
+						}
+						sampleInfo << " (" << filtMode << ")";
+					}
+					if (ctypeBits == HUD_CTYPE_TYPEVINHIGH && simulation->IsElement(part.ctype))
+					{
+						sampleInfo << " (" << simulation->ElementResolve(TYP(part.ctype), ID(part.ctype)) << ")";
+					}
+					else if (ctypeBits == HUD_CTYPE_TYPEVINTMP && simulation->IsElement(part.ctype))
+					{
+						sampleInfo << " (" << simulation->ElementResolve(part.ctype, part.tmp) << ")";
+					}
+					else if (ctypeBits == HUD_CTYPE_TYPEORNUM && simulation->IsElement(part.ctype))
+					{
+						sampleInfo << " (" << simulation->ElementResolve(part.ctype, 0) << ")";
+					}
+					else if ((ctypeBits == HUD_CTYPE_TYPEORNUM || ctypeBits == HUD_CTYPE_NUM) && part.ctype)
+					{
+						sampleInfo << " (" << part.ctype << ")";
+					}
+				}
+				sampleInfo << ", Temp: ";
+				formatTemperature(sampleInfo, part.temp);
+				if (debugHUD)
+				{
+					sampleInfo << ", Life: " << part.life;
+					if (tmpBits != HUD_TMP_NOTHING && ctypeBits != HUD_CTYPE_WAVELENGTH)
+					{
+						sampleInfo << ", Tmp: ";
+						if (tmpBits == HUD_TMP_NUM)
+						{
+							sampleInfo << part.tmp;
+						}
+						else if (tmpBits == HUD_TMP_TYPEORNUM && simulation->IsElement(TYP(part.tmp)))
+						{
+							sampleInfo << simulation->ElementResolve(TYP(part.tmp), ID(part.tmp));
+						}
+						else if (tmpBits == HUD_TMP_TYPEORNUM || tmpBits == HUD_TMP_NUM)
+						{
+							sampleInfo << part.tmp;
+						}
+					}
+					if (tmp2Bits == HUD_TMP2_NUM)
+					{
+						sampleInfo << ", Tmp2: " << part.tmp2;
+					}
+				}
+			}
+			else if (simulationSample.WallType)
+			{
+				sampleInfo << simulation->wtypes[simulationSample.WallType].name;
+			}
+			else
+			{
+				sampleInfo << displayType;
+			}
+			if (simulationSample.isMouseInSim)
+			{
+				sampleInfo << ", Pressure: " << simulationSample.AirPressure;
+			}
+			lines.push_back(sampleInfo.Build());
+		}
+
+		if (debugHUD && simulationSample.isMouseInSim) // Non particle stuff like pressure gravity etc.
+		{
+			StringBuilder debugSampleInfo;
+			debugSampleInfo << Format::Precision(2);
+			if (part.type)
+			{
+				debugSampleInfo << "#" << simulationSample.ParticleID << ", ";
+			}
+			debugSampleInfo << "X: " << simulationSample.PositionX << ", Y: " << simulationSample.PositionY;
+			if (simulationSample.Gravity)
+			{
+				debugSampleInfo << ", GX: " << simulationSample.GravityVelocityX << ", GY: " << simulationSample.GravityVelocityY;
+			}
+			if (ambientHeat)
+			{
+				debugSampleInfo << ", AHeat: ";
+				formatTemperature(debugSampleInfo, simulationSample.AirTemperature);
+			}
+			lines.push_back(debugSampleInfo.Build());
+		}
+
+		// TODO-REDO_UI: Custom hud in Lua. We'd basically get lines from a callback.
+		auto posY = 10;
+		auto &g = gui::SDLWindow::Ref();
+		for (auto &line : lines)
+		{
+			auto size = g.TextSize(line);
+			gui::Rect rect{ { simulationSize.x - 11 - size.x, posY }, size };
+			g.DrawText(rect.pos, line, { 255, 255, 255, 255 }, gui::SDLWindow::drawTextShaded);
+			posY += FONT_H + 3;
+		}
+
+		// TODO-REDO_UI: Make the hud move under zoom window if it overlaps, draw filt spectrum.
 	}
 
 	void Game::DrawHighlight(const LockedTextureData ltd, gui::Point point) const
@@ -1131,13 +1285,13 @@ namespace activities::game
 		auto alphaInt = int(alpha * 255);
 		if (alphaInt)
 		{
-			gui::SDLWindow::Ref().DrawText(bottomLeftTextPos, actionTipText, { 239, 239, 20, alphaInt });
+			gui::SDLWindow::Ref().DrawText(bottomLeftTextPos, actionTipText, { 239, 239, 20, alphaInt }, gui::SDLWindow::drawTextShaded);
 		}
 	}
 
 	void Game::ToggleIntroText()
 	{
-		if (introTextState == introTextForcedOff)
+		if (introTextState == introTextForcedOff || (introTextState == introTextInitial && introTextAnim.Current() < 0.5f))
 		{
 			introTextState = introTextForcedOn;
 		}

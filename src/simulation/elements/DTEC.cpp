@@ -31,6 +31,7 @@ void Element::Element_DTEC()
 	HeatConduct = 0;
 
 	Properties = TYPE_SOLID;
+	HudProperties = HUD_CTYPE_TYPEVINTMP | HUD_TMP_NUM | HUD_TMP2_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

@@ -32,6 +32,7 @@ void Element::Element_WIRE()
 	HeatConduct = 250;
 
 	Properties = TYPE_SOLID;
+	HudProperties = HUD_CTYPE_NUM | HUD_TMP_NUM;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
