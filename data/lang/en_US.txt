@@ -3,8 +3,8 @@
 DEFAULT_LS_GAME_INTRO_TITLE         = "The Powder Toy"
 DEFAULT_LS_GAME_INTRO_ONLINE_NORMAL = "\bgTo use online features such as saving, you need to register at: \brhttps://powdertoy.co.uk/Register.html"
 DEFAULT_LS_GAME_INTRO_ONLINE_BETA   = "\brThis is a BETA, you cannot save things publicly. If you are planning on publishing any saves, use the release version"
-DEFAULT_LS_GAME_INTRO_TEXT          = "\bl{0} - Version {1} - https://powdertoy.co.uk, irc.libera.chat #powder
-\uE069\uE069\uE069\uE069\uE069\uE069\uE069\uE069\uE069\uE069\uE069\uE069\uE069\uE069\uE069\uE069\uE069\uE069\uE069
+DEFAULT_LS_GAME_INTRO_TEXT          = "\b\u01FE\bl\bn\b\u0102{0}\b\u0101\bz\b\u01FF\bl - Version {1} - https://powdertoy.co.uk, irc.libera.chat #powder
+
 
 \bgControl+C/V/X are Copy, Paste and cut respectively.
 \bgTo choose a material, hover over one of the icons on the right, it will show a selection of elements in that group.

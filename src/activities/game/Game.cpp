@@ -673,7 +673,7 @@ namespace activities::game
 		introTextAnim.Start(introTextTimeout, false);
 
 		introText = "DEFAULT_LS_GAME_INTRO_TEXT"_Ls(
-			"DEFAULT_LS_GAME_INTRO_TITLE"_Ls(), // * TODO-REDO_UI: Fix underline.
+			"DEFAULT_LS_GAME_INTRO_TITLE"_Ls(),
 			MTOS(SAVE_VERSION) "." MTOS(MINOR_VERSION),
 #ifdef BETA
 			"DEFAULT_LS_GAME_INTRO_ONLINE_BETA"_Ls(),

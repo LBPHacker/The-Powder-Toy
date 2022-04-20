@@ -885,9 +885,10 @@ namespace gui
 		Point drawAt = position;
 		auto nextOffset = Point{ 0, 0 };
 		bool canBacktrack = false;
-		bool bold   = flags & drawTextBold;
-		bool invert = flags & drawTextInvert;
-		bool darken = flags & drawTextDarken;
+		bool bold      = flags & drawTextBold;
+		bool invert    = flags & drawTextInvert;
+		bool darken    = flags & drawTextDarken;
+		bool underline = flags & drawTextUnderline;
 		Color color;
 		auto setColor = [this, &invert, &darken, &color](Color newColor) {
 			color = newColor;
@@ -936,6 +937,10 @@ namespace gui
 					bold = true;
 					break;
 
+				case 'n':
+					underline = true;
+					break;
+
 				case 'a':
 					if (!invert)
 					{
@@ -944,9 +949,10 @@ namespace gui
 					break;
 
 				case 'z':
-					bold   = flags & drawTextBold;
-					invert = flags & drawTextInvert;
-					darken = flags & drawTextDarken;
+					bold      = flags & drawTextBold;
+					invert    = flags & drawTextInvert;
+					darken    = flags & drawTextDarken;
+					underline = flags & drawTextUnderline;
 					setColor(initial);
 					break;
 
@@ -982,6 +988,10 @@ namespace gui
 						{
 							offset -= 0x100;
 						}
+						if (underline)
+						{
+							DrawLine(drawAt + Point{ 0, FONT_H + 1 }, drawAt + Point{ offset - 1, FONT_H + 1 }, color);
+						}
 						drawAt.x += offset;
 					}
 					if (escape >= 0xA0 && escape < 0xB0)
@@ -1010,6 +1020,10 @@ namespace gui
 				rectFrom.h = FONT_H;
 				rectTo.x = drawAt.x + nextOffset.x;
 				rectTo.y = drawAt.y + nextOffset.y;
+				if (underline)
+				{
+					DrawLine(drawAt + Point{ 0, FONT_H + 1 }, drawAt + Point{ rectFrom.w - 1, FONT_H + 1 }, color);
+				}
 				rectTo.w = rectFrom.w;
 				rectTo.h = rectFrom.h;
 				if (monospace)

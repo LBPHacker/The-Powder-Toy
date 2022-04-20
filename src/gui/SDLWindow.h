@@ -275,12 +275,13 @@ namespace gui
 		void DrawTexture(const Texture &texture, Rect rect);
 		void DrawTexture(const Texture &texture, Rect rect, Rect source);
 
-		static constexpr uint32_t drawTextBold           =     1U;
-		static constexpr uint32_t drawTextInvert         =     2U;
-		static constexpr uint32_t drawTextDarken         =     4U;
-		static constexpr uint32_t drawTextMonospaceShift =     4U;
-		static constexpr uint32_t drawTextMonospaceMask  =  0xF0U;
-		static constexpr uint32_t drawTextShaded         = 0x100U;
+		static constexpr uint32_t drawTextBold           = 0x0001U;
+		static constexpr uint32_t drawTextInvert         = 0x0002U;
+		static constexpr uint32_t drawTextDarken         = 0x0004U;
+		static constexpr uint32_t drawTextUnderline      = 0x0008U;
+		static constexpr uint32_t drawTextMonospaceMask  = 0x00F0U;
+		static constexpr uint32_t drawTextShaded         = 0x0100U;
+		static constexpr unsigned int drawTextMonospaceShift = 4;
 		static uint32_t DrawTextMonospace(int spacing)
 		{
 			return ((uint32_t(spacing)) << drawTextMonospaceShift) & drawTextMonospaceMask;
