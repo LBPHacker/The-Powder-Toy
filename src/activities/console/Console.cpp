@@ -7,6 +7,7 @@
 #include "gui/Appearance.h"
 #include "gui/Button.h"
 #include "gui/ScrollPanel.h"
+#include "gui/Separator.h"
 #include "gui/Label.h"
 #include "gui/TextBox.h"
 #include "gui/Icons.h"
@@ -49,6 +50,9 @@ namespace activities::console
 			// * TODO-REDO_UI: implement validation
 		});
 		inputBox->Format(FormatInput);
+
+		inputBoxBorder = EmplaceChild<gui::Separator>().get();
+		inputBoxBorder->Size({ windowSize.x - 2, 1 });
 
 		// * TODO-REDO_UI: load history
 
@@ -186,20 +190,6 @@ namespace activities::console
 		return ModalWindow::KeyPress(sym, scan, repeat, shift, ctrl, alt);
 	}
 
-	void Console::Draw() const
-	{
-		// * TODO-REDO_UI: Get rid of this. inputBox should draw its own borders, and a Separator should be used to separate the two halves of sp.
-		auto abs = AbsolutePosition();
-		auto size = Size();
-		auto &c = gui::Appearance::colors.inactive.idle;
-		auto &g = gui::SDLWindow::Ref();
-		g.DrawRect({ abs, size - gui::Point{ 0, 1 } }, { 0x00, 0x00, 0x00, 0xC0 });
-		g.DrawLine(abs + gui::Point{ 0, size.y - 17 }, abs + gui::Point{ size.x, size.y - 17 }, c.border);
-		g.DrawLine(abs + gui::Point{ 0, size.y -  1 }, abs + gui::Point{ size.x, size.y -  1 }, c.border);
-		g.DrawLine(abs + gui::Point{ 0, size.y      }, abs + gui::Point{ size.x, size.y      }, c.shadow);
-		ModalWindow::Draw();
-	}
-
 	void Console::UpdateLayout()
 	{
 		Size({ windowSize.x, bottomDragger->Position().y });
@@ -208,6 +198,7 @@ namespace activities::console
 		splitDragger->Size({ 4, Size().y - 18 });
 		splitDragger->AllowedRect({ { 1 + inputMinWidth, 1 }, { windowSize.x - 2 - inputMinWidth - outputMinWidth, Size().y - 18 } });
 		inputBox->Position({ 3, Size().y - 18 });
+		inputBoxBorder->Position({ 1, Size().y - 17 });
 	}
 
 	void Console::UpdateEntryLayout()

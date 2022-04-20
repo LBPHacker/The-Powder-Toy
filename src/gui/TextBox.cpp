@@ -541,6 +541,7 @@ namespace gui
 			return true;
 
 		case SDLK_RETURN:
+		case SDLK_KP_ENTER:
 			if (acceptNewline)
 			{
 				TextInput("\n");

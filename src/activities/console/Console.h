@@ -10,6 +10,7 @@ namespace gui
 	class Button;
 	class ScrollPanel;
 	class Dragger;
+	class Separator;
 }
 
 namespace activities::console
@@ -42,6 +43,7 @@ namespace activities::console
 		gui::TextBox *inputBox = nullptr;
 		gui::Dragger *bottomDragger = nullptr;
 		gui::Dragger *splitDragger = nullptr;
+		gui::Separator *inputBoxBorder = nullptr;
 
 		void ScrollEntryIntoView(HistoryEntry *entry);
 		void UpdateLayout();
@@ -56,7 +58,6 @@ namespace activities::console
 	public:
 		Console();
 
-		void Draw() const final override;
 		bool KeyPress(int sym, int scan, bool repeat, bool shift, bool ctrl, bool alt) final override;
 	};
 }
