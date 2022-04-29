@@ -20,9 +20,30 @@
 # include "Separator.h"
 #endif
 
-static gui::Timestamp Ticks()
+static gui::Timestamp Now()
 {
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+	return gui::Timestamp(SDL_GetTicks64());
+#else
 	return gui::Timestamp(SDL_GetTicks());
+#endif
+}
+
+static gui::Timestamp TimestampFrom32(uint32_t badThen)
+{
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+	auto goodNow = uint64_t(SDL_GetTicks64());
+	auto badNow = uint32_t(SDL_GetTicks());
+
+	// Negative if badThen is after badNow. This moves the range of correctness from
+	// [now - 2^32 ticks, now) to [now - 2^31 ticks, now + 2^31 ticks).
+	auto badDiff = int32_t(badThen - badNow);
+
+	auto goodThen = uint64_t(goodNow + badDiff);
+	return gui::Timestamp(goodThen);
+#else
+	return gui::Timestamp(badThen);
+#endif
 }
 
 namespace gui
@@ -45,7 +66,7 @@ namespace gui
 			hoverCursors[i] = SDLASSERTPTR(SDL_CreateSystemCursor(SDL_SystemCursor(i)));
 		}
 
-		eventTimestamp = Ticks();
+		eventTimestamp = Now();
 		Recreate(conf);
 	}
 
@@ -245,7 +266,9 @@ namespace gui
 			SDLASSERTZERO(SDL_SetRenderTarget(sdlRenderer, backdrop));
 			auto prevDrawToolTips = ModalWindowOnTop()->DrawToolTips();
 			ModalWindowOnTop()->DrawToolTips(false);
-			DrawTopWindow();
+			auto oldEventTimestamp = eventTimestamp;
+			DrawTopWindow(); // Triggers an Event::DRAW, changes eventTimestamp.
+			eventTimestamp = oldEventTimestamp;
 			ModalWindowOnTop()->DrawToolTips(prevDrawToolTips);
 			SDLASSERTZERO(SDL_SetRenderTarget(sdlRenderer, prevRenderTarget));
 		}
@@ -339,7 +362,7 @@ namespace gui
 
 	void SDLWindow::FrameBegin()
 	{
-		frameStart = Ticks();
+		frameStart = Now();
 	}
 
 	void SDLWindow::FramePoll()
@@ -362,7 +385,7 @@ namespace gui
 		switch (sdlEvent.type)
 		{
 		case SDL_QUIT:
-			eventTimestamp = sdlEvent.quit.timestamp;
+			eventTimestamp = TimestampFrom32(sdlEvent.quit.timestamp);
 			if (mw->Quittable())
 			{
 				ev.type = Event::QUIT;
@@ -384,7 +407,7 @@ namespace gui
 
 		case SDL_KEYDOWN:
 		case SDL_KEYUP:
-			eventTimestamp = sdlEvent.key.timestamp;
+			eventTimestamp = TimestampFrom32(sdlEvent.key.timestamp);
 			discardTextInput = false;
 			ev.type = sdlEvent.type == SDL_KEYDOWN ? Event::KEYPRESS : Event::KEYRELEASE;
 			ev.key.sym = sdlEvent.key.keysym.sym;
@@ -461,7 +484,7 @@ namespace gui
 
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
-			eventTimestamp = sdlEvent.button.timestamp;
+			eventTimestamp = TimestampFrom32(sdlEvent.button.timestamp);
 			mouseButtonsDown += sdlEvent.type == SDL_MOUSEBUTTONDOWN ? 1 : -1;
 #if !defined(AND) && !defined(DEBUG)
 			SDLASSERTZERO(SDL_CaptureMouse(mouseButtonsDown > 0 ? SDL_TRUE : SDL_FALSE));
@@ -473,7 +496,7 @@ namespace gui
 			break;
 
 		case SDL_MOUSEMOTION:
-			eventTimestamp = sdlEvent.motion.timestamp;
+			eventTimestamp = TimestampFrom32(sdlEvent.motion.timestamp);
 			mousePosition = { sdlEvent.motion.x, sdlEvent.motion.y };
 			ev.type = Event::MOUSEMOVE;
 			ev.mouse.current = mousePosition;
@@ -481,7 +504,7 @@ namespace gui
 			break;
 
 		case SDL_MOUSEWHEEL:
-			eventTimestamp = sdlEvent.wheel.timestamp;
+			eventTimestamp = TimestampFrom32(sdlEvent.wheel.timestamp);
 			// * Forward these as two separate events instead of one. The reason is that the
 			//   most important consumer of these events is ScrollPanels, which need to be
 			//   able to let the event bubble up in case they can't scroll any further.
@@ -516,7 +539,7 @@ namespace gui
 			break;
 
 		case SDL_WINDOWEVENT:
-			eventTimestamp = sdlEvent.window.timestamp;
+			eventTimestamp = TimestampFrom32(sdlEvent.window.timestamp);
 			switch (sdlEvent.window.event)
 			{
 			case SDL_WINDOWEVENT_SIZE_CHANGED:
@@ -563,7 +586,7 @@ namespace gui
 			break;
 
 		case SDL_TEXTINPUT:
-			eventTimestamp = sdlEvent.text.timestamp;
+			eventTimestamp = TimestampFrom32(sdlEvent.text.timestamp);
 			if (discardTextInput)
 			{
 				break;
@@ -577,7 +600,7 @@ namespace gui
 			break;
 
 		case SDL_TEXTEDITING:
-			eventTimestamp = sdlEvent.text.timestamp;
+			eventTimestamp = TimestampFrom32(sdlEvent.text.timestamp);
 			if (discardTextInput)
 			{
 				break;
@@ -608,7 +631,7 @@ namespace gui
 			break;
 
 		case SDL_DROPFILE:
-			eventTimestamp = sdlEvent.drop.timestamp;
+			eventTimestamp = TimestampFrom32(sdlEvent.drop.timestamp);
 			{
 				String path = ByteString(sdlEvent.drop.file).FromUtf8();
 				ev.type = Event::FILEDROP;
@@ -649,7 +672,7 @@ namespace gui
 		}
 		Event ev;
 		ev.type = Event::DRAW;
-		eventTimestamp = Ticks();
+		eventTimestamp = Now();
 		static_cast<const ModalWindow *>(mwe.window.get())->HandleEvent(ev);
 	}
 
@@ -724,7 +747,7 @@ namespace gui
 
 	void SDLWindow::FrameTime()
 	{
-		auto correctedFrameTime = Ticks() - frameStart;
+		auto correctedFrameTime = Now() - frameStart;
 		correctedFrameTimeAvg = correctedFrameTimeAvg * 0.95 + correctedFrameTime * 0.05;
 		if (frameStart - lastFpsUpdate > 200)
 		{

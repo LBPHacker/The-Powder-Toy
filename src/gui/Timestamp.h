@@ -5,5 +5,5 @@
 
 namespace gui
 {
-	using Timestamp = int32_t;
+	using Timestamp = int64_t;
 }
