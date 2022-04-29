@@ -1051,7 +1051,7 @@ namespace activities::game
 	{
 		auto &g = gui::SDLWindow::Ref();
 		auto start = bottomLeftTextPos;
-		auto now = g.Ticks();
+		auto now = g.EventTimestamp();
 		for (auto &entry : log)
 		{
 			int alpha = 255;
@@ -1553,7 +1553,7 @@ namespace activities::game
 		{
 			log.pop_back();
 		}
-		log.push_front(LogEntry{ message, gui::SDLWindow::Ref().Ticks() });
+		log.push_front(LogEntry{ message, gui::SDLWindow::Ref().EventTimestamp() });
 	}
 
 	Game::OpenButtonAction Game::GetOpenButtonAction() const

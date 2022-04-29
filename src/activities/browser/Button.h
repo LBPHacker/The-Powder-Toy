@@ -4,6 +4,7 @@
 #include "gui/ImageButton.h"
 #include "gui/Image.h"
 #include "gui/ButtonMenu.h"
+#include "gui/Timestamp.h"
 
 #include <cstdint>
 
@@ -52,7 +53,7 @@ namespace activities::browser
 		void UpdateLayout();
 		bool GroupHover() const;
 
-		int32_t bigThumbnailCountingSince = 0;
+		gui::Timestamp bigThumbnailCountingSince = 0;
 		void ResetBigThumbnailCounting();
 
 	public:

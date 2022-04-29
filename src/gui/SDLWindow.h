@@ -6,6 +6,7 @@
 #include "Rect.h"
 #include "Color.h"
 #include "Cursor.h"
+#include "Timestamp.h"
 
 #include <array>
 #include <tuple>
@@ -163,7 +164,7 @@ namespace gui
 		{
 			std::shared_ptr<ModalWindow> window;
 			SDL_Texture *backdrop;
-			int32_t pushedAt;
+			Timestamp pushedAt;
 		};
 
 		SDL_Window *sdlWindow = NULL;
@@ -196,9 +197,10 @@ namespace gui
 
 		Configuration conf;
 		Point mousePosition = { 0, 0 };
-		int32_t frameStart = 0;
-		int32_t lastFpsUpdate = 0;
-		int32_t prevFrameStart = 0;
+		Timestamp frameStart = 0;
+		Timestamp eventTimestamp = 0;
+		Timestamp lastFpsUpdate = 0;
+		Timestamp prevFrameStart = 0;
 		float frameTimeAvg = 0.f;
 		float correctedFrameTimeAvg = 0.f;
 		float fpsMeasured = 0.f;
@@ -311,7 +313,10 @@ namespace gui
 		static String ClipboardText();
 		static bool ClipboardEmpty();
 
-		int32_t Ticks() const;
+		Timestamp EventTimestamp() const
+		{
+			return eventTimestamp;
+		}
 
 		void Recreate(Configuration newConf);
 		const Configuration &Config() const

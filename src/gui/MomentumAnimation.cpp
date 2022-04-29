@@ -10,7 +10,7 @@ namespace gui
 	{
 		initialPosition = position;
 		initialMomentum = momentum;
-		initialTime = SDLWindow::Ref().Ticks();
+		initialTime = SDLWindow::Ref().EventTimestamp();
 	}
 
 	int MomentumAnimation::EffectivePosition() const
@@ -24,7 +24,7 @@ namespace gui
 
 	float MomentumAnimation::EffectiveMomentum() const
 	{
-		return initialMomentum * exp2f(-((SDLWindow::Ref().Ticks() - initialTime) / 1000.f) / halfLife); // a * .5 ^ (t / t_{1/2})
+		return initialMomentum * exp2f(-((SDLWindow::Ref().EventTimestamp() - initialTime) / 1000.f) / halfLife); // a * .5 ^ (t / t_{1/2})
 	}
 
 	bool MomentumAnimation::Small() const

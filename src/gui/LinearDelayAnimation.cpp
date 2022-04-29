@@ -7,13 +7,13 @@ namespace gui
 	void LinearDelayAnimation::Start(float value, bool newUp)
 	{
 		initialValue = value;
-		initialTime = SDLWindow::Ref().Ticks();
+		initialTime = SDLWindow::Ref().EventTimestamp();
 		up = newUp;
 	}
 
 	float LinearDelayAnimation::Current() const
 	{
-		float effective = initialValue + (up ? 1 : -1) * slope * (SDLWindow::Ref().Ticks() - initialTime) / 1000.f;
+		float effective = initialValue + (up ? 1 : -1) * slope * (SDLWindow::Ref().EventTimestamp() - initialTime) / 1000.f;
 		if (effective > upperLimit) effective = upperLimit;
 		if (effective < lowerLimit) effective = lowerLimit;
 		return effective;

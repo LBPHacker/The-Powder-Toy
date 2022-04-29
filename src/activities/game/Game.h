@@ -6,6 +6,7 @@
 #include "common/tpt-compat.h"
 #include "gui/ModalWindow.h"
 #include "gui/LinearDelayAnimation.h"
+#include "gui/Timestamp.h"
 #include "simulation/SimulationData.h"
 #include "simulation/ElementDefs.h"
 #include "simulation/Sample.h"
@@ -251,7 +252,7 @@ namespace activities::game
 		struct LogEntry
 		{
 			String message;
-			int32_t pushedAt;
+			gui::Timestamp pushedAt;
 		};
 		std::list<LogEntry> log;
 		void InitCommandInterface();

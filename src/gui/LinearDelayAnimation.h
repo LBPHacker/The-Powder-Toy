@@ -1,12 +1,13 @@
 #pragma once
+#include "Config.h"
 
-#include <cstdint>
+#include "Timestamp.h"
 
 namespace gui
 {
 	class LinearDelayAnimation
 	{
-		int32_t initialTime = 0;
+		Timestamp initialTime = 0;
 		float initialValue = 0.f;
 		float lowerLimit = 0.f;
 		float upperLimit = 0.f;

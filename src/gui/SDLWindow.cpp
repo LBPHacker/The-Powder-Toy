@@ -20,6 +20,15 @@
 # include "Separator.h"
 #endif
 
+static gui::Timestamp Ticks()
+{
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+	return gui::Timestamp(SDL_GetTicks64());
+#else
+	return gui::Timestamp(SDL_GetTicks());
+#endif
+}
+
 namespace gui
 {
 	constexpr auto backdropDarkenTicks = 300;
@@ -40,6 +49,7 @@ namespace gui
 			hoverCursors[i] = SDLASSERTPTR(SDL_CreateSystemCursor(SDL_SystemCursor(i)));
 		}
 
+		eventTimestamp = Ticks();
 		Recreate(conf);
 	}
 
@@ -247,7 +257,7 @@ namespace gui
 		{
 			UpdateGainableStates(ModalWindowOnTop().get(), true);
 		}
-		modalWindows.push_back(ModalWindowEntry{ mw, backdrop, Ticks() });
+		modalWindows.push_back(ModalWindowEntry{ mw, backdrop, EventTimestamp() });
 		{
 			Event ev;
 			ev.type = Event::RENDERERUP;
@@ -333,12 +343,7 @@ namespace gui
 
 	void SDLWindow::FrameBegin()
 	{
-		frameStart = int32_t(SDL_GetTicks());
-	}
-
-	int32_t SDLWindow::Ticks() const
-	{
-		return int32_t(SDL_GetTicks());
+		frameStart = Ticks();
 	}
 
 	void SDLWindow::FramePoll()
@@ -361,6 +366,7 @@ namespace gui
 		switch (sdlEvent.type)
 		{
 		case SDL_QUIT:
+			eventTimestamp = sdlEvent.quit.timestamp;
 			if (mw->Quittable())
 			{
 				ev.type = Event::QUIT;
@@ -382,6 +388,7 @@ namespace gui
 
 		case SDL_KEYDOWN:
 		case SDL_KEYUP:
+			eventTimestamp = sdlEvent.key.timestamp;
 			discardTextInput = false;
 			ev.type = sdlEvent.type == SDL_KEYDOWN ? Event::KEYPRESS : Event::KEYRELEASE;
 			ev.key.sym = sdlEvent.key.keysym.sym;
@@ -458,6 +465,7 @@ namespace gui
 
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
+			eventTimestamp = sdlEvent.button.timestamp;
 			mouseButtonsDown += sdlEvent.type == SDL_MOUSEBUTTONDOWN ? 1 : -1;
 #if !defined(AND) && !defined(DEBUG)
 			SDLASSERTZERO(SDL_CaptureMouse(mouseButtonsDown > 0 ? SDL_TRUE : SDL_FALSE));
@@ -469,6 +477,7 @@ namespace gui
 			break;
 
 		case SDL_MOUSEMOTION:
+			eventTimestamp = sdlEvent.motion.timestamp;
 			mousePosition = { sdlEvent.motion.x, sdlEvent.motion.y };
 			ev.type = Event::MOUSEMOVE;
 			ev.mouse.current = mousePosition;
@@ -476,6 +485,7 @@ namespace gui
 			break;
 
 		case SDL_MOUSEWHEEL:
+			eventTimestamp = sdlEvent.wheel.timestamp;
 			// * Forward these as two separate events instead of one. The reason is that the
 			//   most important consumer of these events is ScrollPanels, which need to be
 			//   able to let the event bubble up in case they can't scroll any further.
@@ -510,6 +520,7 @@ namespace gui
 			break;
 
 		case SDL_WINDOWEVENT:
+			eventTimestamp = sdlEvent.window.timestamp;
 			switch (sdlEvent.window.event)
 			{
 			case SDL_WINDOWEVENT_SIZE_CHANGED:
@@ -556,6 +567,7 @@ namespace gui
 			break;
 
 		case SDL_TEXTINPUT:
+			eventTimestamp = sdlEvent.text.timestamp;
 			if (discardTextInput)
 			{
 				break;
@@ -569,6 +581,7 @@ namespace gui
 			break;
 
 		case SDL_TEXTEDITING:
+			eventTimestamp = sdlEvent.text.timestamp;
 			if (discardTextInput)
 			{
 				break;
@@ -599,6 +612,7 @@ namespace gui
 			break;
 
 		case SDL_DROPFILE:
+			eventTimestamp = sdlEvent.drop.timestamp;
 			{
 				String path = ByteString(sdlEvent.drop.file).FromUtf8();
 				ev.type = Event::FILEDROP;
@@ -617,6 +631,7 @@ namespace gui
 		timeSinceRender += (frameStart - prevFrameStart) / 1000.f;
 		prevFrameStart = frameStart;
 		ev.type = Event::TICK;
+		eventTimestamp = frameStart;
 		mw->HandleEvent(ev);
 	}
 
@@ -626,7 +641,7 @@ namespace gui
 		SDLASSERTZERO(SDL_RenderClear(sdlRenderer));
 		if (mwe.backdrop)
 		{
-			int32_t pushedFor = Ticks() - mwe.pushedAt;
+			Timestamp pushedFor = EventTimestamp() - mwe.pushedAt;
 			auto alpha = int(255.f * (1.f - backdropDarkenAlpha));
 			if (pushedFor < backdropDarkenTicks)
 			{
@@ -638,6 +653,7 @@ namespace gui
 		}
 		Event ev;
 		ev.type = Event::DRAW;
+		eventTimestamp = Ticks();
 		static_cast<const ModalWindow *>(mwe.window.get())->HandleEvent(ev);
 	}
 
@@ -693,7 +709,7 @@ namespace gui
 	void SDLWindow::FrameEnd()
 	{
 		SDL_RenderPresent(sdlRenderer);
-		int32_t frameTime = Ticks() - frameStart;
+		Timestamp frameTime = EventTimestamp() - frameStart;
 		frameTimeAvg = frameTimeAvg * 0.8 + frameTime * 0.2;
 	}
 
@@ -712,7 +728,7 @@ namespace gui
 
 	void SDLWindow::FrameTime()
 	{
-		int32_t correctedFrameTime = SDL_GetTicks() - frameStart;
+		auto correctedFrameTime = Ticks() - frameStart;
 		correctedFrameTimeAvg = correctedFrameTimeAvg * 0.95 + correctedFrameTime * 0.05;
 		if (frameStart - lastFpsUpdate > 200)
 		{

@@ -125,7 +125,7 @@ namespace gui
 
 	void TextBox::UpdateText()
 	{
-		cursorTick = SDLWindow::Ref().Ticks();
+		cursorTick = SDLWindow::Ref().EventTimestamp();
 		UpdateWrapper();
 		UpdateCursor();
 		shouldTriggerChange = true;
@@ -288,7 +288,7 @@ namespace gui
 				}
 			}
 			g.DrawText(textAbs, textToDraw, textColor, Enabled() ? 0 : SDLWindow::drawTextDarken);
-			if (drawCursor && WithFocus() && (g.Ticks() - cursorTick) % 1000 < 500)
+			if (drawCursor && WithFocus() && (g.EventTimestamp() - cursorTick) % 1000 < 500)
 			{
 				auto cur = textAbs + Point{ wrapperCursor.point.x, wrapperCursor.line * FONT_H };
 				g.DrawLine(cur, cur + Point{ 0, FONT_H - 1 }, e.border);

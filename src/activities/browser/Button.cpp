@@ -186,7 +186,7 @@ namespace activities::browser
 		if (bigThumbnail)
 		{
 			selectCheck->Visible(UnderMouse());
-			auto bigThumbnailVisible = UnderMouse() && bigThumbnailCountingSince + bigThumbnailDelay <= gui::SDLWindow::Ref().Ticks();
+			auto bigThumbnailVisible = UnderMouse() && bigThumbnailCountingSince + bigThumbnailDelay <= gui::SDLWindow::Ref().EventTimestamp();
 			auto prevBigThumbnailVisible = bigThumbnail->Visible();
 			bigThumbnail->Visible(bigThumbnailVisible);
 			if (bigThumbnailVisible && !prevBigThumbnailVisible)
@@ -306,7 +306,7 @@ namespace activities::browser
 
 	void Button::ResetBigThumbnailCounting()
 	{
-		bigThumbnailCountingSince = gui::SDLWindow::Ref().Ticks();
+		bigThumbnailCountingSince = gui::SDLWindow::Ref().EventTimestamp();
 	}
 
 	void Button::MouseEnter(gui::Point current)

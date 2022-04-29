@@ -5,6 +5,7 @@
 #include "TextWrapper.h"
 #include "Alignment.h"
 #include "Color.h"
+#include "Timestamp.h"
 
 #include <utility>
 #include <functional>
@@ -58,7 +59,7 @@ namespace gui
 		String textToDraw;
 
 		uint32_t align = Alignment::horizLeft;
-		int32_t cursorTick = 0;
+		Timestamp cursorTick = 0;
 
 		void UpdateWrapper();
 		void UpdateText();

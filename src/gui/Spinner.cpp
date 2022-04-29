@@ -19,7 +19,7 @@ namespace gui
 		auto abs = AbsolutePosition();
 		auto size = Size();
 		auto &g = SDLWindow::Ref();
-		auto sweep = (g.Ticks() % 1000) / 1000.f;
+		auto sweep = (g.EventTimestamp() % 1000) / 1000.f;
 		for (auto i = 0; i < lines; ++i)
 		{
 			auto line = i / float(lines);

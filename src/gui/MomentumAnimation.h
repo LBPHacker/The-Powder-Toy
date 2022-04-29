@@ -1,6 +1,7 @@
 #pragma once
+#include "Config.h"
 
-#include <cstdint>
+#include "Timestamp.h"
 
 namespace gui
 {
@@ -8,7 +9,7 @@ namespace gui
 	{
 		int initialPosition = 0;
 		float initialMomentum = 0.f;
-		int32_t initialTime = 0;
+		Timestamp initialTime = 0;
 		float halfLife = 0.f;
 		float smallThreshold = 0.f;
 		float limit = 0.f;
