@@ -22,11 +22,7 @@
 
 static gui::Timestamp Ticks()
 {
-#if SDL_VERSION_ATLEAST(2, 0, 18)
-	return gui::Timestamp(SDL_GetTicks64());
-#else
 	return gui::Timestamp(SDL_GetTicks());
-#endif
 }
 
 namespace gui
