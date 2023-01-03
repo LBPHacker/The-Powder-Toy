@@ -32,9 +32,9 @@ void Air::make_kernel() //used for velocity
 
 void Air::Clear()
 {
-	std::fill(&pv[0][0], &pv[0][0]+((XRES/CELL)*(YRES/CELL)), 0.0f);
-	std::fill(&vy[0][0], &vy[0][0]+((XRES/CELL)*(YRES/CELL)), 0.0f);
-	std::fill(&vx[0][0], &vx[0][0]+((XRES/CELL)*(YRES/CELL)), 0.0f);
+	std::fill(&pv[0][0], &pv[0][0]+((XRES/CELL)*(YRES/CELL)), edgePressure);
+	std::fill(&vx[0][0], &vx[0][0]+((XRES/CELL)*(YRES/CELL)), edgeVelocityX);
+	std::fill(&vy[0][0], &vy[0][0]+((XRES/CELL)*(YRES/CELL)), edgeVelocityY);
 }
 
 void Air::ClearAirH()
@@ -127,35 +127,35 @@ void Air::update_air()
 	{
 		for (int i=0; i<YRES/CELL; i++) //reduces pressure/velocity on the edges every frame
 		{
-			pv[i][0] = pv[i][0]*0.8f;
-			pv[i][1] = pv[i][1]*0.8f;
-			pv[i][2] = pv[i][2]*0.8f;
-			pv[i][XRES/CELL-2] = pv[i][XRES/CELL-2]*0.8f;
-			pv[i][XRES/CELL-1] = pv[i][XRES/CELL-1]*0.8f;
-			vx[i][0] = vx[i][0]*0.9f;
-			vx[i][1] = vx[i][1]*0.9f;
-			vx[i][XRES/CELL-2] = vx[i][XRES/CELL-2]*0.9f;
-			vx[i][XRES/CELL-1] = vx[i][XRES/CELL-1]*0.9f;
-			vy[i][0] = vy[i][0]*0.9f;
-			vy[i][1] = vy[i][1]*0.9f;
-			vy[i][XRES/CELL-2] = vy[i][XRES/CELL-2]*0.9f;
-			vy[i][XRES/CELL-1] = vy[i][XRES/CELL-1]*0.9f;
+			pv[i][0] = pv[i][0]*0.8f + 0.2f * edgePressure;
+			pv[i][1] = pv[i][1]*0.8f + 0.2f * edgePressure;
+			pv[i][2] = pv[i][2]*0.8f + 0.2f * edgePressure;
+			pv[i][XRES/CELL-2] = pv[i][XRES/CELL-2]*0.8f + 0.2f * edgePressure;
+			pv[i][XRES/CELL-1] = pv[i][XRES/CELL-1]*0.8f + 0.2f * edgePressure;
+			vx[i][0] = vx[i][0]*0.9f + 0.1f * edgeVelocityX;
+			vx[i][1] = vx[i][1]*0.9f + 0.1f * edgeVelocityX;
+			vx[i][XRES/CELL-2] = vx[i][XRES/CELL-2]*0.9f + 0.1f * edgeVelocityX;
+			vx[i][XRES/CELL-1] = vx[i][XRES/CELL-1]*0.9f + 0.1f * edgeVelocityX;
+			vy[i][0] = vy[i][0]*0.9f + 0.1f * edgeVelocityY;
+			vy[i][1] = vy[i][1]*0.9f + 0.1f * edgeVelocityY;
+			vy[i][XRES/CELL-2] = vy[i][XRES/CELL-2]*0.9f + 0.1f * edgeVelocityY;
+			vy[i][XRES/CELL-1] = vy[i][XRES/CELL-1]*0.9f + 0.1f * edgeVelocityY;
 		}
 		for (int i=0; i<XRES/CELL; i++) //reduces pressure/velocity on the edges every frame
 		{
-			pv[0][i] = pv[0][i]*0.8f;
-			pv[1][i] = pv[1][i]*0.8f;
-			pv[2][i] = pv[2][i]*0.8f;
-			pv[YRES/CELL-2][i] = pv[YRES/CELL-2][i]*0.8f;
-			pv[YRES/CELL-1][i] = pv[YRES/CELL-1][i]*0.8f;
-			vx[0][i] = vx[0][i]*0.9f;
-			vx[1][i] = vx[1][i]*0.9f;
-			vx[YRES/CELL-2][i] = vx[YRES/CELL-2][i]*0.9f;
-			vx[YRES/CELL-1][i] = vx[YRES/CELL-1][i]*0.9f;
-			vy[0][i] = vy[0][i]*0.9f;
-			vy[1][i] = vy[1][i]*0.9f;
-			vy[YRES/CELL-2][i] = vy[YRES/CELL-2][i]*0.9f;
-			vy[YRES/CELL-1][i] = vy[YRES/CELL-1][i]*0.9f;
+			pv[0][i] = pv[0][i]*0.8f + 0.2f * edgePressure;
+			pv[1][i] = pv[1][i]*0.8f + 0.2f * edgePressure;
+			pv[2][i] = pv[2][i]*0.8f + 0.2f * edgePressure;
+			pv[YRES/CELL-2][i] = pv[YRES/CELL-2][i]*0.8f + 0.2f * edgePressure;
+			pv[YRES/CELL-1][i] = pv[YRES/CELL-1][i]*0.8f + 0.2f * edgePressure;
+			vx[0][i] = vx[0][i]*0.9f + 0.1f * edgeVelocityX;
+			vx[1][i] = vx[1][i]*0.9f + 0.1f * edgeVelocityX;
+			vx[YRES/CELL-2][i] = vx[YRES/CELL-2][i]*0.9f + 0.1f * edgeVelocityX;
+			vx[YRES/CELL-1][i] = vx[YRES/CELL-1][i]*0.9f + 0.1f * edgeVelocityX;
+			vy[0][i] = vy[0][i]*0.9f + 0.1f * edgeVelocityY;
+			vy[1][i] = vy[1][i]*0.9f + 0.1f * edgeVelocityY;
+			vy[YRES/CELL-2][i] = vy[YRES/CELL-2][i]*0.9f + 0.1f * edgeVelocityY;
+			vy[YRES/CELL-1][i] = vy[YRES/CELL-1][i]*0.9f + 0.1f * edgeVelocityY;
 		}
 
 		for (int j=1; j<YRES/CELL; j++) //clear some velocities near walls
@@ -382,7 +382,10 @@ void Air::RecalculateBlockAirMaps()
 Air::Air(Simulation & simulation):
 	sim(simulation),
 	airMode(0),
-	ambientAirTemp(R_TEMP + 273.15f)
+	ambientAirTemp(R_TEMP + 273.15f),
+	edgePressure(0),
+	edgeVelocityX(0),
+	edgeVelocityY(0)
 {
 	//Simulation should do this.
 	make_kernel();

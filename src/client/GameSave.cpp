@@ -513,6 +513,9 @@ void GameSave::readOPS(const std::vector<char> &data)
 		CheckBsonFieldFloat(iter, "customGravityY", &customGravityY);
 		CheckBsonFieldInt(iter, "airMode", &airMode);
 		CheckBsonFieldFloat(iter, "ambientAirTemp", &ambientAirTemp);
+		CheckBsonFieldFloat(iter, "edgePressure", &edgePressure);
+		CheckBsonFieldFloat(iter, "edgeVelocityX", &edgeVelocityX);
+		CheckBsonFieldFloat(iter, "edgeVelocityY", &edgeVelocityY);
 		CheckBsonFieldInt(iter, "edgeMode", &edgeMode);
 		CheckBsonFieldInt(iter, "pmapbits", &pmapbits);
 		if (!strcmp(bson_iterator_key(&iter), "signs"))
@@ -2431,6 +2434,21 @@ std::pair<bool, std::vector<char>> GameSave::serialiseOPS() const
 	{
 		bson_append_double(&b, "ambientAirTemp", double(ambientAirTemp));
 		RESTRICTVERSION(96, 0);
+	}
+	if (fabsf(edgePressure) > 0.0001f)
+	{
+		bson_append_double(&b, "edgePressure", double(edgePressure));
+		RESTRICTVERSION(97, 0);
+	}
+	if (fabsf(edgeVelocityX) > 0.0001f)
+	{
+		bson_append_double(&b, "edgeVelocityX", double(edgeVelocityX));
+		RESTRICTVERSION(97, 0);
+	}
+	if (fabsf(edgeVelocityY) > 0.0001f)
+	{
+		bson_append_double(&b, "edgeVelocityY", double(edgeVelocityY));
+		RESTRICTVERSION(97, 0);
 	}
 	bson_append_int(&b, "edgeMode", edgeMode);
 

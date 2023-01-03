@@ -90,6 +90,9 @@ private:
 
 	int edgeMode;
 	float ambientAirTemp;
+	float edgePressure;
+	float edgeVelocityX;
+	float edgeVelocityY;
 	int decoSpace;
 
 	String infoTip;
@@ -131,6 +134,12 @@ public:
 	}
 	void SetAmbientAirTemperature(float ambientAirTemp);
 	float GetAmbientAirTemperature();
+	void SetEdgePressure(float edgePressure);
+	float GetEdgePressure();
+	void SetEdgeVelocityX(float edgeVelocityX);
+	float GetEdgeVelocityX();
+	void SetEdgeVelocityY(float edgeVelocityY);
+	float GetEdgeVelocityY();
 	void SetDecoSpace(int decoSpace);
 	int GetDecoSpace();
 

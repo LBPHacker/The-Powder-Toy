@@ -25,6 +25,9 @@ public:
 	void SetCustomGravityY(float y);
 	void SetAirMode(int airMode);
 	void SetAmbientAirTemperature(float ambientAirTemp);
+	void SetEdgePressure(float edgePressure);
+	void SetEdgeVelocityX(float edgeVelocityX);
+	void SetEdgeVelocityY(float edgeVelocityY);
 	void SetEdgeMode(int edgeMode);
 	void SetTemperatureScale(int temperatureScale);
 	void SetFullscreen(bool fullscreen);

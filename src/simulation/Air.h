@@ -10,6 +10,9 @@ public:
 	Simulation & sim;
 	int airMode;
 	float ambientAirTemp;
+	float edgePressure;
+	float edgeVelocityX;
+	float edgeVelocityY;
 	//Arrays from the simulation
 	unsigned char (*bmap)[XRES/CELL];
 	unsigned char (*emap)[XRES/CELL];

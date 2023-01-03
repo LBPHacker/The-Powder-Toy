@@ -112,6 +112,39 @@ void OptionsModel::SetAmbientAirTemperature(float ambientAirTemp)
 	notifySettingsChanged();
 }
 
+float OptionsModel::GetEdgePressure()
+{
+	return gModel->GetSimulation()->air->edgePressure;
+}
+void OptionsModel::SetEdgePressure(float edgePressure)
+{
+	Client::Ref().SetPref("Simulation.EdgePressure", edgePressure);
+	gModel->SetEdgePressure(edgePressure);
+	notifySettingsChanged();
+}
+
+float OptionsModel::GetEdgeVelocityX()
+{
+	return gModel->GetSimulation()->air->edgeVelocityX;
+}
+void OptionsModel::SetEdgeVelocityX(float edgeVelocityX)
+{
+	Client::Ref().SetPref("Simulation.EdgeVelocityX", edgeVelocityX);
+	gModel->SetEdgeVelocityX(edgeVelocityX);
+	notifySettingsChanged();
+}
+
+float OptionsModel::GetEdgeVelocityY()
+{
+	return gModel->GetSimulation()->air->edgeVelocityY;
+}
+void OptionsModel::SetEdgeVelocityY(float edgeVelocityY)
+{
+	Client::Ref().SetPref("Simulation.EdgeVelocityY", edgeVelocityY);
+	gModel->SetEdgeVelocityY(edgeVelocityY);
+	notifySettingsChanged();
+}
+
 int OptionsModel::GetGravityMode()
 {
 	return sim->gravityMode;

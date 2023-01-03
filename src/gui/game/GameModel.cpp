@@ -55,6 +55,9 @@ GameModel::GameModel():
 	colour(255, 0, 0, 255),
 	edgeMode(0),
 	ambientAirTemp(R_TEMP + 273.15f),
+	edgePressure(0),
+	edgeVelocityX(0),
+	edgeVelocityY(0),
 	decoSpace(0)
 {
 	sim = new Simulation();
@@ -108,7 +111,34 @@ GameModel::GameModel():
 			ambientAirTemp = temp;
 		}
 	}
+	edgePressure = 0;
+	{
+		auto pres = Client::Ref().GetPrefNumber("Simulation.EdgePressure", edgePressure);
+		if (MIN_PRESSURE <= pres && MAX_PRESSURE >= pres)
+		{
+			edgePressure = pres;
+		}
+	}
+	edgeVelocityX = 0;
+	{
+		auto vel = Client::Ref().GetPrefNumber("Simulation.EdgeVelocityX", edgeVelocityX);
+		if (-SIM_MAXVELOCITY <= vel && SIM_MAXVELOCITY >= vel)
+		{
+			edgeVelocityX = vel;
+		}
+	}
+	edgeVelocityY = 0;
+	{
+		auto vel = Client::Ref().GetPrefNumber("Simulation.EdgeVelocityY", edgeVelocityY);
+		if (-SIM_MAXVELOCITY <= vel && SIM_MAXVELOCITY >= vel)
+		{
+			edgeVelocityY = vel;
+		}
+	}
 	sim->air->ambientAirTemp = ambientAirTemp;
+	sim->air->edgePressure = edgePressure;
+	sim->air->edgeVelocityX = edgeVelocityX;
+	sim->air->edgeVelocityY = edgeVelocityY;
 	decoSpace = Client::Ref().GetPrefInteger("Simulation.DecoSpace", 0);
 	sim->SetDecoSpace(decoSpace);
 	int ngrav_enable = Client::Ref().GetPrefInteger("Simulation.NewtonianGravity", 0);
@@ -551,6 +581,39 @@ float GameModel::GetAmbientAirTemperature()
 	return this->ambientAirTemp;
 }
 
+void GameModel::SetEdgePressure(float edgePressure)
+{
+	this->edgePressure = edgePressure;
+	sim->air->edgePressure = edgePressure;
+}
+
+float GameModel::GetEdgePressure()
+{
+	return this->edgePressure;
+}
+
+void GameModel::SetEdgeVelocityX(float edgeVelocityX)
+{
+	this->edgeVelocityX = edgeVelocityX;
+	sim->air->edgeVelocityX = edgeVelocityX;
+}
+
+float GameModel::GetEdgeVelocityX()
+{
+	return this->edgeVelocityX;
+}
+
+void GameModel::SetEdgeVelocityY(float edgeVelocityY)
+{
+	this->edgeVelocityY = edgeVelocityY;
+	sim->air->edgeVelocityY = edgeVelocityY;
+}
+
+float GameModel::GetEdgeVelocityY()
+{
+	return this->edgeVelocityY;
+}
+
 void GameModel::SetDecoSpace(int decoSpace)
 {
 	sim->SetDecoSpace(decoSpace);
@@ -964,6 +1027,9 @@ void GameModel::SetSave(SaveInfo * newSave, bool invertIncludePressure)
 		sim->customGravityY = saveData->customGravityY;
 		sim->air->airMode = saveData->airMode;
 		sim->air->ambientAirTemp = saveData->ambientAirTemp;
+		sim->air->edgePressure = saveData->edgePressure;
+		sim->air->edgeVelocityX = saveData->edgeVelocityX;
+		sim->air->edgeVelocityY = saveData->edgeVelocityY;
 		sim->edgeMode = saveData->edgeMode;
 		sim->legacy_enable = saveData->legacyEnable;
 		sim->water_equal_test = saveData->waterEEnabled;
@@ -1028,6 +1094,9 @@ void GameModel::SetSaveFile(SaveFile * newSave, bool invertIncludePressure)
 		sim->customGravityY = saveData->customGravityY;
 		sim->air->airMode = saveData->airMode;
 		sim->air->ambientAirTemp = saveData->ambientAirTemp;
+		sim->air->edgePressure = saveData->edgePressure;
+		sim->air->edgeVelocityX = saveData->edgeVelocityX;
+		sim->air->edgeVelocityY = saveData->edgeVelocityY;
 		sim->edgeMode = saveData->edgeMode;
 		sim->legacy_enable = saveData->legacyEnable;
 		sim->water_equal_test = saveData->waterEEnabled;
@@ -1346,6 +1415,9 @@ void GameModel::ClearSimulation()
 	sim->water_equal_test = false;
 	sim->SetEdgeMode(edgeMode);
 	sim->air->ambientAirTemp = ambientAirTemp;
+	sim->air->edgePressure = edgePressure;
+	sim->air->edgeVelocityX = edgeVelocityX;
+	sim->air->edgeVelocityY = edgeVelocityY;
 
 	sim->clear_sim();
 	ren->ClearAccumulation();

@@ -924,6 +924,9 @@ void LuaScriptInterface::initSimulationAPI()
 		{"waterEqualisation", simulation_waterEqualisation},
 		{"waterEqualization", simulation_waterEqualisation},
 		{"ambientAirTemp", simulation_ambientAirTemp},
+		{"edgePressure", simulation_edgePressure},
+		{"edgeVelocityX", simulation_edgeVelocityX},
+		{"edgeVelocityY", simulation_edgeVelocityY},
 		{"elementCount", simulation_elementCount},
 		{"can_move", simulation_canMove},
 		{"brush", simulation_brush},
@@ -2116,6 +2119,45 @@ int LuaScriptInterface::simulation_ambientAirTemp(lua_State * l)
 	}
 	float ambientAirTemp = restrict_flt(luaL_optnumber(l, 1, R_TEMP + 273.15f), MIN_TEMP, MAX_TEMP);
 	luacon_model->SetAmbientAirTemperature(ambientAirTemp);
+	return 0;
+}
+
+int LuaScriptInterface::simulation_edgePressure(lua_State * l)
+{
+	int acount = lua_gettop(l);
+	if (acount == 0)
+	{
+		lua_pushnumber(l, luacon_sim->air->edgePressure);
+		return 1;
+	}
+	float edgePressure = restrict_flt(luaL_optnumber(l, 1, 0), MIN_PRESSURE, MAX_PRESSURE);
+	luacon_model->SetEdgePressure(edgePressure);
+	return 0;
+}
+
+int LuaScriptInterface::simulation_edgeVelocityX(lua_State * l)
+{
+	int acount = lua_gettop(l);
+	if (acount == 0)
+	{
+		lua_pushnumber(l, luacon_sim->air->edgeVelocityX);
+		return 1;
+	}
+	float edgeVelocityX = restrict_flt(luaL_optnumber(l, 1, 0), -SIM_MAXVELOCITY, SIM_MAXVELOCITY);
+	luacon_model->SetEdgeVelocityX(edgeVelocityX);
+	return 0;
+}
+
+int LuaScriptInterface::simulation_edgeVelocityY(lua_State * l)
+{
+	int acount = lua_gettop(l);
+	if (acount == 0)
+	{
+		lua_pushnumber(l, luacon_sim->air->edgeVelocityY);
+		return 1;
+	}
+	float edgeVelocityY = restrict_flt(luaL_optnumber(l, 1, 0), -SIM_MAXVELOCITY, SIM_MAXVELOCITY);
+	luacon_model->SetEdgeVelocityY(edgeVelocityY);
 	return 0;
 }
 
