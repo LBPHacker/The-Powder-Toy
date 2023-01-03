@@ -124,10 +124,10 @@ OptionsView::OptionsView():
 	currentY+=20;
 	ambientAirTemp = new ui::Textbox(ui::Point(Size.X-95, currentY), ui::Point(60, 16));
 	ambientAirTemp->SetActionCallback({ [this] {
-		UpdateAirTemp(ambientAirTemp->GetText(), false);
+		UpdateAmbientAirTemp(ambientAirTemp->GetText(), false);
 	} });
 	ambientAirTemp->SetDefocusCallback({ [this] {
-		UpdateAirTemp(ambientAirTemp->GetText(), true);
+		UpdateAmbientAirTemp(ambientAirTemp->GetText(), true);
 	}});
 	scrollPanel->AddChild(ambientAirTemp);
 
@@ -135,6 +135,24 @@ OptionsView::OptionsView():
 	scrollPanel->AddChild(ambientAirTempPreview);
 
 	tempLabel = new ui::Label(ui::Point(8, currentY), ui::Point(Size.X-96, 16), "Ambient Air Temperature");
+	tempLabel->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
+	tempLabel->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
+	scrollPanel->AddChild(tempLabel);
+
+	currentY+=20;
+	edgePressure = new ui::Textbox(ui::Point(Size.X-95, currentY), ui::Point(60, 16));
+	edgePressure->SetActionCallback({ [this] {
+		UpdateEdgePressure(edgePressure->GetText(), false);
+	} });
+	edgePressure->SetDefocusCallback({ [this] {
+		UpdateEdgePressure(edgePressure->GetText(), true);
+	}});
+	scrollPanel->AddChild(edgePressure);
+
+	edgePressurePreview = new ui::Button(ui::Point(Size.X-31, currentY), ui::Point(16, 16), "", "Preview");
+	scrollPanel->AddChild(edgePressurePreview);
+
+	tempLabel = new ui::Label(ui::Point(8, currentY), ui::Point(Size.X-96, 16), "Edge Pressure");
 	tempLabel->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
 	tempLabel->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
 	scrollPanel->AddChild(tempLabel);
@@ -149,6 +167,8 @@ OptionsView::OptionsView():
 
 	class GravityWindow : public ui::Window
 	{
+		std::function<void (float, float)> done;
+
 		void OnTryExit(ExitMethod method) override
 		{
 			CloseActiveWindow();
@@ -166,15 +186,13 @@ OptionsView::OptionsView():
 		ui::DirectionSelector * gravityDirection;
 		ui::Label * labelValues;
 
-		OptionsController * c;
-
 	public:
-		GravityWindow(ui::Point position, float scale, int radius, float x, float y, OptionsController * c_):
+		GravityWindow(ui::Point position, float scale, int radius, float x, float y, String label, std::function<void (float, float)> newDone):
 			ui::Window(position, ui::Point((radius * 5 / 2) + 20, (radius * 5 / 2) + 75)),
-			gravityDirection(new ui::DirectionSelector(ui::Point(10, 32), scale, radius, radius / 4, 2, 5)),
-			c(c_)
+			done(newDone),
+			gravityDirection(new ui::DirectionSelector(ui::Point(10, 32), scale, radius, radius / 4, 2, 5))
 			{
-				ui::Label * tempLabel = new ui::Label(ui::Point(4, 1), ui::Point(Size.X - 8, 22), "Custom Gravity");
+				ui::Label * tempLabel = new ui::Label(ui::Point(4, 1), ui::Point(Size.X - 8, 22), label);
 				tempLabel->SetTextColour(style::Colour::InformationTitle);
 				tempLabel->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
 				tempLabel->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
@@ -200,8 +218,7 @@ OptionsView::OptionsView():
 				okayButton->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
 				okayButton->Appearance.BorderInactive = ui::Colour(200, 200, 200);
 				okayButton->SetActionCallback({ [this] {
-					c->SetCustomGravityX(gravityDirection->GetXValue());
-					c->SetCustomGravityY(gravityDirection->GetYValue());
+					done(gravityDirection->GetXValue(), gravityDirection->GetYValue());
 					CloseActiveWindow();
 					SelfDestruct();
 				} });
@@ -215,10 +232,28 @@ OptionsView::OptionsView():
 	gravityMode->SetActionCallback({ [this] {
 		c->SetGravityMode(gravityMode->GetOption().second);
 		if (gravityMode->GetOption().second == 3)
-			new GravityWindow(ui::Point(-1, -1), 0.05f, 40, customGravityX, customGravityY, c);
+			new GravityWindow(ui::Point(-1, -1), 0.05f, 40, customGravityX, customGravityY, "Custom Gravity", [this](float x, float y) {
+				c->SetCustomGravityX(x);
+				c->SetCustomGravityY(y);
+			});
 	} });
 
 	tempLabel = new ui::Label(ui::Point(8, currentY), ui::Point(Size.X-96, 16), "Gravity Simulation Mode");
+	tempLabel->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
+	tempLabel->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
+	scrollPanel->AddChild(tempLabel);
+
+	currentY+=20;
+	edgeVelocityChange = new ui::Button(ui::Point(Size.X-95, currentY), ui::Point(80, 16), "Change");
+	scrollPanel->AddChild(edgeVelocityChange);
+	edgeVelocityChange->SetActionCallback({ [this] {
+		new GravityWindow(ui::Point(-1, -1), 0.05f, 40, edgeVelocityX, edgeVelocityY, "Edge Velocity", [this](float x, float y) {
+			c->SetEdgeVelocityX(x);
+			c->SetEdgeVelocityY(y);
+		});
+	} });
+
+	tempLabel = new ui::Label(ui::Point(8, currentY), ui::Point(Size.X-96, 16), "Edge Velocity");
 	tempLabel->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
 	tempLabel->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
 	scrollPanel->AddChild(tempLabel);
@@ -459,7 +494,7 @@ void OptionsView::AmbientAirTempToTextBox(float airTemp)
 	ambientAirTemp->SetText(sb.Build());
 }
 
-void OptionsView::UpdateAirTemp(String temp, bool isDefocus)
+void OptionsView::UpdateAmbientAirTemp(String temp, bool isDefocus)
 {
 	// Parse air temp and determine validity
 	float airTemp = 0;
@@ -502,6 +537,73 @@ void OptionsView::UpdateAirTemp(String temp, bool isDefocus)
 	UpdateAmbientAirTempPreview(airTemp, isValid);
 }
 
+void OptionsView::UpdateEdgePressurePreview(float edgePres, bool isValid)
+{
+	if (isValid)
+	{
+		int PressureToColour(float pres);
+		int c = PressureToColour(edgePres);
+		edgePressurePreview->Appearance.BackgroundInactive = ui::Colour(PIXR(c), PIXG(c), PIXB(c));
+		edgePressurePreview->SetText("");
+	}
+	else
+	{
+		edgePressurePreview->Appearance.BackgroundInactive = ui::Colour(0, 0, 0);
+		edgePressurePreview->SetText("?");
+	}
+	edgePressurePreview->Appearance.BackgroundHover = edgePressurePreview->Appearance.BackgroundInactive;
+}
+
+void OptionsView::EdgePressureToTextBox(float edgePres)
+{
+	StringBuilder sb;
+	sb << Format::Precision(2) << edgePres;
+	edgePressure->SetText(sb.Build());
+}
+
+void OptionsView::UpdateEdgePressure(String pres, bool isDefocus)
+{
+	// Parse edge pressure and determine validity
+	float edgePres = 0;
+	bool isValid;
+	try
+	{
+		edgePres = pres.ToNumber<float>();
+		isValid = true;
+	}
+	catch (const std::exception &ex)
+	{
+		isValid = false;
+	}
+
+	// While defocusing, correct out of range pressures and empty textboxes
+	if (isDefocus)
+	{
+		if (pres.empty())
+		{
+			isValid = true;
+			edgePres = 0;
+		}
+		else if (!isValid)
+			return;
+		else if (edgePres < MIN_PRESSURE)
+			edgePres = MIN_PRESSURE;
+		else if (edgePres > MAX_PRESSURE)
+			edgePres = MAX_PRESSURE;
+
+		EdgePressureToTextBox(edgePres);
+	}
+	// Out of range pressures are invalid, preview should go away
+	else if (isValid && (edgePres < MIN_PRESSURE || edgePres > MAX_PRESSURE))
+		isValid = false;
+
+	// If valid, set pres
+	if (isValid)
+		c->SetEdgePressure(edgePres);
+
+	UpdateEdgePressurePreview(edgePres, isValid);
+}
+
 void OptionsView::NotifySettingsChanged(OptionsModel * sender)
 {
 	temperatureScale->SetOption(sender->GetTemperatureScale()); // has to happen before AmbientAirTempToTextBox is called
@@ -517,6 +619,14 @@ void OptionsView::NotifySettingsChanged(OptionsModel * sender)
 		UpdateAmbientAirTempPreview(airTemp, true);
 		AmbientAirTempToTextBox(airTemp);
 	}
+	if (!edgePressure->IsFocused())
+	{
+		float edgePres = sender->GetEdgePressure();
+		UpdateEdgePressurePreview(edgePres, true);
+		EdgePressureToTextBox(edgePres);
+	}
+	edgeVelocityX = sender->GetEdgeVelocityX();
+	edgeVelocityY = sender->GetEdgeVelocityY();
 	gravityMode->SetOption(sender->GetGravityMode());
 	customGravityX = sender->GetCustomGravityX();
 	customGravityY = sender->GetCustomGravityY();

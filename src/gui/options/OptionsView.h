@@ -25,6 +25,9 @@ class OptionsView: public ui::Window
 	ui::DropDown * airMode;
 	ui::Textbox * ambientAirTemp;
 	ui::Button * ambientAirTempPreview;
+	ui::Textbox * edgePressure;
+	ui::Button * edgePressurePreview;
+	ui::Button * edgeVelocityChange;
 	ui::DropDown * gravityMode;
 	ui::DropDown * edgeMode;
 	ui::DropDown * temperatureScale;
@@ -42,9 +45,13 @@ class OptionsView: public ui::Window
 	ui::Checkbox * perfectCirclePressure;
 	ui::ScrollPanel * scrollPanel;
 	float customGravityX, customGravityY;
+	float edgeVelocityX, edgeVelocityY;
 	void UpdateAmbientAirTempPreview(float airTemp, bool isValid);
 	void AmbientAirTempToTextBox(float airTemp);
-	void UpdateAirTemp(String temp, bool isDefocus);
+	void UpdateAmbientAirTemp(String temp, bool isDefocus);
+	void UpdateEdgePressurePreview(float edgePres, bool isValid);
+	void EdgePressureToTextBox(float edgePres);
+	void UpdateEdgePressure(String temp, bool isDefocus);
 public:
 	OptionsView();
 	void NotifySettingsChanged(OptionsModel * sender);
