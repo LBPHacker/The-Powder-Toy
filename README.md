@@ -17,6 +17,18 @@ Build instructions
 
 See the _Powder Toy Development Help_ section [on the main page of the wiki](https://powdertoy.co.uk/Wiki/W/Main_Page.html).
 
+Formatting Guidelines
+===========================================================================
+We have [a clang-format config](./.clang-format) that our pull request pipelines enforce. Please set up the required Git hook to enforce formatting locally before committing and contributing changes like so:
+
+```sh
+./git-pre-commit-format install
+```
+
+If you are on Windows, use Git Bash for this. More details [here](https://github.com/barisione/clang-format-hooks/).
+
+Note that we have opted to not apply our formatting rules to the entire codebase at once but to let it slowly converge to correctness instead, so do not expect perfect formatting in existing code.
+
 Thanks
 ===========================================================================
 
