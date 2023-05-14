@@ -25,7 +25,7 @@ static void CheckBsonFieldFloat(bson_iterator iter, const char *field, float *se
 
 GameSave::GameSave(Vec2<int> newBlockSize)
 {
-	setSize(newBlockSize);
+	setSize(newBlockSize + Vec2{ 2, 2 } );
 }
 
 GameSave::GameSave(const std::vector<char> &data, bool newWantAuthors)
