@@ -15,6 +15,7 @@ on:
 jobs:
   prepare:
     runs-on: ubuntu-latest
+    environment: modtest
     outputs:
       release_upload_url: ${{ steps.create_release.outputs.upload_url }}
       do_release: ${{ steps.prepare.outputs.do_release }}
@@ -54,6 +55,7 @@ jobs:
           prerelease: false
   build:
     runs-on: ${{ matrix.runs_on }}
+    environment: modtest
     needs: [prepare]
     strategy:
       fail-fast: false
@@ -118,6 +120,7 @@ jobs:
           name: ${{ matrix.debug_asset_name }}
   publish:
     runs-on: ubuntu-latest
+    environment: modtest
     needs: [build, prepare]
     strategy:
       fail-fast: false
@@ -139,6 +142,7 @@ jobs:
           PUBLISH_FILENAME: ${{ matrix.starcatcher_name }}
   release:
     runs-on: ubuntu-latest
+    environment: modtest
     needs: [build, publish, prepare]
     if: needs.prepare.outputs.do_publish == 'yes'
     steps:
