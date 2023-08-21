@@ -40,21 +40,21 @@ option(
 	'display_version_major',
 	type: 'integer',
 	min: 0,
-	value: 98,
+	value: 1,
 	description: 'Major component of the display version, should more or less map to the MINOR version in semantic versioning'
 )
 option(
 	'display_version_minor',
 	type: 'integer',
 	min: 0,
-	value: 2,
+	value: 3,
 	description: 'Minor component of the display version, should more or less map to the PATCH version in semantic versioning'
 )
 option(
 	'build_num',
 	type: 'integer',
 	min: 0,
-	value: 372,
+	value: 2,
 	description: 'Build number, should be strictly monotonously increasing across public releases'
 )
 option(
@@ -82,7 +82,7 @@ option(
 	'mod_id',
 	type: 'integer',
 	min: 0,
-	value: 0,
+	value: 8,
 	description: 'Mod ID, used on the https://starcatcher.us/TPT build server, the build server will compile for all platforms for you and send updates in-game, see jacob1 to get a mod ID'
 )
 option(
@@ -198,25 +198,25 @@ option(
 option(
 	'app_name',
 	type: 'string',
-	value: 'The Powder Toy',
+	value: 'Mod Test',
 	description: 'App name, used for desktop integration and the window title, change if you work on a mod'
 )
 option(
 	'app_comment',
 	type: 'string',
-	value: 'Physics sandbox game',
+	value: 'Mod test',
 	description: 'App comment, used for desktop integration, change if you work on a mod'
 )
 option(
 	'app_exe',
 	type: 'string',
-	value: 'powder',
+	value: 'modtest',
 	description: 'App executable name, used for desktop integration, change if you work on a mod'
 )
 option(
 	'app_id',
 	type: 'string',
-	value: 'uk.co.powdertoy.tpt',
+	value: 'uk.co.powdertoy.tptmodtest',
 	description: 'App ID, a D-Bus well-known name, used for desktop integration, change if you work on a mod'
 )
 option(
