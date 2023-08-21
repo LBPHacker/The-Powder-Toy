@@ -1,4 +1,4 @@
-project('the-powder-toy', 'cpp', version: '99.3.386', meson_version: '>=0.64.0')
+project('mod-test', 'cpp', version: '1.4.7-upstream-99.3.386', meson_version: '>=0.64.0')
 # if you are a mod developer and don't mind dealing with merge conflicts,
 # you can replace 'the-powder-toy' with your mod's simplified name, and version: 'X.Y.Z' with version: 'A.B.C-upstream-X.Y.Z'
 # where A.B.C is your mod's version (you can change this to anything) and X.Y.Z is the upstream version (merge this from upstream)

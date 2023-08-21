@@ -15,6 +15,7 @@ on:
 jobs:
   prepare:
     runs-on: ubuntu-24.04
+    environment: modtest
     outputs:
       do_release: ${{ steps.prepare.outputs.do_release }}
       build_matrix: ${{ steps.prepare.outputs.build_matrix }}
@@ -57,6 +58,7 @@ jobs:
   build:
     runs-on: ${{ matrix.runs_on }}
     name: ${{ matrix.job_name }}
+    environment: modtest
     needs: [prepare]
     strategy:
       fail-fast: false
@@ -151,6 +153,7 @@ jobs:
           name: ${{ matrix.debug_asset_name }}
   publish:
     runs-on: ubuntu-24.04
+    environment: modtest
     needs: [build, prepare]
     strategy:
       fail-fast: false
@@ -172,6 +175,7 @@ jobs:
           PUBLISH_FILENAME: ${{ matrix.starcatcher_name }}
   release:
     runs-on: ubuntu-24.04
+    environment: modtest
     needs: [build, publish, prepare]
     if: needs.prepare.outputs.do_publish == 'yes'
     steps:
