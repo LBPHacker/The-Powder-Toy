@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-arm-android-bionic-static-release-v20231231153342
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20231231153342/tpt-libs-prebuilt-arm-android-bionic-static-release-v20231231153342.zip
+source_filename = tpt-libs-prebuilt-arm-android-bionic-static-release-v20231231153342.zip
+source_hash = dd583e6ee60ebd3a0835d19bf10ac8808f9b6fd9c6e0d2df215b25d29ceea3bc

@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-aarch64-android-bionic-static-debug-v20231231153342
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20231231153342/tpt-libs-prebuilt-aarch64-android-bionic-static-debug-v20231231153342.zip
+source_filename = tpt-libs-prebuilt-aarch64-android-bionic-static-debug-v20231231153342.zip
+source_hash = 57ead4458a04f7fefa650ffc0d1a84ad6bf005e5c67199e9d3548a13f880751b
