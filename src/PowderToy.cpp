@@ -97,25 +97,37 @@ void TickClient()
 	Client::Ref().Tick();
 }
 
-void BlueScreen(String detailMessage)
+void BlueScreen(String detailMessage, std::optional<std::vector<String>> backtrace)
 {
 	auto &engine = ui::Engine::Ref();
 	engine.g->BlendFilledRect(engine.g->Size().OriginRect(), 0x1172A9_rgb .WithAlpha(0xD2));
 
-	String errorTitle = "ERROR";
-	String errorDetails = "Details: " + detailMessage;
-	String errorHelp = String("An unrecoverable fault has occurred, please report the error by visiting the website below\n") + SCHEME + SERVER;
-	auto versionInfo = ByteString::Build("Version: ", VersionInfo(), "\nTag: ", VCS_TAG).FromUtf8();
+	String errorText;
+	auto addParapgraph = [&errorText](String str) {
+		errorText += str + "\n\n";
+	};
 
-	// We use the width of errorHelp to center, but heights of the individual texts for vertical spacing
-	auto pos = engine.g->Size() / 2 - Vec2(Graphics::TextSize(errorHelp).X / 2, 100);
-	engine.g->BlendText(pos, errorTitle, 0xFFFFFF_rgb .WithAlpha(0xFF));
-	pos.Y += 4 + Graphics::TextSize(errorTitle).Y;
-	engine.g->BlendText(pos, errorDetails, 0xFFFFFF_rgb .WithAlpha(0xFF));
-	pos.Y += 4 + Graphics::TextSize(errorDetails).Y;
-	engine.g->BlendText(pos, errorHelp, 0xFFFFFF_rgb .WithAlpha(0xFF));
-	pos.Y += 4 + Graphics::TextSize(errorHelp).Y;
-	engine.g->BlendText(pos, versionInfo, 0xFFFFFF_rgb .WithAlpha(0xFF));
+	ByteString crashLogPath = ByteString::Build("crash.", uint64_t(time(NULL)), ".log");
+
+	addParapgraph(String::Build("ERROR - Details: ", detailMessage, "\nAn unrecoverable fault has occurred, please report the error by visiting the website below\n\n  ", SCHEME, SERVER));
+	addParapgraph(String::Build("An attempt will be made to save all of this information to ", crashLogPath.FromUtf8(), " in your data folder.\nPlease attach this file to your report."));
+	addParapgraph(String::Build("Version: ", VersionInfo().FromUtf8(), "\nTag: ", VCS_TAG));
+	if (backtrace)
+	{
+		StringBuilder btBuilder;
+		btBuilder << "Backtrace:\n";
+		for (auto &item : *backtrace)
+		{
+			btBuilder << " - " << item << "\n";
+		}
+		addParapgraph(btBuilder.Build());
+	}
+
+	auto off = (engine.g->Size().X - Graphics::TextSize(errorText).X) / 2;
+	engine.g->BlendText(ui::Point(off, off), errorText, 0xFFFFFF_rgb .WithAlpha(0xFF));
+
+	auto crashLogData = errorText.ToUtf8();
+	Platform::WriteFile(std::vector<char>(crashLogData.begin(), crashLogData.end()), crashLogPath);
 
 	//Death loop
 	SDL_Event event;
@@ -151,7 +163,7 @@ void SigHandler(int signal)
 			break;
 		}
 	}
-	BlueScreen(ByteString(message).FromUtf8());
+	BlueScreen(ByteString(message).FromUtf8(), Platform::Backtrace(Platform::backtraceFromHere));
 }
 
 constexpr int SCALE_MAXIMUM = 10;
@@ -518,7 +530,7 @@ int Main(int argc, char *argv[])
 		}
 		catch (const std::exception &e)
 		{
-			BlueScreen(ByteString(e.what()).FromUtf8());
+			BlueScreen(ByteString(e.what()).FromUtf8(), Platform::Backtrace(Platform::backtraceFromException));
 		}
 	}
 	else

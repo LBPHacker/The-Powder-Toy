@@ -2,7 +2,11 @@ common_files += files(
 	'Common.cpp',
 )
 
-use_bluescreen = not is_debug
+if get_option('use_bluescreen') == 'auto'
+	use_bluescreen = not is_debug
+else
+	use_bluescreen = get_option('use_bluescreen') == 'yes'
+endif
 can_install_enforce_no = false
 set_window_icon = false
 path_sep_char = '/'
@@ -12,6 +16,10 @@ if host_platform == 'windows'
 		'Windows.cpp',
 		'ExitCommon.cpp',
 	)
+	backtrace_files = files('BacktraceWindows.cpp')
+	if use_bluescreen
+		powder_deps += dependency('stackwalker', static: true)
+	endif
 	powder_files += files(
 		'MainCommon.cpp',
 		'DdirCommon.cpp',
@@ -24,6 +32,7 @@ elif host_platform == 'darwin'
 		'PosixProc.cpp',
 		'ExitCommon.cpp',
 	)
+	backtrace_files = files('BacktraceNull.cpp')
 	powder_files += files(
 		'MainCommon.cpp',
 		'DdirCommon.cpp',
@@ -36,6 +45,7 @@ elif host_platform == 'android'
 		'PosixProc.cpp',
 		'ExitCommon.cpp',
 	)
+	backtrace_files = files('BacktraceNull.cpp')
 	powder_files += files(
 		'MainCommon.cpp',
 		'DdirCommon.cpp',
@@ -47,6 +57,7 @@ elif host_platform == 'emscripten'
 		'Emscripten.cpp',
 		'Posix.cpp',
 	)
+	backtrace_files = files('BacktraceNull.cpp')
 elif host_platform == 'linux'
 	# TODO: again, this is more like "posix" than "linux"
 	set_window_icon = true
@@ -56,6 +67,7 @@ elif host_platform == 'linux'
 		'PosixProc.cpp',
 		'ExitCommon.cpp',
 	)
+	backtrace_files = files('BacktraceLinux.cpp')
 	powder_files += files(
 		'MainCommon.cpp',
 		'DdirCommon.cpp',
@@ -68,10 +80,16 @@ else
 		'PosixProc.cpp',
 		'ExitCommon.cpp',
 	)
+	backtrace_files = files('BacktraceNull.cpp')
 	powder_files += files(
 		'MainCommon.cpp',
 		'DdirCommon.cpp',
 	)
+endif
+if use_bluescreen
+	common_files += backtrace_files
+else
+	common_files += files('BacktraceNull.cpp')
 endif
 conf_data.set('SET_WINDOW_ICON', set_window_icon.to_string())
 conf_data.set('PATH_SEP_CHAR', path_sep_char)
