@@ -445,7 +445,12 @@ fi
 
 if [[ $SEPARATE_DEBUG == yes ]] && [[ $BSH_HOST_PLATFORM-$BSH_HOST_LIBC != windows-msvc ]]; then
 	$objcopy --only-keep-debug $strip_target $DEBUG_ASSET_PATH
-	$strip --strip-debug --strip-unneeded $strip_target
+	strip_cmd=$strip$'\t'--strip-debug$'\t'--strip-unneeded
+	for sym in $(nm -Ujg powder | grep -P -e "^lua(|open|L)_"); do
+		strip_cmd+=$'\t'-K$'\t'sym
+	done
+	strip_cmd+=$'\t'$strip_target
+	$strip_cmd
 	$objcopy --add-gnu-debuglink $DEBUG_ASSET_PATH $strip_target
 	chmod -x $DEBUG_ASSET_PATH
 fi

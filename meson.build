@@ -303,6 +303,17 @@ else
 		# the app alongside libpowder.so, and possibly add it to SDL's list of libraries to load
 		project_link_args += [ '-static-libstdc++' ]
 	endif
+	if is_static and lua_variant != 'none'
+		if c_compiler.has_link_argument('-Wl,--export-dynamic-symbol')
+			project_link_args += [
+				'-Wl,--export-dynamic-symbol=lua_*',
+				'-Wl,--export-dynamic-symbol=luaL_*',
+				'-Wl,--export-dynamic-symbol=luaopen_*',
+			]
+		else
+			warning('your linker does not support -Wl,--export-dynamic-symbol; the resulting static binary will crash when loading Lua shared modules')
+		endif
+	endif
 	project_c_args += args_ccomp + [
 		'-Wno-implicit-fallthrough',
 		'-Wno-missing-field-initializers',
