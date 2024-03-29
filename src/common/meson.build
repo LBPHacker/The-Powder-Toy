@@ -3,5 +3,8 @@ common_files += files(
 	'tpt-rand.cpp',
 )
 
-subdir('clipboard')
+powder_files += files(
+	'Clipboard.cpp',
+)
+
 subdir('platform')

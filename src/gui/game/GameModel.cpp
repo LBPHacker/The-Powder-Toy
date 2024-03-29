@@ -20,7 +20,7 @@
 #include "client/SaveInfo.h"
 #include "client/http/ExecVoteRequest.h"
 #include "common/platform/Platform.h"
-#include "common/clipboard/Clipboard.h"
+#include "common/Clipboard.h"
 #include "graphics/Renderer.h"
 #include "simulation/Air.h"
 #include "simulation/GOLString.h"

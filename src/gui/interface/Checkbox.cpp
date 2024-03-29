@@ -74,24 +74,25 @@ void Checkbox::OnMouseLeave(int x, int y)
 void Checkbox::Draw(const Point& screenPos)
 {
 	Graphics * g = GetGraphics();
+	auto textColor = Enabled ? 0xFFFFFF_rgb : 0x808080_rgb;
 	if(checked)
 	{
-		g->DrawFilledRect(RectSized(screenPos + Vec2{ 5, 5 }, Vec2{ 6, 6 }), 0xFFFFFF_rgb);
+		g->DrawFilledRect(RectSized(screenPos + Vec2{ 5, 5 }, Vec2{ 6, 6 }), textColor);
 	}
 	if(isMouseOver)
 	{
-		g->DrawRect(RectSized(screenPos + Vec2{ 2, 2 }, Vec2{ 12, 12 }), 0xFFFFFF_rgb);
-		g->BlendFilledRect(RectSized(screenPos + Vec2{ 5, 5 }, Vec2{ 6, 6 }), 0xFFFFFF_rgb .WithAlpha(170));
+		g->DrawRect(RectSized(screenPos + Vec2{ 2, 2 }, Vec2{ 12, 12 }), textColor);
+		g->BlendFilledRect(RectSized(screenPos + Vec2{ 5, 5 }, Vec2{ 6, 6 }), textColor .WithAlpha(170));
 		if (!Appearance.icon)
-			g->BlendText(screenPos + Vec2{ 18, 4 }, text, 0xFFFFFF_rgb .WithAlpha(255));
+			g->BlendText(screenPos + Vec2{ 18, 4 }, text, textColor .WithAlpha(255));
 		else
 			g->draw_icon(screenPos.X+iconPosition.X, screenPos.Y+iconPosition.Y, Appearance.icon, 255);
 	}
 	else
 	{
-		g->BlendRect(RectSized(screenPos + Vec2{ 2, 2 }, Vec2{ 12, 12 }), 0xFFFFFF_rgb .WithAlpha(200));
+		g->BlendRect(RectSized(screenPos + Vec2{ 2, 2 }, Vec2{ 12, 12 }), textColor .WithAlpha(200));
 		if (!Appearance.icon)
-			g->BlendText(screenPos + Vec2{ 18, 4 }, text, 0xFFFFFF_rgb .WithAlpha(200));
+			g->BlendText(screenPos + Vec2{ 18, 4 }, text, textColor .WithAlpha(200));
 		else
 			g->draw_icon(screenPos.X+iconPosition.X, screenPos.Y+iconPosition.Y, Appearance.icon, 200);
 	}

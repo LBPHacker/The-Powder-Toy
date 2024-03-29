@@ -25,6 +25,13 @@ void TickClient()
 {
 }
 
+namespace Clipboard
+{
+	void FlushNative()
+	{
+	}
+}
+
 struct ExplicitSingletons
 {
 	// These need to be listed in the order they are populated in main.

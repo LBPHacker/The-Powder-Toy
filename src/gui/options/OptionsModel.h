@@ -43,14 +43,12 @@ public:
 	void SetScale(int scale);
 	bool GetGraveExitsConsole();
 	void SetGraveExitsConsole(bool graveExitsConsole);
-	bool GetNativeClipoard();
-	void SetNativeClipoard(bool nativeClipoard);
+	bool GetNativeClipboard();
+	void SetNativeClipboard(bool nativeClipoard);
 	bool GetResizable();
 	void SetResizable(bool resizable);
 	bool GetFullscreen();
 	void SetFullscreen(bool fullscreen);
-	bool GetChangeResolution();
-	void SetChangeResolution(bool newChangeResolution);
 	bool GetForceIntegerScaling();
 	void SetForceIntegerScaling(bool forceIntegerScaling);
 	bool GetBlurryScaling();

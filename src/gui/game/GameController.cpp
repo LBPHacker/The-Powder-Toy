@@ -65,7 +65,7 @@
 #include "gui/tags/TagsView.h"
 
 #include "Config.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <iostream>
 
 GameController::GameController():
@@ -1033,6 +1033,11 @@ int GameController::GetEdgeMode()
 	return gameModel->GetEdgeMode();
 }
 
+Renderer *GameController::GetRenderer()
+{
+	return gameModel->GetRenderer();
+}
+
 void GameController::SetEdgeMode(int edgeMode)
 {
 	if (edgeMode < 0 || edgeMode >= NUM_EDGEMODES)
@@ -1733,4 +1738,9 @@ void GameController::SetToolIndex(ByteString identifier, std::optional<int> inde
 	{
 		commandInterface->SetToolIndex(identifier, index);
 	}
+}
+
+RendererSettings &GameController::GetRendererSettings()
+{
+	return gameModel->GetRendererSettings();
 }

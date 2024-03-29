@@ -9,7 +9,7 @@
 #include "simulation/Simulation.h"
 #include "simulation/SimulationData.h"
 #include "graphics/Graphics.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 class PropertyWindow: public ui::Window
 {

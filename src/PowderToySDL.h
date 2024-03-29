@@ -4,7 +4,7 @@
 #include "gui/WindowFrameOps.h"
 #include "FpsLimit.h"
 #include <cstdint>
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <variant>
 
 extern int desktopWidth;

@@ -5,7 +5,7 @@
 #include "gui/interface/Engine.h"
 #include "graphics/Graphics.h"
 #include "common/platform/Platform.h"
-#include "common/clipboard/Clipboard.h"
+#include "common/Clipboard.h"
 #include <iostream>
 
 int desktopWidth = 1280;
@@ -45,22 +45,13 @@ void SetTextInputRect(int x, int y, int w, int h)
 {
 	// Why does SDL_SetTextInputRect not take logical coordinates???
 	SDL_Rect rect;
-#if SDL_VERSION_ATLEAST(2, 0, 18)
-	int wx, wy, wwx, why;
-	SDL_RenderLogicalToWindow(sdl_renderer, float(x), float(y), &wx, &wy);
-	SDL_RenderLogicalToWindow(sdl_renderer, float(x + w), float(y + h), &wwx, &why);
+	float wx, wy, wwx, why;
+	SDL_RenderCoordinatesToWindow(sdl_renderer, float(x), float(y), &wx, &wy);
+	SDL_RenderCoordinatesToWindow(sdl_renderer, float(x + w), float(y + h), &wwx, &why);
 	rect.x = wx;
 	rect.y = wy;
 	rect.w = wwx - wx;
 	rect.h = why - wy;
-#else
-	// TODO: use SDL_RenderLogicalToWindow when ubuntu deigns to update to sdl 2.0.18
-	auto scale = ui::Engine::Ref().windowFrameOps.scale;
-	rect.x = x * scale;
-	rect.y = y * scale;
-	rect.w = w * scale;
-	rect.h = h * scale;
-#endif
 	SDL_SetTextInputRect(&rect);
 }
 
@@ -84,26 +75,13 @@ unsigned int GetTicks()
 	return SDL_GetTicks();
 }
 
-static void CalculateMousePosition(int *x, int *y)
-{
-	int globalMx, globalMy;
-	SDL_GetGlobalMouseState(&globalMx, &globalMy);
-	int windowX, windowY;
-	SDL_GetWindowPosition(sdl_window, &windowX, &windowY);
-
-	if (x)
-		*x = (globalMx - windowX) / currentFrameOps.scale;
-	if (y)
-		*y = (globalMy - windowY) / currentFrameOps.scale;
-}
-
 void blit(pixel *vid)
 {
 	SDL_UpdateTexture(sdl_texture, NULL, vid, WINDOWW * sizeof (Uint32));
 	// need to clear the renderer if there are black edges (fullscreen, or resizable window)
 	if (currentFrameOps.fullscreen || currentFrameOps.resizable)
 		SDL_RenderClear(sdl_renderer);
-	SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
+	SDL_RenderTexture(sdl_renderer, sdl_texture, NULL, NULL);
 	SDL_RenderPresent(sdl_renderer);
 }
 
@@ -114,11 +92,10 @@ void SDLOpen()
 		fprintf(stderr, "Initializing SDL (video subsystem): %s\n", SDL_GetError());
 		Platform::Exit(-1);
 	}
-	Clipboard::Init();
 
 	SDLSetScreen();
 
-	int displayIndex = SDL_GetWindowDisplayIndex(sdl_window);
+	int displayIndex = SDL_GetDisplayForWindow(sdl_window);
 	if (displayIndex >= 0)
 	{
 		SDL_Rect rect;
@@ -156,14 +133,12 @@ void SDLSetScreen()
 	{
 		newFrameOps.resizable = false;
 		newFrameOps.fullscreen = false;
-		newFrameOps.changeResolution = false;
 		newFrameOps.forceIntegerScaling = false;
 	}
 	if (FORCE_WINDOW_FRAME_OPS == forceWindowFrameOpsHandheld)
 	{
 		newFrameOps.resizable = false;
 		newFrameOps.fullscreen = true;
-		newFrameOps.changeResolution = false;
 		newFrameOps.forceIntegerScaling = false;
 	}
 
@@ -175,13 +150,12 @@ void SDLSetScreen()
 	                // Also recreate it when enabling resizable windows, to fix bugs on windows,
 	                //  see https://github.com/jacob1/The-Powder-Toy/issues/24
 	                newFrameOpsNorm.resizable        != currentFrameOpsNorm.resizable        ||
-	                newFrameOpsNorm.changeResolution != currentFrameOpsNorm.changeResolution ||
-	                newFrameOpsNorm.blurryScaling    != currentFrameOpsNorm.blurryScaling    ||
 	                newVsyncHint != vsyncHint;
 
 	if (!(recreate ||
 	      newFrameOpsNorm.scale               != currentFrameOpsNorm.scale               ||
-	      newFrameOpsNorm.forceIntegerScaling != currentFrameOpsNorm.forceIntegerScaling))
+	      newFrameOpsNorm.forceIntegerScaling != currentFrameOpsNorm.forceIntegerScaling ||
+	      newFrameOpsNorm.blurryScaling       != currentFrameOpsNorm.blurryScaling))
 	{
 		return;
 	}
@@ -212,20 +186,15 @@ void SDLSetScreen()
 		}
 
 		unsigned int flags = 0;
-		unsigned int rendererFlags = 0;
 		if (newFrameOpsNorm.fullscreen)
 		{
-			flags = newFrameOpsNorm.changeResolution ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_FULLSCREEN_DESKTOP;
+			flags |= SDL_WINDOW_FULLSCREEN;
 		}
 		if (newFrameOpsNorm.resizable)
 		{
 			flags |= SDL_WINDOW_RESIZABLE;
 		}
-		if (vsyncHint)
-		{
-			rendererFlags |= SDL_RENDERER_PRESENTVSYNC;
-		}
-		sdl_window = SDL_CreateWindow(APPNAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, size.X, size.Y, flags);
+		sdl_window = SDL_CreateWindow(APPNAME, size.X, size.Y, flags);
 		if (!sdl_window)
 		{
 			fprintf(stderr, "SDL_CreateWindow failed: %s\n", SDL_GetError());
@@ -236,21 +205,17 @@ void SDLSetScreen()
 			WindowIcon(sdl_window);
 		}
 		SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, newFrameOpsNorm.blurryScaling ? "linear" : "nearest");
-		sdl_renderer = SDL_CreateRenderer(sdl_window, -1, rendererFlags);
+		sdl_renderer = SDL_CreateRenderer(sdl_window, NULL);
 		if (!sdl_renderer)
 		{
 			fprintf(stderr, "SDL_CreateRenderer failed; available renderers:\n");
 			int num = SDL_GetNumRenderDrivers();
 			for (int i = 0; i < num; ++i)
 			{
-				SDL_RendererInfo info;
-				SDL_GetRenderDriverInfo(i, &info);
-				fprintf(stderr, " - %s\n", info.name);
+				fprintf(stderr, " - %s\n", SDL_GetRenderDriver(i));
 			}
 			Platform::Exit(-1);
 		}
-		SDL_RenderSetLogicalSize(sdl_renderer, WINDOWW, WINDOWH);
 		sdl_texture = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, WINDOWW, WINDOWH);
 		if (!sdl_texture)
 		{
@@ -258,9 +223,21 @@ void SDLSetScreen()
 			Platform::Exit(-1);
 		}
 		SDL_RaiseWindow(sdl_window);
-		Clipboard::RecreateWindow();
 	}
-	SDL_RenderSetIntegerScale(sdl_renderer, newFrameOpsNorm.forceIntegerScaling ? SDL_TRUE : SDL_FALSE);
+	if (SDL_SetRenderLogicalPresentation(
+		sdl_renderer,
+		WINDOWW,
+		WINDOWH,
+		newFrameOpsNorm.forceIntegerScaling ? SDL_LOGICAL_PRESENTATION_INTEGER_SCALE : SDL_LOGICAL_PRESENTATION_LETTERBOX,
+		newFrameOpsNorm.blurryScaling ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST
+	))
+	{
+		fprintf(stderr, "SDL_SetRenderLogicalPresentation failed: %s\n", SDL_GetError());
+	}
+	if (SDL_SetRenderVSync(sdl_renderer, vsyncHint ? 1 : 0))
+	{
+		fprintf(stderr, "SDL_SetRenderVSync failed: %s\n", SDL_GetError());
+	}
 	if (!(newFrameOpsNorm.resizable && SDL_GetWindowFlags(sdl_window) & SDL_WINDOW_MAXIMIZED))
 	{
 		SDL_SetWindowSize(sdl_window, size.X, size.Y);
@@ -280,44 +257,44 @@ static void EventProcess(const SDL_Event &event)
 	auto &engine = ui::Engine::Ref();
 	switch (event.type)
 	{
-	case SDL_QUIT:
+	case SDL_EVENT_QUIT:
 		if (ALLOW_QUIT && (engine.GetFastQuit() || engine.CloseWindow()))
 		{
 			engine.Exit();
 		}
 		break;
-	case SDL_KEYDOWN:
-		if (SDL_GetModState() & KMOD_GUI)
+	case SDL_EVENT_KEY_DOWN:
+		if (SDL_GetModState() & SDL_KMOD_GUI)
 		{
 			break;
 		}
-		if (ALLOW_QUIT && !event.key.repeat && event.key.keysym.sym == 'q' && (event.key.keysym.mod&KMOD_CTRL) && !(event.key.keysym.mod&KMOD_ALT))
+		if (ALLOW_QUIT && !event.key.repeat && event.key.keysym.sym == 'q' && (event.key.keysym.mod&SDL_KMOD_CTRL) && !(event.key.keysym.mod&SDL_KMOD_ALT))
 			engine.ConfirmExit();
 		else
-			engine.onKeyPress(event.key.keysym.sym, event.key.keysym.scancode, event.key.repeat, event.key.keysym.mod&KMOD_SHIFT, event.key.keysym.mod&KMOD_CTRL, event.key.keysym.mod&KMOD_ALT);
+			engine.onKeyPress(event.key.keysym.sym, event.key.keysym.scancode, event.key.repeat, event.key.keysym.mod&SDL_KMOD_SHIFT, event.key.keysym.mod&SDL_KMOD_CTRL, event.key.keysym.mod&SDL_KMOD_ALT);
 		break;
-	case SDL_KEYUP:
-		if (SDL_GetModState() & KMOD_GUI)
+	case SDL_EVENT_KEY_UP:
+		if (SDL_GetModState() & SDL_KMOD_GUI)
 		{
 			break;
 		}
-		engine.onKeyRelease(event.key.keysym.sym, event.key.keysym.scancode, event.key.repeat, event.key.keysym.mod&KMOD_SHIFT, event.key.keysym.mod&KMOD_CTRL, event.key.keysym.mod&KMOD_ALT);
+		engine.onKeyRelease(event.key.keysym.sym, event.key.keysym.scancode, event.key.repeat, event.key.keysym.mod&SDL_KMOD_SHIFT, event.key.keysym.mod&SDL_KMOD_CTRL, event.key.keysym.mod&SDL_KMOD_ALT);
 		break;
-	case SDL_TEXTINPUT:
-		if (SDL_GetModState() & KMOD_GUI)
+	case SDL_EVENT_TEXT_INPUT:
+		if (SDL_GetModState() & SDL_KMOD_GUI)
 		{
 			break;
 		}
 		engine.onTextInput(ByteString(event.text.text).FromUtf8());
 		break;
-	case SDL_TEXTEDITING:
-		if (SDL_GetModState() & KMOD_GUI)
+	case SDL_EVENT_TEXT_EDITING:
+		if (SDL_GetModState() & SDL_KMOD_GUI)
 		{
 			break;
 		}
 		engine.onTextEditing(ByteString(event.edit.text).FromUtf8(), event.edit.start);
 		break;
-	case SDL_MOUSEWHEEL:
+	case SDL_EVENT_MOUSE_WHEEL:
 	{
 		// int x = event.wheel.x;
 		int y = event.wheel.y;
@@ -330,18 +307,17 @@ static void EventProcess(const SDL_Event &event)
 		engine.onMouseWheel(mousex, mousey, y); // TODO: pass x?
 		break;
 	}
-	case SDL_MOUSEMOTION:
+	case SDL_EVENT_MOUSE_MOTION:
 		mousex = event.motion.x;
 		mousey = event.motion.y;
 		engine.onMouseMove(mousex, mousey);
 
 		hasMouseMoved = true;
 		break;
-	case SDL_DROPFILE:
-		engine.onFileDrop(event.drop.file);
-		SDL_free(event.drop.file);
+	case SDL_EVENT_DROP_FILE:
+		engine.onFileDrop(event.drop.data);
 		break;
-	case SDL_MOUSEBUTTONDOWN:
+	case SDL_EVENT_MOUSE_BUTTON_DOWN:
 		// if mouse hasn't moved yet, sdl will send 0,0. We don't want that
 		if (hasMouseMoved)
 		{
@@ -357,7 +333,7 @@ static void EventProcess(const SDL_Event &event)
 			SDL_CaptureMouse(SDL_TRUE);
 		}
 		break;
-	case SDL_MOUSEBUTTONUP:
+	case SDL_EVENT_MOUSE_BUTTON_UP:
 		// if mouse hasn't moved yet, sdl will send 0,0. We don't want that
 		if (hasMouseMoved)
 		{
@@ -373,23 +349,10 @@ static void EventProcess(const SDL_Event &event)
 			SDL_CaptureMouse(SDL_FALSE);
 		}
 		break;
-	case SDL_WINDOWEVENT:
-	{
-		switch (event.window.event)
-		{
-		case SDL_WINDOWEVENT_SHOWN:
-			if (!calculatedInitialMouse)
-			{
-				//initial mouse coords, sdl won't tell us this if mouse hasn't moved
-				CalculateMousePosition(&mousex, &mousey);
-				engine.initialMouse(mousex, mousey);
-				engine.onMouseMove(mousex, mousey);
-				calculatedInitialMouse = true;
-			}
-			break;
-		}
+
+	case SDL_EVENT_CLIPBOARD_UPDATE:
+		Clipboard::FlushNative();
 		break;
-	}
 	}
 }
 
@@ -418,6 +381,7 @@ void EngineProcess()
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
+		SDL_ConvertEventToRenderCoordinates(sdl_renderer, &event);
 		EventProcess(event);
 	}
 
