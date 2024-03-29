@@ -239,7 +239,7 @@ if host_platform == 'emscripten'
 else
 	zlib_dep = dependency('zlib', static: is_static)
 	png_dep = dependency('libpng16', static: is_static)
-	sdl2_dep = dependency('sdl2', static: is_static)
+	sdl2_dep = dependency('sdl3', static: is_static)
 	bzip2_dep = dependency('bzip2', static: is_static)
 endif
 json_dep = dependency('jsoncpp', static: is_static)

@@ -82,11 +82,6 @@ void OptionsController::SetFullscreen(bool fullscreen)
 	model->SetFullscreen(fullscreen);
 }
 
-void OptionsController::SetChangeResolution(bool newChangeResolution)
-{
-	model->SetChangeResolution(newChangeResolution);
-}
-
 void OptionsController::SetForceIntegerScaling(bool forceIntegerScaling)
 {
 	model->SetForceIntegerScaling(forceIntegerScaling);
@@ -112,9 +107,9 @@ void OptionsController::SetGraveExitsConsole(bool graveExitsConsole)
 	model->SetGraveExitsConsole(graveExitsConsole);
 }
 
-void OptionsController::SetNativeClipoard(bool nativeClipoard)
+void OptionsController::SetNativeClipboard(bool nativeClipoard)
 {
-	model->SetNativeClipoard(nativeClipoard);
+	model->SetNativeClipboard(nativeClipoard);
 }
 
 void OptionsController::SetResizable(bool resizable)

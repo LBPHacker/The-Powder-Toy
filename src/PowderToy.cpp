@@ -10,6 +10,7 @@
 #include "client/http/GetSaveRequest.h"
 #include "client/http/GetSaveDataRequest.h"
 #include "common/platform/Platform.h"
+#include "common/Clipboard.h"
 #include "graphics/Graphics.h"
 #include "simulation/SaveRenderer.h"
 #include "simulation/SimulationData.h"
@@ -29,7 +30,7 @@
 #include <climits>
 #include <iostream>
 #include <csignal>
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <exception>
 #include <cstdlib>
 
@@ -51,7 +52,8 @@ void LoadWindowPosition()
 	if (borderTop == 0)
 		borderTop = 5;
 
-	int numDisplays = SDL_GetNumVideoDisplays();
+	int numDisplays = 1;
+	SDL_GetDisplays(&numDisplays);
 	SDL_Rect displayBounds;
 	bool ok = false;
 	for (int i = 0; i < numDisplays; i++)
@@ -148,7 +150,7 @@ static void BlueScreen(String detailMessage, std::optional<std::vector<String>> 
 	{
 		while (SDL_PollEvent(&event))
 		{
-			if (event.type == SDL_QUIT)
+			if (event.type == SDL_EVENT_QUIT)
 			{
 				running = false;
 			}
@@ -352,13 +354,13 @@ int Main(int argc, char *argv[])
 		prefs.Get("Scale", 1),
 		prefs.Get("Resizable", false),
 		prefs.Get("Fullscreen", false),
-		prefs.Get("AltFullscreen", false),
 		prefs.Get("ForceIntegerScaling", true),
 		prefs.Get("BlurryScaling", false),
 	};
 	auto graveExitsConsole = prefs.Get("GraveExitsConsole", true);
 	momentumScroll = prefs.Get("MomentumScroll", true);
 	showAvatars = prefs.Get("ShowAvatars", true);
+	Clipboard::SetNativeClipboard(prefs.Get("NativeClipboard.Enabled", false));
 
 	auto true_string = [](ByteString str) {
 		str = str.ToLower();

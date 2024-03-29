@@ -4,7 +4,7 @@
 #include "simulation/Air.h"
 #include "simulation/gravity/Gravity.h"
 #include "prefs/GlobalPrefs.h"
-#include "common/clipboard/Clipboard.h"
+#include "common/Clipboard.h"
 #include "gui/interface/Engine.h"
 #include "gui/game/GameModel.h"
 
@@ -174,14 +174,14 @@ void OptionsModel::SetGraveExitsConsole(bool graveExitsConsole)
 	notifySettingsChanged();
 }
 
-bool OptionsModel::GetNativeClipoard()
+bool OptionsModel::GetNativeClipboard()
 {
-	return Clipboard::GetEnabled();
+	return Clipboard::GetNativeClipboard();
 }
 
-void OptionsModel::SetNativeClipoard(bool nativeClipoard)
+void OptionsModel::SetNativeClipboard(bool nativeClipoard)
 {
-	Clipboard::SetEnabled(nativeClipoard);
+	Clipboard::SetNativeClipboard(nativeClipoard);
 	GlobalPrefs::Ref().Set("NativeClipboard.Enabled", nativeClipoard);
 	notifySettingsChanged();
 }
@@ -206,18 +206,6 @@ void OptionsModel::SetFullscreen(bool fullscreen)
 {
 	ui::Engine::Ref().SetFullscreen(fullscreen);
 	GlobalPrefs::Ref().Set("Fullscreen", fullscreen);
-	notifySettingsChanged();
-}
-
-bool OptionsModel::GetChangeResolution()
-{
-	return ui::Engine::Ref().GetChangeResolution();
-}
-
-void OptionsModel::SetChangeResolution(bool newChangeResolution)
-{
-	ui::Engine::Ref().SetChangeResolution(newChangeResolution);
-	GlobalPrefs::Ref().Set("AltFullscreen", newChangeResolution);
 	notifySettingsChanged();
 }
 

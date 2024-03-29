@@ -1,5 +1,6 @@
 #pragma once
 #include "lua/CommandInterfacePtr.h"
+#include "common/ExplicitSingleton.h"
 #include "client/ClientListener.h"
 #include "client/StartupInfo.h"
 #include "common/ExplicitSingleton.h"
@@ -19,6 +20,8 @@ constexpr auto DEBUG_LINES      = 0x0004;
 constexpr auto DEBUG_PARTICLE   = 0x0008;
 constexpr auto DEBUG_SURFNORM   = 0x0010;
 
+struct RendererSettings;
+class Renderer;
 class DebugInfo;
 class SaveFile;
 class Notification;
@@ -128,6 +131,7 @@ public:
 	void SetTemperatureScale(int temperatureScale);
 	int GetTemperatureScale();
 	int GetEdgeMode();
+	Renderer *GetRenderer();
 	void SetEdgeMode(int edgeMode);
 	void SetDebugFlags(unsigned int flags) { debugFlags = flags; }
 	unsigned int GetDebugFlags() const { return debugFlags; }
@@ -208,4 +212,6 @@ public:
 	bool ThreadedRenderingAllowed();
 
 	void SetToolIndex(ByteString identifier, std::optional<int> index);
+
+	RendererSettings &GetRendererSettings();
 };

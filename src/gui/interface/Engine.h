@@ -125,13 +125,11 @@ namespace ui
 
 		void SetScale              (int newScale               ) { windowFrameOps.scale               = newScale;               }
 		void SetFullscreen         (bool newFullscreen         ) { windowFrameOps.fullscreen          = newFullscreen;          }
-		void SetChangeResolution   (bool setChangeResolution   ) { windowFrameOps.changeResolution    = setChangeResolution;    }
 		void SetForceIntegerScaling(bool newForceIntegerScaling) { windowFrameOps.forceIntegerScaling = newForceIntegerScaling; }
 		void SetResizable          (bool newResizable          ) { windowFrameOps.resizable           = newResizable;           }
 		void SetBlurryScaling      (bool newBlurryScaling      ) { windowFrameOps.blurryScaling       = newBlurryScaling;       }
 		int  GetScale              () const { return windowFrameOps.scale;               }
 		bool GetFullscreen         () const { return windowFrameOps.fullscreen;          }
-		bool GetChangeResolution   () const { return windowFrameOps.changeResolution;    }
 		bool GetForceIntegerScaling() const { return windowFrameOps.forceIntegerScaling; }
 		bool GetResizable          () const { return windowFrameOps.resizable;           }
 		bool GetBlurryScaling      () const { return windowFrameOps.blurryScaling;       }

@@ -2,7 +2,7 @@
 #include "Format.h"
 #include "OptionsController.h"
 #include "OptionsModel.h"
-#include "common/clipboard/Clipboard.h"
+#include "common/Clipboard.h"
 #include "common/platform/Platform.h"
 #include "graphics/Graphics.h"
 #include "graphics/Renderer.h"
@@ -24,7 +24,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cmath>
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 OptionsView::OptionsView() : ui::Window(ui::Point(-1, -1), ui::Point(320, 340))
 {
@@ -270,14 +270,11 @@ OptionsView::OptionsView() : ui::Window(ui::Point(-1, -1), ui::Point(320, 340))
 		fullscreen = addCheckbox(0, "Fullscreen \bg- fill the entire screen", "", [this] {
 			c->SetFullscreen(fullscreen->GetChecked());
 		});
-		changeResolution = addCheckbox(1, "Set optimal screen resolution", "", [this] {
-			c->SetChangeResolution(changeResolution->GetChecked());
-		});
-		forceIntegerScaling = addCheckbox(1, "Force integer scaling \bg- less blurry", "", [this] {
+		forceIntegerScaling = addCheckbox(1, "Force integer scaling \bg- easier on the eye but smaller", "", [this] {
 			c->SetForceIntegerScaling(forceIntegerScaling->GetChecked());
 		});
 	}
-	blurryScaling = addCheckbox(0, "Blurry scaling \bg- more blurry, better on very big screens", "", [this] {
+	blurryScaling = addCheckbox(0, "Blurry scaling \bg- easier on the eye but more blurry", "", [this] {
 		c->SetBlurryScaling(blurryScaling->GetChecked());
 	});
 	addSeparator();
@@ -305,19 +302,9 @@ OptionsView::OptionsView() : ui::Window(ui::Point(-1, -1), ui::Point(320, 340))
 	graveExitsConsole = addCheckbox(0, "Key under Esc exits console", "Disable if that key is 0 on your keyboard", [this] {
 		c->SetGraveExitsConsole(graveExitsConsole->GetChecked());
 	});
-	if constexpr (PLATFORM_CLIPBOARD)
-	{
-		auto indent = 0;
-		nativeClipoard = addCheckbox(indent, "Use platform clipboard", "Allows copying and pasting across TPT instances", [this] {
-			c->SetNativeClipoard(nativeClipoard->GetChecked());
-		});
-		currentY -= 4; // temporarily undo the currentY += 4 at the end of addCheckbox
-		if (auto extra = Clipboard::Explanation())
-		{
-			addLabel(indent, "\bg" + *extra);
-		}
-		currentY += 4; // and then undo the undo
-	}
+	nativeClipoard = addCheckbox(0, "Use platform clipboard", "Allows copying and pasting across TPT instances", [this] {
+		c->SetNativeClipboard(nativeClipoard->GetChecked());
+	});
 	threadedRendering = addCheckbox(0, "Separate rendering thread", "May increase framerate when fancy effects are in use", [this] {
 		c->SetThreadedRendering(threadedRendering->GetChecked());
 	});
@@ -460,21 +447,26 @@ void OptionsView::NotifySettingsChanged(OptionsModel * sender)
 	{
 		scale->SetOption(sender->GetScale());
 	}
+	// TODO: replace this mess with:
+	//  - non-resizable (integer)
+	//  - resizable (rational)
+	//  - resizable (blurry)
+	//  - fullscreen (integer)
+	//  - fullscreen (rational)
+	//  - fullscreen (blurry)
 	if (resizable)
 	{
 		resizable->SetChecked(sender->GetResizable());
+		resizable->Enabled = !sender->GetFullscreen();
 	}
 	if (fullscreen)
 	{
 		fullscreen->SetChecked(sender->GetFullscreen());
 	}
-	if (changeResolution)
-	{
-		changeResolution->SetChecked(sender->GetChangeResolution());
-	}
 	if (forceIntegerScaling)
 	{
 		forceIntegerScaling->SetChecked(sender->GetForceIntegerScaling());
+		forceIntegerScaling->Enabled = sender->GetFullscreen();
 	}
 	if (blurryScaling)
 	{
@@ -486,7 +478,7 @@ void OptionsView::NotifySettingsChanged(OptionsModel * sender)
 	}
 	if (nativeClipoard)
 	{
-		nativeClipoard->SetChecked(sender->GetNativeClipoard());
+		nativeClipoard->SetChecked(sender->GetNativeClipboard());
 	}
 	showAvatars->SetChecked(sender->GetShowAvatars());
 	mouseClickRequired->SetChecked(sender->GetMouseClickRequired());
