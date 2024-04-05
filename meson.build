@@ -265,6 +265,9 @@ if is_msvc
 			'/LTCG',
 		]
 	endif
+	project_link_args += [
+		'/MANIFEST:NO',
+	]
 	project_c_args += args_msvc
 	project_cpp_args += args_msvc
 else
