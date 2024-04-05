@@ -39,6 +39,11 @@ void Simulation::Load(const GameSave *save, bool includePressure, Vec2<int> bloc
 	auto pasteArea = RES.OriginRect() & RectSized(partP, save->blockSize * CELL);
 	for (int i = 0; i <= parts_lastActiveIndex; i++)
 	{
+		if (!parts[i].type)
+		{
+			i = parts[i].tmp2;
+			continue;
+		}
 		if (parts[i].type)
 		{
 			auto p = Vec2<int>{ int(parts[i].x + 0.5f), int(parts[i].y + 0.5f) };
@@ -125,12 +130,11 @@ void Simulation::Load(const GameSave *save, bool includePressure, Vec2<int> bloc
 		removeExistingParticles({ x, y });
 
 		// Allocate particle (this location is guaranteed to be empty due to "full scan" logic above)
-		if (pfree == -1)
+		auto i = Allocate();
+		if (i == -1)
+		{
 			break;
-		auto i = pfree;
-		pfree = parts[i].life;
-		if (i > parts_lastActiveIndex)
-			parts_lastActiveIndex = i;
+		}
 		parts[i] = tempPart;
 		elementCount[tempPart.type]++;
 
@@ -972,9 +976,14 @@ void Simulation::clear_sim(void)
 	memset(bmap, 0, sizeof(bmap));
 	memset(emap, 0, sizeof(emap));
 	memset(parts, 0, sizeof(Particle)*NPART);
-	for (int i = 0; i < NPART-1; i++)
-		parts[i].life = i+1;
-	parts[NPART-1].life = -1;
+	for (int i = 0; i < NPART; i++)
+	{
+		parts[i].life = i + 1;
+		parts[i].tmp = i;
+		parts[i].tmp2 = NPART - 1;
+	}
+	parts[NPART - 1].life = -1;
+	parts[NPART - 1].tmp = 0;
 	pfree = 0;
 	parts_lastActiveIndex = 0;
 	memset(pmap, 0, sizeof(pmap));
@@ -1732,6 +1741,20 @@ void Simulation::kill_part(int i)//kills particle number i
 
 	parts[i].type = PT_NONE;
 	parts[i].life = pfree;
+	auto left = i;
+	auto right = i;
+	if (i > 0 && !parts[i - 1].type)
+	{
+		left = parts[i - 1].tmp;
+	}
+	if (i < NPART - 1 && !parts[i + 1].type)
+	{
+		right = parts[i + 1].tmp2;
+	}
+	parts[i].tmp = left;
+	parts[i].tmp2 = right;
+	parts[left].tmp2 = right;
+	parts[right].tmp = left;
 	pfree = i;
 }
 
@@ -1778,6 +1801,26 @@ bool Simulation::part_change_type(int i, int x, int y, int t)
 			photons[y][x] = 0;
 	}
 	return false;
+}
+
+// This doesn't fully allocate the particle; the last step the caller has to take is assign a non-zero value to .type.
+int Simulation::Allocate()
+{
+	if (pfree == -1)
+	{
+		return -1;
+	}
+	auto i = pfree;
+	auto left = parts[i].tmp;
+	auto right = parts[i].tmp2;
+	parts[left].tmp2 = i - 1;
+	parts[right].tmp = i + 1;
+	pfree = parts[i].life;
+	if (i > parts_lastActiveIndex)
+	{
+		parts_lastActiveIndex = i;
+	}
+	return i;
 }
 
 //the function for creating a particle, use p=-1 for creating a new particle, -2 is from a brush, or a particle number to replace a particle.
@@ -1847,24 +1890,21 @@ int Simulation::create_part(int p, int x, int y, int t, int v)
 		{
 			return -1;
 		}
-		if (pfree == -1)
+		i = Allocate();
+		if (i == -1)
 			return -1;
-		i = pfree;
-		pfree = parts[i].life;
 	}
 	else if (p == -2)//creating from brush
 	{
-		if (pfree == -1)
+		i = Allocate();
+		if (i == -1)
 			return -1;
-		i = pfree;
-		pfree = parts[i].life;
 	}
 	else if (p == -3)//skip pmap checks, e.g. for sing explosion
 	{
-		if (pfree == -1)
+		i = Allocate();
+		if (i == -1)
 			return -1;
-		i = pfree;
-		pfree = parts[i].life;
 	}
 	else
 	{
@@ -1884,9 +1924,7 @@ int Simulation::create_part(int p, int x, int y, int t, int v)
 
 		i = p;
 	}
-
-	if (i>parts_lastActiveIndex) parts_lastActiveIndex = i;
-
+	// don't add any return logic here; the particle is already allocated, must assign a .type to it immediately
 	parts[i] = elements[t].DefaultProperties;
 	parts[i].type = t;
 	parts[i].x = (float)x;
@@ -1966,11 +2004,7 @@ void Simulation::GetGravityField(int x, int y, float particleGrav, float newtonG
 void Simulation::create_gain_photon(int pp)//photons from PHOT going through GLOW
 {
 	float xx, yy;
-	int i, lr, temp_bin, nx, ny;
-
-	if (pfree == -1)
-		return;
-	i = pfree;
+	int lr, temp_bin, nx, ny;
 
 	lr = 2*rng.between(0, 1) - 1; // -1 or 1
 
@@ -1986,9 +2020,11 @@ void Simulation::create_gain_photon(int pp)//photons from PHOT going through GLO
 	if (TYP(pmap[ny][nx]) != PT_GLOW)
 		return;
 
-	pfree = parts[i].life;
-	if (i>parts_lastActiveIndex) parts_lastActiveIndex = i;
-
+	auto i = Allocate();
+	if (i == -1)
+	{
+		return;
+	}
 	parts[i].type = PT_PHOT;
 	parts[i].life = 680;
 	parts[i].x = xx;
@@ -2009,12 +2045,8 @@ void Simulation::create_gain_photon(int pp)//photons from PHOT going through GLO
 
 void Simulation::create_cherenkov_photon(int pp)//photons from NEUT going through GLAS
 {
-	int i, lr, nx, ny;
+	int lr, nx, ny;
 	float r;
-
-	if (pfree == -1)
-		return;
-	i = pfree;
 
 	nx = (int)(parts[pp].x + 0.5f);
 	ny = (int)(parts[pp].y + 0.5f);
@@ -2024,11 +2056,13 @@ void Simulation::create_cherenkov_photon(int pp)//photons from NEUT going throug
 	if (hypotf(parts[pp].vx, parts[pp].vy) < 1.44f)
 		return;
 
-	pfree = parts[i].life;
-	if (i>parts_lastActiveIndex) parts_lastActiveIndex = i;
-
 	lr = rng.between(0, 1);
 
+	auto i = Allocate();
+	if (i == -1)
+	{
+		return;
+	}
 	parts[i].type = PT_PHOT;
 	parts[i].ctype = 0x00000F80;
 	parts[i].life = 680;
@@ -2205,6 +2239,11 @@ void Simulation::UpdateParticles(int start, int end)
 	auto &elements = sd.elements;
 	for (auto i = start; i < end && i <= parts_lastActiveIndex; i++)
 	{
+		if (!parts[i].type)
+		{
+			i = parts[i].tmp2;
+			continue;
+		}
 		if (parts[i].type)
 		{
 			debug_mostRecentlyUpdated = i;
@@ -3354,11 +3393,23 @@ void Simulation::RecalcFreeParticles(bool do_life_dec)
 	NUM_PARTS = 0;
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
+	auto freeRangeBeginsAt = -1;
 	//the particle loop that resets the pmap/photon maps every frame, to update them.
 	for (int i = 0; i <= parts_lastActiveIndex; i++)
 	{
 		if (parts[i].type)
 		{
+			if (freeRangeBeginsAt != -1)
+			{
+				auto freeRangeEndsAt = i - 1;
+				for (auto j = freeRangeBeginsAt; j <= freeRangeEndsAt; ++j)
+				{
+					parts[j].tmp = j;
+					parts[j].tmp2 = freeRangeEndsAt;
+				}
+				parts[freeRangeEndsAt].tmp = freeRangeBeginsAt;
+				freeRangeBeginsAt = -1;
+			}
 			t = parts[i].type;
 			x = (int)(parts[i].x+0.5f);
 			y = (int)(parts[i].y+0.5f);
@@ -3416,19 +3467,25 @@ void Simulation::RecalcFreeParticles(bool do_life_dec)
 		}
 		else
 		{
-			if (lastPartUnused<0) pfree = i;
-			else parts[lastPartUnused].life = i;
+			if (freeRangeBeginsAt == -1)
+			{
+				freeRangeBeginsAt = i;
+			}
+			(lastPartUnused == -1 ? pfree : parts[lastPartUnused].life) = i;
 			lastPartUnused = i;
 		}
 	}
-	if (lastPartUnused == -1)
+	if (freeRangeBeginsAt != -1)
 	{
-		pfree = (parts_lastActiveIndex>=(NPART-1)) ? -1 : parts_lastActiveIndex+1;
+		auto freeRangeEndsAt = NPART - 1;
+		for (auto j = freeRangeBeginsAt; j <= parts_lastActiveIndex; ++j)
+		{
+			parts[j].tmp = j;
+			parts[j].tmp2 = freeRangeEndsAt;
+		}
+		parts[freeRangeEndsAt].tmp = freeRangeBeginsAt;
 	}
-	else
-	{
-		parts[lastPartUnused].life = (parts_lastActiveIndex>=(NPART-1)) ? -1 : parts_lastActiveIndex+1;
-	}
+	(lastPartUnused == -1 ? pfree : parts[lastPartUnused].life) = (parts_lastActiveIndex >= (NPART - 1)) ? -1 : parts_lastActiveIndex + 1;
 	parts_lastActiveIndex = lastPartUsed;
 	if (elementRecount)
 		elementRecount = false;
@@ -3440,6 +3497,11 @@ void Simulation::SimulateGoL()
 	CGOL = 0;
 	for (int i = 0; i <= parts_lastActiveIndex; ++i)
 	{
+		if (!parts[i].type)
+		{
+			i = parts[i].tmp2;
+			continue;
+		}
 		auto &part = parts[i];
 		if (part.type != PT_LIFE)
 		{
@@ -3646,6 +3708,11 @@ void Simulation::CheckStacking()
 	{
 		for (int i = 0; i <= parts_lastActiveIndex; i++)
 		{
+			if (!parts[i].type)
+			{
+				i = parts[i].tmp2;
+				continue;
+			}
 			if (parts[i].type)
 			{
 				int t = parts[i].type;
@@ -3832,6 +3899,11 @@ void Simulation::BeforeSim()
 		{
 			for (int i = 0; i <= parts_lastActiveIndex; i++)
 			{
+				if (!parts[i].type)
+				{
+					i = parts[i].tmp2;
+					continue;
+				}
 				if (parts[i].type==PT_PPIP)
 				{
 					parts[i].tmp |= (parts[i].tmp&0xE0000000)>>3;

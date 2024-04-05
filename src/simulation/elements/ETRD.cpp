@@ -147,6 +147,11 @@ int Element_ETRD_nearestSparkablePart(Simulation *sim, int targetId)
 		{
 			for (int i = 0; i <= sim->parts_lastActiveIndex; i++)
 			{
+				if (!parts[i].type)
+				{
+					i = parts[i].tmp2;
+					continue;
+				}
 				if (parts[i].type == PT_ETRD && !parts[i].life)
 				{
 					ui::Point checkPos = ui::Point(int(parts[i].x)-targetPos.X, int(parts[i].y)-targetPos.Y);
@@ -166,6 +171,11 @@ int Element_ETRD_nearestSparkablePart(Simulation *sim, int targetId)
 		int countLife0 = 0;
 		for (int i = 0; i <= sim->parts_lastActiveIndex; i++)
 		{
+			if (!parts[i].type)
+			{
+				i = parts[i].tmp2;
+				continue;
+			}
 			if (parts[i].type == PT_ETRD && !parts[i].life)
 			{
 				countLife0++;

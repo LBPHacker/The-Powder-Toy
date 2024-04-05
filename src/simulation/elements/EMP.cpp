@@ -107,6 +107,11 @@ void Element_EMP_Trigger(Simulation *sim, int triggerCount)
 
 	for (int r = 0; r <=sim->parts_lastActiveIndex; r++)
 	{
+		if (!parts[r].type)
+		{
+			r = parts[r].tmp2;
+			continue;
+		}
 		int t = parts[r].type;
 		auto rx = int(parts[r].x);
 		auto ry = int(parts[r].y);

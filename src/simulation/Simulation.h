@@ -34,6 +34,8 @@ class GameSave;
 
 class Simulation
 {
+	int Allocate();
+
 public:
 	GravityPtr grav;
 	std::unique_ptr<Air> air;

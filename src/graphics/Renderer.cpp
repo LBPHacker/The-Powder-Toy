@@ -199,6 +199,11 @@ void Renderer::render_parts()
 	}
 	foundElements = 0;
 	for(i = 0; i<=sim->parts_lastActiveIndex; i++) {
+		if (!parts[i].type)
+		{
+			i = parts[i].tmp2;
+			continue;
+		}
 		if (sim->parts[i].type && sim->parts[i].type >= 0 && sim->parts[i].type < PT_NUM) {
 			t = sim->parts[i].type;
 
@@ -736,6 +741,11 @@ void Renderer::render_parts()
 							type = PT_PRTI;
 						for (int z = 0; z <= sim->parts_lastActiveIndex; z++)
 						{
+							if (!parts[z].type)
+							{
+								z = parts[z].tmp2;
+								continue;
+							}
 							if (parts[z].type == type)
 							{
 								othertmp = (int)((parts[z].temp-73.15f)/100+1);

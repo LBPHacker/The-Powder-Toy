@@ -358,6 +358,11 @@ void Air::ApproximateBlockAirMaps()
 	auto &elements = sd.elements;
 	for (int i = 0; i <= sim.parts_lastActiveIndex; i++)
 	{
+		if (!sim.parts[i].type)
+		{
+			i = sim.parts[i].tmp2;
+			continue;
+		}
 		int type = sim.parts[i].type;
 		if (!type)
 			continue;

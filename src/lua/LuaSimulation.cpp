@@ -869,6 +869,11 @@ static int resetTemp(lua_State *L)
 	bool onlyConductors = luaL_optint(L, 1, 0);
 	for (int i = 0; i < sim->parts_lastActiveIndex; i++)
 	{
+		if (!sim->parts[i].type)
+		{
+			i = sim->parts[i].tmp2;
+			continue;
+		}
 		if (sim->parts[i].type && (elements[sim->parts[i].type].HeatConduct || !onlyConductors))
 		{
 			sim->parts[i].temp = elements[sim->parts[i].type].DefaultProperties.temp;
@@ -1293,6 +1298,11 @@ static int partsClosure(lua_State *L)
 	auto *lsi = GetLSI();
 	for (int i = lua_tointeger(L, lua_upvalueindex(1)); i <= lsi->sim->parts_lastActiveIndex; ++i)
 	{
+		if (!lsi->sim->parts[i].type)
+		{
+			i = lsi->sim->parts[i].tmp2;
+			continue;
+		}
 		if (lsi->sim->parts[i].type)
 		{
 			lua_pushnumber(L, i + 1);

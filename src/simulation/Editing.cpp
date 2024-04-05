@@ -93,6 +93,11 @@ void Simulation::clear_area(int area_x, int area_y, int area_w, int area_h)
 	float fx = area_x-.5f, fy = area_y-.5f;
 	for (int i = 0; i <= parts_lastActiveIndex; i++)
 	{
+		if (!parts[i].type)
+		{
+			i = parts[i].tmp2;
+			continue;
+		}
 		if (parts[i].type)
 			if (parts[i].x >= fx && parts[i].x <= fx+area_w+1 && parts[i].y >= fy && parts[i].y <= fy+area_h+1)
 				kill_part(i);
