@@ -1486,11 +1486,11 @@ void Renderer::Clear()
 {
 	if(displayMode & DISPLAY_PERS)
 	{
-		std::copy(persistentVideo.RowIterator({ 0, 0 }), persistentVideo.RowIterator({ 0, YRES }), video.RowIterator({ 0, 0 }));
+		std::copy(persistentVideo.begin(), persistentVideo.end(), video.RowIterator({ 0, 0 }));
 	}
 	else
 	{
-		std::fill_n(video.data(), WINDOWW * YRES, 0);
+		std::fill_n(video.data(), WINDOWW * WINDOWH, 0);
 	}
 	AdjustHdispLimit();
 }
@@ -1514,7 +1514,7 @@ void Renderer::prepare_alpha(int size, float intensity)
 	int x,y,i,j;
 	float multiplier = 255.0f*fireIntensity;
 
-	PlaneAdapter<std::vector<float>> temp({ CELL * 3, CELL * 3 }, 0.f);
+	PlaneAdapter<std::vector<float>> temp(Vec2<int>{ CELL * 3, CELL * 3 }, 0.f);
 	for (x=0; x<CELL; x++)
 		for (y=0; y<CELL; y++)
 			for (i=-CELL; i<CELL; i++)
@@ -1593,7 +1593,7 @@ Renderer::Renderer()
 	persistentVideo = PlaneAdapter<std::vector<pixel>>(WINDOW, 0);
 	warpVideo = PlaneAdapter<std::vector<pixel>>(WINDOW, 0);
 
-	fire_alpha = PlaneAdapter<std::vector<pixel>>({ CELL * 3, CELL * 3 }, 0);
+	fire_alpha = PlaneAdapter<std::vector<pixel>>(Vec2<int>{ CELL * 3, CELL * 3 }, 0);
 
 	fire_r = PlaneAdapter<std::vector<unsigned char>>(CELLS, 0);
 	fire_g = PlaneAdapter<std::vector<unsigned char>>(CELLS, 0);

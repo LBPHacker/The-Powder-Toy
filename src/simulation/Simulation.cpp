@@ -3957,8 +3957,8 @@ Simulation::Simulation()
 	photons = PlaneAdapter<std::vector<int>>(RES);
 	pmap_count = PlaneAdapter<std::vector<unsigned int>>(RES);
 
-	Element_LOLZ_lolz = PlaneAdapter<std::vector<int>>({ XRES / 9, YRES / 9 });
-	Element_LOVE_love = PlaneAdapter<std::vector<int>>({ XRES / 9, YRES / 9 });
+	Element_LOLZ_lolz = PlaneAdapter<std::vector<int>>(Vec2<int>{ XRES / 9, YRES / 9 });
+	Element_LOVE_love = PlaneAdapter<std::vector<int>>(Vec2<int>{ XRES / 9, YRES / 9 });
 
 	Element_PSTN_tempParts = std::vector<int>(std::max(XRES, YRES));
 
@@ -4018,5 +4018,3 @@ void Simulation::EnableNewtonianGravity(bool enable)
 }
 
 static_assert(PMAPBITS <= 16, "PMAPBITS is too large");
-// we want XRES * YRES <= (1 << (31 - PMAPBITS)), but we do a division because multiplication could silently overflow
-static_assert(uint32_t(XRES) <= (UINT32_C(1) << (31 - PMAPBITS)) / uint32_t(YRES), "not enough space in pmap");

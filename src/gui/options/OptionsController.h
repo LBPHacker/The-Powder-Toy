@@ -3,6 +3,7 @@
 #include "simulation/SimulationSettings.h"
 #include "FpsLimit.h"
 
+struct SimulationConfig;
 class GameModel;
 class OptionsModel;
 class OptionsView;
@@ -52,6 +53,7 @@ public:
 	void SetAutoStartupRequest(bool newAutoStartupRequest);
 	void SetFpsLimit(SimFpsLimit newFpsLimit);
 	void SetDrawLimit(DrawLimit newDrawLimit);
+	void SetNextSimulationConfig(SimulationConfig config);
 	
 	void Exit();
 	OptionsView * GetView();

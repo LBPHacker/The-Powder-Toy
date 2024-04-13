@@ -1,9 +1,8 @@
 #include "OptionsController.h"
-
 #include "OptionsView.h"
 #include "OptionsModel.h"
-
 #include "Controller.h"
+#include "InitSimulationConfig.h"
 
 OptionsController::OptionsController(GameModel * gModel_, std::function<void ()> onDone_):
 	gModel(gModel_),
@@ -205,6 +204,11 @@ void OptionsController::SetFpsLimit(SimFpsLimit newFpsLimit)
 void OptionsController::SetDrawLimit(DrawLimit newDrawLimit)
 {
 	model->SetDrawLimit(newDrawLimit);
+}
+
+void OptionsController::SetNextSimulationConfig(SimulationConfig config)
+{
+	model->SetNextSimulationConfig(config);
 }
 
 void OptionsController::Exit()
