@@ -271,7 +271,7 @@ void Renderer::render_parts()
 
 			if(nx >= XRES || nx < 0 || ny >= YRES || ny < 0)
 				continue;
-			if(TYP(sim->photons[ny][nx]) && !(elements[t].Properties & TYPE_ENERGY) && t!=PT_STKM && t!=PT_STKM2 && t!=PT_FIGH)
+			if(TYP(sim->photons[{ nx, ny }]) && !(elements[t].Properties & TYPE_ENERGY) && t!=PT_STKM && t!=PT_STKM2 && t!=PT_FIGH)
 				continue;
 
 			//Defaults
@@ -770,7 +770,7 @@ void Renderer::render_parts()
 						drad = (TPT_PI_FLT * ((float)orbl[r]) / 180.0f)*1.41f;
 						nxo = (int)(ddist*cos(drad));
 						nyo = (int)(ddist*sin(drad));
-						if (ny+nyo>0 && ny+nyo<YRES && nx+nxo>0 && nx+nxo<XRES && TYP(sim->pmap[ny+nyo][nx+nxo]) != PT_PRTI)
+						if (ny+nyo>0 && ny+nyo<YRES && nx+nxo>0 && nx+nxo<XRES && TYP(sim->pmap[{ nx+nxo, ny+nyo }]) != PT_PRTI)
 							AddPixel({ nx+nxo, ny+nyo }, RGBA(colr, colg, colb, 255-orbd[r]));
 					}
 				}
@@ -787,14 +787,14 @@ void Renderer::render_parts()
 						drad = (TPT_PI_FLT * ((float)orbl[r]) / 180.0f)*1.41f;
 						nxo = (int)(ddist*cos(drad));
 						nyo = (int)(ddist*sin(drad));
-						if (ny+nyo>0 && ny+nyo<YRES && nx+nxo>0 && nx+nxo<XRES && TYP(sim->pmap[ny+nyo][nx+nxo]) != PT_PRTO)
+						if (ny+nyo>0 && ny+nyo<YRES && nx+nxo>0 && nx+nxo<XRES && TYP(sim->pmap[{ nx+nxo, ny+nyo }]) != PT_PRTO)
 							AddPixel({ nx+nxo, ny+nyo }, RGBA(colr, colg, colb, 255-orbd[r]));
 					}
 				}
 				if (pixel_mode & EFFECT_DBGLINES && !(displayMode&DISPLAY_PERS))
 				{
 					// draw lines connecting wifi/portal channels
-					if (mousePos.X == nx && mousePos.Y == ny && i == ID(sim->pmap[ny][nx]) && debugLines)
+					if (mousePos.X == nx && mousePos.Y == ny && i == ID(sim->pmap[{ nx, ny }]) && debugLines)
 					{
 						int type = parts[i].type, tmp = (int)((parts[i].temp-73.15f)/100+1), othertmp;
 						if (type == PT_PRTI)
@@ -816,16 +816,16 @@ void Renderer::render_parts()
 				if(firea && (pixel_mode & FIRE_BLEND))
 				{
 					firea /= 2;
-					fire_r[ny/CELL][nx/CELL] = (firea*firer + (255-firea)*fire_r[ny/CELL][nx/CELL]) >> 8;
-					fire_g[ny/CELL][nx/CELL] = (firea*fireg + (255-firea)*fire_g[ny/CELL][nx/CELL]) >> 8;
-					fire_b[ny/CELL][nx/CELL] = (firea*fireb + (255-firea)*fire_b[ny/CELL][nx/CELL]) >> 8;
+					fire_r[{ nx/CELL, ny/CELL }] = (firea*firer + (255-firea)*fire_r[{ nx/CELL, ny/CELL }]) >> 8;
+					fire_g[{ nx/CELL, ny/CELL }] = (firea*fireg + (255-firea)*fire_g[{ nx/CELL, ny/CELL }]) >> 8;
+					fire_b[{ nx/CELL, ny/CELL }] = (firea*fireb + (255-firea)*fire_b[{ nx/CELL, ny/CELL }]) >> 8;
 				}
 				if(firea && (pixel_mode & FIRE_ADD))
 				{
 					firea /= 8;
-					firer = ((firea*firer) >> 8) + fire_r[ny/CELL][nx/CELL];
-					fireg = ((firea*fireg) >> 8) + fire_g[ny/CELL][nx/CELL];
-					fireb = ((firea*fireb) >> 8) + fire_b[ny/CELL][nx/CELL];
+					firer = ((firea*firer) >> 8) + fire_r[{ nx/CELL, ny/CELL }];
+					fireg = ((firea*fireg) >> 8) + fire_g[{ nx/CELL, ny/CELL }];
+					fireb = ((firea*fireb) >> 8) + fire_b[{ nx/CELL, ny/CELL }];
 
 					if(firer>255)
 						firer = 255;
@@ -834,16 +834,16 @@ void Renderer::render_parts()
 					if(fireb>255)
 						fireb = 255;
 
-					fire_r[ny/CELL][nx/CELL] = firer;
-					fire_g[ny/CELL][nx/CELL] = fireg;
-					fire_b[ny/CELL][nx/CELL] = fireb;
+					fire_r[{ nx/CELL, ny/CELL }] = firer;
+					fire_g[{ nx/CELL, ny/CELL }] = fireg;
+					fire_b[{ nx/CELL, ny/CELL }] = fireb;
 				}
 				if(firea && (pixel_mode & FIRE_SPARK))
 				{
 					firea /= 4;
-					fire_r[ny/CELL][nx/CELL] = (firea*firer + (255-firea)*fire_r[ny/CELL][nx/CELL]) >> 8;
-					fire_g[ny/CELL][nx/CELL] = (firea*fireg + (255-firea)*fire_g[ny/CELL][nx/CELL]) >> 8;
-					fire_b[ny/CELL][nx/CELL] = (firea*fireb + (255-firea)*fire_b[ny/CELL][nx/CELL]) >> 8;
+					fire_r[{ nx/CELL, ny/CELL }] = (firea*firer + (255-firea)*fire_r[{ nx/CELL, ny/CELL }]) >> 8;
+					fire_g[{ nx/CELL, ny/CELL }] = (firea*fireg + (255-firea)*fire_g[{ nx/CELL, ny/CELL }]) >> 8;
+					fire_b[{ nx/CELL, ny/CELL }] = (firea*fireb + (255-firea)*fire_b[{ nx/CELL, ny/CELL }]) >> 8;
 				}
 			}
 		}
@@ -926,33 +926,33 @@ void Renderer::draw_air()
 	if(!(displayMode & DISPLAY_AIR))
 		return;
 	int x, y, i, j;
-	auto *pv = sim->pv;
-	auto *hv = sim->hv;
-	auto *vx = sim->vx;
-	auto *vy = sim->vy;
+	auto &pv = sim->pv;
+	auto &hv = sim->hv;
+	auto &vx = sim->vx;
+	auto &vy = sim->vy;
 	auto c = 0x000000_rgb;
 	for (y=0; y<YCELLS; y++)
 		for (x=0; x<XCELLS; x++)
 		{
 			if (displayMode & DISPLAY_AIRP)
 			{
-				if (pv[y][x] > 0.0f)
-					c = RGB(clamp_flt(pv[y][x], 0.0f, 8.0f), 0, 0);//positive pressure is red!
+				if (pv[{ x, y }] > 0.0f)
+					c = RGB(clamp_flt(pv[{ x, y }], 0.0f, 8.0f), 0, 0);//positive pressure is red!
 				else
-					c = RGB(0, 0, clamp_flt(-pv[y][x], 0.0f, 8.0f));//negative pressure is blue!
+					c = RGB(0, 0, clamp_flt(-pv[{ x, y }], 0.0f, 8.0f));//negative pressure is blue!
 			}
 			else if (displayMode & DISPLAY_AIRV)
 			{
-				c = RGB(clamp_flt(fabsf(vx[y][x]), 0.0f, 8.0f),//vx adds red
-					clamp_flt(pv[y][x], 0.0f, 8.0f),//pressure adds green
-					clamp_flt(fabsf(vy[y][x]), 0.0f, 8.0f));//vy adds blue
+				c = RGB(clamp_flt(fabsf(vx[{ x, y }]), 0.0f, 8.0f),//vx adds red
+					clamp_flt(pv[{ x, y }], 0.0f, 8.0f),//pressure adds green
+					clamp_flt(fabsf(vy[{ x, y }]), 0.0f, 8.0f));//vy adds blue
 			}
 			else if (displayMode & DISPLAY_AIRH)
 			{
-				c = RGB::Unpack(HeatToColour(hv[y][x]));
-				//c = RGB(clamp_flt(fabsf(vx[y][x]), 0.0f, 8.0f),//vx adds red
-				//	clamp_flt(hv[y][x], 0.0f, 1600.0f),//heat adds green
-				//	clamp_flt(fabsf(vy[y][x]), 0.0f, 8.0f)).Pack();//vy adds blue
+				c = RGB::Unpack(HeatToColour(hv[{ x, y }]));
+				//c = RGB(clamp_flt(fabsf(vx[{ x, y }]), 0.0f, 8.0f),//vx adds red
+				//	clamp_flt(hv[{ x, y }], 0.0f, 1600.0f),//heat adds green
+				//	clamp_flt(fabsf(vy[{ x, y }]), 0.0f, 8.0f)).Pack();//vy adds blue
 			}
 			else if (displayMode & DISPLAY_AIRC)
 			{
@@ -960,12 +960,12 @@ void Renderer::draw_air()
 				int g;
 				int b;
 				// velocity adds grey
-				r = clamp_flt(fabsf(vx[y][x]), 0.0f, 24.0f) + clamp_flt(fabsf(vy[y][x]), 0.0f, 20.0f);
-				g = clamp_flt(fabsf(vx[y][x]), 0.0f, 20.0f) + clamp_flt(fabsf(vy[y][x]), 0.0f, 24.0f);
-				b = clamp_flt(fabsf(vx[y][x]), 0.0f, 24.0f) + clamp_flt(fabsf(vy[y][x]), 0.0f, 20.0f);
-				if (pv[y][x] > 0.0f)
+				r = clamp_flt(fabsf(vx[{ x, y }]), 0.0f, 24.0f) + clamp_flt(fabsf(vy[{ x, y }]), 0.0f, 20.0f);
+				g = clamp_flt(fabsf(vx[{ x, y }]), 0.0f, 20.0f) + clamp_flt(fabsf(vy[{ x, y }]), 0.0f, 24.0f);
+				b = clamp_flt(fabsf(vx[{ x, y }]), 0.0f, 24.0f) + clamp_flt(fabsf(vy[{ x, y }]), 0.0f, 20.0f);
+				if (pv[{ x, y }] > 0.0f)
 				{
-					r += clamp_flt(pv[y][x], 0.0f, 16.0f);//pressure adds red!
+					r += clamp_flt(pv[{ x, y }], 0.0f, 16.0f);//pressure adds red!
 					if (r>255)
 						r=255;
 					if (g>255)
@@ -976,7 +976,7 @@ void Renderer::draw_air()
 				}
 				else
 				{
-					b += clamp_flt(-pv[y][x], 0.0f, 16.0f);//pressure adds blue!
+					b += clamp_flt(-pv[{ x, y }], 0.0f, 16.0f);//pressure adds blue!
 					if (r>255)
 						r=255;
 					if (g>255)
@@ -1004,12 +1004,12 @@ void Renderer::DrawWalls()
 	auto &wtypes = sd.wtypes;
 	for (int y = 0; y < YCELLS; y++)
 		for (int x =0; x < XCELLS; x++)
-			if (sim->bmap[y][x])
+			if (sim->bmap[{ x, y }])
 			{
-				unsigned char wt = sim->bmap[y][x];
+				unsigned char wt = sim->bmap[{ x, y }];
 				if (wt >= UI_WALLCOUNT)
 					continue;
-				unsigned char powered = sim->emap[y][x];
+				unsigned char powered = sim->emap[{ x, y }];
 				RGB prgb = wtypes[wt].colour;
 				RGB grgb = wtypes[wt].eglow;
 
@@ -1082,7 +1082,7 @@ void Renderer::DrawWalls()
 						float yf = y*CELL + CELL*0.5f;
 						int oldX = (int)(xf+0.5f), oldY = (int)(yf+0.5f);
 						int newX, newY;
-						float xVel = sim->vx[y][x]*0.125f, yVel = sim->vy[y][x]*0.125f;
+						float xVel = sim->vx[{ x, y }]*0.125f, yVel = sim->vy[{ x, y }]*0.125f;
 						// there is no velocity here, draw a streamline and continue
 						if (!xVel && !yVel)
 						{
@@ -1109,9 +1109,9 @@ void Renderer::DrawWalls()
 							{
 								int wallX = newX/CELL;
 								int wallY = newY/CELL;
-								xVel = sim->vx[wallY][wallX]*0.125f;
-								yVel = sim->vy[wallY][wallX]*0.125f;
-								if (wallX != x && wallY != y && sim->bmap[wallY][wallX] == WL_STREAM)
+								xVel = sim->vx[{ wallX, wallY }]*0.125f;
+								yVel = sim->vy[{ wallX, wallY }]*0.125f;
+								if (wallX != x && wallY != y && sim->bmap[{ wallX, wallY }] == WL_STREAM)
 									break;
 							}
 							xf += xVel;
@@ -1236,9 +1236,9 @@ void Renderer::DrawWalls()
 					// glow if electrified
 					RGB glow = wtypes[wt].eglow;
 					int alpha = 255;
-					int cr = (alpha*glow.Red   + (255-alpha)*fire_r[y/CELL][x/CELL]) >> 8;
-					int cg = (alpha*glow.Green + (255-alpha)*fire_g[y/CELL][x/CELL]) >> 8;
-					int cb = (alpha*glow.Blue  + (255-alpha)*fire_b[y/CELL][x/CELL]) >> 8;
+					int cr = (alpha*glow.Red   + (255-alpha)*fire_r[{ x/CELL, y/CELL }]) >> 8;
+					int cg = (alpha*glow.Green + (255-alpha)*fire_g[{ x/CELL, y/CELL }]) >> 8;
+					int cb = (alpha*glow.Blue  + (255-alpha)*fire_b[{ x/CELL, y/CELL }]) >> 8;
 
 					if (cr > 255)
 						cr = 255;
@@ -1246,9 +1246,9 @@ void Renderer::DrawWalls()
 						cg = 255;
 					if (cb > 255)
 						cb = 255;
-					fire_r[y][x] = cr;
-					fire_g[y][x] = cg;
-					fire_b[y][x] = cb;
+					fire_r[{ x, y }] = cr;
+					fire_g[{ x, y }] = cg;
+					fire_b[{ x, y }] = cb;
 				}
 			}
 }
@@ -1261,14 +1261,14 @@ void Renderer::render_fire()
 	for (j=0; j<YCELLS; j++)
 		for (i=0; i<XCELLS; i++)
 		{
-			r = fire_r[j][i];
-			g = fire_g[j][i];
-			b = fire_b[j][i];
+			r = fire_r[{ i, j }];
+			g = fire_g[{ i, j }];
+			b = fire_b[{ i, j }];
 			if (r || g || b)
 				for (y=-CELL; y<2*CELL; y++)
 					for (x=-CELL; x<2*CELL; x++)
 					{
-						a = fire_alpha[y+CELL][x+CELL];
+						a = fire_alpha[{ x+CELL, y+CELL }];
 						if (findingElement)
 							a /= 2;
 						AddFirePixel({ i*CELL+x, j*CELL+y }, RGB(r, g, b), a);
@@ -1280,16 +1280,16 @@ void Renderer::render_fire()
 				for (x=-1; x<2; x++)
 					if ((x || y) && i+x>=0 && j+y>=0 && i+x<XCELLS && j+y<YCELLS)
 					{
-						r += fire_r[j+y][i+x];
-						g += fire_g[j+y][i+x];
-						b += fire_b[j+y][i+x];
+						r += fire_r[{ i+x, j+y }];
+						g += fire_g[{ i+x, j+y }];
+						b += fire_b[{ i+x, j+y }];
 					}
 			r /= 16;
 			g /= 16;
 			b /= 16;
-			fire_r[j][i] = r>4 ? r-4 : 0;
-			fire_g[j][i] = g>4 ? g-4 : 0;
-			fire_b[j][i] = b>4 ? b-4 : 0;
+			fire_r[{ i, j }] = r>4 ? r-4 : 0;
+			fire_g[{ i, j }] = g>4 ? g-4 : 0;
+			fire_b[{ i, j }] = b>4 ? b-4 : 0;
 		}
 }
 

@@ -56,8 +56,8 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	sim->pv[y/CELL][x/CELL] -= .003f;
-	int under = pmap[y][x];
+	sim->pv[{ x/CELL, y/CELL }] -= .003f;
+	int under = pmap[{ x, y }];
 	int utype = TYP(under);
 	int uID = ID(under);
 	switch (utype)
@@ -76,7 +76,7 @@ static int update(UPDATE_FUNC_ARGS)
 		break;
 	}
 	case PT_DEUT:
-		if (sim->rng.chance(-((int)sim->pv[y / CELL][x / CELL] - 4) + (parts[uID].life / 100), 200))
+		if (sim->rng.chance(-((int)sim->pv[{ x / CELL, y / CELL }] - 4) + (parts[uID].life / 100), 200))
 		{
 			DeutImplosion(sim, parts[uID].life, x, y, restrict_flt(parts[uID].temp + parts[uID].life * 500, MIN_TEMP, MAX_TEMP), PT_PROT);
 			sim->kill_part(uID);
@@ -127,7 +127,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			sim->create_part(uID, x, y, PT_FIRE);
 			parts[uID].temp += restrict_flt(float(elements[utype].Flammable * 5), MIN_TEMP, MAX_TEMP);
-			sim->pv[y / CELL][x / CELL] += 1.00f;
+			sim->pv[{ x / CELL, y / CELL }] += 1.00f;
 		}
 		//prevent inactive sparkable elements from being sparked
 		else if ((elements[utype].Properties&PROP_CONDUCTS) && parts[uID].life <= 4)
@@ -168,7 +168,7 @@ static int update(UPDATE_FUNC_ARGS)
 		return 1;
 	}
 	//collide with other protons to make heavier materials
-	int ahead = sim->photons[y][x];
+	int ahead = sim->photons[{ x, y }];
 	if (ID(ahead) != i && TYP(ahead) == PT_PROT)
 	{
 		float velocity1 = powf(parts[i].vx, 2.0f)+powf(parts[i].vy, 2.0f);
@@ -204,7 +204,7 @@ static int DeutImplosion(Simulation * sim, int n, int x, int y, float temp, int 
 		else if (sim->MaxPartsReached())
 			break;
 	}
-	sim->pv[y/CELL][x/CELL] -= (6.0f * CFDS)*n;
+	sim->pv[{ x/CELL, y/CELL }] -= (6.0f * CFDS)*n;
 	return 0;
 }
 

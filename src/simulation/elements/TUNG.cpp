@@ -65,7 +65,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if(TYP(r) == PT_O2)
 					{
 						splode = true;
@@ -78,7 +78,7 @@ static int update(UPDATE_FUNC_ARGS)
 	{
 		if (sim->rng.chance(1, 50))
 		{
-			sim->pv[y/CELL][x/CELL] += 50.0f;
+			sim->pv[{ x/CELL, y/CELL }] += 50.0f;
 		}
 		else if (sim->rng.chance(1, 100))
 		{
@@ -100,7 +100,7 @@ static int update(UPDATE_FUNC_ARGS)
 		parts[i].vy += sim->rng.between(-50, 50);
 		return 1;
 	}
-	auto press = int(sim->pv[y/CELL][x/CELL] * 64);
+	auto press = int(sim->pv[{ x/CELL, y/CELL }] * 64);
 	auto diff = press - parts[i].tmp3;
 	if (diff > 32 || diff < -32)
 	{
@@ -139,5 +139,5 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
-	sim->parts[i].tmp3 = int(sim->pv[y/CELL][x/CELL] * 64);
+	sim->parts[i].tmp3 = int(sim->pv[{ x/CELL, y/CELL }] * 64);
 }

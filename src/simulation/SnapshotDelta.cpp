@@ -160,6 +160,13 @@ void FillHunkVector(const std::vector<Item> &oldItems, const std::vector<Item> &
 }
 
 template<class Item>
+void FillHunkPlane(const PlaneAdapter<std::vector<Item>> &oldItems, const PlaneAdapter<std::vector<Item>> &newItems, SnapshotDelta::HunkVector<Item> &out)
+{
+	auto size = oldItems.Size();
+	FillHunkVectorPtr<Item>(oldItems.data(), newItems.data(), out, size.X * size.Y);
+}
+
+template<class Item>
 void FillSingleDiff(const Item &oldItem, const Item &newItem, SnapshotDelta::SingleDiff<Item> &out)
 {
 	if (oldItem != newItem)
@@ -191,6 +198,12 @@ void ApplyHunkVector(const SnapshotDelta::HunkVector<Item> &in, std::vector<Item
 }
 
 template<bool UseOld, class Item>
+void ApplyHunkPlane(const SnapshotDelta::HunkVector<Item> &in, PlaneAdapter<std::vector<Item>> &items)
+{
+	ApplyHunkVectorPtr<UseOld, Item>(in, items.data());
+}
+
+template<bool UseOld, class Item>
 void ApplySingleDiff(const SnapshotDelta::SingleDiff<Item> &in, Item &item)
 {
 	if (in.valid)
@@ -203,19 +216,19 @@ std::unique_ptr<SnapshotDelta> SnapshotDelta::FromSnapshots(const Snapshot &oldS
 {
 	auto ptr = std::make_unique<SnapshotDelta>();
 	auto &delta = *ptr;
-	FillHunkVector(oldSnap.AirPressure    , newSnap.AirPressure    , delta.AirPressure    );
-	FillHunkVector(oldSnap.AirVelocityX   , newSnap.AirVelocityX   , delta.AirVelocityX   );
-	FillHunkVector(oldSnap.AirVelocityY   , newSnap.AirVelocityY   , delta.AirVelocityY   );
-	FillHunkVector(oldSnap.AmbientHeat    , newSnap.AmbientHeat    , delta.AmbientHeat    );
-	FillHunkVector(oldSnap.GravMass       , newSnap.GravMass       , delta.GravMass       );
-	FillHunkVector(oldSnap.GravForceX     , newSnap.GravForceX     , delta.GravForceX     );
-	FillHunkVector(oldSnap.GravForceY     , newSnap.GravForceY     , delta.GravForceY     );
-	FillHunkVector(oldSnap.BlockMap       , newSnap.BlockMap       , delta.BlockMap       );
-	FillHunkVector(oldSnap.ElecMap        , newSnap.ElecMap        , delta.ElecMap        );
-	FillHunkVector(oldSnap.BlockAir       , newSnap.BlockAir       , delta.BlockAir       );
-	FillHunkVector(oldSnap.BlockAirH      , newSnap.BlockAirH      , delta.BlockAirH      );
-	FillHunkVector(oldSnap.FanVelocityX   , newSnap.FanVelocityX   , delta.FanVelocityX   );
-	FillHunkVector(oldSnap.FanVelocityY   , newSnap.FanVelocityY   , delta.FanVelocityY   );
+	FillHunkPlane(oldSnap.AirPressure    , newSnap.AirPressure    , delta.AirPressure    );
+	FillHunkPlane(oldSnap.AirVelocityX   , newSnap.AirVelocityX   , delta.AirVelocityX   );
+	FillHunkPlane(oldSnap.AirVelocityY   , newSnap.AirVelocityY   , delta.AirVelocityY   );
+	FillHunkPlane(oldSnap.AmbientHeat    , newSnap.AmbientHeat    , delta.AmbientHeat    );
+	FillHunkPlane(oldSnap.GravMass       , newSnap.GravMass       , delta.GravMass       );
+	FillHunkPlane(oldSnap.GravForceX     , newSnap.GravForceX     , delta.GravForceX     );
+	FillHunkPlane(oldSnap.GravForceY     , newSnap.GravForceY     , delta.GravForceY     );
+	FillHunkPlane(oldSnap.BlockMap       , newSnap.BlockMap       , delta.BlockMap       );
+	FillHunkPlane(oldSnap.ElecMap        , newSnap.ElecMap        , delta.ElecMap        );
+	FillHunkPlane(oldSnap.BlockAir       , newSnap.BlockAir       , delta.BlockAir       );
+	FillHunkPlane(oldSnap.BlockAirH      , newSnap.BlockAirH      , delta.BlockAirH      );
+	FillHunkPlane(oldSnap.FanVelocityX   , newSnap.FanVelocityX   , delta.FanVelocityX   );
+	FillHunkPlane(oldSnap.FanVelocityY   , newSnap.FanVelocityY   , delta.FanVelocityY   );
 	FillHunkVector(oldSnap.WirelessData   , newSnap.WirelessData   , delta.WirelessData   );
 	FillSingleDiff(oldSnap.signs          , newSnap.signs          , delta.signs          );
 	FillSingleDiff(oldSnap.Authors        , newSnap.Authors        , delta.Authors        );
@@ -239,19 +252,19 @@ std::unique_ptr<Snapshot> SnapshotDelta::Forward(const Snapshot &oldSnap)
 {
 	auto ptr = std::make_unique<Snapshot>(oldSnap);
 	auto &newSnap = *ptr;
-	ApplyHunkVector<false>(AirPressure    , newSnap.AirPressure    );
-	ApplyHunkVector<false>(AirVelocityX   , newSnap.AirVelocityX   );
-	ApplyHunkVector<false>(AirVelocityY   , newSnap.AirVelocityY   );
-	ApplyHunkVector<false>(AmbientHeat    , newSnap.AmbientHeat    );
-	ApplyHunkVector<false>(GravMass       , newSnap.GravMass       );
-	ApplyHunkVector<false>(GravForceX     , newSnap.GravForceX     );
-	ApplyHunkVector<false>(GravForceY     , newSnap.GravForceY     );
-	ApplyHunkVector<false>(BlockMap       , newSnap.BlockMap       );
-	ApplyHunkVector<false>(ElecMap        , newSnap.ElecMap        );
-	ApplyHunkVector<false>(BlockAir       , newSnap.BlockAir       );
-	ApplyHunkVector<false>(BlockAirH      , newSnap.BlockAirH      );
-	ApplyHunkVector<false>(FanVelocityX   , newSnap.FanVelocityX   );
-	ApplyHunkVector<false>(FanVelocityY   , newSnap.FanVelocityY   );
+	ApplyHunkPlane<false>(AirPressure    , newSnap.AirPressure    );
+	ApplyHunkPlane<false>(AirVelocityX   , newSnap.AirVelocityX   );
+	ApplyHunkPlane<false>(AirVelocityY   , newSnap.AirVelocityY   );
+	ApplyHunkPlane<false>(AmbientHeat    , newSnap.AmbientHeat    );
+	ApplyHunkPlane<false>(GravMass       , newSnap.GravMass       );
+	ApplyHunkPlane<false>(GravForceX     , newSnap.GravForceX     );
+	ApplyHunkPlane<false>(GravForceY     , newSnap.GravForceY     );
+	ApplyHunkPlane<false>(BlockMap       , newSnap.BlockMap       );
+	ApplyHunkPlane<false>(ElecMap        , newSnap.ElecMap        );
+	ApplyHunkPlane<false>(BlockAir       , newSnap.BlockAir       );
+	ApplyHunkPlane<false>(BlockAirH      , newSnap.BlockAirH      );
+	ApplyHunkPlane<false>(FanVelocityX   , newSnap.FanVelocityX   );
+	ApplyHunkPlane<false>(FanVelocityY   , newSnap.FanVelocityY   );
 	ApplyHunkVector<false>(WirelessData   , newSnap.WirelessData   );
 	ApplySingleDiff<false>(signs          , newSnap.signs          );
 	ApplySingleDiff<false>(Authors        , newSnap.Authors        );
@@ -273,19 +286,19 @@ std::unique_ptr<Snapshot> SnapshotDelta::Restore(const Snapshot &newSnap)
 {
 	auto ptr = std::make_unique<Snapshot>(newSnap);
 	auto &oldSnap = *ptr;
-	ApplyHunkVector<true>(AirPressure    , oldSnap.AirPressure    );
-	ApplyHunkVector<true>(AirVelocityX   , oldSnap.AirVelocityX   );
-	ApplyHunkVector<true>(AirVelocityY   , oldSnap.AirVelocityY   );
-	ApplyHunkVector<true>(AmbientHeat    , oldSnap.AmbientHeat    );
-	ApplyHunkVector<true>(GravMass       , oldSnap.GravMass       );
-	ApplyHunkVector<true>(GravForceX     , oldSnap.GravForceX     );
-	ApplyHunkVector<true>(GravForceY     , oldSnap.GravForceY     );
-	ApplyHunkVector<true>(BlockMap       , oldSnap.BlockMap       );
-	ApplyHunkVector<true>(ElecMap        , oldSnap.ElecMap        );
-	ApplyHunkVector<true>(BlockAir       , oldSnap.BlockAir       );
-	ApplyHunkVector<true>(BlockAirH      , oldSnap.BlockAirH      );
-	ApplyHunkVector<true>(FanVelocityX   , oldSnap.FanVelocityX   );
-	ApplyHunkVector<true>(FanVelocityY   , oldSnap.FanVelocityY   );
+	ApplyHunkPlane<true>(AirPressure    , oldSnap.AirPressure    );
+	ApplyHunkPlane<true>(AirVelocityX   , oldSnap.AirVelocityX   );
+	ApplyHunkPlane<true>(AirVelocityY   , oldSnap.AirVelocityY   );
+	ApplyHunkPlane<true>(AmbientHeat    , oldSnap.AmbientHeat    );
+	ApplyHunkPlane<true>(GravMass       , oldSnap.GravMass       );
+	ApplyHunkPlane<true>(GravForceX     , oldSnap.GravForceX     );
+	ApplyHunkPlane<true>(GravForceY     , oldSnap.GravForceY     );
+	ApplyHunkPlane<true>(BlockMap       , oldSnap.BlockMap       );
+	ApplyHunkPlane<true>(ElecMap        , oldSnap.ElecMap        );
+	ApplyHunkPlane<true>(BlockAir       , oldSnap.BlockAir       );
+	ApplyHunkPlane<true>(BlockAirH      , oldSnap.BlockAirH      );
+	ApplyHunkPlane<true>(FanVelocityX   , oldSnap.FanVelocityX   );
+	ApplyHunkPlane<true>(FanVelocityY   , oldSnap.FanVelocityY   );
 	ApplyHunkVector<true>(WirelessData   , oldSnap.WirelessData   );
 	ApplySingleDiff<true>(signs          , oldSnap.signs          );
 	ApplySingleDiff<true>(Authors        , oldSnap.Authors        );

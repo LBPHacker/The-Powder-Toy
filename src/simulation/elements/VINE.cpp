@@ -59,7 +59,7 @@ static int update(UPDATE_FUNC_ARGS)
 	rndstore >>= 2;
 	if (rx || ry)
 	{
-		auto r = pmap[y+ry][x+rx];
+		auto r = pmap[{ x+rx, y+ry }];
 		if (!(rndstore % 15))
 			sim->part_change_type(i, x, y, PT_PLNT);
 		else if (!r)

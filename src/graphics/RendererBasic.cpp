@@ -78,7 +78,7 @@ void Renderer::Clear()
 {
 	if(displayMode & DISPLAY_PERS)
 	{
-		std::copy(persistentVideo.begin(), persistentVideo.end(), video.RowIterator({ 0, 0 }));
+		std::copy(persistentVideo.RowIterator({ 0, 0 }), persistentVideo.RowIterator({ 0, YRES }), video.RowIterator({ 0, 0 }));
 	}
 	else
 	{
@@ -98,10 +98,6 @@ void Renderer::DrawBlob(Vec2<int> pos, RGB colour)
 	BlendPixel(pos + Vec2{ -1, +1 }, colour.WithAlpha(64));
 }
 
-float temp[CELL*3][CELL*3];
-float fire_alphaf[CELL*3][CELL*3];
-float glow_alphaf[11][11];
-float blur_alphaf[7][7];
 void Renderer::prepare_alpha(int size, float intensity)
 {
 	fireIntensity = intensity;
@@ -109,15 +105,15 @@ void Renderer::prepare_alpha(int size, float intensity)
 	int x,y,i,j;
 	float multiplier = 255.0f*fireIntensity;
 
-	memset(temp, 0, sizeof(temp));
+	PlaneAdapter<std::vector<float>> temp({ CELL * 3, CELL * 3 }, 0.f);
 	for (x=0; x<CELL; x++)
 		for (y=0; y<CELL; y++)
 			for (i=-CELL; i<CELL; i++)
 				for (j=-CELL; j<CELL; j++)
-					temp[y+CELL+j][x+CELL+i] += expf(-0.1f*(i*i+j*j));
+					temp[{ x+CELL+i, y+CELL+j }] += expf(-0.1f*(i*i+j*j));
 	for (x=0; x<CELL*3; x++)
 		for (y=0; y<CELL*3; y++)
-			fire_alpha[y][x] = (int)(multiplier*temp[y][x]/(CELL*CELL));
+			fire_alpha[{ x, y }] = (int)(multiplier*temp[{ x, y }]/(CELL*CELL));
 
 }
 
@@ -184,9 +180,15 @@ Renderer::Renderer()
 {
 	PopulateTables();
 
-	memset(fire_r, 0, sizeof(fire_r));
-	memset(fire_g, 0, sizeof(fire_g));
-	memset(fire_b, 0, sizeof(fire_b));
+	video = PlaneAdapter<std::vector<pixel>>(WINDOW, 0);
+	persistentVideo = PlaneAdapter<std::vector<pixel>>(WINDOW, 0);
+	warpVideo = PlaneAdapter<std::vector<pixel>>(WINDOW, 0);
+
+	fire_alpha = PlaneAdapter<std::vector<pixel>>({ CELL * 3, CELL * 3 }, 0);
+
+	fire_r = PlaneAdapter<std::vector<unsigned char>>(CELLS, 0);
+	fire_g = PlaneAdapter<std::vector<unsigned char>>(CELLS, 0);
+	fire_b = PlaneAdapter<std::vector<unsigned char>>(CELLS, 0);
 
 	//Set defauly display modes
 	prepare_alpha(CELL, 1.0f);
@@ -195,9 +197,9 @@ Renderer::Renderer()
 
 void Renderer::ClearAccumulation()
 {
-	std::fill(&fire_r[0][0], &fire_r[0][0] + NCELL, 0);
-	std::fill(&fire_g[0][0], &fire_g[0][0] + NCELL, 0);
-	std::fill(&fire_b[0][0], &fire_b[0][0] + NCELL, 0);
+	std::fill(fire_r.begin(), fire_r.end(), 0);
+	std::fill(fire_g.begin(), fire_g.end(), 0);
+	std::fill(fire_b.begin(), fire_b.end(), 0);
 	std::fill(persistentVideo.begin(), persistentVideo.end(), 0);
 }
 

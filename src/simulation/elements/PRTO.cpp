@@ -69,7 +69,7 @@ static int update(UPDATE_FUNC_ARGS)
 		auto ry = portal_ry[count];
 		if (rx || ry)
 		{
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[{ x+rx, y+ry }];
 			if (!r)
 			{
 				fe = 1;
@@ -86,7 +86,7 @@ static int update(UPDATE_FUNC_ARGS)
 						sim->create_part(-1,x-1,y+1,PT_SPRK);
 						sim->create_part(-1,x-1,y,PT_SPRK);
 						sim->create_part(-1,x-1,y-1,PT_SPRK);
-						memset(&sim->portalp[parts[i].tmp][randomness][nnx], 0, sizeof(Particle));
+						sim->portalp[parts[i].tmp][randomness][nnx] = {};
 						break;
 					}
 					else if (sim->portalp[parts[i].tmp][randomness][nnx].type)
@@ -133,7 +133,7 @@ static int update(UPDATE_FUNC_ARGS)
 							parts[np] = sim->portalp[parts[i].tmp][randomness][nnx];
 						parts[np].x = float(x+rx);
 						parts[np].y = float(y+ry);
-						memset(&sim->portalp[parts[i].tmp][randomness][nnx], 0, sizeof(Particle));
+						sim->portalp[parts[i].tmp][randomness][nnx] = {};
 						break;
 					}
 				}

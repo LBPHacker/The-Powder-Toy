@@ -17,20 +17,24 @@ uint32_t Snapshot::Hash() const
 	auto takeVector = [&take](auto &vec) {
 		take(reinterpret_cast<const uint8_t *>(vec.data()), vec.size() * sizeof(vec[0]));
 	};
-	takeVector(AirPressure);
-	takeVector(AirVelocityX);
-	takeVector(AirVelocityY);
-	takeVector(AmbientHeat);
+	auto takePlane = [&take](auto &plane) {
+		auto size = plane.Size();
+		take(reinterpret_cast<const uint8_t *>(plane.data()), size.X * size.Y * sizeof(plane[{ 0, 0 }]));
+	};
+	takePlane(AirPressure);
+	takePlane(AirVelocityX);
+	takePlane(AirVelocityY);
+	takePlane(AmbientHeat);
 	takeVector(Particles);
-	takeVector(GravMass);
-	takeVector(GravForceX);
-	takeVector(GravForceY);
-	takeVector(BlockMap);
-	takeVector(ElecMap);
-	takeVector(BlockAir);
-	takeVector(BlockAirH);
-	takeVector(FanVelocityX);
-	takeVector(FanVelocityY);
+	takePlane(GravMass);
+	takePlane(GravForceX);
+	takePlane(GravForceY);
+	takePlane(BlockMap);
+	takePlane(ElecMap);
+	takePlane(BlockAir);
+	takePlane(BlockAirH);
+	takePlane(FanVelocityX);
+	takePlane(FanVelocityY);
 	takeVector(PortalParticles);
 	takeVector(WirelessData);
 	takeVector(stickmen);

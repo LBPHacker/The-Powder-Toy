@@ -53,7 +53,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 				{
 					if (parts[i].ctype==5 && sim->rng.chance(1, 2000))
@@ -89,7 +89,7 @@ static int update(UPDATE_FUNC_ARGS)
 			}
 		}
 	}
-	if (parts[i].temp > 9773.15 && sim->pv[y/CELL][x/CELL] > 200.0f)
+	if (parts[i].temp > 9773.15 && sim->pv[{ x/CELL, y/CELL }] > 200.0f)
 	{
 		if (sim->rng.chance(1, 5))
 		{
@@ -105,7 +105,7 @@ static int update(UPDATE_FUNC_ARGS)
 					parts[j].temp = MAX_TEMP;
 			}
 			parts[i].temp = MAX_TEMP;
-			sim->pv[y/CELL][x/CELL] += 100;
+			sim->pv[{ x/CELL, y/CELL }] += 100;
 		}
 	}
 	return 0;
