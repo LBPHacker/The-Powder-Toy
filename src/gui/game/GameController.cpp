@@ -1584,6 +1584,11 @@ void GameController::NotifyNewNotification(Client * sender, ServerNotification n
 	gameModel->AddNotification(new LinkNotification(notification.link, notification.text));
 }
 
+void GameController::AddSimConfigResetNotification(String message)
+{
+	gameModel->AddNotification(new SimConfigResetNotification{ message });
+}
+
 void GameController::NotifyUpdateAvailable(Client * sender)
 {
 	class UpdateNotification : public Notification
@@ -1737,4 +1742,9 @@ void GameController::SetToolIndex(ByteString identifier, std::optional<int> inde
 	{
 		commandInterface->SetToolIndex(identifier, index);
 	}
+}
+
+void SimConfigResetNotification::Action()
+{
+	GameController::Ref().OpenOptions();
 }

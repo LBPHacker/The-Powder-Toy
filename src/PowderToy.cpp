@@ -14,6 +14,7 @@
 #include "simulation/SaveRenderer.h"
 #include "simulation/SimulationData.h"
 #include "common/tpt-rand.h"
+#include "InitSimulationConfig.h"
 #include "gui/game/Favorite.h"
 #include "gui/Style.h"
 #include "gui/game/GameController.h"
@@ -346,6 +347,32 @@ int Main(int argc, char *argv[])
 
 	auto &prefs = GlobalPrefs::Ref();
 
+	std::optional<String> configResetMessage;
+	{
+		auto defaultConfig = SimulationConfig::Default();
+		SimulationConfig config;
+		config.CELL    = prefs.Get("Simulation.CellSize"  , defaultConfig.CELL   );
+		config.CELLS.X = prefs.Get("Simulation.CellCountX", defaultConfig.CELLS.X);
+		config.CELLS.Y = prefs.Get("Simulation.CellCountY", defaultConfig.CELLS.Y);
+		std::optional<SimulationConfig> loadBrokenAsNext;
+		try
+		{
+			config.Check();
+		}
+		catch (const SimulationConfig::CheckFailed &ex)
+		{
+			configResetMessage = "Invalid simulation configuration detected, sane defaults loaded";
+			std::cerr << "failed to apply custom simulation config: " << ex.what() << std::endl;
+			loadBrokenAsNext = config;
+			config = defaultConfig;
+		}
+		InitSimulationConfig(config);
+		if (loadBrokenAsNext)
+		{
+			SetNextSimulationConfig(*loadBrokenAsNext);
+		}
+	}
+
 	WindowFrameOps windowFrameOps{
 		prefs.Get("Scale", 1),
 		prefs.Get("Resizable", false),
@@ -570,6 +597,10 @@ int Main(int argc, char *argv[])
 		Platform::MarkPresentable();
 	}
 
+	if (configResetMessage)
+	{
+		gameController->AddSimConfigResetNotification(*configResetMessage);
+	}
 	MainLoop();
 
 	Platform::Exit(0);

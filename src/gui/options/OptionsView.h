@@ -2,12 +2,15 @@
 #include "common/String.h"
 #include "gui/interface/Window.h"
 #include "gui/interface/ScrollPanel.h"
+#include "InitSimulationConfig.h"
+#include <optional>
 
 namespace ui
 {
 	class Checkbox;
 	class DropDown;
 	class Textbox;
+	class Label;
 	class Button;
 	class Label;
 }
@@ -22,6 +25,9 @@ class OptionsView: public ui::Window
 	ui::Checkbox *newtonianGravity{};
 	ui::Checkbox *waterEqualisation{};
 	ui::DropDown *airMode{};
+	ui::Textbox *horizontalCellCount{};
+	ui::Textbox *verticalCellCount{};
+	ui::Textbox *cellSize{};
 	ui::Textbox *ambientAirTemp{};
 	ui::Button *ambientAirTempPreview{};
 	ui::DropDown *gravityMode{};
@@ -48,11 +54,16 @@ class OptionsView: public ui::Window
 	ui::Checkbox *autoStartupRequest{};
 	ui::Label *startupRequestStatus{};
 	ui::ScrollPanel *scrollPanel{};
+	ui::Label *simConfigStatus{};
+	std::optional<SimulationConfig> newConfig;
 	float customGravityX, customGravityY;
 	void UpdateAmbientAirTempPreview(float airTemp, bool isValid);
 	void AmbientAirTempToTextBox(float airTemp);
 	void UpdateAirTemp(String temp, bool isDefocus);
 	void UpdateStartupRequestStatus();
+	void LoadSimConfig(SimulationConfig config);
+	void SaveSimConfig();
+	void UpdateSimConfig();
 public:
 	OptionsView();
 	void NotifySettingsChanged(OptionsModel * sender);
