@@ -9,6 +9,7 @@
 #include "simulation/Sign.h"
 #include "simulation/Particle.h"
 #include "Misc.h"
+#include "Notification.h"
 #include <vector>
 #include <utility>
 #include <memory>
@@ -22,9 +23,15 @@ constexpr auto DEBUG_SIMHUD     = 0x0020;
 constexpr auto DEBUG_RENHUD     = 0x0040;
 constexpr auto DEBUG_AIRVEL     = 0x0080;
 
+struct SimConfigResetNotification : public Notification
+{
+	using Notification::Notification;
+
+	void Action() final override;
+};
+
 class DebugInfo;
 class SaveFile;
-class Notification;
 class GameModel;
 class GameView;
 class Snapshot;
@@ -214,4 +221,6 @@ public:
 
 	void SetToolIndex(ByteString identifier, std::optional<int> index);
 	void InitCommandInterface();
+
+	void AddSimConfigResetNotification(String message);
 };
