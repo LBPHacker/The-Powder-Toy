@@ -5,7 +5,7 @@
 #include <vector>
 
 template<class Item>
-using GravityPlane = PlaneAdapter<std::vector<Item>, CELLS.X, CELLS.Y>;
+using GravityPlane = PlaneAdapter<std::vector<Item>>;
 
 struct GravityInput
 {

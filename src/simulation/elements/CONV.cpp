@@ -58,9 +58,9 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			for (auto ry = -1; ry <= 1; ry++)
 			{
-				auto r = sim->photons[y+ry][x+rx];
+				auto r = sim->photons[{ x+rx, y+ry }];
 				if (!r)
-					r = pmap[y+ry][x+rx];
+					r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				int rt = TYP(r);
@@ -85,9 +85,9 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (x+rx>=0 && y+ry>=0 && x+rx<XRES && y+ry<YRES)
 				{
-					auto r = sim->photons[y+ry][x+rx];
+					auto r = sim->photons[{ x+rx, y+ry }];
 					if (!r || (restrictElement && ((TYP(r) == restrictElement) == (parts[i].tmp2 == 1))))
-						r = pmap[y+ry][x+rx];
+						r = pmap[{ x+rx, y+ry }];
 					if (!r || (restrictElement && ((TYP(r) == restrictElement) == (parts[i].tmp2 == 1))))
 						continue;
 					if (TYP(r) != PT_CONV && TYP(r) != PT_DMND && TYP(r) != ctype)

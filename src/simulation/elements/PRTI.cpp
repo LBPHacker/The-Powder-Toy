@@ -77,12 +77,12 @@ static int update(UPDATE_FUNC_ARGS)
 		int ry = portal_ry[count];
 		if (rx || ry)
 		{
-			int r = pmap[y+ry][x+rx];
+			int r = pmap[{ x+rx, y+ry }];
 			if (!r || TYP(r) == PT_STOR)
 				fe = 1;
 			if (!r || (!(elements[TYP(r)].Properties & (TYPE_PART | TYPE_LIQUID | TYPE_GAS | TYPE_ENERGY)) && TYP(r)!=PT_SPRK && TYP(r)!=PT_STOR))
 			{
-				r = sim->photons[y+ry][x+rx];
+				r = sim->photons[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 			}
@@ -101,7 +101,7 @@ static int update(UPDATE_FUNC_ARGS)
 						if (sd.IsElement(parts[ID(r)].tmp) && (elements[parts[ID(r)].tmp].Properties & (TYPE_PART | TYPE_LIQUID | TYPE_GAS | TYPE_ENERGY)))
 						{
 							// STOR uses same format as PIPE, so we can use this function to do the transfer
-							Element_PIPE_transfer_pipe_to_part(sim, parts+(ID(r)), &sim->portalp[parts[i].tmp][count][nnx], true);
+							Element_PIPE_transfer_pipe_to_part(sim, &parts[ID(r)], &sim->portalp[parts[i].tmp][count][nnx], true);
 							break;
 						}
 					}
