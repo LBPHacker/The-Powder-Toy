@@ -53,7 +53,7 @@ static int update(UPDATE_FUNC_ARGS)
 	{
 		for(int ry = -1; ry < 2; ry++)
 		{
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[{ x+rx, y+ry }];
 
 			if (!r)
 				continue;
@@ -75,8 +75,8 @@ static int update(UPDATE_FUNC_ARGS)
 	}
 
 	//Block air like TTAN
-	sim->air->bmap_blockair[y/CELL][x/CELL] = 1;
-	sim->air->bmap_blockairh[y/CELL][x/CELL] = 0x8;
+	sim->air->bmap_blockair[{ x/CELL, y/CELL }] = 1;
+	sim->air->bmap_blockairh[{ x/CELL, y/CELL }] = 0x8;
 
 	return 0;
 }

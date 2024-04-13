@@ -46,7 +46,7 @@ void Element::Element_RFRG()
 
 int Element_RFRG_update(UPDATE_FUNC_ARGS)
 {
-	float new_pressure = sim->pv[y/CELL][x/CELL];
+	float new_pressure = sim->pv[{ x/CELL, y/CELL }];
 	float *old_pressure = (float *)&parts[i].tmp;
 	if (std::isnan(*old_pressure))
 	{

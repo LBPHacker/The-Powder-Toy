@@ -167,8 +167,9 @@ std::vector<char> VideoBuffer::ToPPM() const
 
 template struct RasterDrawMethods<VideoBuffer>;
 
-Graphics::Graphics()
-{}
+Graphics::Graphics() : video(WINDOW)
+{
+}
 
 void Graphics::draw_icon(int x, int y, Icon icon, unsigned char alpha, bool invert)
 {

@@ -3,6 +3,7 @@
 #include "Sign.h"
 #include "Stickman.h"
 #include "common/tpt-rand.h"
+#include "common/Plane.h"
 #include <vector>
 #include <array>
 #include <cstdint>
@@ -11,25 +12,25 @@
 class Snapshot
 {
 public:
-	std::vector<float> AirPressure;
-	std::vector<float> AirVelocityX;
-	std::vector<float> AirVelocityY;
-	std::vector<float> AmbientHeat;
+	PlaneAdapter<std::vector<float>> AirPressure;
+	PlaneAdapter<std::vector<float>> AirVelocityX;
+	PlaneAdapter<std::vector<float>> AirVelocityY;
+	PlaneAdapter<std::vector<float>> AmbientHeat;
 
 	std::vector<Particle> Particles;
 
-	std::vector<float> GravForceX;
-	std::vector<float> GravForceY;
-	std::vector<float> GravMass;
-	std::vector<uint32_t> GravMask;
+	PlaneAdapter<std::vector<float>> GravForceX;
+	PlaneAdapter<std::vector<float>> GravForceY;
+	PlaneAdapter<std::vector<float>> GravMass;
+	PlaneAdapter<std::vector<uint32_t>> GravMask;
 
-	std::vector<unsigned char> BlockMap;
-	std::vector<unsigned char> ElecMap;
-	std::vector<unsigned char> BlockAir;
-	std::vector<unsigned char> BlockAirH;
+	PlaneAdapter<std::vector<unsigned char>> BlockMap;
+	PlaneAdapter<std::vector<unsigned char>> ElecMap;
+	PlaneAdapter<std::vector<unsigned char>> BlockAir;
+	PlaneAdapter<std::vector<unsigned char>> BlockAirH;
 
-	std::vector<float> FanVelocityX;
-	std::vector<float> FanVelocityY;
+	PlaneAdapter<std::vector<float>> FanVelocityX;
+	PlaneAdapter<std::vector<float>> FanVelocityY;
 
 
 	std::vector<Particle> PortalParticles;

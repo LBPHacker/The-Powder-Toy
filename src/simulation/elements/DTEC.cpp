@@ -64,7 +64,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if (!r)
 						continue;
 					auto rt = TYP(r);
@@ -90,9 +90,9 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (x+rx>=0 && y+ry>=0 && x+rx<XRES && y+ry<YRES && (rx || ry))
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if(!r)
-					r = sim->photons[y+ry][x+rx];
+					r = sim->photons[{ x+rx, y+ry }];
 				if(!r)
 					continue;
 				if (TYP(r) == parts[i].ctype && (parts[i].ctype != PT_LIFE || parts[i].tmp == parts[ID(r)].ctype || !parts[i].tmp))
@@ -114,7 +114,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if (!r)
 						continue;
 					nx = x+rx;
@@ -126,7 +126,7 @@ static int update(UPDATE_FUNC_ARGS)
 						ny += ry;
 						if (nx<0 || ny<0 || nx>=XRES || ny>=YRES)
 							break;
-						r = pmap[ny][nx];
+						r = pmap[{ nx, ny }];
 					}
 				}
 			}

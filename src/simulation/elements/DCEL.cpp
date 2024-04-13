@@ -63,9 +63,9 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if ((rx || ry) && !(rx && ry))
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
-					r = sim->photons[y+ry][x+rx];
+					r = sim->photons[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				if (elements[TYP(r)].Properties & (TYPE_PART | TYPE_LIQUID | TYPE_GAS | TYPE_ENERGY))

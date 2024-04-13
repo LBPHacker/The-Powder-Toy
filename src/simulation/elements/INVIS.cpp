@@ -55,7 +55,7 @@ static int update(UPDATE_FUNC_ARGS)
 	else
 		pressureResistance = 4.0f;
 
-	if (sim->pv[y/CELL][x/CELL] < -pressureResistance || sim->pv[y/CELL][x/CELL] > pressureResistance)
+	if (sim->pv[{ x/CELL, y/CELL }] < -pressureResistance || sim->pv[{ x/CELL, y/CELL }] > pressureResistance)
 		parts[i].tmp2 = 1;
 	else
 		parts[i].tmp2 = 0;
@@ -64,7 +64,7 @@ static int update(UPDATE_FUNC_ARGS)
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
-	//pv[ny/CELL][nx/CELL]>4.0f || pv[ny/CELL][nx/CELL]<-4.0f
+	//pv[{ nx/CELL, ny/CELL }]>4.0f || pv[{ nx/CELL, ny/CELL }]<-4.0f
 	if(cpart->tmp2)
 	{
 		*cola = 100;

@@ -56,7 +56,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				auto rt = TYP(r);
@@ -75,12 +75,11 @@ static int update(UPDATE_FUNC_ARGS)
 								if ((ynxj < 0) || (ynxj >= YRES) || (xnxi < 0) || (xnxi >= XRES))
 									continue;
 
-								auto nt = TYP(pmap[ynxj][xnxi]);
+								auto nt = TYP(pmap[{ xnxi, ynxj }]);
 								if (nt!=PT_DMND && nt!=PT_CLNE && nt!=PT_PCLN && nt!=PT_BCLN && nt!=PT_VIBR)
 								{
 									if (nt)
-										sim->kill_part(ID(pmap[ynxj][xnxi]));
-									sim->pv[ynxj/CELL][xnxi/CELL] += 0.1f;
+										sim->kill_part(ID(pmap[{ xnxi, ynxj }]));
 									//@ BOMB -> EMBR
 									auto nb = sim->create_part(-3, xnxi, ynxj, PT_EMBR);
 									if (nb!=-1)
@@ -104,7 +103,7 @@ static int update(UPDATE_FUNC_ARGS)
 								if ((ynxj < 0) || (ynxj >= YRES) || (xnxi < 0) || (xnxi >= XRES))
 									continue;
 
-								if (TYP(pmap[ynxj][xnxi]))
+								if (TYP(pmap[{ xnxi, ynxj }]))
 									continue;
 
 								//@ BOMB -> EMBR
