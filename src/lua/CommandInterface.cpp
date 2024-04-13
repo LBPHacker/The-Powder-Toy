@@ -294,10 +294,10 @@ static std::vector<int> EvaluateSelector(Simulation *sim, AnyType selector)
 			if(tempPoint.X<0 || tempPoint.Y<0 || tempPoint.Y >= YRES || tempPoint.X >= XRES)
 				throw GeneralException("Invalid position");
 
-			auto r = sim->pmap[tempPoint.Y][tempPoint.X];
+			auto r = sim->pmap[tempPoint];
 			if (!r)
 			{
-				r = sim->photons[tempPoint.Y][tempPoint.X];
+				r = sim->photons[tempPoint];
 			}
 			if (r)
 			{
@@ -587,7 +587,7 @@ AnyType CommandInterface::tptS_reset(std::deque<String> * words)
 		for (int nx = 0; nx < XCELLS; nx++)
 			for (int ny = 0; ny < YCELLS; ny++)
 			{
-				sim->pv[ny][nx] = 0;
+				sim->pv[{ nx, ny }] = 0;
 			}
 	}
 	else if (resetStr == "velocity")
@@ -595,8 +595,8 @@ AnyType CommandInterface::tptS_reset(std::deque<String> * words)
 		for (int nx = 0; nx < XCELLS; nx++)
 			for (int ny = 0; ny < YCELLS; ny++)
 			{
-				sim->vx[ny][nx] = 0;
-				sim->vy[ny][nx] = 0;
+				sim->vx[{ nx, ny }] = 0;
+				sim->vy[{ nx, ny }] = 0;
 			}
 	}
 	else if (resetStr == "sparks")

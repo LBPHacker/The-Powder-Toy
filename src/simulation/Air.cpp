@@ -28,14 +28,14 @@ void Air::make_kernel(void) //used for velocity
 
 void Air::Clear()
 {
-	std::fill(&sim.pv[0][0], &sim.pv[0][0]+NCELL, 0.0f);
-	std::fill(&sim.vy[0][0], &sim.vy[0][0]+NCELL, 0.0f);
-	std::fill(&sim.vx[0][0], &sim.vx[0][0]+NCELL, 0.0f);
+	std::fill(sim.pv.begin(), sim.pv.end(), 0.0f);
+	std::fill(sim.vy.begin(), sim.vy.end(), 0.0f);
+	std::fill(sim.vx.begin(), sim.vx.end(), 0.0f);
 }
 
 void Air::ClearAirH()
 {
-	std::fill(&sim.hv[0][0], &sim.hv[0][0]+NCELL, ambientAirTemp);
+	std::fill(sim.hv.begin(), sim.hv.end(), ambientAirTemp);
 }
 
 // Used when updating temp or velocity from far away
@@ -48,17 +48,17 @@ void Air::update_airh(void)
 	auto &hv = sim.hv;
 	for (auto i=0; i<YCELLS; i++) //sets air temp on the edges every frame
 	{
-		hv[i][0] = ambientAirTemp;
-		hv[i][1] = ambientAirTemp;
-		hv[i][XCELLS-2] = ambientAirTemp;
-		hv[i][XCELLS-1] = ambientAirTemp;
+		hv[{ 0, i }] = ambientAirTemp;
+		hv[{ 1, i }] = ambientAirTemp;
+		hv[{ XCELLS-2, i }] = ambientAirTemp;
+		hv[{ XCELLS-1, i }] = ambientAirTemp;
 	}
 	for (auto i=0; i<XCELLS; i++) //sets air temp on the edges every frame
 	{
-		hv[0][i] = ambientAirTemp;
-		hv[1][i] = ambientAirTemp;
-		hv[YCELLS-2][i] = ambientAirTemp;
-		hv[YCELLS-1][i] = ambientAirTemp;
+		hv[{ i, 0 }] = ambientAirTemp;
+		hv[{ i, 1 }] = ambientAirTemp;
+		hv[{ i, YCELLS-2 }] = ambientAirTemp;
+		hv[{ i, YCELLS-1 }] = ambientAirTemp;
 	}
 	for (auto y=0; y<YCELLS; y++) //update air temp and velocity
 	{
@@ -71,19 +71,19 @@ void Air::update_airh(void)
 			{
 				for (auto i=-1; i<2; i++)
 				{
-					if (y+j>0 && y+j<YCELLS-2 && x+i>0 && x+i<XCELLS-2 && !(bmap_blockairh[y+j][x+i]&0x8))
+					if (y+j>0 && y+j<YCELLS-2 && x+i>0 && x+i<XCELLS-2 && !(bmap_blockairh[{ x+i, y+j }]&0x8))
 					{
 						auto f = kernel[i+1+(j+1)*3];
-						dh += hv[y+j][x+i]*f;
-						dx += vx[y+j][x+i]*f;
-						dy += vy[y+j][x+i]*f;
+						dh += hv[{ x+i, y+j }]*f;
+						dx += vx[{ x+i, y+j }]*f;
+						dy += vy[{ x+i, y+j }]*f;
 					}
 					else
 					{
 						auto f = kernel[i+1+(j+1)*3];
-						dh += hv[y][x]*f;
-						dx += vx[y][x]*f;
-						dy += vy[y][x]*f;
+						dh += hv[{ x, y }]*f;
+						dx += vx[{ x, y }]*f;
+						dy += vy[{ x, y }]*f;
 					}
 				}
 			}
@@ -115,7 +115,7 @@ void Air::update_airh(void)
 				{
 					tx += stepX;
 					ty += stepY;
-					if (bmap_blockairh[(int)(ty+0.5f)][(int)(tx+0.5f)]&0x8)
+					if (bmap_blockairh[{ int(tx+0.5f), int(ty+0.5f) }]&0x8)
 					{
 						tx -= stepX;
 						ty -= stepY;
@@ -133,21 +133,21 @@ void Air::update_airh(void)
 			auto j = (int)ty;
 			tx -= i;
 			ty -= j;
-			if (!(bmap_blockairh[y][x]&0x8) && i>=2 && i<=XCELLS-3 && j>=2 && j<=YCELLS-3)
+			if (!(bmap_blockairh[{ x, y }]&0x8) && i>=2 && i<=XCELLS-3 && j>=2 && j<=YCELLS-3)
 			{
 				auto odh = dh;
 				dh *= 1.0f - AIR_VADV;
-				dh += AIR_VADV*(1.0f-tx)*(1.0f-ty)*((bmap_blockairh[j][i]&0x8) ? odh : hv[j][i]);
-				dh += AIR_VADV*tx*(1.0f-ty)*((bmap_blockairh[j][i+1]&0x8) ? odh : hv[j][i+1]);
-				dh += AIR_VADV*(1.0f-tx)*ty*((bmap_blockairh[j+1][i]&0x8) ? odh : hv[j+1][i]);
-				dh += AIR_VADV*tx*ty*((bmap_blockairh[j+1][i+1]&0x8) ? odh : hv[j+1][i+1]);
+				dh += AIR_VADV*(1.0f-tx)*(1.0f-ty)*((bmap_blockairh[{ i, j }]&0x8) ? odh : hv[{ i, j }]);
+				dh += AIR_VADV*tx*(1.0f-ty)*((bmap_blockairh[{ i+1, j }]&0x8) ? odh : hv[{ i+1, j }]);
+				dh += AIR_VADV*(1.0f-tx)*ty*((bmap_blockairh[{ i, j+1 }]&0x8) ? odh : hv[{ i, j+1 }]);
+				dh += AIR_VADV*tx*ty*((bmap_blockairh[{ i+1, j+1 }]&0x8) ? odh : hv[{ i+1, j+1 }]);
 			}
 
 			// Temp caps
 			if (dh > MAX_TEMP) dh = MAX_TEMP;
 			if (dh < MIN_TEMP) dh = MIN_TEMP;
 
-			ohv[y][x] = dh;
+			ohv[{ x, y }] = dh;
 
 			// Air convection.
 			// We use the Boussinesq approximation, i.e. we assume density to be nonconstant only
@@ -157,17 +157,17 @@ void Air::update_airh(void)
 			{
 				float convGravX, convGravY;
 				sim.GetGravityField(x*CELL, y*CELL, -1.0f, -1.0f, convGravX, convGravY);
-				auto weight = (hv[y][x] - ambientAirTemp) / 10000.0f;
+				auto weight = (hv[{ x, y }] - ambientAirTemp) / 10000.0f;
 
 				// Our approximation works best when the temperature difference is small, so we cap it from above.
 				if (weight > 0.01f) weight = 0.01f;
 
-				vx[y][x] += weight * convGravX;
-				vy[y][x] += weight * convGravY;
+				vx[{ x, y }] += weight * convGravX;
+				vy[{ x, y }] += weight * convGravY;
 			}
 		}
 	}
-	memcpy(hv, ohv, sizeof(hv));
+	hv = ohv;
 }
 
 void Air::update_air(void)
@@ -182,47 +182,47 @@ void Air::update_air(void)
 	{
 		for (auto i=0; i<YCELLS; i++) //reduces pressure/velocity on the edges every frame
 		{
-			pv[i][0] = pv[i][0]*0.8f;
-			pv[i][1] = pv[i][1]*0.8f;
-			pv[i][XCELLS-2] = pv[i][XCELLS-2]*0.8f;
-			pv[i][XCELLS-1] = pv[i][XCELLS-1]*0.8f;
-			vx[i][0] = vx[i][0]*0.9f;
-			vx[i][1] = vx[i][1]*0.9f;
-			vx[i][XCELLS-2] = vx[i][XCELLS-2]*0.9f;
-			vx[i][XCELLS-1] = vx[i][XCELLS-1]*0.9f;
-			vy[i][0] = vy[i][0]*0.9f;
-			vy[i][1] = vy[i][1]*0.9f;
-			vy[i][XCELLS-2] = vy[i][XCELLS-2]*0.9f;
-			vy[i][XCELLS-1] = vy[i][XCELLS-1]*0.9f;
+			pv[{ 0, i }] = pv[{ 0, i }]*0.8f;
+			pv[{ 1, i }] = pv[{ 1, i }]*0.8f;
+			pv[{ XCELLS-2, i }] = pv[{ XCELLS-2, i }]*0.8f;
+			pv[{ XCELLS-1, i }] = pv[{ XCELLS-1, i }]*0.8f;
+			vx[{ 0, i }] = vx[{ 0, i }]*0.9f;
+			vx[{ 1, i }] = vx[{ 1, i }]*0.9f;
+			vx[{ XCELLS-2, i }] = vx[{ XCELLS-2, i }]*0.9f;
+			vx[{ XCELLS-1, i }] = vx[{ XCELLS-1, i }]*0.9f;
+			vy[{ 0, i }] = vy[{ 0, i }]*0.9f;
+			vy[{ 1, i }] = vy[{ 1, i }]*0.9f;
+			vy[{ XCELLS-2, i }] = vy[{ XCELLS-2, i }]*0.9f;
+			vy[{ XCELLS-1, i }] = vy[{ XCELLS-1, i }]*0.9f;
 		}
 		for (auto i=0; i<XCELLS; i++) //reduces pressure/velocity on the edges every frame
 		{
-			pv[0][i] = pv[0][i]*0.8f;
-			pv[1][i] = pv[1][i]*0.8f;
-			pv[YCELLS-2][i] = pv[YCELLS-2][i]*0.8f;
-			pv[YCELLS-1][i] = pv[YCELLS-1][i]*0.8f;
-			vx[0][i] = vx[0][i]*0.9f;
-			vx[1][i] = vx[1][i]*0.9f;
-			vx[YCELLS-2][i] = vx[YCELLS-2][i]*0.9f;
-			vx[YCELLS-1][i] = vx[YCELLS-1][i]*0.9f;
-			vy[0][i] = vy[0][i]*0.9f;
-			vy[1][i] = vy[1][i]*0.9f;
-			vy[YCELLS-2][i] = vy[YCELLS-2][i]*0.9f;
-			vy[YCELLS-1][i] = vy[YCELLS-1][i]*0.9f;
+			pv[{ i, 0 }] = pv[{ i, 0 }]*0.8f;
+			pv[{ i, 1 }] = pv[{ i, 1 }]*0.8f;
+			pv[{ i, YCELLS-2 }] = pv[{ i, YCELLS-2 }]*0.8f;
+			pv[{ i, YCELLS-1 }] = pv[{ i, YCELLS-1 }]*0.8f;
+			vx[{ i, 0 }] = vx[{ i, 0 }]*0.9f;
+			vx[{ i, 1 }] = vx[{ i, 1 }]*0.9f;
+			vx[{ i, YCELLS-2 }] = vx[{ i, YCELLS-2 }]*0.9f;
+			vx[{ i, YCELLS-1 }] = vx[{ i, YCELLS-1 }]*0.9f;
+			vy[{ i, 0 }] = vy[{ i, 0 }]*0.9f;
+			vy[{ i, 1 }] = vy[{ i, 1 }]*0.9f;
+			vy[{ i, YCELLS-2 }] = vy[{ i, YCELLS-2 }]*0.9f;
+			vy[{ i, YCELLS-1 }] = vy[{ i, YCELLS-1 }]*0.9f;
 		}
 
 		for (auto j=1; j<YCELLS-1; j++) //clear some velocities near walls
 		{
 			for (auto i=1; i<XCELLS-1; i++)
 			{
-				if (bmap_blockair[j][i])
+				if (bmap_blockair[{ i, j }])
 				{
-					vx[j][i] = 0.0f;
-					vx[j][i-1] = 0.0f;
-					vx[j][i+1] = 0.0f;
-					vy[j][i] = 0.0f;
-					vy[j-1][i] = 0.0f;
-					vy[j+1][i] = 0.0f;
+					vx[{ i, j }] = 0.0f;
+					vx[{ i-1, j }] = 0.0f;
+					vx[{ i+1, j }] = 0.0f;
+					vy[{ i, j }] = 0.0f;
+					vy[{ i, j-1 }] = 0.0f;
+					vy[{ i, j+1 }] = 0.0f;
 				}
 			}
 		}
@@ -232,10 +232,10 @@ void Air::update_air(void)
 			for (auto x=1; x<XCELLS-1; x++)
 			{
 				auto dp = 0.0f;
-				dp += vx[y][x-1] - vx[y][x+1];
-				dp += vy[y-1][x] - vy[y+1][x];
-				pv[y][x] *= AIR_PLOSS;
-				pv[y][x] += dp*AIR_TSTEPP * 0.5f;;
+				dp += vx[{ x-1, y }] - vx[{ x+1, y }];
+				dp += vy[{ x, y-1 }] - vy[{ x, y+1 }];
+				pv[{ x, y }] *= AIR_PLOSS;
+				pv[{ x, y }] += dp*AIR_TSTEPP * 0.5f;;
 			}
 		}
 
@@ -245,16 +245,16 @@ void Air::update_air(void)
 			{
 				auto dx = 0.0f;
 				auto dy = 0.0f;
-				dx += pv[y][x-1] - pv[y][x+1];
-				dy += pv[y-1][x] - pv[y+1][x];
-				vx[y][x] *= AIR_VLOSS;
-				vy[y][x] *= AIR_VLOSS;
-				vx[y][x] += dx*AIR_TSTEPV * 0.5f;
-				vy[y][x] += dy*AIR_TSTEPV * 0.5f;
-				if (bmap_blockair[y][x-1] || bmap_blockair[y][x] || bmap_blockair[y][x+1])
-					vx[y][x] = 0;
-				if (bmap_blockair[y-1][x] || bmap_blockair[y][x] || bmap_blockair[y+1][x])
-					vy[y][x] = 0;
+				dx += pv[{ x-1, y }] - pv[{ x+1, y }];
+				dy += pv[{ x, y-1 }] - pv[{ x, y+1 }];
+				vx[{ x, y }] *= AIR_VLOSS;
+				vy[{ x, y }] *= AIR_VLOSS;
+				vx[{ x, y }] += dx*AIR_TSTEPV * 0.5f;
+				vy[{ x, y }] += dy*AIR_TSTEPV * 0.5f;
+				if (bmap_blockair[{ x-1, y }] || bmap_blockair[{ x, y }] || bmap_blockair[{ x+1, y }])
+					vx[{ x, y }] = 0;
+				if (bmap_blockair[{ x, y-1 }] || bmap_blockair[{ x, y }] || bmap_blockair[{ x, y+1 }])
+					vy[{ x, y }] = 0;
 			}
 		}
 
@@ -271,19 +271,19 @@ void Air::update_air(void)
 					{
 						if (y+j>0 && y+j<YCELLS-1 &&
 						        x+i>0 && x+i<XCELLS-1 &&
-						        !bmap_blockair[y+j][x+i])
+						        !bmap_blockair[{ x+i, y+j }])
 						{
 							auto f = kernel[i+1+(j+1)*3];
-							dx += vx[y+j][x+i]*f;
-							dy += vy[y+j][x+i]*f;
-							dp += pv[y+j][x+i]*f;
+							dx += vx[{ x+i, y+j }]*f;
+							dy += vy[{ x+i, y+j }]*f;
+							dp += pv[{ x+i, y+j }]*f;
 						}
 						else
 						{
 							auto f = kernel[i+1+(j+1)*3];
-							dx += vx[y][x]*f;
-							dy += vy[y][x]*f;
-							dp += pv[y][x]*f;
+							dx += vx[{ x, y }]*f;
+							dy += vy[{ x, y }]*f;
+							dp += pv[{ x, y }]*f;
 						}
 					}
 				}
@@ -315,7 +315,7 @@ void Air::update_air(void)
 					{
 						tx += stepX;
 						ty += stepY;
-						if (bmap_blockair[(int)(ty+0.5f)][(int)(tx+0.5f)])
+						if (bmap_blockair[{ (int)(tx+0.5f), (int)(ty+0.5f) }])
 						{
 							tx -= stepX;
 							ty -= stepY;
@@ -333,28 +333,28 @@ void Air::update_air(void)
 				auto j = (int)ty;
 				tx -= i;
 				ty -= j;
-				if (!bmap_blockair[y][x] && i>=2 && i<=XCELLS-3 && j>=2 && j<=YCELLS-3)
+				if (!bmap_blockair[{ x, y }] && i>=2 && i<=XCELLS-3 && j>=2 && j<=YCELLS-3)
 				{
 					dx *= 1.0f - AIR_VADV;
 					dy *= 1.0f - AIR_VADV;
 
-					dx += AIR_VADV*(1.0f-tx)*(1.0f-ty)*vx[j][i];
-					dy += AIR_VADV*(1.0f-tx)*(1.0f-ty)*vy[j][i];
+					dx += AIR_VADV*(1.0f-tx)*(1.0f-ty)*vx[{ i, j }];
+					dy += AIR_VADV*(1.0f-tx)*(1.0f-ty)*vy[{ i, j }];
 
-					dx += AIR_VADV*tx*(1.0f-ty)*vx[j][i+1];
-					dy += AIR_VADV*tx*(1.0f-ty)*vy[j][i+1];
+					dx += AIR_VADV*tx*(1.0f-ty)*vx[{ i+1, j }];
+					dy += AIR_VADV*tx*(1.0f-ty)*vy[{ i+1, j }];
 
-					dx += AIR_VADV*(1.0f-tx)*ty*vx[j+1][i];
-					dy += AIR_VADV*(1.0f-tx)*ty*vy[j+1][i];
+					dx += AIR_VADV*(1.0f-tx)*ty*vx[{ i, j+1 }];
+					dy += AIR_VADV*(1.0f-tx)*ty*vy[{ i, j+1 }];
 
-					dx += AIR_VADV*tx*ty*vx[j+1][i+1];
-					dy += AIR_VADV*tx*ty*vy[j+1][i+1];
+					dx += AIR_VADV*tx*ty*vx[{ i+1, j+1 }];
+					dy += AIR_VADV*tx*ty*vy[{ i+1, j+1 }];
 				}
 
-				if (bmap[y][x] == WL_FAN)
+				if (bmap[{ x, y }] == WL_FAN)
 				{
-					dx += fvx[y][x];
-					dy += fvy[y][x];
+					dx += fvx[{ x, y }];
+					dy += fvy[{ x, y }];
 				}
 				// pressure/velocity caps
 				if (dp > MAX_PRESSURE) dp = MAX_PRESSURE;
@@ -386,14 +386,14 @@ void Air::update_air(void)
 					break;
 				}
 
-				ovx[y][x] = dx;
-				ovy[y][x] = dy;
-				opv[y][x] = dp;
+				ovx[{ x, y }] = dx;
+				ovy[{ x, y }] = dy;
+				opv[{ x, y }] = dp;
 			}
 		}
-		memcpy(vx, ovx, sizeof(vx));
-		memcpy(vy, ovy, sizeof(vy));
-		memcpy(pv, opv, sizeof(pv));
+		vx = ovx;
+		vy = ovy;
+		pv = opv;
 	}
 }
 
@@ -406,9 +406,9 @@ void Air::Invert()
 	{
 		for (auto ny = 0; ny<YCELLS; ny++)
 		{
-			pv[ny][nx] = -pv[ny][nx];
-			vx[ny][nx] = -vx[ny][nx];
-			vy[ny][nx] = -vy[ny][nx];
+			pv[{ nx, ny }] = -pv[{ nx, ny }];
+			vx[{ nx, ny }] = -vx[{ nx, ny }];
+			vy[{ nx, ny }] = -vy[{ nx, ny }];
 		}
 	}
 }
@@ -431,16 +431,16 @@ void Air::ApproximateBlockAirMaps()
 			int x = ((int)(sim.parts[i].x+0.5f))/CELL, y = ((int)(sim.parts[i].y+0.5f))/CELL;
 			if (InBounds(x, y))
 			{
-				bmap_blockair[y][x] = 1;
-				bmap_blockairh[y][x] = 0x8;
+				bmap_blockair[{ x, y }] = 1;
+				bmap_blockairh[{ x, y }] = 0x8;
 			}
 		}
 		// mostly accurate insulator blocking, besides checking GEL
 		else if ((type == PT_HSWC && sim.parts[i].life != 10) || elements[type].HeatConduct <= (sim.rng()%250))
 		{
 			int x = ((int)(sim.parts[i].x+0.5f))/CELL, y = ((int)(sim.parts[i].y+0.5f))/CELL;
-			if (InBounds(x, y) && !(bmap_blockairh[y][x]&0x8))
-				bmap_blockairh[y][x]++;
+			if (InBounds(x, y) && !(bmap_blockairh[{ x, y }]&0x8))
+				bmap_blockairh[{ x, y }]++;
 		}
 	}
 }
@@ -450,16 +450,19 @@ Air::Air(Simulation & simulation):
 	airMode(AIR_ON),
 	ambientAirTemp(R_TEMP + 273.15f)
 {
+	ovx = PlaneAdapter<std::vector<float>>(CELLS);
+	ovy = PlaneAdapter<std::vector<float>>(CELLS);
+	opv = PlaneAdapter<std::vector<float>>(CELLS);
+	ohv = PlaneAdapter<std::vector<float>>(CELLS);
+	bmap_blockair = PlaneAdapter<std::vector<unsigned char>>(CELLS);
+	bmap_blockairh = PlaneAdapter<std::vector<unsigned char>>(CELLS);
+
 	//Simulation should do this.
 	make_kernel();
-	std::fill(&bmap_blockair [0][0], &bmap_blockair [0][0] + NCELL, 0);
-	std::fill(&bmap_blockairh[0][0], &bmap_blockairh[0][0] + NCELL, 0);
-	std::fill(&sim.vx[0][0], &sim.vx[0][0] + NCELL, 0.0f);
-	std::fill(&ovx   [0][0], &ovx   [0][0] + NCELL, 0.0f);
-	std::fill(&sim.vy[0][0], &sim.vy[0][0] + NCELL, 0.0f);
-	std::fill(&ovy   [0][0], &ovy   [0][0] + NCELL, 0.0f);
-	std::fill(&sim.hv[0][0], &sim.hv[0][0] + NCELL, 0.0f);
-	std::fill(&ohv   [0][0], &ohv   [0][0] + NCELL, 0.0f);
-	std::fill(&sim.pv[0][0], &sim.pv[0][0] + NCELL, 0.0f);
-	std::fill(&opv   [0][0], &opv   [0][0] + NCELL, 0.0f);
+	std::fill(bmap_blockair.begin() , bmap_blockair.end() , 0);
+	std::fill(bmap_blockairh.begin(), bmap_blockairh.end(), 0);
+	std::fill(ovx.begin()           , ovx.end()           , 0.0f);
+	std::fill(ovy.begin()           , ovy.end()           , 0.0f);
+	std::fill(ohv.begin()           , ohv.end()           , 0.0f);
+	std::fill(opv.begin()           , opv.end()           , 0.0f);
 }
