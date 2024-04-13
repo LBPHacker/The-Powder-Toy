@@ -2,6 +2,7 @@
 #include "common/String.h"
 #include "gui/interface/Window.h"
 #include "gui/interface/ScrollPanel.h"
+#include "InitSimulationConfig.h"
 #include <optional>
 
 namespace ui
@@ -9,6 +10,7 @@ namespace ui
 	class Checkbox;
 	class DropDown;
 	class Textbox;
+	class Label;
 	class Button;
 	class Label;
 }
@@ -23,6 +25,14 @@ class OptionsView: public ui::Window
 	ui::Checkbox *newtonianGravity{};
 	ui::Checkbox *waterEqualisation{};
 	ui::DropDown *airMode{};
+	ui::Textbox *horizontalCellCount{};
+	ui::Textbox *verticalCellCount{};
+	ui::Textbox *cellSize{};
+	ui::Textbox *partCount{};
+	ui::Textbox *maxTemp{};
+	ui::Textbox *minTemp{};
+	ui::Textbox *maxPressure{};
+	ui::Textbox *minPressure{};
 	ui::Textbox *ambientAirTemp{};
 	ui::Button *ambientAirTempPreview{};
 	ui::Textbox *edgePressure{};
@@ -58,6 +68,8 @@ class OptionsView: public ui::Window
 	ui::Checkbox *autoStartupRequest{};
 	ui::Label *startupRequestStatus{};
 	ui::ScrollPanel *scrollPanel{};
+	ui::Label *simConfigStatus{};
+	std::optional<SimulationConfig> newConfig;
 	float customGravityX, customGravityY;
 	float edgeVelocityX, edgeVelocityY;
 	void UpdateAmbientAirTempPreview(float airTemp, bool isValid);
@@ -73,6 +85,9 @@ class OptionsView: public ui::Window
 	void FpsLimitToInterface(SimFpsLimit limit);
 	void UpdateDrawLimit(bool isDefocus);
 	void DrawLimitToInterface(DrawLimit limit);
+	void LoadSimConfig(SimulationConfig config);
+	void SaveSimConfig();
+	void UpdateSimConfig();
 public:
 	OptionsView();
 	void NotifySettingsChanged(OptionsModel * sender);
