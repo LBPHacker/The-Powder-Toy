@@ -60,7 +60,7 @@ int Element_COAL_update(UPDATE_FUNC_ARGS)
 	}
 	if (parts[i].type == PT_COAL)
 	{
-		if ((sim->pv[y/CELL][x/CELL] > 4.3f)&&parts[i].tmp>40)
+		if ((sim->pv[{ x/CELL, y/CELL }] > 4.3f)&&parts[i].tmp>40)
 			parts[i].tmp=39;
 		else if (parts[i].tmp<40&&parts[i].tmp>0)
 			parts[i].tmp--;

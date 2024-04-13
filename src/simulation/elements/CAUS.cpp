@@ -58,12 +58,12 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				int r = pmap[y+ry][x+rx];
+				int r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				if (TYP(r) == PT_GAS)
 				{
-					if (sim->pv[(y+ry)/CELL][(x+rx)/CELL] > 3)
+					if (sim->pv[{ (x+rx)/CELL, (y+ry)/CELL }] > 3)
 					{
 						sim->part_change_type(ID(r), x+rx, y+ry, PT_RFRG);
 						sim->part_change_type(i, x, y, PT_RFRG);

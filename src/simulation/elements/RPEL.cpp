@@ -58,9 +58,9 @@ static int update(UPDATE_FUNC_ARGS)
 		ry = sim->rng.between(-10, 10);
 		if (x+rx >= 0 && x+rx < XRES && y+ry >= 0 && y+ry < YRES && (rx || ry))
 		{
-			r = pmap[y+ry][x+rx];
+			r = pmap[{ x+rx, y+ry }];
 			if (!r)
-				r = sim->photons[y+ry][x+rx];
+				r = sim->photons[{ x+rx, y+ry }];
 
 			if (r && !(elements[TYP(r)].Properties & TYPE_SOLID)) {
 				if (!parts[i].ctype || parts[i].ctype == parts[ID(r)].type) {

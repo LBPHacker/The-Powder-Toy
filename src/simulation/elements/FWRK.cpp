@@ -106,7 +106,7 @@ static int update(UPDATE_FUNC_ARGS)
 				parts[np].dcolour = parts[i].dcolour;
 			}
 		}
-		sim->pv[y/CELL][x/CELL] += 8.0f;
+		sim->pv[{ x/CELL, y/CELL }] += 8.0f;
 		sim->kill_part(i);
 		return 1;
 	}

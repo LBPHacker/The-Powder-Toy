@@ -59,7 +59,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				auto rt = TYP(r);
@@ -72,7 +72,7 @@ static int update(UPDATE_FUNC_ARGS)
 				}
 				else if (rt!=PT_CLNE&&rt!=PT_THDR&&rt!=PT_SPRK&&rt!=PT_DMND&&rt!=PT_FIRE)
 				{
-					sim->pv[y/CELL][x/CELL] += 100.0f;
+					sim->pv[{ x/CELL, y/CELL }] += 100.0f;
 					if (sim->legacy_enable && sim->rng.chance(1, 200))
 					{
 						parts[i].life = sim->rng.between(120, 169);

@@ -10,16 +10,6 @@
 #include <mutex>
 #include <condition_variable>
 
-// DFT is cyclic in nature; gravity would wrap around sort of like in loop mode without the 2x here;
-// in fact it still does, it's just not as visible. the arrays are 2x as big along all dimensions as normal cell maps
-constexpr auto blocks = CELLS * 2;
-
-// https://www.fftw.org/fftw3_doc/Multi_002dDimensional-DFTs-of-Real-Data.html#Multi_002dDimensional-DFTs-of-Real-Data
-constexpr auto transSize = (blocks.X / 2 + 1) * blocks.Y;
-
-// NCELL * 4 is size of data array, scaling needed because FFTW calculates an unnormalized DFT
-constexpr auto scaleFactor = -float(M_GRAV) / (NCELL * 4);
-
 static_assert(sizeof(std::complex<float>) == sizeof(fftwf_complex));
 struct FftwArrayDeleter        { void operator ()(float               ptr[]) const { fftwf_free(ptr);         } };
 struct FftwComplexArrayDeleter { void operator ()(std::complex<float> ptr[]) const { fftwf_free(ptr);         } };
@@ -52,6 +42,20 @@ struct GravityImpl : public Gravity
 	GravityInput gravIn;
 	GravityOutput gravOut;
 	bool copyGravOut = false;
+
+	// DFT is cyclic in nature; gravity would wrap around sort of like in loop mode without the 2x here;
+	// in fact it still does, it's just not as visible. the arrays are 2x as big along all dimensions as normal cell maps
+	Vec2<int> blocks;
+	// https://www.fftw.org/fftw3_doc/Multi_002dDimensional-DFTs-of-Real-Data.html#Multi_002dDimensional-DFTs-of-Real-Data
+	int transSize;
+	// NCELL * 4 is size of data array, scaling needed because FFTW calculates an unnormalized DFT
+	float scaleFactor;
+
+	GravityImpl() : blocks(CELLS * 2)
+	{
+		transSize = (blocks.X / 2 + 1) * blocks.Y;
+		scaleFactor = -float(M_GRAV) / (NCELL * 4);
+	}
 
 	~GravityImpl();
 
@@ -101,7 +105,7 @@ void GravityImpl::Wait()
 void GravityImpl::Work()
 {
 	{
-		PlaneAdapter<PlaneBase<float>, blocks.X, blocks.Y> massBigP(blocks, std::in_place, massBig.get());
+		PlaneAdapter<PlaneBase<float>> massBigP(blocks, std::in_place, massBig.get());
 		for (auto p : CELLS.OriginRect())
 		{
 			// used to be a membwand but we'd need a new buffer for this,
@@ -121,8 +125,8 @@ void GravityImpl::Work()
 	fftwf_execute(forceXInverse.get());
 	fftwf_execute(forceYInverse.get());
 	{
-		PlaneAdapter<PlaneBase<float>, blocks.X, blocks.Y> forceXBigP(blocks, std::in_place, forceXBig.get());
-		PlaneAdapter<PlaneBase<float>, blocks.X, blocks.Y> forceYBigP(blocks, std::in_place, forceYBig.get());
+		PlaneAdapter<PlaneBase<float>> forceXBigP(blocks, std::in_place, forceXBig.get());
+		PlaneAdapter<PlaneBase<float>> forceYBigP(blocks, std::in_place, forceYBig.get());
 		for (auto p : CELLS.OriginRect())
 		{
 			// similarly
@@ -155,8 +159,8 @@ void GravityImpl::Init()
 	auto kernelYRaw = FftwArray(blocks.X * blocks.Y);
 	auto kernelXForward = FftwPlanPtr(fftwf_plan_dft_r2c_2d(blocks.Y, blocks.X, kernelXRaw.get(), reinterpret_cast<fftwf_complex *>(kernelXT.get()), fftwPlanFlags));
 	auto kernelYForward = FftwPlanPtr(fftwf_plan_dft_r2c_2d(blocks.Y, blocks.X, kernelYRaw.get(), reinterpret_cast<fftwf_complex *>(kernelYT.get()), fftwPlanFlags));
-	PlaneAdapter<PlaneBase<float>, blocks.X, blocks.Y> kernelX(blocks, std::in_place, kernelXRaw.get());
-	PlaneAdapter<PlaneBase<float>, blocks.X, blocks.Y> kernelY(blocks, std::in_place, kernelYRaw.get());
+	PlaneAdapter<PlaneBase<float>> kernelX(blocks, std::in_place, kernelXRaw.get());
+	PlaneAdapter<PlaneBase<float>> kernelY(blocks, std::in_place, kernelYRaw.get());
 	//calculate velocity map caused by a point mass
 	for (auto p : blocks.OriginRect())
 	{
