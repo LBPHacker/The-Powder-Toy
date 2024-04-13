@@ -6,9 +6,6 @@
 #include "simulation/ElementGraphics.h"
 #include "simulation/Simulation.h"
 
-constexpr auto VIDXRES = WINDOWW;
-constexpr auto VIDYRES = WINDOWH;
-
 void Renderer::RenderBegin()
 {
 	draw_grav();
@@ -43,11 +40,11 @@ void Renderer::SetSample(Vec2<int> pos)
 void Renderer::clearScreen() {
 	if(display_mode & DISPLAY_PERS)
 	{
-		std::copy(persistentVideo.begin(), persistentVideo.end(), video.RowIterator({ 0, 0 }));
+		std::copy(persistentVideo.RowIterator({ 0, 0 }), persistentVideo.RowIterator({ 0, YRES }), video.RowIterator({ 0, 0 }));
 	}
 	else
 	{
-		std::fill_n(video.data(), VIDXRES * YRES, 0);
+		std::fill_n(video.data(), WINDOWW * YRES, 0);
 	}
 }
 
@@ -56,7 +53,7 @@ void Renderer::FinaliseParts()
 	if(display_mode & DISPLAY_WARP)
 	{
 		warpVideo = video;
-		std::fill_n(video.data(), VIDXRES * YRES, 0);
+		std::fill_n(video.data(), WINDOWW * YRES, 0);
 		render_gravlensing(warpVideo);
 	}
 }
@@ -111,12 +108,12 @@ void Renderer::DrawBlob(Vec2<int> pos, RGB<uint8_t> colour)
 
 void Renderer::render_gravlensing(const Video &source)
 {
-	int nx, ny, rx, ry, gx, gy, bx, by, co;
+	int nx, ny, rx, ry, gx, gy, bx, by;
 	for(nx = 0; nx < XRES; nx++)
 	{
 		for(ny = 0; ny < YRES; ny++)
 		{
-			co = (ny/CELL)*XCELLS+(nx/CELL);
+			auto co = Vec2<int>{ nx/CELL, ny/CELL };
 			rx = (int)(nx-sim->gravx[co]*0.75f+0.5f);
 			ry = (int)(ny-sim->gravy[co]*0.75f+0.5f);
 			gx = (int)(nx-sim->gravx[co]*0.875f+0.5f);
@@ -135,10 +132,6 @@ void Renderer::render_gravlensing(const Video &source)
 	}
 }
 
-float temp[CELL*3][CELL*3];
-float fire_alphaf[CELL*3][CELL*3];
-float glow_alphaf[11][11];
-float blur_alphaf[7][7];
 void Renderer::prepare_alpha(int size, float intensity)
 {
 	fireIntensity = intensity;
@@ -146,21 +139,21 @@ void Renderer::prepare_alpha(int size, float intensity)
 	int x,y,i,j;
 	float multiplier = 255.0f*fireIntensity;
 
-	memset(temp, 0, sizeof(temp));
+	PlaneAdapter<std::vector<float>> temp({ CELL * 3, CELL * 3 }, 0.f);
 	for (x=0; x<CELL; x++)
 		for (y=0; y<CELL; y++)
 			for (i=-CELL; i<CELL; i++)
 				for (j=-CELL; j<CELL; j++)
-					temp[y+CELL+j][x+CELL+i] += expf(-0.1f*(i*i+j*j));
+					temp[{ x+CELL+i, y+CELL+j }] += expf(-0.1f*(i*i+j*j));
 	for (x=0; x<CELL*3; x++)
 		for (y=0; y<CELL*3; y++)
-			fire_alpha[y][x] = (int)(multiplier*temp[y][x]/(CELL*CELL));
+			fire_alpha[{ x, y }] = (int)(multiplier*temp[{ x, y }]/(CELL*CELL));
 
 }
 
 pixel Renderer::GetPixel(Vec2<int> pos) const
 {
-	if (pos.X<0 || pos.Y<0 || pos.X>=VIDXRES || pos.Y>=VIDYRES)
+	if (pos.X<0 || pos.Y<0 || pos.X>=WINDOWW || pos.Y>=WINDOWH)
 		return 0;
 	return video[pos];
 }
@@ -246,9 +239,16 @@ Renderer::Renderer(Simulation *newSim):
 {
 	PopulateTables();
 
-	memset(fire_r, 0, sizeof(fire_r));
-	memset(fire_g, 0, sizeof(fire_g));
-	memset(fire_b, 0, sizeof(fire_b));
+	video = PlaneAdapter<std::vector<pixel>>(WINDOW, 0);
+	persistentVideo = PlaneAdapter<std::vector<pixel>>(WINDOW, 0);
+	warpVideo = PlaneAdapter<std::vector<pixel>>(WINDOW, 0);
+
+	fire_alpha = PlaneAdapter<std::vector<pixel>>({ CELL * 3, CELL * 3 }, 0);
+	fire_alphaf = PlaneAdapter<std::vector<float>>({ CELL * 3, CELL * 3 }, 0.f);
+
+	fire_r = PlaneAdapter<std::vector<unsigned char>>(CELLS, 0);
+	fire_g = PlaneAdapter<std::vector<unsigned char>>(CELLS, 0);
+	fire_b = PlaneAdapter<std::vector<unsigned char>>(CELLS, 0);
 
 	//Set defauly display modes
 	ResetModes();
@@ -340,9 +340,9 @@ void Renderer::CompileRenderMode()
 
 void Renderer::ClearAccumulation()
 {
-	std::fill(&fire_r[0][0], &fire_r[0][0] + NCELL, 0);
-	std::fill(&fire_g[0][0], &fire_g[0][0] + NCELL, 0);
-	std::fill(&fire_b[0][0], &fire_b[0][0] + NCELL, 0);
+	std::fill(fire_r.begin(), fire_r.end(), 0);
+	std::fill(fire_g.begin(), fire_g.end(), 0);
+	std::fill(fire_b.begin(), fire_b.end(), 0);
 	std::fill(persistentVideo.begin(), persistentVideo.end(), 0);
 }
 

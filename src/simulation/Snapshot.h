@@ -3,6 +3,7 @@
 #include "Sign.h"
 #include "Stickman.h"
 #include "common/tpt-rand.h"
+#include "common/Plane.h"
 #include <vector>
 #include <array>
 #include <json/json.h>
@@ -10,25 +11,25 @@
 class Snapshot
 {
 public:
-	std::vector<float> AirPressure;
-	std::vector<float> AirVelocityX;
-	std::vector<float> AirVelocityY;
-	std::vector<float> AmbientHeat;
+	PlaneAdapter<std::vector<float>> AirPressure;
+	PlaneAdapter<std::vector<float>> AirVelocityX;
+	PlaneAdapter<std::vector<float>> AirVelocityY;
+	PlaneAdapter<std::vector<float>> AmbientHeat;
 
 	std::vector<Particle> Particles;
 
-	std::vector<float> GravVelocityX;
-	std::vector<float> GravVelocityY;
-	std::vector<float> GravValue;
-	std::vector<float> GravMap;
+	PlaneAdapter<std::vector<float>> GravVelocityX;
+	PlaneAdapter<std::vector<float>> GravVelocityY;
+	PlaneAdapter<std::vector<float>> GravValue;
+	PlaneAdapter<std::vector<float>> GravMap;
 
-	std::vector<unsigned char> BlockMap;
-	std::vector<unsigned char> ElecMap;
-	std::vector<unsigned char> BlockAir;
-	std::vector<unsigned char> BlockAirH;
+	PlaneAdapter<std::vector<unsigned char>> BlockMap;
+	PlaneAdapter<std::vector<unsigned char>> ElecMap;
+	PlaneAdapter<std::vector<unsigned char>> BlockAir;
+	PlaneAdapter<std::vector<unsigned char>> BlockAirH;
 
-	std::vector<float> FanVelocityX;
-	std::vector<float> FanVelocityY;
+	PlaneAdapter<std::vector<float>> FanVelocityX;
+	PlaneAdapter<std::vector<float>> FanVelocityY;
 
 
 	std::vector<Particle> PortalParticles;

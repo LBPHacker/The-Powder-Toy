@@ -30,13 +30,13 @@ void SampleTool::Draw(Simulation * sim, Brush const &brush, ui::Point position)
 	else
 	{
 		Particle *part = nullptr;
-		if (sim->photons[position.Y][position.X])
+		if (sim->photons[position])
 		{
-			part = &sim->parts[ID(sim->photons[position.Y][position.X])];
+			part = &sim->parts[ID(sim->photons[position])];
 		}
-		else if (sim->pmap[position.Y][position.X])
+		else if (sim->pmap[position])
 		{
-			part = &sim->parts[ID(sim->pmap[position.Y][position.X])];
+			part = &sim->parts[ID(sim->pmap[position])];
 		}
 		if (part)
 		{

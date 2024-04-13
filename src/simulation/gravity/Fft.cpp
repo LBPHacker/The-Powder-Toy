@@ -5,11 +5,6 @@
 #include <complex>
 #include <fftw3.h>
 
-constexpr auto xblock2     = XCELLS * 2;
-constexpr auto yblock2     = YCELLS * 2;
-constexpr auto fft_tsize   = (xblock2 / 2 + 1) * yblock2;
-//NCELL*4 is size of data array, scaling needed because FFTW calculates an unnormalized DFT
-constexpr auto scaleFactor = -float(M_GRAV) / (NCELL * 4);
 
 static_assert(sizeof(std::complex<float>) == sizeof(fftwf_complex));
 struct FftwArrayDeleter        { void operator ()(float               ptr[]) const { fftwf_free(ptr);         } };
@@ -37,8 +32,18 @@ struct GravityImpl : public Gravity
 	void grav_fft_init();
 	void grav_fft_cleanup();
 
+	int xblock2;
+	int yblock2;
+	int fft_tsize;
+	//NCELL*4 is size of data array, scaling needed because FFTW calculates an unnormalized DFT
+	int scaleFactor;
+
 	GravityImpl() : Gravity(CtorTag{})
 	{
+		xblock2     = XCELLS * 2;
+		yblock2     = YCELLS * 2;
+		fft_tsize   = (xblock2 / 2 + 1) * yblock2;
+		scaleFactor = int(-float(M_GRAV) / (NCELL * 4));
 	}
 
 	~GravityImpl();
@@ -108,9 +113,9 @@ void GravityImpl::grav_fft_cleanup()
 
 void Gravity::get_result()
 {
-	std::swap(gravy, th_gravy);
-	std::swap(gravx, th_gravx);
-	std::swap(gravp, th_gravp);
+	std::swap(*gravy, th_gravy);
+	std::swap(*gravx, th_gravx);
+	std::swap(*gravp, th_gravp);
 }
 
 void Gravity::update_grav()
@@ -131,23 +136,23 @@ void Gravity::update_grav()
 	auto &plan_gravx_inverse = fftGravity->plan_gravx_inverse;
 	auto &plan_gravy_inverse = fftGravity->plan_gravy_inverse;
 
-	if (memcmp(&th_ogravmap[0], &th_gravmap[0], sizeof(float) * NCELL) != 0)
+	if (memcmp(th_ogravmap.data(), th_gravmap.data(), sizeof(float) * NCELL) != 0)
 	{
 		th_gravchanged = 1;
 
-		membwand(&th_gravmap[0], &gravmask[0], NCELL * sizeof(float), NCELL * sizeof(uint32_t));
+		membwand(th_gravmap.data(), gravmask.data(), NCELL * sizeof(float), NCELL * sizeof(uint32_t));
 		//copy gravmap into padded gravmap array
 		for (int y = 0; y < YCELLS; y++)
 		{
 			for (int x = 0; x < XCELLS; x++)
 			{
-				th_gravmapbig[(y+YCELLS)*xblock2+XCELLS+x] = th_gravmap[y*XCELLS+x];
+				th_gravmapbig[(y+YCELLS)*fftGravity->xblock2+XCELLS+x] = th_gravmap[{ x, y }];
 			}
 		}
 		//transform gravmap
 		fftwf_execute(plan_gravmap.get());
 		//do convolution (multiply the complex numbers)
-		for (int i = 0; i < fft_tsize; i++)
+		for (int i = 0; i < fftGravity->fft_tsize; i++)
 		{
 			th_gravxbigt[i] = th_gravmapbigt[i] * th_ptgravxt[i];
 			th_gravybigt[i] = th_gravmapbigt[i] * th_ptgravyt[i];
@@ -159,9 +164,9 @@ void Gravity::update_grav()
 		{
 			for (int x = 0; x < XCELLS; x++)
 			{
-				th_gravx[y*XCELLS+x] = th_gravxbig[y*xblock2+x];
-				th_gravy[y*XCELLS+x] = th_gravybig[y*xblock2+x];
-				th_gravp[y*XCELLS+x] = hypotf(th_gravxbig[y*xblock2+x], th_gravybig[y*xblock2+x]);
+				th_gravx[{ x, y }] = th_gravxbig[y*fftGravity->xblock2+x];
+				th_gravy[{ x, y }] = th_gravybig[y*fftGravity->xblock2+x];
+				th_gravp[{ x, y }] = hypotf(th_gravxbig[y*fftGravity->xblock2+x], th_gravybig[y*fftGravity->xblock2+x]);
 			}
 		}
 	}

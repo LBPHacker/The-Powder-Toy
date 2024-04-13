@@ -15,10 +15,10 @@ void SurfaceNormals::Draw()
 {
 	auto *g = ui::Engine::Ref().g;
 	ui::Point pos = controller->PointTranslate(view->GetCurrentMouse());
-	auto p = sim->photons[pos.Y][pos.X];
+	auto p = sim->photons[pos];
 	if (!p)
 	{
-		p = sim->pmap[pos.Y][pos.X];
+		p = sim->pmap[pos];
 	}
 	if (!p)
 	{
@@ -38,8 +38,8 @@ void SurfaceNormals::Draw()
 		}
 		if (sim->eval_move(PT_PHOT, mr.fin_x, mr.fin_y, NULL))
 		{
-			int rt = TYP(sim->pmap[mr.fin_y][mr.fin_x]);
-			int lt = TYP(sim->pmap[y][x]);
+			int rt = TYP(sim->pmap[{ mr.fin_x, mr.fin_y }]);
+			int lt = TYP(sim->pmap[{ x, y }]);
 			int rt_glas = (rt == PT_GLAS) || (rt == PT_BGLA);
 			int lt_glas = (lt == PT_GLAS) || (lt == PT_BGLA);
 			if ((rt_glas && !lt_glas) || (lt_glas && !rt_glas))

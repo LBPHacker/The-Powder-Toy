@@ -54,7 +54,7 @@ public:
 
 class Graphics: public RasterDrawMethods<Graphics>
 {
-	PlaneAdapter<std::array<pixel, WINDOW.X * WINDOW.Y>, WINDOW.X, WINDOW.Y> video;
+	PlaneAdapter<std::vector<pixel>> video;
 	Rect<int> clipRect = video.Size().OriginRect();
 
 	friend struct RasterDrawMethods<Graphics>;

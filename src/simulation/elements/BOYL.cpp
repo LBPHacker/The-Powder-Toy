@@ -49,17 +49,17 @@ void Element::Element_BOYL()
 static int update(UPDATE_FUNC_ARGS)
 {
 	float limit = parts[i].temp / 100;
-	if (sim->pv[y / CELL][x / CELL] < limit)
-		sim->pv[y / CELL][x / CELL] += 0.001f*(limit - sim->pv[y / CELL][x / CELL]);
-	if (sim->pv[y / CELL + 1][x / CELL] < limit)
-		sim->pv[y / CELL + 1][x / CELL] += 0.001f*(limit - sim->pv[y / CELL + 1][x / CELL]);
-	if (sim->pv[y / CELL - 1][x / CELL] < limit)
-		sim->pv[y / CELL - 1][x / CELL] += 0.001f*(limit - sim->pv[y / CELL - 1][x / CELL]);
+	if (sim->pv[{ x / CELL, y / CELL }] < limit)
+		sim->pv[{ x / CELL, y / CELL }] += 0.001f*(limit - sim->pv[{ x / CELL, y / CELL }]);
+	if (sim->pv[{ x / CELL, y / CELL + 1 }] < limit)
+		sim->pv[{ x / CELL, y / CELL + 1 }] += 0.001f*(limit - sim->pv[{ x / CELL, y / CELL + 1 }]);
+	if (sim->pv[{ x / CELL, y / CELL - 1 }] < limit)
+		sim->pv[{ x / CELL, y / CELL - 1 }] += 0.001f*(limit - sim->pv[{ x / CELL, y / CELL - 1 }]);
 
-	sim->pv[y / CELL][x / CELL + 1]	+= 0.001f*(limit - sim->pv[y / CELL][x / CELL + 1]);
-	sim->pv[y / CELL + 1][x / CELL + 1] += 0.001f*(limit - sim->pv[y / CELL + 1][x / CELL + 1]);
-	sim->pv[y / CELL][x / CELL - 1]	+= 0.001f*(limit - sim->pv[y / CELL][x / CELL - 1]);
-	sim->pv[y / CELL - 1][x / CELL - 1] += 0.001f*(limit - sim->pv[y / CELL - 1][x / CELL - 1]);
+	sim->pv[{ x / CELL + 1, y / CELL }]	+= 0.001f*(limit - sim->pv[{ x / CELL + 1, y / CELL }]);
+	sim->pv[{ x / CELL + 1, y / CELL + 1 }] += 0.001f*(limit - sim->pv[{ x / CELL + 1, y / CELL + 1 }]);
+	sim->pv[{ x / CELL - 1, y / CELL }]	+= 0.001f*(limit - sim->pv[{ x / CELL - 1, y / CELL }]);
+	sim->pv[{ x / CELL - 1, y / CELL - 1 }] += 0.001f*(limit - sim->pv[{ x / CELL - 1, y / CELL - 1 }]);
 
 	for (auto rx = -1; rx <= 1; rx++)
 	{
@@ -67,7 +67,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				if (TYP(r)==PT_WATR)
@@ -81,7 +81,7 @@ static int update(UPDATE_FUNC_ARGS)
 					{
 						sim->kill_part(ID(r));
 						sim->part_change_type(i,x,y,PT_WATR);
-						sim->pv[y/CELL][x/CELL] += 4.0;
+						sim->pv[{ x/CELL, y/CELL }] += 4.0;
 					}
 				}
 			}
