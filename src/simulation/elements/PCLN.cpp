@@ -62,7 +62,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				if (TYP(r)==PT_SPRK)
@@ -91,9 +91,9 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			for (auto ry = -1; ry <= 1; ry++)
 			{
-				auto r = sim->photons[y+ry][x+rx];
+				auto r = sim->photons[{ x+rx, y+ry }];
 				if (!r)
-					r = pmap[y+ry][x+rx];
+					r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				auto rt = TYP(r);

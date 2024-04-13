@@ -9,6 +9,7 @@
 #include "CoordStack.h"
 #include "gravity/GravityPtr.h"
 #include "common/tpt-rand.h"
+#include "common/Plane.h"
 #include "Element.h"
 #include "SimulationConfig.h"
 #include <cstring>
@@ -35,8 +36,6 @@ class GameSave;
 class Simulation
 {
 public:
-	GravityPtr grav;
-	std::unique_ptr<Air> air;
 	RNG rng;
 
 	std::vector<sign> signs;
@@ -52,7 +51,7 @@ public:
 	int pfree;
 	int NUM_PARTS;
 	bool elementRecount;
-	int elementCount[PT_NUM];
+	std::array<int, PT_NUM> elementCount;
 	int ISWIRE;
 	bool force_stacking_check;
 	int emp_decor;
@@ -63,38 +62,43 @@ public:
 	//Stickman
 	playerst player;
 	playerst player2;
-	playerst fighters[MAX_FIGHTERS]; //Defined in Stickman.h
+	std::array<playerst, MAX_FIGHTERS> fighters; //Defined in Stickman.h
 	unsigned char fighcount; //Contains the number of fighters
 	bool gravWallChanged;
 	//Portals and Wifi
-	Particle portalp[CHANNELS][8][80];
-	int portal_rx[8];
-	int portal_ry[8];
-	int wireless[CHANNELS][2];
+	std::array<std::array<std::array<Particle, 80>, 8>, CHANNELS> portalp;
+	std::array<int, 8> portal_rx;
+	std::array<int, 8> portal_ry;
+	std::array<std::array<int, 2>, CHANNELS> wireless;
 	//Gol sim
 	int CGOL;
 	int GSPEED;
-	unsigned int gol[YRES][XRES][5];
+	PlaneAdapter<std::vector<std::array<unsigned int, 5>>> gol;
 	//Air sim
-	float (*vx)[XCELLS];
-	float (*vy)[XCELLS];
-	float (*pv)[XCELLS];
-	float (*hv)[XCELLS];
+	PlaneAdapter<std::vector<float>> vx;
+	PlaneAdapter<std::vector<float>> vy;
+	PlaneAdapter<std::vector<float>> pv;
+	PlaneAdapter<std::vector<float>> hv;
 	//Gravity sim
-	float *gravx;//gravx[YCELLS * XCELLS];
-	float *gravy;//gravy[YCELLS * XCELLS];
-	float *gravp;//gravp[YCELLS * XCELLS];
-	float *gravmap;//gravmap[YCELLS * XCELLS];
+	PlaneAdapter<std::vector<float>> gravx;
+	PlaneAdapter<std::vector<float>> gravy;
+	PlaneAdapter<std::vector<float>> gravp;
+	PlaneAdapter<std::vector<float>> gravmap;
 	//Walls
-	unsigned char bmap[YCELLS][XCELLS];
-	unsigned char emap[YCELLS][XCELLS];
-	float fvx[YCELLS][XCELLS];
-	float fvy[YCELLS][XCELLS];
+	PlaneAdapter<std::vector<unsigned char>> bmap;
+	PlaneAdapter<std::vector<unsigned char>> emap;
+	PlaneAdapter<std::vector<float>> fvx;
+	PlaneAdapter<std::vector<float>> fvy;
 	//Particles
-	Particle parts[NPART];
-	int pmap[YRES][XRES];
-	int photons[YRES][XRES];
-	unsigned int pmap_count[YRES][XRES];
+	std::vector<Particle> parts;
+	PlaneAdapter<std::vector<int>> pmap;
+	PlaneAdapter<std::vector<int>> photons;
+	PlaneAdapter<std::vector<unsigned int>> pmap_count;
+	//Lolz
+	PlaneAdapter<std::vector<int>> Element_LOLZ_lolz;
+	PlaneAdapter<std::vector<int>> Element_LOVE_love;
+	//PSTN
+	std::vector<int> pstnTempParts;
 	//Simulation Settings
 	int edgeMode;
 	int gravityMode;
@@ -215,6 +219,9 @@ public:
 	~Simulation();
 
 	bool useLuaCallbacks = false;
+
+	GravityPtr grav;
+	std::unique_ptr<Air> air;
 
 private:
 	CoordStack& getCoordStackSingleton();

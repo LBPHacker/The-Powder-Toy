@@ -55,7 +55,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 
@@ -79,9 +79,9 @@ static int update(UPDATE_FUNC_ARGS)
 			}
 		}
 	}
-	if (parts[i].temp > 9973.15 && sim->pv[y/CELL][x/CELL] > 250.0f)
+	if (parts[i].temp > 9973.15 && sim->pv[{ x/CELL, y/CELL }] > 250.0f)
 	{
-		int gravPos = ((y/CELL)*XCELLS)+(x/CELL);
+		auto gravPos = Vec2<int>{ x / CELL, y / CELL };
 		float gravx = sim->gravx[gravPos];
 		float gravy = sim->gravy[gravPos];
 		if (gravx*gravx + gravy*gravy > 400)
@@ -100,7 +100,7 @@ static int update(UPDATE_FUNC_ARGS)
 					parts[j].temp = MAX_TEMP;
 					parts[j].tmp = 0x1;
 				}
-				auto rx = x + sim->rng.between(-1, 1), ry = y + sim->rng.between(-1, 1), r = TYP(pmap[ry][rx]);
+				auto rx = x + sim->rng.between(-1, 1), ry = y + sim->rng.between(-1, 1), r = TYP(pmap[{ rx, ry }]);
 				if (can_move[PT_PLSM][r] || r == PT_O2)
 				{
 					j = sim->create_part(-3,rx,ry,PT_PLSM);
@@ -114,7 +114,7 @@ static int update(UPDATE_FUNC_ARGS)
 				if (j != -1)
 					parts[j].temp = MAX_TEMP;
 				parts[i].temp = MAX_TEMP;
-				sim->pv[y/CELL][x/CELL] = MAX_PRESSURE;
+				sim->pv[{ x/CELL, y/CELL }] = MAX_PRESSURE;
 			}
 		}
 	}

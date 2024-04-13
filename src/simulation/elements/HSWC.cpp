@@ -63,9 +63,9 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if (!r)
-						r = sim->photons[y+ry][x+rx];
+						r = sim->photons[{ x+rx, y+ry }];
 					if (!r)
 						continue;
 					if (TYP(r) == PT_HSWC)

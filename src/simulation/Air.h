@@ -1,5 +1,7 @@
 #pragma once
 #include "SimulationConfig.h"
+#include "common/Plane.h"
+#include <vector>
 
 class Simulation;
 
@@ -10,21 +12,21 @@ public:
 	int airMode;
 	float ambientAirTemp;
 	//Arrays from the simulation
-	unsigned char (*bmap)[XCELLS];
-	unsigned char (*emap)[XCELLS];
-	float (*fvx)[XCELLS];
-	float (*fvy)[XCELLS];
+	PlaneAdapter<std::vector<unsigned char>> *bmap;
+	PlaneAdapter<std::vector<unsigned char>> *emap;
+	PlaneAdapter<std::vector<float>> *fvx;
+	PlaneAdapter<std::vector<float>> *fvy;
 	//
-	float vx[YCELLS][XCELLS];
-	float ovx[YCELLS][XCELLS];
-	float vy[YCELLS][XCELLS];
-	float ovy[YCELLS][XCELLS];
-	float pv[YCELLS][XCELLS];
-	float opv[YCELLS][XCELLS];
-	float hv[YCELLS][XCELLS];
-	float ohv[YCELLS][XCELLS]; // Ambient Heat
-	unsigned char bmap_blockair[YCELLS][XCELLS];
-	unsigned char bmap_blockairh[YCELLS][XCELLS];
+	PlaneAdapter<std::vector<float>> *vx{};
+	PlaneAdapter<std::vector<float>> ovx;
+	PlaneAdapter<std::vector<float>> *vy{};
+	PlaneAdapter<std::vector<float>> ovy;
+	PlaneAdapter<std::vector<float>> *pv{};
+	PlaneAdapter<std::vector<float>> opv;
+	PlaneAdapter<std::vector<float>> *hv{};
+	PlaneAdapter<std::vector<float>> ohv; // Ambient Heat
+	PlaneAdapter<std::vector<unsigned char>> bmap_blockair;
+	PlaneAdapter<std::vector<unsigned char>> bmap_blockairh;
 	float kernel[9];
 	void make_kernel(void);
 	void update_airh(void);

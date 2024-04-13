@@ -82,7 +82,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				int neighborData = pmap[y + ry][x + rx];
+				int neighborData = pmap[{ x + rx, y + ry }];
 				if (!neighborData)
 				{
 					if (burnTimer > 1012 && sim->rng.chance(1, 10))
@@ -177,7 +177,7 @@ static int update(UPDATE_FUNC_ARGS)
 					{
 						sim->part_change_type(i, x, y, PT_PLSM);
 						sim->part_change_type(ID(neighborData), x + rx, y + ry, PT_PLSM);
-						sim->pv[y / CELL][x / CELL] += 4.0;
+						sim->pv[{ x / CELL, y / CELL }] += 4.0;
 						return 0;
 					}						
 					break;
@@ -202,7 +202,7 @@ static int update(UPDATE_FUNC_ARGS)
 		int ry = sim->rng.between(-3, 3);
 		if (rx || ry)
 		{
-			int neighborData = pmap[y + ry][x + rx];
+			int neighborData = pmap[{ x + rx, y + ry }];
 			if (TYP(neighborData) != PT_LITH)
 			{
 				continue;

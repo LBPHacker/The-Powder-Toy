@@ -53,13 +53,13 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	if (sim->pv[y/CELL][x/CELL]<=3)
+	if (sim->pv[{ x/CELL, y/CELL }]<=3)
 	{
-		if (sim->pv[y/CELL][x/CELL] <= -0.5 || sim->rng.chance(1, 4000))
+		if (sim->pv[{ x/CELL, y/CELL }] <= -0.5 || sim->rng.chance(1, 4000))
 		{
 			sim->part_change_type(i,x,y,PT_CO2);
 			parts[i].ctype = 5;
-			sim->pv[y/CELL][x/CELL] += 0.5f;
+			sim->pv[{ x/CELL, y/CELL }] += 0.5f;
 		}
 	}
 	if (parts[i].tmp2!=20) {
@@ -77,7 +77,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			sim->part_change_type(i,x,y,PT_CO2);
 			parts[i].ctype = 5;
-			sim->pv[y/CELL][x/CELL] += 0.2f;
+			sim->pv[{ x/CELL, y/CELL }] += 0.2f;
 		}
 		parts[i].tmp--;
 	}
@@ -87,7 +87,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				if ((elements[TYP(r)].Properties&TYPE_PART) && parts[i].tmp == 0 && sim->rng.chance(1, 83))
@@ -95,11 +95,11 @@ static int update(UPDATE_FUNC_ARGS)
 					//Start explode
 					parts[i].tmp = sim->rng.between(0, 24);
 				}
-				else if((elements[TYP(r)].Properties&TYPE_SOLID) && TYP(r)!=PT_DMND && TYP(r)!=PT_GLAS && parts[i].tmp == 0 && sim->rng.chance(int(2 - sim->pv[y/CELL][x/CELL]), 6667))
+				else if((elements[TYP(r)].Properties&TYPE_SOLID) && TYP(r)!=PT_DMND && TYP(r)!=PT_GLAS && parts[i].tmp == 0 && sim->rng.chance(int(2 - sim->pv[{ x/CELL, y/CELL }]), 6667))
 				{
 					sim->part_change_type(i,x,y,PT_CO2);
 					parts[i].ctype = 5;
-					sim->pv[y/CELL][x/CELL] += 0.2f;
+					sim->pv[{ x/CELL, y/CELL }] += 0.2f;
 				}
 				if (TYP(r)==PT_CBNW)
 				{

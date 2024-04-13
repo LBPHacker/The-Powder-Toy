@@ -16,6 +16,9 @@
 #pragma once
 #include <cstdlib>
 #include <exception>
+#include <vector>
+#include <array>
+#include "SimulationConfig.h"
 
 class CoordStackOverflowException: public std::exception
 {
@@ -31,23 +34,17 @@ public:
 class CoordStack
 {
 private:
-	unsigned short (*stack)[2];
+	std::vector<std::array<unsigned short, 2>> stack;
 	int stack_size;
-	const static int stack_limit = XRES*YRES;
 public:
 	CoordStack() :
-		stack(NULL),
+		stack(XRES*YRES),
 		stack_size(0)
 	{
-		stack = new unsigned short[stack_limit][2];
-	}
-	~CoordStack()
-	{
-		delete[] stack;
 	}
 	void push(int x, int y)
 	{
-		if (stack_size>=stack_limit)
+		if (stack_size>=XRES*YRES)
 			throw CoordStackOverflowException();
 		stack[stack_size][0] = x;
 		stack[stack_size][1] = y;

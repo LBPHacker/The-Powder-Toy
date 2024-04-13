@@ -157,14 +157,14 @@ static int luaGraphicsWrapper(GRAPHICS_FUNC_ARGS)
 	auto *sim = lsi->sim;
 	if (customElements[cpart->type].graphics)
 	{
-		auto *pipeSubcallWcpart = gfctx.pipeSubcallCpart ? sim->parts + (gfctx.pipeSubcallCpart - gfctx.sim->parts) : nullptr;
+		auto *pipeSubcallWcpart = gfctx.pipeSubcallCpart ? &sim->parts[0] + (gfctx.pipeSubcallCpart - &gfctx.sim->parts[0]) : nullptr;
 		if (pipeSubcallWcpart)
 		{
 			std::swap(*pipeSubcallWcpart, *gfctx.pipeSubcallTpart);
 			cpart = pipeSubcallWcpart;
 		}
 		int cache = 0, callret;
-		int i = cpart - gfctx.sim->parts; // pointer arithmetic be like
+		int i = cpart - &gfctx.sim->parts[0]; // pointer arithmetic be like
 		lua_rawgeti(lsi->L, LUA_REGISTRYINDEX, customElements[cpart->type].graphics);
 		lua_pushinteger(lsi->L, i);
 		lua_pushinteger(lsi->L, *colr);

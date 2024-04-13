@@ -56,13 +56,13 @@ static void wtrv_reactions(int wtrv1_id, UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				int r = pmap[y + ry][x + rx];
+				int r = pmap[{ x + rx, y + ry }];
 				if (!r || ID(r) == wtrv1_id)
 					continue;
 				int rt = TYP(r);
 
 				// WTRV + BCOL -> OIL
-				if (rt == PT_BCOL && parts[ID(r)].temp > 200.0f + 273.15f && parts[wtrv1_id].temp > 200.0f + 273.15f && sim->pv[(y + ry) / CELL][(x + rx) / CELL] > 7.f)
+				if (rt == PT_BCOL && parts[ID(r)].temp > 200.0f + 273.15f && parts[wtrv1_id].temp > 200.0f + 273.15f && sim->pv[{ (x + rx) / CELL, (y + ry) / CELL }] > 7.f)
 				{
 					sim->part_change_type(ID(r), x + rx, y + ry, PT_OIL);
 					sim->kill_part(wtrv1_id);
@@ -81,7 +81,7 @@ static void hygn_reactions(int hygn1_id, UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				int r = pmap[y + ry][x + rx];
+				int r = pmap[{ x + rx, y + ry }];
 				if (!r || ID(r) == hygn1_id)
 					continue;
 				int rt = TYP(r);
@@ -116,7 +116,7 @@ static void hygn_reactions(int hygn1_id, UPDATE_FUNC_ARGS)
 
 					parts[ID(r)].temp += 1000.0f;
 					parts[hygn1_id].temp += 1000.0f;
-					sim->pv[(y + ry) / CELL][(x + rx) / CELL] += 10.0f;
+					sim->pv[{ (x + rx) / CELL, (y + ry) / CELL }] += 10.0f;
 
 					int j = sim->create_part(-3, x + rx, y + ry, PT_PHOT);
 					if (j > -1)
@@ -152,7 +152,7 @@ static int update(UPDATE_FUNC_ARGS)
 			static const int checkCoordsY[] = { 0, 0, -4, 4 };
 			int rx = checkCoordsX[j];
 			int ry = checkCoordsY[j];
-			int r = pmap[y + ry][x + rx];
+			int r = pmap[{ x + rx, y + ry }];
 			if (r && TYP(r) == PT_SPRK && parts[ID(r)].life && parts[ID(r)].life < 4)
 			{
 				sim->part_change_type(i, x, y, PT_SPRK);
@@ -169,7 +169,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				int r = pmap[y + ry][x + rx];
+				int r = pmap[{ x + rx, y + ry }];
 				if (!r)
 					continue;
 				int rt = TYP(r);
@@ -217,7 +217,7 @@ static int update(UPDATE_FUNC_ARGS)
 					switch (rt)
 					{
 					case PT_GAS: // GAS + > 2 pressure + >= 200 C -> INSL
-						if (parts[ID(r)].temp >= 200.0f + 273.15f && sim->pv[(y + ry) / CELL][(x + rx) / CELL] > 2.0f)
+						if (parts[ID(r)].temp >= 200.0f + 273.15f && sim->pv[{ (x + rx) / CELL, (y + ry) / CELL }] > 2.0f)
 						{
 							sim->part_change_type(ID(r), x + rx, y + ry, PT_INSL);
 							parts[i].temp += 60.0f; // Other part is INSL, adding temp is useless
@@ -225,7 +225,7 @@ static int update(UPDATE_FUNC_ARGS)
 						break;
 
 					case PT_BREC: // BREL + > 1000 C + > 50 pressure -> EXOT
-						if (parts[ID(r)].temp > 1000.0f + 273.15f && sim->pv[(y + ry) / CELL][(x + rx) / CELL] > 50.0f)
+						if (parts[ID(r)].temp > 1000.0f + 273.15f && sim->pv[{ (x + rx) / CELL, (y + ry) / CELL }] > 50.0f)
 						{
 							sim->part_change_type(ID(r), x + rx, y + ry, PT_EXOT);
 							parts[ID(r)].temp -= 30.0f;

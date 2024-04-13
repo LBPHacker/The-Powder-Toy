@@ -50,7 +50,7 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	if ((parts[i].tmp == 0 && sim->pv[y/CELL][x/CELL] > parts[i].temp-273.15f) || (parts[i].tmp == 2 && sim->pv[y/CELL][x/CELL] < parts[i].temp-273.15f))
+	if ((parts[i].tmp == 0 && sim->pv[{ x/CELL, y/CELL }] > parts[i].temp-273.15f) || (parts[i].tmp == 2 && sim->pv[{ x/CELL, y/CELL }] < parts[i].temp-273.15f))
 	{
 		for (auto rx = -2; rx <= 2; rx++)
 		{
@@ -58,7 +58,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if (!r)
 						continue;
 					auto pavg = sim->parts_avg(i,ID(r),PT_INSL);
@@ -79,7 +79,7 @@ static int update(UPDATE_FUNC_ARGS)
 	if (parts[i].tmp == 1)
 	{
 		bool setFilt = true;
-		float photonWl = sim->pv[y / CELL][x / CELL];
+		float photonWl = sim->pv[{ x / CELL, y / CELL }];
 		if (setFilt)
 		{
 			for (auto rx = -1; rx <= 1; rx++)
@@ -88,7 +88,7 @@ static int update(UPDATE_FUNC_ARGS)
 				{
 					if (rx || ry)
 					{
-						auto r = pmap[y + ry][x + rx];
+						auto r = pmap[{ x + rx, y + ry }];
 						if (!r)
 							continue;
 						auto nx = x + rx;
@@ -100,7 +100,7 @@ static int update(UPDATE_FUNC_ARGS)
 							ny += ry;
 							if (nx < 0 || ny < 0 || nx >= XRES || ny >= YRES)
 								break;
-							r = pmap[ny][nx];
+							r = pmap[{ nx, ny }];
 						}
 					}
 				}

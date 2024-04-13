@@ -54,7 +54,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				if (TYP(r)==PT_CFLM && sim->rng.chance(1, 4))
@@ -62,7 +62,7 @@ static int update(UPDATE_FUNC_ARGS)
 					sim->part_change_type(i,x,y,PT_CFLM);
 					parts[i].life = sim->rng.between(50, 199);
 					parts[ID(r)].temp = parts[i].temp = 0;
-					sim->pv[y/CELL][x/CELL] -= 0.5;
+					sim->pv[{ x/CELL, y/CELL }] -= 0.5;
 				}
 			}
 		}

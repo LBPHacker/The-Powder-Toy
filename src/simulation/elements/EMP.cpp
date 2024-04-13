@@ -79,7 +79,7 @@ void Element_EMP_Trigger(Simulation *sim, int triggerCount)
 	 * - Probability of centre isElec particle breaking is slightly different (1/48 instead of 1-(1-1/80)*(1-1/120) = just under 1/48).
 	 */
 
-	Particle *parts = sim->parts;
+	auto &parts = sim->parts;
 
 	float prob_changeCenter = Probability::binomial_gte1(triggerCount, 1.0f/48);
 	DeltaTempGenerator temp_center(triggerCount, 1.0f/100, 3000.0f);
@@ -130,7 +130,7 @@ void Element_EMP_Trigger(Simulation *sim, int triggerCount)
 				for (int ny =-2; ny <= 2; ny++)
 					if (rx+nx>=0 && ry+ny>=0 && rx+nx<XRES && ry+ny<YRES && (rx || ry))
 					{
-						int n = sim->pmap[ry+ny][rx+nx];
+						int n = sim->pmap[{ rx+nx, ry+ny }];
 						if (!n)
 							continue;
 						int ntype = TYP(n);

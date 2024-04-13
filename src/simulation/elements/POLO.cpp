@@ -54,7 +54,7 @@ constexpr int LIMIT = 5;
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	int r = sim->photons[y][x];
+	int r = sim->photons[{ x, y }];
 	if (parts[i].tmp < LIMIT && !parts[i].life)
 	{
 		if (sim->rng.chance(1, 10000) && !parts[i].tmp)

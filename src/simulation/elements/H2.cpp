@@ -55,17 +55,17 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				auto rt = TYP(r);
-				if (sim->pv[y/CELL][x/CELL] > 8.0f && rt == PT_DESL) // This will not work. DESL turns to fire above 5.0 pressure
+				if (sim->pv[{ x/CELL, y/CELL }] > 8.0f && rt == PT_DESL) // This will not work. DESL turns to fire above 5.0 pressure
 				{
 					sim->part_change_type(ID(r),x+rx,y+ry,PT_WATR);
 					sim->part_change_type(i,x,y,PT_OIL);
 					return 1;
 				}
-				if (sim->pv[y/CELL][x/CELL] > 45.0f)
+				if (sim->pv[{ x/CELL, y/CELL }] > 45.0f)
 				{
 					if (parts[ID(r)].temp > 2273.15)
 						continue;
@@ -95,7 +95,7 @@ static int update(UPDATE_FUNC_ARGS)
 			}
 		}
 	}
-	if (parts[i].temp > 2273.15 && sim->pv[y/CELL][x/CELL] > 50.0f)
+	if (parts[i].temp > 2273.15 && sim->pv[{ x/CELL, y/CELL }] > 50.0f)
 	{
 		if (sim->rng.chance(1, 5))
 		{
@@ -120,7 +120,7 @@ static int update(UPDATE_FUNC_ARGS)
 				parts[j].temp = temp;
 				parts[j].tmp = 0x1;
 			}
-			auto rx = x + sim->rng.between(-1, 1), ry = y + sim->rng.between(-1, 1), rt = TYP(pmap[ry][rx]);
+			auto rx = x + sim->rng.between(-1, 1), ry = y + sim->rng.between(-1, 1), rt = TYP(pmap[{ rx, ry }]);
 			if (can_move[PT_PLSM][rt] || rt == PT_H2)
 			{
 				j = sim->create_part(-3,rx,ry,PT_PLSM);
@@ -131,7 +131,7 @@ static int update(UPDATE_FUNC_ARGS)
 				}
 			}
 			parts[i].temp = temp + sim->rng.between(750, 1249);
-			sim->pv[y/CELL][x/CELL] += 30;
+			sim->pv[{ x/CELL, y/CELL }] += 30;
 			return 1;
 		}
 	}

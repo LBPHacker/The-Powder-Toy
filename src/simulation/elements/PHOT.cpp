@@ -71,7 +71,7 @@ static int update(UPDATE_FUNC_ARGS)
 	{
 		for (auto ry = -1; ry <= 1; ry++)
 		{
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[{ x+rx, y+ry }];
 			if (!r)
 				continue;
 			if (TYP(r)==PT_ISOZ || TYP(r)==PT_ISZS)
@@ -89,7 +89,7 @@ static int update(UPDATE_FUNC_ARGS)
 						rr = int(sim->rng.between(128, 355) / 127.0f);
 					parts[ID(r)].vx = rr*cosf(rrr);
 					parts[ID(r)].vy = rr*sinf(rrr);
-					sim->pv[y/CELL][x/CELL] -= 15.0f * CFDS;
+					sim->pv[{ x/CELL, y/CELL }] -= 15.0f * CFDS;
 				}
 			}
 			else if((TYP(r) == PT_QRTZ || TYP(r) == PT_PQRT) && !ry && !rx)//if on QRTZ
@@ -178,6 +178,6 @@ static void create(ELEMENT_CREATE_FUNC_ARGS)
 	float a = sim->rng.between(0, 7) * 0.78540f;
 	sim->parts[i].vx = 3.0f * cosf(a);
 	sim->parts[i].vy = 3.0f * sinf(a);
-	if (TYP(sim->pmap[y][x]) == PT_FILT)
-		sim->parts[i].ctype = Element_FILT_interactWavelengths(sim, &sim->parts[ID(sim->pmap[y][x])], sim->parts[i].ctype);
+	if (TYP(sim->pmap[{ x, y }]) == PT_FILT)
+		sim->parts[i].ctype = Element_FILT_interactWavelengths(sim, &sim->parts[ID(sim->pmap[{ x, y }])], sim->parts[i].ctype);
 }

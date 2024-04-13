@@ -51,7 +51,7 @@ void Element::Element_CRMC()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	if (sim->pv[y/CELL][x/CELL] < -30.0f)
+	if (sim->pv[{ x/CELL, y/CELL }] < -30.0f)
 		sim->create_part(i, x, y, PT_CLST);
 	return 0;
 }

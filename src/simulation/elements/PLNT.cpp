@@ -57,7 +57,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				switch (TYP(r))
 				{
 				case PT_WATR:
@@ -94,7 +94,7 @@ static int update(UPDATE_FUNC_ARGS)
 							int nny = (rndstore%3) -1;
 							if (nnx || nny)
 							{
-								if (pmap[y+ry+nny][x+rx+nnx])
+								if (pmap[{ x+rx+nnx, y+ry+nny }])
 									continue;
 								auto np = sim->create_part(-1,x+rx+nnx,y+ry+nny,PT_VINE);
 								if (np<0) continue;
@@ -117,7 +117,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if (!r)
 						sim->create_part(-1,x+rx,y+ry,PT_O2);
 				}

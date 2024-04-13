@@ -50,7 +50,7 @@ void Element::Element_SPNG()
 static int update(UPDATE_FUNC_ARGS)
 {
 	int limit = 50;
-	if (parts[i].life<limit && sim->pv[y/CELL][x/CELL]<=3&&sim->pv[y/CELL][x/CELL]>=-3&&parts[i].temp<=374.0f)
+	if (parts[i].life<limit && sim->pv[{ x/CELL, y/CELL }]<=3&&sim->pv[{ x/CELL, y/CELL }]>=-3&&parts[i].temp<=374.0f)
 	{
 		int absorbChanceDenom = parts[i].life*10000/limit + 500;
 		for (auto rx = -1; rx <= 1; rx++)
@@ -59,7 +59,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					switch (TYP(r))
 					{
 					case PT_WATR:
@@ -110,7 +110,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if ((!r)&&parts[i].life>=1)//if nothing then create water
 					{
 						auto np = sim->create_part(-1,x+rx,y+ry,PT_WATR);
@@ -126,7 +126,7 @@ static int update(UPDATE_FUNC_ARGS)
 		auto ry = sim->rng.between(-2, 2);
 		if (rx || ry)
 		{
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[{ x+rx, y+ry }];
 			if (!r)
 				continue;
 			if (TYP(r)==PT_SPNG&&(parts[i].life>parts[ID(r)].life)&&parts[i].life>0)//diffusion
@@ -156,7 +156,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if (!r)
 						continue;
 					if (TYP(r)==PT_FIRE)
@@ -183,7 +183,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if ((!r)&&parts[i].life>=1)//if nothing then create steam
 					{
 						auto np = sim->create_part(-1,x+rx,y+ry,PT_WTRV);
