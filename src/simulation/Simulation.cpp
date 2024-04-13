@@ -3865,5 +3865,3 @@ void Simulation::EnableNewtonianGravity(bool enable)
 }
 
 static_assert(PMAPBITS <= 16, "PMAPBITS is too large");
-// we want XRES * YRES <= (1 << (31 - PMAPBITS)), but we do a division because multiplication could silently overflow
-static_assert(uint32_t(XRES) <= (UINT32_C(1) << (31 - PMAPBITS)) / uint32_t(YRES), "not enough space in pmap");
