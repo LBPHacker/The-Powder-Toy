@@ -1,6 +1,7 @@
 #include "PowderToySDL.h"
 #include "graphics/Graphics.h"
 #include "common/platform/Platform.h"
+#include "InitSimulationConfig.h"
 #include "common/tpt-rand.h"
 #include "gui/font/FontEditor.h"
 #include "gui/interface/Engine.h"
@@ -34,6 +35,8 @@ static std::unique_ptr<ExplicitSingletons> explicitSingletons;
 
 int main(int argc, char * argv[])
 {
+	InitSimulationConfig();
+
 	Platform::SetupCrt();
 	Platform::Atexit([]() {
 		SDLClose();

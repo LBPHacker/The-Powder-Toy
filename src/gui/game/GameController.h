@@ -10,6 +10,7 @@
 #include "simulation/Particle.h"
 #include "simulation/SimulationSettings.h"
 #include "Misc.h"
+#include "Notification.h"
 #include <vector>
 #include <utility>
 #include <memory>
@@ -25,9 +26,15 @@ constexpr auto DEBUG_AIRVEL     = 0x0080;
 constexpr auto DEBUG_FRAMETIME  = 0x0100;
 
 class FrameTime;
+struct SimConfigResetNotification : public Notification
+{
+	using Notification::Notification;
+
+	void Action() final override;
+};
+
 class DebugInfo;
 class SaveFile;
-class Notification;
 class GameModel;
 class GameView;
 class Snapshot;
@@ -219,4 +226,6 @@ public:
 	void InitCommandInterface();
 
 	FrameTime *GetFrameTime() const;
+
+	void AddSimConfigResetNotification(String message);
 };

@@ -4,13 +4,13 @@
 #include <vector>
 #include <cstdint>
 
-constexpr float MAX_TEMP = 9999;
-constexpr float MIN_TEMP = 0;
+extern float MAX_TEMP;
+extern float MIN_TEMP;
 constexpr float O_MAX_TEMP = 3500;
 constexpr float O_MIN_TEMP = -273;
 
-constexpr float MAX_PRESSURE = 256.0f;
-constexpr float MIN_PRESSURE = -256.0f;
+extern float MAX_PRESSURE;
+extern float MIN_PRESSURE;
 
 constexpr auto TYPE_PART          = UINT32_C(0x00000001);  //1 Powders
 constexpr auto TYPE_LIQUID        = UINT32_C(0x00000002);  //2 Liquids
