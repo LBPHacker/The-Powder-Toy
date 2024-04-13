@@ -51,7 +51,7 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	auto &sd = SimulationData::CRef();
 	auto &can_move = sd.can_move;
-	if (parts[i].temp > 5273.15 && sim->pv[y/CELL][x/CELL] > 100.0f)
+	if (parts[i].temp > 5273.15 && sim->pv[{ x/CELL, y/CELL }] > 100.0f)
 	{
 		parts[i].tmp |= 0x1;
 		if (sim->rng.chance(1, 5))
@@ -76,7 +76,7 @@ static int update(UPDATE_FUNC_ARGS)
 				parts[j].temp = temp;
 				parts[j].tmp = 0x1;
 			}
-			int rx = x + sim->rng.between(-1, 1), ry = y + sim->rng.between(-1, 1), rt = TYP(pmap[ry][rx]);
+			int rx = x + sim->rng.between(-1, 1), ry = y + sim->rng.between(-1, 1), rt = TYP(pmap[{ rx, ry }]);
 			if (can_move[PT_PLSM][rt] || rt == PT_NBLE)
 			{
 				j = sim->create_part(-3,rx,ry,PT_PLSM);
@@ -87,7 +87,7 @@ static int update(UPDATE_FUNC_ARGS)
 				}
 			}
 			parts[i].temp = temp + 1750 + sim->rng.between(0, 499);
-			sim->pv[y/CELL][x/CELL] += 50;
+			sim->pv[{ x/CELL, y/CELL }] += 50;
 		}
 	}
 	return 0;

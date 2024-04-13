@@ -908,7 +908,7 @@ void GameSave::readOPS(const std::vector<char> &data)
 					throw ParseException(ParseException::Corrupt, "Too many particles");
 
 				//Clear the particle, ready for our new properties
-				memset(&(particles[newIndex]), 0, sizeof(Particle));
+				particles[newIndex] = {};
 
 				//Required fields
 				particles[newIndex].type = partsData[i];
@@ -1465,7 +1465,7 @@ void GameSave::readPSv(const std::vector<char> &dataVec)
 			}
 			if (j)
 			{
-				memset(&particles[0]+k, 0, sizeof(Particle));
+				particles[k] = {};
 				particles[k].type = j;
 				if (j == PT_COAL)
 					particles[k].tmp = 50;

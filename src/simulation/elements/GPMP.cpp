@@ -63,14 +63,14 @@ static int update(UPDATE_FUNC_ARGS)
 		if (parts[i].temp<= -256.0f+273.15f)
 			parts[i].temp = -256.0f+273.15f;
 
-		sim->gravmap[(y/CELL)*XCELLS+(x/CELL)] = 0.2f*(parts[i].temp-273.15);
+		sim->gravmap[{ x / CELL, y / CELL }] = 0.2f*(parts[i].temp-273.15);
 		for (auto rx = -2; rx <= 2; rx++)
 		{
 			for (auto ry = -2; ry <= 2; ry++)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if (!r)
 						continue;
 					if (TYP(r)==PT_GPMP)

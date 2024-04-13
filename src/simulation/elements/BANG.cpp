@@ -59,7 +59,7 @@ static int update(UPDATE_FUNC_ARGS)
 				{
 					if (rx || ry)
 					{
-						auto r = pmap[y+ry][x+rx];
+						auto r = pmap[{ x+rx, y+ry }];
 						if (!r)
 							continue;
 						if (TYP(r)==PT_FIRE || TYP(r)==PT_PLSM || TYP(r)==PT_SPRK || TYP(r)==PT_LIGH)
@@ -73,7 +73,7 @@ static int update(UPDATE_FUNC_ARGS)
 	}
 	else if(parts[i].tmp==1)
 	{
-		if (pmap[y][x] && ID(pmap[y][x]) == i)
+		if (pmap[{ x, y }] && ID(pmap[{ x, y }]) == i)
 		{
 			sim->flood_prop(x, y, Particle::GetProperties()[FIELD_TMP], 2);
 		}
@@ -87,7 +87,7 @@ static int update(UPDATE_FUNC_ARGS)
 	{
 		float otemp = parts[i].temp-273.15f;
 		//Explode!!
-		sim->pv[y/CELL][x/CELL] += 0.5f;
+		sim->pv[{ x/CELL, y/CELL }] += 0.5f;
 		parts[i].tmp = 0;
 		if (sim->rng.chance(1, 3))
 		{

@@ -57,11 +57,11 @@ static int update(UPDATE_FUNC_ARGS)
 	for(int j = 0; j < 8; j++)
 	{
 		auto rndstore = sim->rng.gen();
-		auto rx = (rndstore % 9)-4;
+		auto rx = int(rndstore % 9)-4;
 		rndstore >>= 4;
-		auto ry = (rndstore % 9)-4;
+		auto ry = int(rndstore % 9)-4;
 		if ((!rx != !ry)) {
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[{ x+rx, y+ry }];
 			if(!r) continue;
 			if(TYP(r)==PT_BMTL && parts[ID(r)].tmp)
 			{
@@ -77,7 +77,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			auto rx = checkCoordsX[j];
 			auto ry = checkCoordsY[j];
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[{ x+rx, y+ry }];
 			if(!r) continue;
 			if(TYP(r)==PT_SPRK && parts[ID(r)].life && parts[ID(r)].life<4)
 			{
@@ -87,11 +87,11 @@ static int update(UPDATE_FUNC_ARGS)
 			}
 		}
 	}
-	if (TYP(sim->photons[y][x]) == PT_NEUT)
+	if (TYP(sim->photons[{ x, y }]) == PT_NEUT)
 	{
 		if (sim->rng.chance(1, 7))
 		{
-			sim->kill_part(ID(sim->photons[y][x]));
+			sim->kill_part(ID(sim->photons[{ x, y }]));
 		}
 	}
 	return 0;

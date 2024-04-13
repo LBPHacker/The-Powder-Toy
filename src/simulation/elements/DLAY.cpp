@@ -61,7 +61,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				auto pavg = sim->parts_avg(ID(r), i, PT_INSL);
 				if (!r || pavg==PT_INSL || pavg==PT_RSSS)
 					continue;

@@ -49,7 +49,7 @@ void Element::Element_GLAS()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	auto press = int(sim->pv[y/CELL][x/CELL] * 64);
+	auto press = int(sim->pv[{ x/CELL, y/CELL }] * 64);
 	auto diff = press - parts[i].tmp3;
 
 	// Determine whether the GLAS is chemically strengthened via .life setting. (250 = Max., 16 = Min.)
@@ -66,5 +66,5 @@ static int update(UPDATE_FUNC_ARGS)
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
-	sim->parts[i].tmp3 = int(sim->pv[y/CELL][x/CELL] * 64);
+	sim->parts[i].tmp3 = int(sim->pv[{ x/CELL, y/CELL }] * 64);
 }

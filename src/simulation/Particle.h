@@ -4,16 +4,20 @@
 
 struct Particle
 {
-	int type;
-	int life, ctype;
-	float x, y, vx, vy;
-	float temp;
-	int tmp3;
-	int tmp4;
-	int flags;
-	int tmp;
-	int tmp2;
-	unsigned int dcolour;
+	int          type    = 0;
+	int          life    = 0;
+	int          ctype   = 0;
+	float        x       = 0;
+	float        y       = 0;
+	float        vx      = 0;
+	float        vy      = 0;
+	float        temp    = 0;
+	int          tmp3    = 0;
+	int          tmp4    = 0;
+	int          flags   = 0;
+	int          tmp     = 0;
+	int          tmp2    = 0;
+	unsigned int dcolour = 0;
 	/** Returns a list of properties, their type and offset within the structure that can be changed
 	 by higher-level processes referring to them by name such as Lua or the property tool **/
 	static std::vector<StructProperty> const &GetProperties();

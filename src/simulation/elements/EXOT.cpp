@@ -59,7 +59,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				auto rt = TYP(r);
@@ -129,9 +129,9 @@ static int update(UPDATE_FUNC_ARGS)
 		}
 	}
 	else if(parts[i].life < 1001)
-		sim->pv[y/CELL][x/CELL] += (parts[i].tmp2*CFDS)/160000;
+		sim->pv[{ x/CELL, y/CELL }] += (parts[i].tmp2*CFDS)/160000;
 
-	if (sim->pv[y/CELL][x/CELL]>200 && parts[i].temp>9000 && parts[i].tmp2>200)
+	if (sim->pv[{ x/CELL, y/CELL }]>200 && parts[i].temp>9000 && parts[i].tmp2>200)
 	{
 		parts[i].tmp2 = 6000;
 		sim->part_change_type(i, x, y, PT_WARP);
@@ -145,7 +145,7 @@ static int update(UPDATE_FUNC_ARGS)
 			auto ry = sim->rng.between(-2, 2);
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				if (TYP(r)==PT_EXOT && (parts[i].tmp2 > parts[ID(r)].tmp2) && parts[ID(r)].tmp2 >= 0) //diffusion
@@ -183,7 +183,7 @@ static int update(UPDATE_FUNC_ARGS)
 	{
 		parts[i].vx = 0;
 		parts[i].vy = 0;
-		sim->pv[y/CELL][x/CELL] -= 0.01f;
+		sim->pv[{ x/CELL, y/CELL }] -= 0.01f;
 		parts[i].tmp--;
 	}
 	return 0;

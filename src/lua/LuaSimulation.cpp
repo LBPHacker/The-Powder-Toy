@@ -173,7 +173,7 @@ static int velocityX(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	return LuaBlockMap(L, MIN_PRESSURE, MAX_PRESSURE, [lsi](Vec2<int> p) -> float & {
-		return lsi->sim->vx[p.Y][p.X];
+		return lsi->sim->vx[p];
 	});
 }
 
@@ -181,7 +181,7 @@ static int velocityY(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	return LuaBlockMap(L, MIN_PRESSURE, MAX_PRESSURE, [lsi](Vec2<int> p) -> float & {
-		return lsi->sim->vy[p.Y][p.X];
+		return lsi->sim->vy[p];
 	});
 }
 
@@ -189,7 +189,7 @@ static int ambientHeat(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	return LuaBlockMap(L, MIN_TEMP, MAX_TEMP, [lsi](Vec2<int> p) -> float & {
-		return lsi->sim->hv[p.Y][p.X];
+		return lsi->sim->hv[p];
 	});
 }
 
@@ -197,7 +197,7 @@ static int pressure(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	return LuaBlockMap(L, MIN_PRESSURE, MAX_PRESSURE, [lsi](Vec2<int> p) -> float & {
-		return lsi->sim->pv[p.Y][p.X];
+		return lsi->sim->pv[p];
 	});
 }
 
@@ -205,7 +205,7 @@ static int gravityMass(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	return LuaBlockMap(L, [lsi](Vec2<int> p) -> float & {
-		return lsi->sim->gravmap[p.Y * XCELLS + p.X];
+		return lsi->sim->gravmap[p];
 	});
 }
 
@@ -217,8 +217,8 @@ static int gravityField(lua_State *L)
 	{
 		return luaL_error(L, "Coordinates (%i, %i) out of range", pos.X, pos.Y);
 	}
-	lua_pushnumber(L, lsi->sim->gravx[pos.Y * XCELLS + pos.X]);
-	lua_pushnumber(L, lsi->sim->gravy[pos.Y * XCELLS + pos.X]);
+	lua_pushnumber(L, lsi->sim->gravx[pos]);
+	lua_pushnumber(L, lsi->sim->gravy[pos]);
 	return 2;
 }
 
@@ -226,7 +226,7 @@ static int elecMap(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	return LuaBlockMap(L, [lsi](Vec2<int> p) -> unsigned char & {
-		return lsi->sim->emap[p.Y][p.X];
+		return lsi->sim->emap[p];
 	});
 }
 
@@ -234,7 +234,7 @@ static int wallMap(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	return LuaBlockMap(L, 0, UI_WALLCOUNT - 1, [lsi](Vec2<int> p) -> unsigned char & {
-		return lsi->sim->bmap[p.Y][p.X];
+		return lsi->sim->bmap[p];
 	});
 }
 
@@ -242,14 +242,14 @@ static int fanVelocityX(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	return LuaBlockMap(L, [lsi](Vec2<int> p) -> float & {
-		return lsi->sim->fvx[p.Y][p.X];
+		return lsi->sim->fvx[p];
 	});
 }
 
 static int fanVelocityY(lua_State *L)
 {	auto *lsi = GetLSI();
 	return LuaBlockMap(L, [lsi](Vec2<int> p) -> float & {
-		return lsi->sim->fvy[p.Y][p.X];
+		return lsi->sim->fvy[p];
 	});
 }
 
@@ -267,9 +267,9 @@ static int partNeighbors(lua_State *L)
 			for (ry = -r; ry <= r; ry++)
 				if (x+rx >= 0 && y+ry >= 0 && x+rx < XRES && y+ry < YRES && (rx || ry))
 				{
-					n = sim->pmap[y+ry][x+rx];
+					n = sim->pmap[{ x+rx, y+ry }];
 					if (!n || TYP(n) != t)
-						n = sim->photons[y+ry][x+rx];
+						n = sim->photons[{ x+rx, y+ry }];
 					if (n && TYP(n) == t)
 					{
 						lua_pushinteger(L, ID(n));
@@ -284,9 +284,9 @@ static int partNeighbors(lua_State *L)
 			for (ry = -r; ry <= r; ry++)
 				if (x+rx >= 0 && y+ry >= 0 && x+rx < XRES && y+ry < YRES && (rx || ry))
 				{
-					n = sim->pmap[y+ry][x+rx];
+					n = sim->pmap[{ x+rx, y+ry }];
 					if (!n)
-						n = sim->photons[y+ry][x+rx];
+						n = sim->photons[{ x+rx, y+ry }];
 					if (n)
 					{
 						lua_pushinteger(L, ID(n));
@@ -348,9 +348,9 @@ static int partID(lua_State *L)
 		return 1;
 	}
 
-	int amalgam = lsi->sim->pmap[y][x];
+	int amalgam = lsi->sim->pmap[{ x, y }];
 	if(!amalgam)
-		amalgam = lsi->sim->photons[y][x];
+		amalgam = lsi->sim->photons[{ x, y }];
 	if (!amalgam)
 		lua_pushnil(L);
 	else
@@ -904,7 +904,7 @@ static int resetPressure(lua_State *L)
 	for (int nx = x1; nx<x1+width; nx++)
 		for (int ny = y1; ny<y1+height; ny++)
 		{
-			lsi->sim->air->pv[ny][nx] = 0;
+			lsi->sim->pv[{ nx, ny }] = 0;
 		}
 	return 0;
 }
@@ -1324,14 +1324,14 @@ static int neighboursClosure(lua_State *L)
 			x = cx - rx;
 			y += 1;
 		}
-		int r = lsi->sim->pmap[py][px];
+		int r = lsi->sim->pmap[{ px, py }];
 		if (!(r && (!t || TYP(r) == t))) // * If not [exists and is of the correct type]
 		{
 			r = 0;
 		}
 		if (!r)
 		{
-			r = lsi->sim->photons[py][px];
+			r = lsi->sim->photons[{ px, py }];
 			if (!(r && (!t || TYP(r) == t))) // * If not [exists and is of the correct type]
 			{
 				r = 0;
@@ -1392,7 +1392,7 @@ static int pmap(lua_State *L)
 	int y = luaL_checkint(L, 2);
 	if (x < 0 || x >= XRES || y < 0 || y >= YRES)
 		return luaL_error(L, "coordinates out of range (%d,%d)", x, y);
-	int r = lsi->sim->pmap[y][x];
+	int r = lsi->sim->pmap[{ x, y }];
 	if (!TYP(r))
 		return 0;
 	lua_pushnumber(L, ID(r));
@@ -1406,7 +1406,7 @@ static int photons(lua_State *L)
 	int y = luaL_checkint(L, 2);
 	if (x < 0 || x >= XRES || y < 0 || y >= YRES)
 		return luaL_error(L, "coordinates out of range (%d,%d)", x, y);
-	int r = lsi->sim->photons[y][x];
+	int r = lsi->sim->photons[{ x, y }];
 	if (!TYP(r))
 		return 0;
 	lua_pushnumber(L, ID(r));
@@ -1785,8 +1785,8 @@ static int resetVelocity(lua_State *L)
 	for (nx = x1; nx<x1+width; nx++)
 		for (ny = y1; ny<y1+height; ny++)
 		{
-			lsi->sim->vx[ny][nx] = 0;
-			lsi->sim->vy[ny][nx] = 0;
+			lsi->sim->vx[{ nx, ny }] = 0;
+			lsi->sim->vy[{ nx, ny }] = 0;
 		}
 	return 0;
 }
@@ -1819,9 +1819,9 @@ static int resetGravityField(lua_State *L)
 	for (nx = x1; nx<x1+width; nx++)
 		for (ny = y1; ny<y1+height; ny++)
 		{
-			sim->gravx[ny*XCELLS+nx] = 0;
-			sim->gravy[ny*XCELLS+nx] = 0;
-			sim->gravp[ny*XCELLS+nx] = 0;
+			sim->gravx[{ nx, ny }] = 0;
+			sim->gravy[{ nx, ny }] = 0;
+			sim->gravp[{ nx, ny }] = 0;
 		}
 	return 0;
 }

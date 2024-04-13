@@ -89,7 +89,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			static const int check_coords_x[] = { -4, 4, 0, 0 };
 			static const int check_coords_y[] = { 0, 0, -4, 4 };
-			int n = pmap[y + check_coords_y[j]][x + check_coords_x[j]];
+			int n = pmap[{ x + check_coords_x[j], y + check_coords_y[j] }];
 			if (n && TYP(n) == PT_SPRK)
 			{
 				Particle &neighbour = parts[ID(n)];

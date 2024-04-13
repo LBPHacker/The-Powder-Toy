@@ -1,6 +1,7 @@
 #pragma once
 #include "Config.h"
 #include "GravityPtr.h"
+#include "common/Plane.h"
 #include "SimulationConfig.h"
 #include <thread>
 #include <mutex>
@@ -17,11 +18,11 @@ protected:
 	bool enabled = false;
 
 	// Maps to be processed by the gravity thread
-	std::vector<float> th_ogravmap;
-	std::vector<float> th_gravmap;
-	std::vector<float> th_gravx;
-	std::vector<float> th_gravy;
-	std::vector<float> th_gravp;
+	PlaneAdapter<std::vector<float>> th_ogravmap;
+	PlaneAdapter<std::vector<float>> th_gravmap;
+	PlaneAdapter<std::vector<float>> th_gravx;
+	PlaneAdapter<std::vector<float>> th_gravy;
+	PlaneAdapter<std::vector<float>> th_gravp;
 
 	int th_gravchanged = 0;
 
@@ -33,13 +34,13 @@ protected:
 	bool ignoreNextResult = false;
 
 	struct mask_el {
-		char *shape;
+		PlaneAdapter<std::vector<char>> shape;
 		char shapeout;
 		mask_el *next;
 	};
 	using mask_el = struct mask_el;
 
-	bool grav_mask_r(int x, int y, char checkmap[YCELLS][XCELLS], char shape[YCELLS][XCELLS]);
+	bool grav_mask_r(int x, int y, PlaneAdapter<std::vector<char>> &checkmap, PlaneAdapter<std::vector<char>> &shape);
 	void mask_free(mask_el *c_mask_el);
 
 	void update_grav();
@@ -55,14 +56,14 @@ public:
 	~Gravity();
 
 	//Maps to be used by the main thread
-	std::vector<float> gravmap;
-	std::vector<float> gravp;
-	std::vector<float> gravy;
-	std::vector<float> gravx;
-	std::vector<uint32_t> gravmask;
+	PlaneAdapter<std::vector<float>> *gravmap{};
+	PlaneAdapter<std::vector<float>> *gravp{};
+	PlaneAdapter<std::vector<float>> *gravy{};
+	PlaneAdapter<std::vector<float>> *gravx{};
+	PlaneAdapter<std::vector<uint32_t>> gravmask;
 	static_assert(sizeof(float) == sizeof(uint32_t));
 
-	unsigned char (*bmap)[XCELLS];
+	PlaneAdapter<std::vector<unsigned char>> *bmap;
 
 	bool IsEnabled() { return enabled; }
 
