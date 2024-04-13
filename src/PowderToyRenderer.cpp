@@ -3,6 +3,7 @@
 #include "common/String.h"
 #include "common/tpt-rand.h"
 #include "Format.h"
+#include "InitSimulationConfig.h"
 #include "gui/interface/Engine.h"
 #include "client/GameSave.h"
 #include "simulation/Simulation.h"
@@ -15,6 +16,8 @@
 
 int main(int argc, char *argv[])
 {
+	InitSimulationConfig();
+
 	if (!argv[1] || !argv[2]) {
 		std::cout << "Usage: " << argv[0] << " <inputFilename> <outputPrefix>" << std::endl;
 		return 1;

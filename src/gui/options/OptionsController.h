@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 
+struct SimulationConfig;
 class GameModel;
 class OptionsModel;
 class OptionsView;
@@ -39,6 +40,7 @@ public:
 	void SetIncludePressure(bool includePressure);
 	void SetPerfectCircle(bool perfectCircle);
 	void SetMomentumScroll(bool momentumScroll);
+	void SetNextSimulationConfig(SimulationConfig config);
 	
 	void Exit();
 	OptionsView * GetView();
