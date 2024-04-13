@@ -6,9 +6,9 @@ void SimTool::CallPerform(Simulation *sim, ui::Point position, ui::Point brushOf
 {
 	Particle * cpart = nullptr;
 	int r;
-	if ((r = sim->pmap[position.Y][position.X]))
+	if ((r = sim->pmap[position]))
 		cpart = &(sim->parts[ID(r)]);
-	else if ((r = sim->photons[position.Y][position.X]))
+	else if ((r = sim->photons[position]))
 		cpart = &(sim->parts[ID(r)]);
 	if (Perform)
 	{

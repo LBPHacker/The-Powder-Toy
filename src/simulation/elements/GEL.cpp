@@ -64,7 +64,7 @@ static int update(UPDATE_FUNC_ARGS)
 			if (rx || ry)
 			{
 				auto gel=false;
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				auto rt = TYP(r);

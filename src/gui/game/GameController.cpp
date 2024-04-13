@@ -816,7 +816,7 @@ void GameController::ResetSpark()
 			sim->parts[i].ctype = sim->parts[i].tmp = 0;
 		}
 	}
-	memset(sim->wireless, 0, sizeof(sim->wireless));
+	std::fill_n(&sim->wireless[0][0], sizeof(sim->wireless) / sizeof(sim->wireless[0][0]), 0);
 }
 
 void GameController::SwitchGravity()

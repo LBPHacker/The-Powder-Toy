@@ -75,7 +75,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if (!r || (parts[i].tmp >=maxtmp))
 						continue;
 					if (TYP(r)==PT_MERC&& sim->rng.chance(1, 3))
@@ -98,7 +98,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if (parts[i].tmp<=maxtmp)
 						continue;
 					if ((!r)&&parts[i].tmp>=1)//if nothing then create MERC
@@ -120,7 +120,7 @@ static int update(UPDATE_FUNC_ARGS)
 		auto ry = sim->rng.between(-2, 2);
 		if (rx || ry)
 		{
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[{ x+rx, y+ry }];
 			if (!r)
 				continue;
 			if (TYP(r)==PT_MERC&&(parts[i].tmp>parts[ID(r)].tmp)&&parts[i].tmp>0)//diffusion

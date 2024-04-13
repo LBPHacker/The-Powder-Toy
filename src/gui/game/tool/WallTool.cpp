@@ -8,7 +8,7 @@ void WallTool::Draw(Simulation * sim, Brush const &brush, ui::Point position) {
 void WallTool::DrawLine(Simulation * sim, Brush const &brush, ui::Point position1, ui::Point position2, bool dragging) {
 	int wallX = position1.X/CELL;
 	int wallY = position1.Y/CELL;
-	if(dragging == false && ToolID == WL_FAN && sim->bmap[wallY][wallX]==WL_FAN)
+	if(dragging == false && ToolID == WL_FAN && sim->bmap[{ wallX, wallY }]==WL_FAN)
 	{
 		float newFanVelX = (position2.X-position1.X)*0.005f;
 		newFanVelX *= Strength;
@@ -17,11 +17,11 @@ void WallTool::DrawLine(Simulation * sim, Brush const &brush, ui::Point position
 		sim->FloodWalls(position1.X, position1.Y, WL_FLOODHELPER, WL_FAN);
 		for (int j = 0; j < YCELLS; j++)
 			for (int i = 0; i < XCELLS; i++)
-				if (sim->bmap[j][i] == WL_FLOODHELPER)
+				if (sim->bmap[{ i, j }] == WL_FLOODHELPER)
 				{
-					sim->fvx[j][i] = newFanVelX;
-					sim->fvy[j][i] = newFanVelY;
-					sim->bmap[j][i] = WL_FAN;
+					sim->fvx[{ i, j }] = newFanVelX;
+					sim->fvy[{ i, j }] = newFanVelY;
+					sim->bmap[{ i, j }] = WL_FAN;
 				}
 	}
 	else

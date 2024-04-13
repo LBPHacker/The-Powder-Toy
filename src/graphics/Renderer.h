@@ -31,7 +31,7 @@ RGB PressureToColour(float pres);
 class Renderer : private RendererSettings, public RasterDrawMethods<Renderer>
 {
 	RendererFrame video;
-	std::array<pixel, WINDOW.X * RES.Y> persistentVideo;
+	PlaneAdapter<std::vector<pixel>> persistentVideo;
 	RendererFrame warpVideo;
 	RendererStats stats;
 
@@ -43,10 +43,10 @@ class Renderer : private RendererSettings, public RasterDrawMethods<Renderer>
 	friend struct RasterDrawMethods<Renderer>;
 
 	RNG rng;
-	unsigned char fire_r[YCELLS][XCELLS];
-	unsigned char fire_g[YCELLS][XCELLS];
-	unsigned char fire_b[YCELLS][XCELLS];
-	unsigned int fire_alpha[CELL*3][CELL*3];
+	PlaneAdapter<std::vector<unsigned char>> fire_r;
+	PlaneAdapter<std::vector<unsigned char>> fire_g;
+	PlaneAdapter<std::vector<unsigned char>> fire_b;
+	PlaneAdapter<std::vector<unsigned int>> fire_alpha;
 
 	void DrawBlob(Vec2<int> pos, RGB colour);
 	void DrawWalls();

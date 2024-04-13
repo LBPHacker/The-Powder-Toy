@@ -62,9 +62,9 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			for (int ry = -1; ry <= 1; ry++)
 			{
-				int r = sim->photons[y+ry][x+rx];
+				int r = sim->photons[{ x+rx, y+ry }];
 				if (!r)
-					r = pmap[y+ry][x+rx];
+					r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				if (TYP(r)!=PT_CRAY && TYP(r)!=PT_PSCN && TYP(r)!=PT_INST && TYP(r)!=PT_METL && TYP(r)!=PT_SPRK && TYP(r)<PT_NUM)
@@ -83,7 +83,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					int r = pmap[y+ry][x+rx];
+					int r = pmap[{ x+rx, y+ry }];
 					if (!r)
 						continue;
 					if (TYP(r)==PT_SPRK && parts[ID(r)].life==3) { //spark found, start creating
@@ -100,8 +100,8 @@ static int update(UPDATE_FUNC_ARGS)
 							if (!(x+nxi+nxx<XRES && y+nyi+nyy<YRES && x+nxi+nxx >= 0 && y+nyi+nyy >= 0)) {
 								break;
 							}
-							r = pmap[y+nyi+nyy][x+nxi+nxx];
-							if (!sim->IsWallBlocking(x+nxi+nxx, y+nyi+nyy, TYP(parts[i].ctype)) && (!sim->pmap[y+nyi+nyy][x+nxi+nxx] || createSpark)) { // create, also set color if it has passed through FILT
+							r = pmap[{ x+nxi+nxx, y+nyi+nyy }];
+							if (!sim->IsWallBlocking(x+nxi+nxx, y+nyi+nyy, TYP(parts[i].ctype)) && (!sim->pmap[{ x+nxi+nxx, y+nyi+nyy }] || createSpark)) { // create, also set color if it has passed through FILT
 								int nr = sim->create_part(-1, x+nxi+nxx, y+nyi+nyy, TYP(parts[i].ctype), ID(parts[i].ctype));
 								if (nr!=-1) {
 									if (colored)

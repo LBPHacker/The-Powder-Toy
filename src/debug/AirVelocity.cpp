@@ -16,8 +16,8 @@ void AirVelocity::Draw()
 	auto *g = ui::Engine::Ref().g;
 	ui::Point pos = controller->PointTranslate(view->GetCurrentMouse());
 
-	float velx = sim->vx[pos.Y/CELL][pos.X/CELL];
-	float vely = sim->vy[pos.Y/CELL][pos.X/CELL];
+	float velx = sim->vx[{ pos.X/CELL, pos.Y/CELL }];
+	float vely = sim->vy[{ pos.X/CELL, pos.Y/CELL }];
 	int endx = pos.X + (int)(10.0f*velx);
 	int endy = pos.Y + (int)(10.0f*vely);
 	

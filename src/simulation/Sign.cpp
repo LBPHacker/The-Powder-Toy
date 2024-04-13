@@ -35,16 +35,16 @@ String sign::getDisplayText(const RenderableSimulation *sim, int &x0, int &y0, i
 			float aheat = 0.0f;
 			if (sim && x >= 0 && x < XRES && y >= 0 && y < YRES)
 			{
-				if (sim->photons[y][x])
+				if (sim->photons[{ x, y }])
 				{
-					part = &(sim->parts[ID(sim->photons[y][x])]);
+					part = &(sim->parts[ID(sim->photons[{ x, y }])]);
 				}
-				else if (sim->pmap[y][x])
+				else if (sim->pmap[{ x, y }])
 				{
-					part = &(sim->parts[ID(sim->pmap[y][x])]);
+					part = &(sim->parts[ID(sim->pmap[{ x, y }])]);
 				}
-				pressure = sim->pv[y/CELL][x/CELL];
-				aheat = sim->hv[y/CELL][x/CELL] - 273.15f;
+				pressure = sim->pv[{ x/CELL, y/CELL }];
+				aheat = sim->hv[{ x/CELL, y/CELL }] - 273.15f;
 			}
 
 			String remaining_text = text;

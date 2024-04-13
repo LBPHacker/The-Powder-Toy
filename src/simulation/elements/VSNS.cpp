@@ -63,7 +63,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					int r = pmap[y + ry][x + rx];
+					int r = pmap[{ x + rx, y + ry }];
 					if (!r)
 						continue;
 					int rt = TYP(r);
@@ -88,9 +88,9 @@ static int update(UPDATE_FUNC_ARGS)
 		for (int ry = -rd; ry < rd + 1; ry++)
 			if (x + rx >= 0 && y + ry >= 0 && x + rx < XRES && y + ry < YRES && (rx || ry))
 			{
-				int r = pmap[y + ry][x + rx];
+				int r = pmap[{ x + rx, y + ry }];
 				if (!r)
-					r = sim->photons[y + ry][x + rx];
+					r = sim->photons[{ x + rx, y + ry }];
 				if (!r)
 					continue;
 				float Vx = parts[ID(r)].vx;
@@ -138,9 +138,9 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				int r = pmap[y + ry][x + rx];
+				int r = pmap[{ x + rx, y + ry }];
 				if (!r)
-					r = sim->photons[y + ry][x + rx];
+					r = sim->photons[{ x + rx, y + ry }];
 				if (!r)
 					continue;
 				int nx = x + rx;
@@ -155,7 +155,7 @@ static int update(UPDATE_FUNC_ARGS)
 						ny += ry;
 						if (nx < 0 || ny < 0 || nx >= XRES || ny >= YRES)
 							break;
-						r = pmap[ny][nx];
+						r = pmap[{ nx, ny }];
 					}
 				}
 				//Deserialization.

@@ -100,7 +100,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				int r = pmap[y+ry][x+rx];
+				int r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				bool boolMode = accepted_conductor(sim, r);
@@ -118,9 +118,9 @@ static int update(UPDATE_FUNC_ARGS)
 				{
 					if (!(xCurrent>=0 && yCurrent>=0 && xCurrent<XRES && yCurrent<YRES))
 						break; // We're out of bounds! Oops!
-					int rr = pmap[yCurrent][xCurrent];
+					int rr = pmap[{ xCurrent, yCurrent }];
 					if (!rr && !ignoreEnergy)
-						rr = sim->photons[yCurrent][xCurrent];
+						rr = sim->photons[{ xCurrent, yCurrent }];
 					if (!rr)
 						continue;
 
@@ -161,7 +161,7 @@ static int update(UPDATE_FUNC_ARGS)
 							ny += ry;
 							if (nx < 0 || ny < 0 || nx >= XRES || ny >= YRES)
 								break;
-							r = pmap[ny][nx];
+							r = pmap[{ nx, ny }];
 						}
 						break;
 					}

@@ -61,7 +61,7 @@ static int update(UPDATE_FUNC_ARGS)
 	auto temp = parts[i].temp;
 
 	// Turn into liquid wax under high temperature and pressure
-	if (temp > 320.0f && sim->pv[y/CELL][x/CELL] > 50.0f && sim->rng.chance(1, 150))
+	if (temp > 320.0f && sim->pv[{ x/CELL, y/CELL }] > 50.0f && sim->rng.chance(1, 150))
 	{
 		//@ SEED -> MWAX
 		sim->create_part(i, x, y, PT_MWAX);
@@ -99,7 +99,7 @@ static int update(UPDATE_FUNC_ARGS)
 		int up = (down+4)%8;
 
 		// Check if there's SAND under the seed particle and empty space above
-		if (TYP(pmap[y+dir3x3[down].Y][x+dir3x3[down].X]) == PT_SAND && !TYP(pmap[y+dir3x3[up].Y][x+dir3x3[up].X]))
+		if (TYP(pmap[Vec2{ x, y } + dir3x3[down]]) == PT_SAND && !TYP(pmap[Vec2{ x, y } + dir3x3[up]]))
 		{
 			if (parts[i].life > 200)
 			{
@@ -124,7 +124,7 @@ static int update(UPDATE_FUNC_ARGS)
 		for (auto ry = -1; ry <= 1; ry++)
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 
 				switch (TYP(r))
 				{

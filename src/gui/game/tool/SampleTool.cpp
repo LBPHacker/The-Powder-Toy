@@ -29,13 +29,13 @@ void SampleTool::Draw(Simulation * sim, Brush const &brush, ui::Point position)
 	else
 	{
 		int i = -1;
-		if (sim->photons[position.Y][position.X])
+		if (sim->photons[position])
 		{
-			i = ID(sim->photons[position.Y][position.X]);
+			i = ID(sim->photons[position]);
 		}
-		else if (sim->pmap[position.Y][position.X])
+		else if (sim->pmap[position])
 		{
-			i = ID(sim->pmap[position.Y][position.X]);
+			i = ID(sim->pmap[position]);
 		}
 		if (i != -1)
 		{

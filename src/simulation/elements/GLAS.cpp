@@ -49,7 +49,7 @@ void Element::Element_GLAS()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	auto press = int(sim->pv[y/CELL][x/CELL] * 64);
+	auto press = int(sim->pv[{ x/CELL, y/CELL }] * 64);
 	auto diff = press - parts[i].tmp3;
 
 	// Determine whether the GLAS is chemically strengthened via .life setting. (250 = Max., 16 = Min.)
@@ -64,15 +64,15 @@ static int update(UPDATE_FUNC_ARGS)
 	parts[i].tmp3 = press;
 
 	// Liquid nitrogen condenses on chemically strengthened glass
-	if ((strength > 200) && (parts[i].temp < 77.0f) && (sim->hv[y/CELL][x/CELL] < 77.0f)
-			&& (sim->pv[y/CELL][x/CELL] > 5.0f) && sim->rng.chance(1, 100))
+	if ((strength > 200) && (parts[i].temp < 77.0f) && (sim->hv[{ x/CELL, y/CELL }] < 77.0f)
+			&& (sim->pv[{ x/CELL, y/CELL }] > 5.0f) && sim->rng.chance(1, 100))
 	{
 		// Sample 4 adjacent cells
 		auto adj = sim->rng.between(0, 3);
 		auto rx = (1 - 2*(adj%2))*(1 - adj/2);
 		auto ry = (1 - 2*(adj%2))*(adj/2);
 
-		auto r = pmap[y+ry][x+rx];
+		auto r = pmap[{ x+rx, y+ry }];
 		// If found an empty spot around glass
 		if (!r)
 		{
@@ -80,7 +80,7 @@ static int update(UPDATE_FUNC_ARGS)
 			auto np = sim->create_part(-1, x+rx, y+ry, PT_LNTG);
 			if (np>-1)
 			{
-				sim->pv[y/CELL][x/CELL] -= 1.0f;
+				sim->pv[{ x/CELL, y/CELL }] -= 1.0f;
 				parts[i].temp += 200.0f;
 			}
 		}
@@ -91,5 +91,5 @@ static int update(UPDATE_FUNC_ARGS)
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
-	sim->parts[i].tmp3 = int(sim->pv[y/CELL][x/CELL] * 64);
+	sim->parts[i].tmp3 = int(sim->pv[{ x/CELL, y/CELL }] * 64);
 }
