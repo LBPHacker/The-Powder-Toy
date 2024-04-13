@@ -1,10 +1,10 @@
 #pragma once
 #include "ElementDefs.h"
 
-constexpr float IPL = MIN_PRESSURE - 1;
-constexpr float IPH = MAX_PRESSURE + 1;
-constexpr float ITL = MIN_TEMP - 1;
-constexpr float ITH = MAX_TEMP + 1;
+extern float IPL;
+extern float IPH;
+extern float ITL;
+extern float ITH;
 
 // no transition (PT_NONE means kill part)
 constexpr int NT = -1;

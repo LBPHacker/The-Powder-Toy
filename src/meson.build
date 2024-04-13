@@ -145,6 +145,7 @@ common_files = files(
 	'Format.cpp',
 	'Misc.cpp',
 	'Probability.cpp',
+	'InitSimulationConfig.cpp',
 )
 
 resolve_vcs_tag = get_option('resolve_vcs_tag')

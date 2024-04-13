@@ -1,0 +1,173 @@
+#include "InitSimulationConfig.h"
+#include "SimulationConfig.h"
+#include "simulation/ElementDefs.h"
+#include "common/String.h"
+#include "prefs/GlobalPrefs.h"
+
+int CELL;
+Vec2<int> CELLS;
+Vec2<int> RES;
+int XCELLS;
+int YCELLS;
+int NCELL;
+int XRES;
+int YRES;
+int NPART;
+int XCNTR;
+int YCNTR;
+Vec2<int> WINDOW;
+int WINDOWW;
+int WINDOWH;
+int ISTP;
+float CFDS;
+float MAX_TEMP;
+float MIN_TEMP;
+float MAX_PRESSURE;
+float MIN_PRESSURE;
+float IPL;
+float IPH;
+float ITL;
+float ITH;
+
+namespace
+{
+	struct FullSimulationConfig
+	{
+		int CELL;
+		Vec2<int> CELLS;
+		Vec2<int> RES;
+		int XCELLS;
+		int YCELLS;
+		int NCELL;
+		int XRES;
+		int YRES;
+		int NPART;
+		int XCNTR;
+		int YCNTR;
+		Vec2<int> WINDOW;
+		int WINDOWW;
+		int WINDOWH;
+		int ISTP;
+		float CFDS;
+		float MAX_TEMP;
+		float MIN_TEMP;
+		float MAX_PRESSURE;
+		float MIN_PRESSURE;
+		float IPL;
+		float IPH;
+		float ITL;
+		float ITH;
+
+		FullSimulationConfig() = default;
+
+		FullSimulationConfig(SimulationConfig config)
+		{
+			CELL         = config.CELL;
+			CELLS        = config.CELLS;
+			RES          = CELLS * CELL;
+			XCELLS       = CELLS.X;
+			YCELLS       = CELLS.Y;
+			NCELL        = XCELLS * YCELLS;
+			XRES         = RES.X;
+			YRES         = RES.Y;
+			NPART        = config.NPART;
+			XCNTR        = XRES / 2;
+			YCNTR        = YRES / 2;
+			WINDOW       = RES + Vec2(BARSIZE, MENUSIZE);
+			WINDOWW      = WINDOW.X;
+			WINDOWH      = WINDOW.Y;
+			ISTP         = CELL / 2;
+			CFDS         = 4.0f / CELL;
+			MAX_TEMP     = config.MAX_TEMP;
+			MIN_TEMP     = config.MIN_TEMP;
+			MAX_PRESSURE = config.MAX_PRESSURE;
+			MIN_PRESSURE = config.MIN_PRESSURE;
+			IPL          = MIN_PRESSURE - 1;
+			IPH          = MAX_PRESSURE + 1;
+			ITL          = MIN_TEMP - 1;
+			ITH          = MAX_TEMP + 1;
+			if (ISTP == 0)
+			{
+				ISTP = 1;
+			}
+		}
+	};
+}
+
+namespace
+{
+	SimulationConfig currentConfig;
+	SimulationConfig nextConfig;
+}
+
+void InitSimulationConfig(SimulationConfig newConfig)
+{
+	currentConfig = newConfig;
+	nextConfig = currentConfig;
+	auto full = FullSimulationConfig(currentConfig);
+	CELL         = full.CELL;
+	CELLS        = full.CELLS;
+	RES          = full.RES;
+	XCELLS       = full.XCELLS;
+	YCELLS       = full.YCELLS;
+	NCELL        = full.NCELL;
+	XRES         = full.XRES;
+	YRES         = full.YRES;
+	NPART        = full.NPART;
+	XCNTR        = full.XCNTR;
+	YCNTR        = full.YCNTR;
+	WINDOW       = full.WINDOW;
+	WINDOWW      = full.WINDOWW;
+	WINDOWH      = full.WINDOWH;
+	ISTP         = full.ISTP;
+	CFDS         = full.CFDS;
+	MAX_TEMP     = full.MAX_TEMP;
+	MIN_TEMP     = full.MIN_TEMP;
+	MAX_PRESSURE = full.MAX_PRESSURE;
+	MIN_PRESSURE = full.MIN_PRESSURE;
+	IPL          = full.IPL;
+	IPH          = full.IPH;
+	ITL          = full.ITL;
+	ITH          = full.ITH;
+}
+
+const SimulationConfig &GetCurrentSimulationConfig()
+{
+	return currentConfig;
+}
+
+const SimulationConfig &GetNextSimulationConfig()
+{
+	return nextConfig;
+}
+
+void SetNextSimulationConfig(SimulationConfig newConfig)
+{
+	nextConfig = newConfig;
+}
+
+void SimulationConfig::Check() const
+{
+	auto checkBounds = [](const char *name, auto value, auto min, auto max) {
+		if (!(value >= min && value <= max))
+		{
+			throw CheckFailed(ByteString::Build(name, " is ", value, ", expected to be between ", min, " and ", max));
+		}
+	};
+	checkBounds("cell size"            , CELL        ,     1,   100);
+	checkBounds("horizontal cell count", CELLS.X     ,     1, 15000);
+	checkBounds("vertical cell count"  , CELLS.Y     ,     1, 15000);
+	checkBounds("particle count count" , NPART       ,     1, 1 << (31 - PMAPBITS));
+	checkBounds("maximum temperature"  , MAX_TEMP    , -1e38,  1e38);
+	checkBounds("minimum temperature"  , MIN_TEMP    , -1e38,  MAX_TEMP);
+	checkBounds("maximum pressure"     , MAX_PRESSURE, -1e38,  1e38);
+	checkBounds("minimum pressure"     , MIN_PRESSURE, -1e38,  MAX_PRESSURE);
+	auto full = FullSimulationConfig(*this);
+	checkBounds("simulation width" , full.RES.X, 300, 15000);
+	checkBounds("simulation height", full.RES.Y, 60, 15000);
+}
+
+bool SimulationConfig::CanSave() const
+{
+	return CELLS.X <= 255 && CELLS.Y <= 255;
+}

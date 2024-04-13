@@ -175,7 +175,7 @@ static std::unique_ptr<PlaneAdapter<std::vector<uint32_t>>> readPNG(
 	png_set_read_fn(png.get(), static_cast<void *>(&readFn), [](png_structp png, png_bytep data, size_t length) {
 		(*static_cast<decltype(readFn) *>(png_get_io_ptr(png)))(png, data, length);
 	});
-	png_set_user_limits(png.get(), RES.X, RES.Y); // Refuse to parse larger images
+	png_set_user_limits(png.get(), std::max(612, RES.X), std::max(384, RES.Y)); // Refuse to parse larger images
 	png_read_info(png.get(), info);
 
 	auto output = std::make_unique<PlaneAdapter<std::vector<uint32_t>>>(

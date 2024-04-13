@@ -357,8 +357,8 @@ void Renderer::render_parts()
 				//Alter colour based on display mode
 				if(colorMode & COLOUR_HEAT)
 				{
-					constexpr float min_temp = MIN_TEMP;
-					constexpr float max_temp = MAX_TEMP;
+					float min_temp = MIN_TEMP;
+					float max_temp = MAX_TEMP;
 					firea = 255;
 					RGB color = heatTableAt(int((sim->parts[i].temp - min_temp) / (max_temp - min_temp) * 1024));
 					firer = colr = color.Red;
@@ -1295,8 +1295,8 @@ void Renderer::render_fire()
 
 int HeatToColour(float temp)
 {
-	constexpr float min_temp = MIN_TEMP;
-	constexpr float max_temp = MAX_TEMP;
+	float min_temp = MIN_TEMP;
+	float max_temp = MAX_TEMP;
 	RGB color = Renderer::heatTableAt(int((temp - min_temp) / (max_temp - min_temp) * 1024));
 	color.Red   = uint8_t(color.Red   * 0.7f);
 	color.Green = uint8_t(color.Green * 0.7f);
