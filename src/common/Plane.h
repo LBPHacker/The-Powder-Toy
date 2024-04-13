@@ -164,6 +164,20 @@ public:
 		Base(std::forward<Args>(args)...)
 	{}
 
+	friend void swap(PlaneAdapter &first, PlaneAdapter &second) noexcept
+	{
+		using std::swap;
+		swap(static_cast<xExtent<Width> &>(first), static_cast<xExtent<Width> &>(second));
+		swap(static_cast<yExtent<Height> &>(first), static_cast<yExtent<Height> &>(second));
+		swap(first.Base, second.Base);
+	}
+
+	PlaneAdapter &operator =(PlaneAdapter other)
+	{
+		swap(*this, other);
+		return *this;
+	}
+
 	Vec2<int> Size() const
 	{
 		return Vec2<int>(getWidth(), getHeight());
@@ -183,6 +197,26 @@ public:
 	const_iterator RowIterator(Vec2<int> p) const
 	{
 		return std::begin(getBase()) + (p.X + p.Y * getWidth());
+	}
+
+	iterator begin()
+	{
+		return std::begin(getBase());
+	}
+
+	const_iterator begin() const
+	{
+		return std::begin(getBase());
+	}
+
+	iterator end()
+	{
+		return std::end(getBase());
+	}
+
+	const_iterator end() const
+	{
+		return std::end(getBase());
 	}
 
 	value_type *data()

@@ -18,8 +18,8 @@ static int perform(SimTool *tool, Simulation *sim, Particle *cpart, int x, int y
 		return 0;
 	}
 
-	sim->hv[y / CELL][x / CELL] += strength * 2.0f;
-	if (sim->hv[y / CELL][x / CELL] > MAX_TEMP) sim->hv[y / CELL][x / CELL] = MAX_TEMP;
-	if (sim->hv[y / CELL][x / CELL] < MIN_TEMP) sim->hv[y / CELL][x / CELL] = MIN_TEMP;
+	sim->hv[{ x / CELL, y / CELL }] += strength * 2.0f;
+	if (sim->hv[{ x / CELL, y / CELL }] > MAX_TEMP) sim->hv[{ x / CELL, y / CELL }] = MAX_TEMP;
+	if (sim->hv[{ x / CELL, y / CELL }] < MIN_TEMP) sim->hv[{ x / CELL, y / CELL }] = MIN_TEMP;
 	return 1;
 }

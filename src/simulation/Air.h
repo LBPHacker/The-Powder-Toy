@@ -1,5 +1,7 @@
 #pragma once
 #include "SimulationConfig.h"
+#include "common/Plane.h"
+#include <vector>
 
 class Simulation;
 
@@ -9,12 +11,12 @@ public:
 	Simulation & sim;
 	int airMode;
 	float ambientAirTemp;
-	float ovx[YCELLS][XCELLS];
-	float ovy[YCELLS][XCELLS];
-	float opv[YCELLS][XCELLS];
-	float ohv[YCELLS][XCELLS]; // Ambient Heat
-	unsigned char bmap_blockair[YCELLS][XCELLS];
-	unsigned char bmap_blockairh[YCELLS][XCELLS];
+	PlaneAdapter<std::vector<float>> ovx;
+	PlaneAdapter<std::vector<float>> ovy;
+	PlaneAdapter<std::vector<float>> opv;
+	PlaneAdapter<std::vector<float>> ohv; // Ambient Heat
+	PlaneAdapter<std::vector<unsigned char>> bmap_blockair;
+	PlaneAdapter<std::vector<unsigned char>> bmap_blockairh;
 	float kernel[9];
 	void make_kernel(void);
 	void update_airh(void);

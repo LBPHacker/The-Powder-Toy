@@ -90,11 +90,11 @@ bool CheckLine(Simulation* sim, int x1, int y1, int x2, int y2, BinaryPredicate 
 	{
 		if (reverseXY)
 		{
-			if (func(sim, sim->pmap[x][y])) return true;
+			if (func(sim, sim->pmap[{ y, x }])) return true;
 		}
 		else
 		{
-			if (func(sim, sim->pmap[y][x])) return true;
+			if (func(sim, sim->pmap[{ x, y }])) return true;
 		}
 		e += de;
 		if (e >= 0.5f)
@@ -104,11 +104,11 @@ bool CheckLine(Simulation* sim, int x1, int y1, int x2, int y2, BinaryPredicate 
 			{
 				if (reverseXY)
 				{
-					if (func(sim, sim->pmap[x][y])) return true;
+					if (func(sim, sim->pmap[{ y, x }])) return true;
 				}
 				else
 				{
-					if (func(sim, sim->pmap[y][x])) return true;
+					if (func(sim, sim->pmap[{ x, y }])) return true;
 				}
 			}
 			e -= 1.0f;
@@ -132,13 +132,13 @@ static int update(UPDATE_FUNC_ARGS)
 			rrx = rx * rad;
 			if (x+rrx >= 0 && x+rrx < XRES && y+rry >= 0 && y+rry < YRES && !CheckLine(sim, x, y, x+rrx, y+rry, isInsulator))
 			{
-				r = pmap[y+rry][x+rrx];
+				r = pmap[{ x+rrx, y+rry }];
 				if (r && elements[TYP(r)].HeatConduct > 0 && (TYP(r) != PT_HSWC || parts[ID(r)].life == 10))
 				{
 					count++;
 					tempAgg += parts[ID(r)].temp;
 				}
-				r = sim->photons[y+rry][x+rrx];
+				r = sim->photons[{ x+rrx, y+rry }];
 				if (r && elements[TYP(r)].HeatConduct > 0 && (TYP(r) != PT_HSWC || parts[ID(r)].life == 10))
 				{
 					count++;
@@ -160,12 +160,12 @@ static int update(UPDATE_FUNC_ARGS)
 				rrx = rx * rad;
 				if (x+rrx >= 0 && x+rrx < XRES && y+rry >= 0 && y+rry < YRES && !CheckLine(sim, x, y, x+rrx, y+rry, isInsulator))
 				{
-					r = pmap[y+rry][x+rrx];
+					r = pmap[{ x+rrx, y+rry }];
 					if (r && elements[TYP(r)].HeatConduct > 0 && (TYP(r) != PT_HSWC || parts[ID(r)].life == 10))
 					{
 						parts[ID(r)].temp = parts[i].temp;
 					}
-					r = sim->photons[y+rry][x+rrx];
+					r = sim->photons[{ x+rrx, y+rry }];
 					if (r && elements[TYP(r)].HeatConduct > 0 && (TYP(r) != PT_HSWC || parts[ID(r)].life == 10))
 					{
 						parts[ID(r)].temp = parts[i].temp;

@@ -49,7 +49,7 @@ void Element::Element_ISZS()
 static int update(UPDATE_FUNC_ARGS)
 {
 	float rr, rrr;
-	if (sim->rng.chance(1, 200) && sim->rng.chance(int(-4.0f * sim->pv[y/CELL][x/CELL]), 1000))
+	if (sim->rng.chance(1, 200) && sim->rng.chance(int(-4.0f * sim->pv[{ x/CELL, y/CELL }]), 1000))
 	{
 		sim->create_part(i, x, y, PT_PHOT);
 		rr = sim->rng.between(128, 355) / 127.0f;
