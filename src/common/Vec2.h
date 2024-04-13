@@ -14,6 +14,12 @@ struct Vec2
 {
 	T X, Y;
 
+	constexpr Vec2():
+		X(0),
+		Y(0)
+	{
+	}
+
 	constexpr Vec2(T x, T y):
 		X(x),
 		Y(y)
