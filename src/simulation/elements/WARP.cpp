@@ -54,7 +54,7 @@ static int update(UPDATE_FUNC_ARGS)
 	if (parts[i].tmp2 > 2000)
 	{
 		parts[i].temp = 10000;
-		sim->pv[y/CELL][x/CELL] += (parts[i].tmp2 / 5000) * CFDS;
+		sim->pv[{ x/CELL, y/CELL }] += (parts[i].tmp2 / 5000) * CFDS;
 		if (sim->rng.chance(1, 50))
 			sim->create_part(-3, x, y, PT_ELEC);
 	}
@@ -64,7 +64,7 @@ static int update(UPDATE_FUNC_ARGS)
 		int ry = sim->rng.between(-1, 1);
 		if (rx || ry)
 		{
-			int r = pmap[y + ry][x + rx];
+			int r = pmap[{ x + rx, y + ry }];
 			if (!r)
 				continue;
 			if (TYP(r) != PT_WARP && TYP(r) != PT_STKM && TYP(r) != PT_STKM2 && TYP(r) != PT_DMND && TYP(r) != PT_CLNE && TYP(r) != PT_BCLN && TYP(r) != PT_PCLN)
@@ -76,8 +76,8 @@ static int update(UPDATE_FUNC_ARGS)
 				parts[ID(r)].vx = sim->rng.between(-2, 1) + 0.5f;
 				parts[ID(r)].vy = float(sim->rng.between(-2, 1));
 				parts[i].life += 4;
-				pmap[y][x] = r;
-				pmap[y + ry][x + rx] = PMAP(i, parts[i].type);
+				pmap[{ x, y }] = r;
+				pmap[{ x + rx, y + ry }] = PMAP(i, parts[i].type);
 				trade = 5;
 			}
 		}

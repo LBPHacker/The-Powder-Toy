@@ -56,12 +56,12 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	unsigned int pressureFactor = 3 + (int)sim->pv[y/CELL][x/CELL];
+	unsigned int pressureFactor = 3 + (int)sim->pv[{ x/CELL, y/CELL }];
 	for (int rx = -1; rx <= 1; rx++)
 	{
 		for (int ry = -1; ry <= 1; ry++)
 		{
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[{ x+rx, y+ry }];
 			switch (TYP(r))
 			{
 			case PT_WATR:
@@ -90,7 +90,7 @@ static int update(UPDATE_FUNC_ARGS)
 						parts[ID(r)].vx = 0.25f*parts[ID(r)].vx + parts[i].vx;
 						parts[ID(r)].vy = 0.25f*parts[ID(r)].vy + parts[i].vy;
 					}
-					sim->pv[y/CELL][x/CELL] += 10.0f * CFDS; //Used to be 2, some people said nukes weren't powerful enough
+					sim->pv[{ x/CELL, y/CELL }] += 10.0f * CFDS; //Used to be 2, some people said nukes weren't powerful enough
 					Element_FIRE_update(UPDATE_FUNC_SUBCALL_ARGS);
 				}
 				break;
@@ -240,6 +240,6 @@ static int DeutExplosion(Simulation * sim, int n, int x, int y, float temp, int 
 		else if (sim->MaxPartsReached())
 			break;
 	}
-	sim->pv[y/CELL][x/CELL] += (6.0f * CFDS)*n;
+	sim->pv[{ x/CELL, y/CELL }] += (6.0f * CFDS)*n;
 	return 0;
 }

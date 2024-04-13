@@ -97,7 +97,7 @@ int Element_ETRD_nearestSparkablePart(Simulation *sim, int targetId)
 	if (sim->etrd_count_valid && sim->etrd_life0_count <= 0)
 		return -1;
 
-	Particle *parts = sim->parts;
+	auto &parts = sim->parts;
 	if (parts[targetId].tmp2 && parts[targetId].tmp > parts[targetId].tmp2) // Invalid range if max is set
 		return -1;
 
@@ -130,7 +130,7 @@ int Element_ETRD_nearestSparkablePart(Simulation *sim, int targetId)
 				}
 				if (InBounds(checkPos.X, checkPos.Y) && checkDistance <= foundDistance)
 				{
-					int r = sim->pmap[checkPos.Y][checkPos.X];
+					int r = sim->pmap[checkPos];
 					if (r && TYP(r) == PT_ETRD && !parts[ID(r)].life && ID(r) != targetId && checkDistance < foundDistance)
 					{
 						foundDistance = checkDistance;

@@ -50,12 +50,12 @@ constexpr float ADVECTION = 0.1f;
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	if (!parts[i].life && sim->pv[y/CELL][x/CELL]>1.0f)
+	if (!parts[i].life && sim->pv[{ x/CELL, y/CELL }]>1.0f)
 		parts[i].life = sim->rng.between(300, 379);
 	if (parts[i].life)
 	{
-		parts[i].vx += ADVECTION*sim->vx[y/CELL][x/CELL];
-		parts[i].vy += ADVECTION*sim->vy[y/CELL][x/CELL];
+		parts[i].vx += ADVECTION*sim->vx[{ x/CELL, y/CELL }];
+		parts[i].vy += ADVECTION*sim->vy[{ x/CELL, y/CELL }];
 	}
 	return 0;
 }

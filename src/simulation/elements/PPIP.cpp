@@ -68,9 +68,9 @@ void Element_PPIP_flood_trigger(Simulation * sim, int x, int y, int sparkedBy)
 	int coord_stack_size = 0;
 	int x1, x2;
 
-	Particle * parts = sim->parts;
-	int (*pmap)[XRES] = sim->pmap;
-	int t = TYP(pmap[y][x]);
+	auto &parts = sim->parts;
+	auto &pmap = sim->pmap;
+	int t = TYP(pmap[{ x, y }]);
 	if (t != PT_PIPE && t != PT_PPIP)
 		return;
 
@@ -82,7 +82,7 @@ void Element_PPIP_flood_trigger(Simulation * sim, int x, int y, int sparkedBy)
 	else if (sparkedBy==PT_INST) prop = PPIP_TMPFLAG_TRIGGER_REVERSE << 3;
 	else if (sparkedBy == PT_HEAC) prop = PFLAG_CAN_CONDUCT; // Special case for HEAC near pipe
 
-	if (prop == 0 || (t != PT_PPIP && sparkedBy != PT_HEAC) || (parts[ID(pmap[y][x])].tmp & prop))
+	if (prop == 0 || (t != PT_PPIP && sparkedBy != PT_HEAC) || (parts[ID(pmap[{ x, y }])].tmp & prop))
 		return;
 
 	coord_stack = new unsigned short[coord_stack_limit][2];
@@ -99,7 +99,7 @@ void Element_PPIP_flood_trigger(Simulation * sim, int x, int y, int sparkedBy)
 		// go left as far as possible
 		while (x1>=CELL)
 		{
-			if (TYP(pmap[y][x1-1]) != t)
+			if (TYP(pmap[{ x1-1, y }]) != t)
 			{
 				break;
 			}
@@ -108,7 +108,7 @@ void Element_PPIP_flood_trigger(Simulation * sim, int x, int y, int sparkedBy)
 		// go right as far as possible
 		while (x2<XRES-CELL)
 		{
-			if (TYP(pmap[y][x2+1]) != t)
+			if (TYP(pmap[{ x2+1, y }]) != t)
 			{
 				break;
 			}
@@ -117,9 +117,9 @@ void Element_PPIP_flood_trigger(Simulation * sim, int x, int y, int sparkedBy)
 		// fill span
 		for (x=x1; x<=x2; x++)
 		{
-			if (!(parts[ID(pmap[y][x])].tmp & prop) && sparkedBy != PT_HEAC)
+			if (!(parts[ID(pmap[{ x, y }])].tmp & prop) && sparkedBy != PT_HEAC)
 				sim->Element_PPIP_ppip_changed = 1;
-			parts[ID(pmap[y][x])].tmp |= prop;
+			parts[ID(pmap[{ x, y }])].tmp |= prop;
 		}
 
 		// add adjacent pixels to stack
@@ -127,7 +127,7 @@ void Element_PPIP_flood_trigger(Simulation * sim, int x, int y, int sparkedBy)
 		// Don't need to check x bounds here, because already limited to [CELL, XRES-CELL]
 		if (y>=CELL+1)
 			for (x=x1-1; x<=x2+1; x++)
-			if (TYP(pmap[y-1][x]) == t && !(parts[ID(pmap[y-1][x])].tmp & prop))
+			if (TYP(pmap[{ x, y-1 }]) == t && !(parts[ID(pmap[{ x, y-1 }])].tmp & prop))
 			{
 				coord_stack[coord_stack_size][0] = x;
 				coord_stack[coord_stack_size][1] = y-1;
@@ -140,7 +140,7 @@ void Element_PPIP_flood_trigger(Simulation * sim, int x, int y, int sparkedBy)
 			}
 		if (y<YRES-CELL-1)
 			for (x=x1-1; x<=x2+1; x++)
-				if (TYP(pmap[y+1][x]) == t && !(parts[ID(pmap[y+1][x])].tmp & prop))
+				if (TYP(pmap[{ x, y+1 }]) == t && !(parts[ID(pmap[{ x, y+1 }])].tmp & prop))
 				{
 					coord_stack[coord_stack_size][0] = x;
 					coord_stack[coord_stack_size][1] = y+1;

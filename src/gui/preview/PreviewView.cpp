@@ -209,7 +209,7 @@ void PreviewView::commentBoxAutoHeight()
 		addCommentBox->Size.Y = oldSize;
 
 		commentBoxHeight = newSize+22;
-		commentBoxPositionX.SetTarget((XRES/2)+4);
+		commentBoxPositionX.SetTarget(float((XRES/2)+4));
 		commentBoxPositionY.SetTarget(float(Size.Y-(newSize+21)));
 		commentBoxSizeX.SetTarget(float(Size.X-(XRES/2)-8));
 		commentBoxSizeY.SetTarget(float(newSize));
@@ -224,7 +224,7 @@ void PreviewView::commentBoxAutoHeight()
 		commentBoxHeight = 20;
 		addCommentBox->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
 
-		commentBoxPositionX.SetTarget((XRES/2)+4);
+		commentBoxPositionX.SetTarget(float((XRES/2)+4));
 		commentBoxPositionY.SetTarget(float(Size.Y-19));
 		commentBoxSizeX.SetTarget(float(Size.X-(XRES/2)-48));
 		commentBoxSizeY.SetTarget(17);

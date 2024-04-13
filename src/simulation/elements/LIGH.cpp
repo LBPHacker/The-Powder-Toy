@@ -73,12 +73,12 @@ static int update(UPDATE_FUNC_ARGS)
 	//Element_FIRE::update(UPDATE_FUNC_SUBCALL_ARGS);
 	if (sim->aheat_enable)
 	{
-		sim->hv[y/CELL][x/CELL] += powderful/50;
-		if (sim->hv[y/CELL][x/CELL] > MAX_TEMP)
-			sim->hv[y/CELL][x/CELL] = MAX_TEMP;
+		sim->hv[{ x/CELL, y/CELL }] += powderful/50;
+		if (sim->hv[{ x/CELL, y/CELL }] > MAX_TEMP)
+			sim->hv[{ x/CELL, y/CELL }] = MAX_TEMP;
 		// If the LIGH was so powerful that it overflowed hv, set to max temp
-		else if (sim->hv[y/CELL][x/CELL] < 0)
-			sim->hv[y/CELL][x/CELL] = MAX_TEMP;
+		else if (sim->hv[{ x/CELL, y/CELL }] < 0)
+			sim->hv[{ x/CELL, y/CELL }] = MAX_TEMP;
 	}
 
 	auto &sd = SimulationData::CRef();
@@ -89,20 +89,20 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				auto rt = TYP(r);
 				if ((surround_space || elements[rt].Explosive) &&
 				    (rt!=PT_SPNG || parts[ID(r)].life==0) &&
-					elements[rt].Flammable && sim->rng.chance(elements[rt].Flammable + int(sim->pv[(y+ry)/CELL][(x+rx)/CELL] * 10.0f), 1000))
+					elements[rt].Flammable && sim->rng.chance(elements[rt].Flammable + int(sim->pv[{ (x+rx)/CELL, (y+ry)/CELL }] * 10.0f), 1000))
 				{
 					sim->part_change_type(ID(r),x+rx,y+ry,PT_FIRE);
 					parts[ID(r)].temp = restrict_flt(elements[PT_FIRE].DefaultProperties.temp + (elements[rt].Flammable/2), MIN_TEMP, MAX_TEMP);
 					parts[ID(r)].life = sim->rng.between(180, 259);
 					parts[ID(r)].tmp = parts[ID(r)].ctype = 0;
 					if (elements[rt].Explosive)
-						sim->pv[y/CELL][x/CELL] += 0.25f * CFDS;
+						sim->pv[{ x/CELL, y/CELL }] += 0.25f * CFDS;
 				}
 				switch (rt)
 				{
@@ -118,7 +118,7 @@ static int update(UPDATE_FUNC_ARGS)
 				case PT_DEUT:
 				case PT_PLUT:
 					parts[ID(r)].temp = restrict_flt(parts[ID(r)].temp+powderful, MIN_TEMP, MAX_TEMP);
-					sim->pv[y/CELL][x/CELL] +=powderful/35;
+					sim->pv[{ x/CELL, y/CELL }] +=powderful/35;
 					if (sim->rng.chance(1, 3))
 					{
 						sim->part_change_type(ID(r),x+rx,y+ry,PT_NEUT);
@@ -153,7 +153,7 @@ static int update(UPDATE_FUNC_ARGS)
 				}
 				if ((elements[TYP(r)].Properties&PROP_CONDUCTS) && parts[ID(r)].life==0)
 					sim->create_part(ID(r),x+rx,y+ry,PT_SPRK);
-				sim->pv[y/CELL][x/CELL] += powderful/400;
+				sim->pv[{ x/CELL, y/CELL }] += powderful/400;
 				if (!sd.IsHeatInsulator(parts[ID(r)])) parts[ID(r)].temp = restrict_flt(parts[ID(r)].temp+powderful/1.3, MIN_TEMP, MAX_TEMP);
 			}
 		}
@@ -222,7 +222,7 @@ static bool create_LIGH(Simulation * sim, int x, int y, int c, float temp, int l
 	}
 	else if (x >= 0 && x < XRES && y >= 0 && y < YRES)
 	{
-		int r = sim->pmap[y][x];
+		int r = sim->pmap[{ x, y }];
 		if (((TYP(r)==PT_VOID || (TYP(r)==PT_PVOD && sim->parts[ID(r)].life >= 10)) && (!sim->parts[ID(r)].ctype || (sim->parts[ID(r)].ctype==c)!=(sim->parts[ID(r)].tmp&1))) || TYP(r)==PT_BHOL || TYP(r)==PT_NBHL) // VOID, PVOD, VACU, and BHOL eat LIGH here
 			return true;
 	}

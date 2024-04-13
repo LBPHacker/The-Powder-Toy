@@ -53,7 +53,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 				{
 					if (sim->rng.chance(1, 5500))
@@ -77,7 +77,7 @@ static int update(UPDATE_FUNC_ARGS)
 					{
 						for (auto nny = -1; nny <= 1; nny++)
 						{
-							if (!pmap[y+ry+nny][x+rx+nnx])
+							if (!pmap[{ x+rx+nnx, y+ry+nny }])
 							{
 								auto np = sim->create_part(-1,x+rx+nnx,y+ry+nny,PT_SHLD1);
 								if (np<0) continue;

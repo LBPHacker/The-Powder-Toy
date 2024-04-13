@@ -71,7 +71,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if (!r || (parts[i].life >=maxlife))
 						continue;
 					if (TYP(r)==PT_DEUT&& sim->rng.chance(1, 3))
@@ -99,7 +99,7 @@ static int update(UPDATE_FUNC_ARGS)
 					//Leave if there is nothing to do
 					if (parts[i].life <= maxlife)
 						goto trade;
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if ((!r)&&parts[i].life>=1)//if nothing then create deut
 					{
 						auto np = sim->create_part(-1,x+rx,y+ry,PT_DEUT);
@@ -119,7 +119,7 @@ trade:
 		auto ry = sim->rng.between(-2, 2);
 		if (rx || ry)
 		{
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[{ x+rx, y+ry }];
 			if (!r)
 				continue;
 			if (TYP(r)==PT_DEUT&&(parts[i].life>parts[ID(r)].life)&&parts[i].life>0)//diffusion

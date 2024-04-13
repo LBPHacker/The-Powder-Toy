@@ -64,7 +64,7 @@ static int update(UPDATE_FUNC_ARGS)
 				parts[r].life = 50;
 		}
 	}
-	if ((sim->pv[y/CELL][x/CELL] > 2.7f) && parts[i].tmp>40)
+	if ((sim->pv[{ x/CELL, y/CELL }] > 2.7f) && parts[i].tmp>40)
 		parts[i].tmp=39;
 	else if (parts[i].tmp<=0) {
 		sim->create_part(i, x, y, PT_FSEP);
@@ -79,7 +79,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				if (TYP(r)==PT_SPRK || (parts[i].temp>=(273.15+700.0f) && sim->rng.chance(1, 20)))

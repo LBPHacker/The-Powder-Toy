@@ -131,7 +131,7 @@ int Element_PIPE_update(UPDATE_FUNC_ARGS)
 				{
 					if (rx || ry)
 					{
-						auto r = pmap[y+ry][x+rx];
+						auto r = pmap[{ x+rx, y+ry }];
 						if (TYP(r) == PT_BRCK)
 						{
 							if (parts[i].tmp & PPIP_TMPFLAG_PAUSED)
@@ -178,7 +178,7 @@ int Element_PIPE_update(UPDATE_FUNC_ARGS)
 					if (rx || ry)
 					{
 						count++;
-						auto r = pmap[y+ry][x+rx];
+						auto r = pmap[{ x+rx, y+ry }];
 						if (!r)
 							continue;
 						if (TYP(r) == PT_HEAC)
@@ -238,15 +238,15 @@ int Element_PIPE_update(UPDATE_FUNC_ARGS)
 				auto rnd = rndstore&7;
 				auto rx = Element_PIPE_offsets[rnd].X;
 				auto ry = Element_PIPE_offsets[rnd].Y;
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if(!r)
-					r = sim->photons[y+ry][x+rx];
+					r = sim->photons[{ x+rx, y+ry }];
 				if (surround_space && !r && TYP(parts[i].ctype))  //creating at end
 				{
 					auto np = sim->create_part(-1, x+rx, y+ry, TYP(parts[i].ctype));
 					if (np!=-1)
 					{
-						Element_PIPE_transfer_pipe_to_part(sim, parts+i, parts+np, false);
+						Element_PIPE_transfer_pipe_to_part(sim, &parts[0]+i, &parts[0]+np, false);
 					}
 				}
 				//try eating particle at entrance
@@ -254,13 +254,13 @@ int Element_PIPE_update(UPDATE_FUNC_ARGS)
 				{
 					if (TYP(r)==PT_SOAP)
 						Element_SOAP_detach(sim, ID(r));
-					Element_PIPE_transfer_part_to_pipe(parts+(ID(r)), parts+i);
+					Element_PIPE_transfer_part_to_pipe(&parts[0]+(ID(r)), &parts[0]+i);
 					sim->kill_part(ID(r));
 				}
 				else if (!TYP(parts[i].ctype) && TYP(r)==PT_STOR && sd.IsElement(parts[ID(r)].tmp) && (elements[parts[ID(r)].tmp].Properties & (TYPE_PART | TYPE_LIQUID | TYPE_GAS | TYPE_ENERGY)))
 				{
 					// STOR stores properties in the same places as PIPE does
-					transfer_pipe_to_pipe(parts+(ID(r)), parts+i, true);
+					transfer_pipe_to_pipe(&parts[0]+(ID(r)), &parts[0]+i, true);
 				}
 			}
 		}
@@ -274,7 +274,7 @@ int Element_PIPE_update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if (!r)
 					{
 						// BRCK border
@@ -299,7 +299,7 @@ int Element_PIPE_update(UPDATE_FUNC_ARGS)
 				{
 					if (rx || ry)
 					{
-						if (!pmap[y+ry][x+rx] && sim->bmap[(y+ry)/CELL][(x+rx)/CELL]!=WL_ALLOWAIR && sim->bmap[(y+ry)/CELL][(x+rx)/CELL]!=WL_WALL && sim->bmap[(y+ry)/CELL][(x+rx)/CELL]!=WL_WALLELEC && (sim->bmap[(y+ry)/CELL][(x+rx)/CELL]!=WL_EWALL || sim->emap[(y+ry)/CELL][(x+rx)/CELL]))
+						if (!pmap[{ x+rx, y+ry }] && sim->bmap[{ (x+rx)/CELL, (y+ry)/CELL }]!=WL_ALLOWAIR && sim->bmap[{ (x+rx)/CELL, (y+ry)/CELL }]!=WL_WALL && sim->bmap[{ (x+rx)/CELL, (y+ry)/CELL }]!=WL_WALLELEC && (sim->bmap[{ (x+rx)/CELL, (y+ry)/CELL }]!=WL_EWALL || sim->emap[{ (x+rx)/CELL, (y+ry)/CELL }]))
 							parts[i].life=50;
 					}
 				}
@@ -314,7 +314,7 @@ int Element_PIPE_update(UPDATE_FUNC_ARGS)
 				{
 					if (rx || ry)
 					{
-						auto r = pmap[y+ry][x+rx];
+						auto r = pmap[{ x+rx, y+ry }];
 						if ((TYP(r)==PT_PIPE || TYP(r) == PT_PPIP) && parts[i].life)
 							issingle = 0;
 					}
@@ -542,12 +542,12 @@ static void pushParticle(Simulation * sim, int i, int count, int original)
 			rndstore = rndstore>>3;
 			auto rx = Element_PIPE_offsets[rnd].X;
 			auto ry = Element_PIPE_offsets[rnd].Y;
-			auto r = sim->pmap[y+ry][x+rx];
+			auto r = sim->pmap[{ x+rx, y+ry }];
 			if (!r)
 				continue;
 			else if ((TYP(r) == PT_PIPE || TYP(r) == PT_PPIP) && (sim->parts[ID(r)].tmp&PFLAG_COLORS) != notctype && !TYP(sim->parts[ID(r)].ctype))
 			{
-				transfer_pipe_to_pipe(sim->parts+i, sim->parts+(ID(r)), false);
+				transfer_pipe_to_pipe(&sim->parts[i], &sim->parts[ID(r)], false);
 				if (ID(r) > original)
 					sim->parts[ID(r)].flags |= PFLAG_NORMALSPEED;//skip particle push, normalizes speed
 				count++;
@@ -563,7 +563,7 @@ static void pushParticle(Simulation * sim, int i, int count, int original)
 				for (int nnx = 0; nnx < 80; nnx++)
 					if (!sim->portalp[portaltmp][count][nnx].type)
 					{
-						Element_PIPE_transfer_pipe_to_part(sim, sim->parts+i, &(sim->portalp[portaltmp][count][nnx]), false);
+						Element_PIPE_transfer_pipe_to_part(sim, &sim->parts[i], &(sim->portalp[portaltmp][count][nnx]), false);
 						count++;
 						break;
 					}
@@ -573,10 +573,10 @@ static void pushParticle(Simulation * sim, int i, int count, int original)
 	else //predefined 1 pixel thick pipe movement
 	{
 		int coords = 7 - ((sim->parts[i].tmp>>10)&7);
-		auto r = sim->pmap[y+ Element_PIPE_offsets[coords].Y][x+ Element_PIPE_offsets[coords].X];
+		auto r = sim->pmap[Vec2<int>{ x, y } + Element_PIPE_offsets[coords]];
 		if ((TYP(r) == PT_PIPE || TYP(r) == PT_PPIP) && (sim->parts[ID(r)].tmp&PFLAG_COLORS) != notctype && !TYP(sim->parts[ID(r)].ctype))
 		{
-			transfer_pipe_to_pipe(sim->parts+i, sim->parts+(ID(r)), false);
+			transfer_pipe_to_pipe(&sim->parts[i], &sim->parts[ID(r)], false);
 			if (ID(r) > original)
 				sim->parts[ID(r)].flags |= PFLAG_NORMALSPEED;//skip particle push, normalizes speed
 			count++;
@@ -592,7 +592,7 @@ static void pushParticle(Simulation * sim, int i, int count, int original)
 			for (int nnx = 0; nnx < 80; nnx++)
 				if (!sim->portalp[portaltmp][count][nnx].type)
 				{
-					Element_PIPE_transfer_pipe_to_part(sim, sim->parts+i, &(sim->portalp[portaltmp][count][nnx]), false);
+					Element_PIPE_transfer_pipe_to_part(sim, &sim->parts[i], &(sim->portalp[portaltmp][count][nnx]), false);
 					count++;
 					break;
 				}
@@ -604,7 +604,7 @@ static void pushParticle(Simulation * sim, int i, int count, int original)
 			auto np = sim->create_part(-1,x+rx,y+ry,TYP(sim->parts[i].ctype));
 			if (np!=-1)
 			{
-				Element_PIPE_transfer_pipe_to_part(sim, sim->parts+i, sim->parts+np, false);
+				Element_PIPE_transfer_pipe_to_part(sim, &sim->parts[i], &sim->parts[np], false);
 			}
 		}
 

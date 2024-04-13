@@ -68,15 +68,15 @@ int Element_VIBR_update(UPDATE_FUNC_ARGS)
 			parts[i].temp += 3;
 		}
 		//Pressure absorption code
-		if (sim->pv[y/CELL][x/CELL] > 2.5)
+		if (sim->pv[{ x/CELL, y/CELL }] > 2.5)
 		{
 			parts[i].tmp += 7;
-			sim->pv[y/CELL][x/CELL]--;
+			sim->pv[{ x/CELL, y/CELL }]--;
 		}
-		else if (sim->pv[y/CELL][x/CELL] < -2.5)
+		else if (sim->pv[{ x/CELL, y/CELL }] < -2.5)
 		{
 			parts[i].tmp -= 2;
-			sim->pv[y/CELL][x/CELL]++;
+			sim->pv[{ x/CELL, y/CELL }]++;
 		}
 		//initiate explosion counter
 		if (parts[i].tmp > 1000)
@@ -91,7 +91,7 @@ int Element_VIBR_update(UPDATE_FUNC_ARGS)
 			auto rx = orbit_rx[rndstore & 7];
 			auto ry = orbit_ry[rndstore & 7];
 			rndstore = rndstore >> 3;
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[{ x+rx, y+ry }];
 			if (TYP(r) && TYP(r) != PT_BREC && (elements[TYP(r)].Properties&PROP_CONDUCTS) && !parts[ID(r)].life)
 			{
 				parts[ID(r)].life = 4;
@@ -104,7 +104,7 @@ int Element_VIBR_update(UPDATE_FUNC_ARGS)
 		{
 			auto rx = rndstore%7-3;
 			auto ry = (rndstore>>3)%7-3;
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[{ x+rx, y+ry }];
 			if (TYP(r) && TYP(r) != PT_VIBR && TYP(r) != PT_BVBR && (!sd.IsHeatInsulator(parts[ID(r)])))
 			{
 				parts[ID(r)].temp = restrict_flt(parts[ID(r)].temp + parts[i].tmp * 3, MIN_TEMP, MAX_TEMP);
@@ -129,7 +129,7 @@ int Element_VIBR_update(UPDATE_FUNC_ARGS)
 				sim->create_part(i, x, y, PT_EXOT);
 				parts[i].tmp2 = (rndstore >> 9) % 1000;
 				parts[i].temp=9000;
-				sim->pv[y/CELL][x/CELL] += 50;
+				sim->pv[{ x/CELL, y/CELL }] += 50;
 
 				return 1;
 			}
@@ -148,7 +148,7 @@ int Element_VIBR_update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				if (parts[i].life)
@@ -183,7 +183,7 @@ int Element_VIBR_update(UPDATE_FUNC_ARGS)
 				if (parts[i].type != PT_BVBR && TYP(r) == PT_ANAR)
 				{
 					sim->part_change_type(i,x,y,PT_BVBR);
-					sim->pv[y/CELL][x/CELL] -= 1;
+					sim->pv[{ x/CELL, y/CELL }] -= 1;
 				}
 			}
 		}
@@ -198,7 +198,7 @@ int Element_VIBR_update(UPDATE_FUNC_ARGS)
 		rndstore >>= 3;
 		if (rx || ry)
 		{
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[{ x+rx, y+ry }];
 			if (TYP(r) != PT_VIBR && TYP(r) != PT_BVBR)
 				continue;
 			if (parts[i].tmp > parts[ID(r)].tmp)

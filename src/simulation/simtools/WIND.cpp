@@ -25,8 +25,8 @@ static void performDrawLine(SimTool *tool, Simulation * sim, Brush const &brush,
 		ui::Point coords = position1 + off;
 		if (coords.X >= 0 && coords.Y >= 0 && coords.X < XRES && coords.Y < YRES)
 		{
-			sim->vx[coords.Y / CELL][coords.X / CELL] += (position2 - position1).X * strength;
-			sim->vy[coords.Y / CELL][coords.X / CELL] += (position2 - position1).Y * strength;
+			sim->vx[coords / CELL] += (position2 - position1).X * strength;
+			sim->vy[coords / CELL] += (position2 - position1).Y * strength;
 		}
 	}
 }

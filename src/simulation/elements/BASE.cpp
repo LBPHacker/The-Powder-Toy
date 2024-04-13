@@ -63,7 +63,7 @@ static int update(UPDATE_FUNC_ARGS)
 	if (parts[i].life > 100)
 		parts[i].life = 100;
 
-	float pres = sim->pv[y/CELL][x/CELL];
+	float pres = sim->pv[{ x/CELL, y/CELL }];
 
 	//Base evaporates into BOYL or increases concentration
 	if (parts[i].life < 100 && pres < 10.0f && parts[i].temp > (120.0f + 273.15f))
@@ -105,7 +105,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				int rt = TYP(r);
@@ -196,7 +196,7 @@ static int update(UPDATE_FUNC_ARGS)
 		auto ry = sim->rng.between(-1, 1);
 		if (rx || ry)
 		{
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[{ x+rx, y+ry }];
 			if (!r)
 				continue;
 			if (TYP(r) == PT_BASE && (parts[i].life > parts[ID(r)].life) && parts[i].life>1)

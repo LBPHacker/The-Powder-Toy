@@ -2268,7 +2268,7 @@ void GameView::OnDraw()
 		{
 			if(selectPoint1.X==-1)
 			{
-				g->BlendFilledRect(RectSized(Vec2{ 0, 0 }, Vec2{ XRES, YRES }), 0x000000_rgb .WithAlpha(100));
+				g->BlendFilledRect(RectSized(Vec2{ 0, 0 }, RES), 0x000000_rgb .WithAlpha(100));
 			}
 			else
 			{

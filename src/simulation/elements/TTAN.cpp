@@ -61,7 +61,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (!rx != !ry)
 				{
-					if (TYP(pmap[y+ry][x+rx]) == PT_TTAN)
+					if (TYP(pmap[{ x+rx, y+ry }]) == PT_TTAN)
 						ttan++;
 				}
 			}
@@ -70,8 +70,8 @@ static int update(UPDATE_FUNC_ARGS)
 
 	if (ttan >= 2)
 	{
-		sim->air->bmap_blockair[y/CELL][x/CELL] = 1;
-		sim->air->bmap_blockairh[y/CELL][x/CELL] = 0x8;
+		sim->air->bmap_blockair[{ x/CELL, y/CELL }] = 1;
+		sim->air->bmap_blockairh[{ x/CELL, y/CELL }] = 0x8;
 	}
 	return 0;
 }

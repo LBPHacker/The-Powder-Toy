@@ -53,7 +53,7 @@ static int update(UPDATE_FUNC_ARGS)
 	auto &elements = sd.elements;
 	int rx = sim->rng.between(-2, 2);
 	int ry = sim->rng.between(-2, 2);
-	int r = pmap[y+ry][x+rx];
+	int r = pmap[{ x+rx, y+ry }];
 	if (!r)
 		return 0;
 	int rt = TYP(r);
@@ -63,16 +63,16 @@ static int update(UPDATE_FUNC_ARGS)
 	if (parts[i].life<=0 || parts[i].life>37)
 	{
 		parts[i].life = sim->rng.between(30, 49);
-		sim->pv[y/CELL][x/CELL]+=60.0f;
+		sim->pv[{ x/CELL, y/CELL }]+=60.0f;
 	}
 	if (rt == PT_PLUT || rt == PT_DEUT)
 	{
-		sim->pv[y/CELL][x/CELL]+=20.0f;
+		sim->pv[{ x/CELL, y/CELL }]+=20.0f;
 		if (sim->rng.chance(1, 2))
 		{
 			sim->create_part(ID(r), x+rx, y+ry, PT_NEUT);
 			parts[ID(r)].temp = MAX_TEMP;
-			sim->pv[y/CELL][x/CELL] += 10.0f;
+			sim->pv[{ x/CELL, y/CELL }] += 10.0f;
 			parts[i].life-=4;
 		}
 	}
@@ -90,7 +90,7 @@ static int update(UPDATE_FUNC_ARGS)
 	else if (!sd.IsHeatInsulator(parts[ID(r)]))
 		parts[ID(r)].temp = MAX_TEMP;
 	parts[i].temp=MAX_TEMP;
-	sim->pv[y/CELL][x/CELL]+=80.0f;
+	sim->pv[{ x/CELL, y/CELL }]+=80.0f;
 	return 0;
 }
 
