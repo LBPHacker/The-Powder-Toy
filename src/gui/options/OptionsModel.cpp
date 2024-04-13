@@ -5,6 +5,7 @@
 #include "simulation/gravity/Gravity.h"
 #include "prefs/GlobalPrefs.h"
 #include "common/clipboard/Clipboard.h"
+#include "InitSimulationConfig.h"
 #include "gui/interface/Engine.h"
 #include "gui/game/GameModel.h"
 #include "client/Client.h"
@@ -359,6 +360,23 @@ void OptionsModel::SetAutoStartupRequest(bool newAutoStartupRequest)
 {
 	GlobalPrefs::Ref().Set("AutoStartupRequest", newAutoStartupRequest);
 	Client::Ref().SetAutoStartupRequest(newAutoStartupRequest);
+	notifySettingsChanged();
+}
+
+SimulationConfig OptionsModel::GetNextSimulationConfig()
+{
+	return ::GetNextSimulationConfig();
+}
+
+void OptionsModel::SetNextSimulationConfig(SimulationConfig config)
+{
+	::SetNextSimulationConfig(config);
+	auto &prefs = GlobalPrefs::Ref();
+	Prefs::DeferWrite dw(prefs);
+	prefs.Set("Simulation.CellSize"  , config.CELL   );
+	prefs.Set("Simulation.CellCountX", config.CELLS.X);
+	prefs.Set("Simulation.CellCountY", config.CELLS.Y);
+	prefs.Set("Simulation.PartCount" , config.NPART  );
 	notifySettingsChanged();
 }
 
