@@ -14,6 +14,7 @@
 #include "simulation/SaveRenderer.h"
 #include "simulation/SimulationData.h"
 #include "common/tpt-rand.h"
+#include "InitSimulationConfig.h"
 #include "gui/game/Favorite.h"
 #include "gui/Style.h"
 #include "gui/game/GameController.h"
@@ -345,6 +346,24 @@ int Main(int argc, char *argv[])
 	explicitSingletons->globalPrefs = std::make_unique<GlobalPrefs>();
 
 	auto &prefs = GlobalPrefs::Ref();
+
+	{
+		auto defaultConfig = SimulationConfig::Default();
+		SimulationConfig config;
+		config.CELL    = prefs.Get("Simulation.CellSize"  , defaultConfig.CELL   );
+		config.CELLS.X = prefs.Get("Simulation.CellCountX", defaultConfig.CELLS.X);
+		config.CELLS.Y = prefs.Get("Simulation.CellCountY", defaultConfig.CELLS.Y);
+		try
+		{
+			config.Check();
+		}
+		catch (const SimulationConfig::CheckFailed &ex)
+		{
+			std::cerr << "failed to apply custom simulation config: " << ex.what() << std::endl;
+			config = defaultConfig;
+		}
+		InitSimulationConfig(config);
+	}
 
 	WindowFrameOps windowFrameOps{
 		prefs.Get("Scale", 1),
