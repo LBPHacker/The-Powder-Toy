@@ -8,29 +8,29 @@ constexpr int BARSIZE  = 17;
 constexpr float M_GRAV = 6.67300e-1f;
 
 //CELL, the size of the pressure, gravity, and wall maps. Larger than 1 to prevent extreme lag
-constexpr int CELL = 4;
-constexpr Vec2<int> CELLS = Vec2(153, 96);
-constexpr Vec2<int> RES = CELLS * CELL;
+extern int CELL;
+extern Vec2<int> CELLS;
+extern Vec2<int> RES;
 
-constexpr int XCELLS = CELLS.X;
-constexpr int YCELLS = CELLS.Y;
-constexpr int NCELL  = XCELLS * YCELLS;
-constexpr int XRES   = RES.X;
-constexpr int YRES   = RES.Y;
-constexpr int NPART  = XRES * YRES;
+extern int XCELLS;
+extern int YCELLS;
+extern int NCELL;
+extern int XRES;
+extern int YRES;
+extern int NPART;
 
-constexpr int XCNTR = XRES / 2;
-constexpr int YCNTR = YRES / 2;
+extern int XCNTR;
+extern int YCNTR;
 
-constexpr Vec2<int> WINDOW = RES + Vec2(BARSIZE, MENUSIZE);
+extern Vec2<int> WINDOW;
 
-constexpr int WINDOWW = WINDOW.X;
-constexpr int WINDOWH = WINDOW.Y;
+extern int WINDOWW;
+extern int WINDOWH;
 
 constexpr int MAXSIGNS = 16;
 
-constexpr int   ISTP            = CELL / 2;
-constexpr float CFDS            = 4.0f / CELL;
+extern int   ISTP;
+extern float CFDS;
 constexpr float MAX_VELOCITY = 1e4f;
 
 //Air constants
