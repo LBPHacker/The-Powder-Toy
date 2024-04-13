@@ -2,6 +2,7 @@
 #include <functional>
 #include "simulation/SimulationSettings.h"
 
+struct SimulationConfig;
 class GameModel;
 class OptionsModel;
 class OptionsView;
@@ -45,6 +46,7 @@ public:
 	void SetMomentumScroll(bool momentumScroll);
 	void SetRedirectStd(bool newRedirectStd);
 	void SetAutoStartupRequest(bool newAutoStartupRequest);
+	void SetNextSimulationConfig(SimulationConfig config);
 	
 	void Exit();
 	OptionsView * GetView();

@@ -22,7 +22,7 @@
 #include <memory>
 #include <optional>
 
-constexpr int CHANNELS = int(MAX_TEMP - 73) / 100 + 2;
+constexpr int CHANNELS = 101;
 
 class Snapshot;
 class Brush;

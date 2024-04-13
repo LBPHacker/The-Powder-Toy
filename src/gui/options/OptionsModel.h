@@ -2,6 +2,7 @@
 #include <vector>
 #include "simulation/SimulationSettings.h"
 
+struct SimulationConfig;
 class GameModel;
 class Simulation;
 class OptionsView;
@@ -76,5 +77,7 @@ public:
 	void SetRedirectStd(bool newRedirectStd);
 	bool GetAutoStartupRequest();
 	void SetAutoStartupRequest(bool newAutoStartupRequest);
+	SimulationConfig GetNextSimulationConfig();
+	void SetNextSimulationConfig(SimulationConfig config);
 	virtual ~OptionsModel();
 };

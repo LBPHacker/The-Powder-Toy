@@ -1,9 +1,8 @@
 #include "OptionsController.h"
-
 #include "OptionsView.h"
 #include "OptionsModel.h"
-
 #include "Controller.h"
+#include "InitSimulationConfig.h"
 
 OptionsController::OptionsController(GameModel * gModel_, std::function<void ()> onDone_):
 	gModel(gModel_),
@@ -175,6 +174,11 @@ void OptionsController::SetRedirectStd(bool newRedirectStd)
 void OptionsController::SetAutoStartupRequest(bool newAutoStartupRequest)
 {
 	model->SetAutoStartupRequest(newAutoStartupRequest);
+}
+
+void OptionsController::SetNextSimulationConfig(SimulationConfig config)
+{
+	model->SetNextSimulationConfig(config);
 }
 
 void OptionsController::Exit()
