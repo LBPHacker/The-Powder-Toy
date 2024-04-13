@@ -5,6 +5,7 @@
 #include "simulation/gravity/Gravity.h"
 #include "prefs/GlobalPrefs.h"
 #include "common/clipboard/Clipboard.h"
+#include "InitSimulationConfig.h"
 #include "gui/interface/Engine.h"
 #include "gui/game/GameModel.h"
 
@@ -315,6 +316,22 @@ void OptionsModel::SetMomentumScroll(bool state)
 {
 	GlobalPrefs::Ref().Set("MomentumScroll", state);
 	ui::Engine::Ref().MomentumScroll = state;
+	notifySettingsChanged();
+}
+
+SimulationConfig OptionsModel::GetNextSimulationConfig()
+{
+	return ::GetNextSimulationConfig();
+}
+
+void OptionsModel::SetNextSimulationConfig(SimulationConfig config)
+{
+	::SetNextSimulationConfig(config);
+	auto &prefs = GlobalPrefs::Ref();
+	Prefs::DeferWrite dw(prefs);
+	prefs.Set("Simulation.CellSize"  , config.CELL   );
+	prefs.Set("Simulation.CellCountX", config.CELLS.X);
+	prefs.Set("Simulation.CellCountY", config.CELLS.Y);
 	notifySettingsChanged();
 }
 

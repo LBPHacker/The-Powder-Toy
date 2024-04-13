@@ -19,6 +19,7 @@
 #include "gui/interface/Label.h"
 #include "gui/interface/Textbox.h"
 #include "gui/interface/DirectionSelector.h"
+#include "InitSimulationConfig.h"
 #include "PowderToySDL.h"
 #include "Config.h"
 #include <cstdio>
@@ -106,6 +107,17 @@ OptionsView::OptionsView() : ui::Window(ui::Point(-1, -1), ui::Point(320, 340))
 		auto *separator = new Separator(ui::Point(0, currentY), ui::Point(Size.X, 1));
 		scrollPanel->AddChild(separator);
 		currentY += 11;
+	};
+	auto addTextbox = [this, &currentY](String info, std::function<void ()> action) {
+		auto *textbox = new ui::Textbox(ui::Point(Size.X-95, currentY), ui::Point(80, 16));
+		textbox->SetActionCallback({ action });
+		scrollPanel->AddChild(textbox);
+		auto *label = new ui::Label(ui::Point(8, currentY), ui::Point(Size.X-105, 16), info);
+		label->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
+		label->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
+		scrollPanel->AddChild(label);
+		currentY += 20;
+		return textbox;
 	};
 
 	heatSimulation = addCheckbox(0, "Heat simulation \bgIntroduced in version 34", "Can cause odd behaviour when disabled", [this] {
@@ -281,6 +293,43 @@ OptionsView::OptionsView() : ui::Window(ui::Point(-1, -1), ui::Point(320, 340))
 		c->SetBlurryScaling(blurryScaling->GetChecked());
 	});
 	addSeparator();
+	horizontalCellCount = addTextbox("Horizontal cell count", [this]() {
+		UpdateSimConfig();
+		SaveSimConfig();
+	});
+	verticalCellCount = addTextbox("Vertical cell count", [this]() {
+		UpdateSimConfig();
+		SaveSimConfig();
+	});
+	cellSize = addTextbox("Cell size", [this]() {
+		UpdateSimConfig();
+		SaveSimConfig();
+	});
+	{
+		simConfigStatus = new ui::Label(ui::Point(8, currentY), ui::Point(1, 40), "");
+		autoWidth(simConfigStatus, 85);
+		simConfigStatus->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
+		simConfigStatus->Appearance.VerticalAlign = ui::Appearance::AlignTop;
+		simConfigStatus->SetMultiline(true);
+		scrollPanel->AddChild(simConfigStatus);
+		auto *useCurrent = new ui::Button(ui::Point(Size.X - 95, currentY), ui::Point(80, 16), "Use current");
+		useCurrent->SetActionCallback({ [this] {
+			LoadSimConfig(GetCurrentSimulationConfig());
+			UpdateSimConfig();
+			SaveSimConfig();
+		} });
+		scrollPanel->AddChild(useCurrent);
+		currentY += 20;
+		auto *useDefaults = new ui::Button(ui::Point(Size.X - 95, currentY), ui::Point(80, 16), "Use defaults");
+		useDefaults->SetActionCallback({ [this] {
+			LoadSimConfig(SimulationConfig::Default());
+			UpdateSimConfig();
+			SaveSimConfig();
+		} });
+		scrollPanel->AddChild(useDefaults);
+		currentY += 20;
+	}
+	addSeparator();
 	if (ALLOW_QUIT)
 	{
 		fastquit = addCheckbox(0, "Fast quit", "Always exit completely when hitting close", [this] {
@@ -390,6 +439,62 @@ void OptionsView::AmbientAirTempToTextBox(float airTemp)
 	ambientAirTemp->SetText(sb.Build());
 }
 
+void OptionsView::SaveSimConfig()
+{
+	if (newConfig)
+	{
+		c->SetNextSimulationConfig(*newConfig);
+	}
+}
+
+void OptionsView::LoadSimConfig(SimulationConfig config)
+{
+	if (!horizontalCellCount->IsFocused())
+	{
+		horizontalCellCount->SetText(String::Build(config.CELLS.X));
+	}
+	if (!verticalCellCount->IsFocused())
+	{
+		verticalCellCount->SetText(String::Build(config.CELLS.Y));
+	}
+	if (!cellSize->IsFocused())
+	{
+		cellSize->SetText(String::Build(config.CELL));
+	}
+}
+
+void OptionsView::UpdateSimConfig()
+{
+	try
+	{
+		newConfig = SimulationConfig{};
+		newConfig->CELLS.X = horizontalCellCount->GetText().ToNumber<int>();
+		newConfig->CELLS.Y = verticalCellCount->GetText().ToNumber<int>();
+		newConfig->CELL = cellSize->GetText().ToNumber<int>();
+		newConfig->Check();
+	}
+	catch (const std::runtime_error &ex) // also catches SimulationConfig::CheckFailed
+	{
+		newConfig.reset();
+		simConfigStatus->SetText(String::Build("\blConfiguration is invalid: ", ByteString(ex.what()).FromUtf8()));
+		return;
+	}
+	String statusText = "\boConfiguration has been changed and will be applied on restart";
+	if (GetCurrentSimulationConfig() == *newConfig)
+	{
+		statusText = "\btConfiguration has not been changed";
+	}
+	if (newConfig->CanSave())
+	{
+		statusText += "; simulations can be saved with these dimensions";
+	}
+	else
+	{
+		statusText += "; simulations cannot be saved with these dimensions";
+	}
+	simConfigStatus->SetText(statusText);
+}
+
 void OptionsView::UpdateAirTemp(String temp, bool isDefocus)
 {
 	// Parse air temp and determine validity
@@ -448,6 +553,8 @@ void OptionsView::NotifySettingsChanged(OptionsModel * sender)
 		UpdateAmbientAirTempPreview(airTemp, true);
 		AmbientAirTempToTextBox(airTemp);
 	}
+	LoadSimConfig(sender->GetNextSimulationConfig());
+	UpdateSimConfig();
 	gravityMode->SetOption(sender->GetGravityMode());
 	customGravityX = sender->GetCustomGravityX();
 	customGravityY = sender->GetCustomGravityY();

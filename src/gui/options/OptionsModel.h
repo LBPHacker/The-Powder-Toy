@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 
+struct SimulationConfig;
 class GameModel;
 class Simulation;
 class OptionsView;
@@ -65,5 +66,7 @@ public:
 	void SetPerfectCircle(bool perfectCircle);
 	bool GetMomentumScroll();
 	void SetMomentumScroll(bool momentumScroll);
+	SimulationConfig GetNextSimulationConfig();
+	void SetNextSimulationConfig(SimulationConfig config);
 	virtual ~OptionsModel();
 };
