@@ -58,7 +58,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				int r = pmap[y+ry][x+rx];
+				int r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				if (TYP(r) == PT_SPRK && parts[ID(r)].life == 3)
@@ -72,7 +72,7 @@ static int update(UPDATE_FUNC_ARGS)
 						if (!(x+nxi+nxx<XRES && y+nyi+nyy<YRES && x+nxi+nxx >= 0 && y+nyi+nyy >= 0))
 							break;
 
-						r = pmap[y+nyi+nyy][x+nxi+nxx];
+						r = pmap[{ x+nxi+nxx, y+nyi+nyy }];
 						rt = TYP(r);
 						r = ID(r);
 						if (!rt)

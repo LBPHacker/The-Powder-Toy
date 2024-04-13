@@ -134,7 +134,7 @@ int Element_STKM_run_stickman(playerst *playerp, UPDATE_FUNC_ARGS)
 		parts[i].temp += 1;
 
 	//Death
-	if (parts[i].life<1 || (sim->pv[y/CELL][x/CELL]>=4.5f && !playerp->fan) ) //If his HP is less than 0 or there is very big wind...
+	if (parts[i].life<1 || (sim->pv[{ x/CELL, y/CELL }]>=4.5f && !playerp->fan) ) //If his HP is less than 0 or there is very big wind...
 	{
 		die(sim, playerp, i);
 		return 1;
@@ -165,8 +165,8 @@ int Element_STKM_run_stickman(playerst *playerp, UPDATE_FUNC_ARGS)
 			break;
 	}
 
-	gvx += sim->gravx[((int)parts[i].y/CELL)*XCELLS+((int)parts[i].x/CELL)];
-	gvy += sim->gravy[((int)parts[i].y/CELL)*XCELLS+((int)parts[i].x/CELL)];
+	gvx += sim->gravx[{ (int)parts[i].x/CELL, (int)parts[i].y/CELL }];
+	gvy += sim->gravy[{ (int)parts[i].x/CELL, (int)parts[i].y/CELL }];
 
 	float mvx = gvx;
 	float mvy = gvy;
@@ -392,10 +392,10 @@ int Element_STKM_run_stickman(playerst *playerp, UPDATE_FUNC_ARGS)
 
 	//Charge detector wall if foot inside
 	if (InBounds(int(playerp->legs[4]+0.5)/CELL, int(playerp->legs[5]+0.5)/CELL) &&
-	       sim->bmap[(int)(playerp->legs[5]+0.5)/CELL][(int)(playerp->legs[4]+0.5)/CELL]==WL_DETECT)
+	       sim->bmap[{ (int)(playerp->legs[4]+0.5)/CELL, (int)(playerp->legs[5]+0.5)/CELL }]==WL_DETECT)
 		sim->set_emap((int)playerp->legs[4]/CELL, (int)playerp->legs[5]/CELL);
 	if (InBounds(int(playerp->legs[12]+0.5)/CELL, int(playerp->legs[13]+0.5)/CELL) &&
-	        sim->bmap[(int)(playerp->legs[13]+0.5)/CELL][(int)(playerp->legs[12]+0.5)/CELL]==WL_DETECT)
+	        sim->bmap[{ (int)(playerp->legs[12]+0.5)/CELL, (int)(playerp->legs[13]+0.5)/CELL }]==WL_DETECT)
 		sim->set_emap((int)(playerp->legs[12]+0.5)/CELL, (int)(playerp->legs[13]+0.5)/CELL);
 
 	//Searching for particles near head
@@ -403,11 +403,11 @@ int Element_STKM_run_stickman(playerst *playerp, UPDATE_FUNC_ARGS)
 		for (ry=-2; ry<3; ry++)
 			if (x+rx>=0 && y+ry>0 && x+rx<XRES && y+ry<YRES && (rx || ry))
 			{
-				r = pmap[y+ry][x+rx];
+				r = pmap[{ x+rx, y+ry }];
 				if (!r)
-					r = sim->photons[y+ry][x+rx];
+					r = sim->photons[{ x+rx, y+ry }];
 
-				if (!r && !sim->bmap[(y+ry)/CELL][(x+rx)/CELL])
+				if (!r && !sim->bmap[{ (x+rx)/CELL, (y+ry)/CELL }])
 					continue;
 
 				Element_STKM_set_element(sim, playerp, TYP(r));
@@ -426,11 +426,11 @@ int Element_STKM_run_stickman(playerst *playerp, UPDATE_FUNC_ARGS)
 					else parts[i].life = int(parts[i].life * 0.9f);
 					sim->kill_part(ID(r));
 				}
-				if (sim->bmap[(ry+y)/CELL][(rx+x)/CELL]==WL_FAN)
+				if (sim->bmap[{ (rx+x)/CELL, (ry+y)/CELL }]==WL_FAN)
 					playerp->fan = true;
-				else if (sim->bmap[(ry+y)/CELL][(rx+x)/CELL]==WL_EHOLE)
+				else if (sim->bmap[{ (rx+x)/CELL, (ry+y)/CELL }]==WL_EHOLE)
 					playerp->rocketBoots = false;
-				else if (sim->bmap[(ry+y)/CELL][(rx+x)/CELL]==WL_GRAV /* && parts[i].type!=PT_FIGH */)
+				else if (sim->bmap[{ (rx+x)/CELL, (ry+y)/CELL }]==WL_GRAV /* && parts[i].type!=PT_FIGH */)
 					playerp->rocketBoots = true;
 				if (TYP(r)==PT_PRTI)
 					Element_STKM_interact(sim, playerp, i, rx, ry);
@@ -446,7 +446,7 @@ int Element_STKM_run_stickman(playerst *playerp, UPDATE_FUNC_ARGS)
 	if (((int)(playerp->comm)&0x08) == 0x08)
 	{
 		ry -= 2 * sim->rng.between(0, 1) + 1;
-		r = pmap[ry][rx];
+		r = pmap[{ rx, ry }];
 		if (elements[TYP(r)].Properties&TYPE_SOLID)
 		{
 			sim->create_part(-1, rx, ry, PT_SPRK);
@@ -462,14 +462,14 @@ int Element_STKM_run_stickman(playerst *playerp, UPDATE_FUNC_ARGS)
 					{
 						int airx = rx + 3*((((int)playerp->pcomm)&0x02) == 0x02) - 3*((((int)playerp->pcomm)&0x01) == 0x01)+j;
 						int airy = ry+k;
-						sim->pv[airy/CELL][airx/CELL] += 0.03f;
+						sim->pv[{ airx/CELL, airy/CELL }] += 0.03f;
 						if (airy + CELL < YRES)
-							sim->pv[airy/CELL+1][airx/CELL] += 0.03f;
+							sim->pv[{ airx/CELL, airy/CELL+1 }] += 0.03f;
 						if (airx + CELL < XRES)
 						{
-							sim->pv[airy/CELL][airx/CELL+1] += 0.03f;
+							sim->pv[{ airx/CELL+1, airy/CELL }] += 0.03f;
 							if (airy + CELL < YRES)
-								sim->pv[airy/CELL+1][airx/CELL+1] += 0.03f;
+								sim->pv[{ airx/CELL+1, airy/CELL+1 }] += 0.03f;
 						}
 					}
 			}
@@ -630,7 +630,7 @@ void Element_STKM_interact(Simulation *sim, playerst *playerp, int i, int x, int
 	int r;
 	if (x<0 || y<0 || x>=XRES || y>=YRES || !sim->parts[i].type)
 		return;
-	r = sim->pmap[y][x];
+	r = sim->pmap[{ x, y }];
 	if (r)
 	{
 		int damage = 0;

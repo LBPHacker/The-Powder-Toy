@@ -122,7 +122,7 @@ static int update(UPDATE_FUNC_ARGS)
 			if (parts[i].temp > 5273.15)
 				parts[i].tmp |= 0x4;
 			parts[i].temp = 3500;
-			sim->pv[y/CELL][x/CELL] += 1;
+			sim->pv[{ x/CELL, y/CELL }] += 1;
 		}
 		break;
 	case PT_TESC:
@@ -134,7 +134,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if (r)
 						continue;
 					if (parts[i].tmp>4 && sim->rng.chance(1, parts[i].tmp*parts[i].tmp/20+6))
@@ -150,12 +150,12 @@ static int update(UPDATE_FUNC_ARGS)
 							parts[p].tmp=int(atan2(-ry, (float)rx)/TPT_PI_FLT*360);
 							parts[p].dcolour = parts[i].dcolour;
 							parts[i].temp-=parts[i].tmp*2+parts[i].temp/5; // slight self-cooling
-							if (fabs(sim->pv[y/CELL][x/CELL])!=0.0f)
+							if (fabs(sim->pv[{ x/CELL, y/CELL }])!=0.0f)
 							{
-								if (fabs(sim->pv[y/CELL][x/CELL])<=0.5f)
-									sim->pv[y/CELL][x/CELL]=0;
+								if (fabs(sim->pv[{ x/CELL, y/CELL }])<=0.5f)
+									sim->pv[{ x/CELL, y/CELL }]=0;
 								else
-									sim->pv[y/CELL][x/CELL]-=(sim->pv[y/CELL][x/CELL]>0)?0.5:-0.5;
+									sim->pv[{ x/CELL, y/CELL }]-=(sim->pv[{ x/CELL, y/CELL }]>0)?0.5:-0.5;
 							}
 						}
 					}
@@ -170,7 +170,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if (!r)
 						continue;
 					if (TYP(r)==PT_DSTW || TYP(r)==PT_SLTW || TYP(r)==PT_WATR)
@@ -198,7 +198,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				auto receiver = TYP(r);
@@ -321,7 +321,7 @@ static int update(UPDATE_FUNC_ARGS)
 				switch (receiver)
 				{
 				case PT_QRTZ:
-					if ((sender==PT_NSCN||sender==PT_METL||sender==PT_PSCN||sender==PT_QRTZ) && (parts[ID(r)].temp<173.15||sim->pv[(y+ry)/CELL][(x+rx)/CELL]>8))
+					if ((sender==PT_NSCN||sender==PT_METL||sender==PT_PSCN||sender==PT_QRTZ) && (parts[ID(r)].temp<173.15||sim->pv[{ (x+rx)/CELL, (y+ry)/CELL }]>8))
 						goto conduct;
 					continue;
 				case PT_NTCT:

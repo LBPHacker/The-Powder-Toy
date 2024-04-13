@@ -204,7 +204,7 @@ void PreviewView::commentBoxAutoHeight()
 		addCommentBox->Size.Y = oldSize;
 
 		commentBoxHeight = newSize+22;
-		commentBoxPositionX = (XRES/2)+4;
+		commentBoxPositionX = float((XRES/2)+4);
 		commentBoxPositionY = float(Size.Y-(newSize+21));
 		commentBoxSizeX = float(Size.X-(XRES/2)-8);
 		commentBoxSizeY = float(newSize);
@@ -219,7 +219,7 @@ void PreviewView::commentBoxAutoHeight()
 		commentBoxHeight = 20;
 		addCommentBox->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
 
-		commentBoxPositionX = (XRES/2)+4;
+		commentBoxPositionX = float((XRES/2)+4);
 		commentBoxPositionY = float(Size.Y-19);
 		commentBoxSizeX = float(Size.X-(XRES/2)-48);
 		commentBoxSizeY = 17;
@@ -632,7 +632,7 @@ void PreviewView::NotifyCommentBoxEnabledChanged(PreviewModel * sender)
 	}
 	if(sender->GetCommentBoxEnabled())
 	{
-		commentBoxPositionX = (XRES/2)+4;
+		commentBoxPositionX = float((XRES/2)+4);
 		commentBoxPositionY = float(Size.Y-19);
 		commentBoxSizeX = float(Size.X-(XRES/2)-48);
 		commentBoxSizeY = 17;

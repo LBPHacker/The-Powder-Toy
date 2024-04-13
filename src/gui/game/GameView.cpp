@@ -2216,7 +2216,7 @@ void GameView::OnDraw()
 			{
 				if(selectPoint1.X==-1)
 				{
-					ren->BlendFilledRect(RectSized(Vec2{ 0, 0 }, Vec2{ XRES, YRES }), 0x000000_rgb .WithAlpha(100));
+					ren->BlendFilledRect(RectSized(Vec2{ 0, 0 }, RES), 0x000000_rgb .WithAlpha(100));
 				}
 				else
 				{
@@ -2244,7 +2244,7 @@ void GameView::OnDraw()
 		c->AfterSimDraw();
 		ren->RenderEnd();
 
-		std::copy_n(ren->Data(), ren->Size().X * ren->Size().Y, g->Data());
+		std::copy_n(ren->Data(), ren->Size().X * YRES, g->Data());
 
 		if (doScreenshot)
 		{

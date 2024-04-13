@@ -341,9 +341,9 @@ void PropertyTool::SetProperty(Simulation *sim, ui::Point position)
 {
 	if(position.X<0 || position.X>XRES || position.Y<0 || position.Y>YRES || !configuration)
 		return;
-	int i = sim->pmap[position.Y][position.X];
+	int i = sim->pmap[position];
 	if(!i)
-		i = sim->photons[position.Y][position.X];
+		i = sim->photons[position];
 	if(!i)
 		return;
 

@@ -29,9 +29,9 @@ int HeatToColour(float temp);
 
 class Renderer: public RasterDrawMethods<Renderer>
 {
-	using Video = PlaneAdapter<std::array<pixel, WINDOW.X * RES.Y>, WINDOW.X, RES.Y>;
+	using Video = PlaneAdapter<std::vector<pixel>>;
 	Video video;
-	std::array<pixel, WINDOW.X * RES.Y> persistentVideo;
+	Video persistentVideo;
 	Video warpVideo;
 
 	Rect<int> GetClipRect() const
@@ -65,10 +65,14 @@ public:
 	unsigned int display_mode;
 	std::vector<RenderPreset> renderModePresets;
 	//
-	unsigned char fire_r[YCELLS][XCELLS];
-	unsigned char fire_g[YCELLS][XCELLS];
-	unsigned char fire_b[YCELLS][XCELLS];
-	unsigned int fire_alpha[CELL*3][CELL*3];
+	PlaneAdapter<std::vector<unsigned char>> fire_r;
+	PlaneAdapter<std::vector<unsigned char>> fire_g;
+	PlaneAdapter<std::vector<unsigned char>> fire_b;
+	PlaneAdapter<std::vector<unsigned int>> fire_alpha;
+	
+	PlaneAdapter<std::vector<float>> fire_alphaf;
+	float glow_alphaf[11][11];
+	float blur_alphaf[7][7];
 	//
 	bool gravityZonesEnabled;
 	bool gravityFieldEnabled;

@@ -53,7 +53,7 @@ void Element::Element_DEUT()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	float gravtot = fabs(sim->gravy[(y/CELL)*XCELLS+(x/CELL)])+fabs(sim->gravx[(y/CELL)*XCELLS+(x/CELL)]);
+	float gravtot = fabs(sim->gravy[{ x / CELL, y / CELL }])+fabs(sim->gravx[{ x / CELL, y / CELL }]);
 	// Prevent division by 0
 	float temp = std::max(1.0f, (parts[i].temp + 1));
 	auto maxlife = int(((10000/(temp + 1))-1));
@@ -70,7 +70,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if (!r || (parts[i].life >=maxlife))
 						continue;
 					if (TYP(r)==PT_DEUT&& sim->rng.chance(1, 3))
@@ -98,7 +98,7 @@ static int update(UPDATE_FUNC_ARGS)
 					//Leave if there is nothing to do
 					if (parts[i].life <= maxlife)
 						goto trade;
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[{ x+rx, y+ry }];
 					if ((!r)&&parts[i].life>=1)//if nothing then create deut
 					{
 						auto np = sim->create_part(-1,x+rx,y+ry,PT_DEUT);
@@ -118,7 +118,7 @@ trade:
 		auto ry = sim->rng.between(-2, 2);
 		if (rx || ry)
 		{
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[{ x+rx, y+ry }];
 			if (!r)
 				continue;
 			if (TYP(r)==PT_DEUT&&(parts[i].life>parts[ID(r)].life)&&parts[i].life>0)//diffusion

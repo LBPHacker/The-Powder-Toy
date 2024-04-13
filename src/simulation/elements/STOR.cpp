@@ -65,7 +65,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if ((ID(r))>=NPART || !r)
 					continue;
 				if (!parts[i].tmp && !parts[i].life && TYP(r)!=PT_STOR && !(elements[TYP(r)].Properties&TYPE_SOLID) && (!parts[i].ctype || TYP(r)==parts[i].ctype))

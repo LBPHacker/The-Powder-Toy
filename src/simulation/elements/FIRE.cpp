@@ -90,7 +90,7 @@ int Element_FIRE_update(UPDATE_FUNC_ARGS)
 		}
 		break;
 	case PT_LAVA: {
-		float pres = sim->pv[y / CELL][x / CELL];
+		float pres = sim->pv[{ x / CELL, y / CELL }];
 		if (parts[i].ctype == PT_ROCK)
 		{			
 			if (pres <= -9)
@@ -149,7 +149,7 @@ int Element_FIRE_update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
 				auto rt = TYP(r);
@@ -161,7 +161,7 @@ int Element_FIRE_update(UPDATE_FUNC_ARGS)
 						sim->part_change_type(ID(r),x+rx,y+ry,PT_LAVA);
 						parts[ID(r)].ctype = PT_BMTL;
 						parts[ID(r)].temp = 3500.0f;
-						sim->pv[(y+ry)/CELL][(x+rx)/CELL] += 50.0f;
+						sim->pv[{ (x+rx)/CELL, (y+ry)/CELL }] += 50.0f;
 					} else {
 						sim->part_change_type(ID(r),x+rx,y+ry,PT_LAVA);
 						parts[ID(r)].life = 400;
@@ -203,7 +203,7 @@ int Element_FIRE_update(UPDATE_FUNC_ARGS)
 					// LAVA(CLST) + LAVA(PQRT) + high enough temp = LAVA(CRMC) + LAVA(CRMC)
 					if (parts[i].ctype == PT_QRTZ && rt == PT_LAVA && parts[ID(r)].ctype == PT_CLST)
 					{
-						float pres = std::max(sim->pv[y/CELL][x/CELL]*10.0f, 0.0f);
+						float pres = std::max(sim->pv[{ x/CELL, y/CELL }]*10.0f, 0.0f);
 						if (parts[i].temp >= pres+elements[PT_CRMC].HighTemperature+50.0f)
 						{
 							parts[i].ctype = PT_CRMC;
@@ -250,7 +250,7 @@ int Element_FIRE_update(UPDATE_FUNC_ARGS)
 						}
 					}
 					else if (parts[i].ctype == PT_ROCK && rt == PT_LAVA && parts[ID(r)].ctype == PT_GOLD && parts[ID(r)].tmp == 0 &&
-						sim->pv[y / CELL][x / CELL] >= 50 && sim->rng.chance(1, 10000)) // Produce GOLD veins/clusters
+						sim->pv[{ x / CELL, y / CELL }] >= 50 && sim->rng.chance(1, 10000)) // Produce GOLD veins/clusters
 					{
 						parts[i].ctype = PT_GOLD;
 						if (rx > 1 || rx < -1) // Trend veins vertical
@@ -263,7 +263,7 @@ int Element_FIRE_update(UPDATE_FUNC_ARGS)
 				}
 
 				if ((surround_space || elements[rt].Explosive) &&
-				    elements[rt].Flammable && sim->rng.chance(int(elements[rt].Flammable + (sim->pv[(y+ry)/CELL][(x+rx)/CELL] * 10.0f)), 1000) &&
+				    elements[rt].Flammable && sim->rng.chance(int(elements[rt].Flammable + (sim->pv[{ (x+rx)/CELL, (y+ry)/CELL }] * 10.0f)), 1000) &&
 				    //exceptions, t is the thing causing the spark and rt is what's burning
 				    (t != PT_SPRK || (rt != PT_RBDM && rt != PT_LRBD && rt != PT_INSL)) &&
 				    (t != PT_PHOT || rt != PT_INSL) &&
@@ -274,7 +274,7 @@ int Element_FIRE_update(UPDATE_FUNC_ARGS)
 					parts[ID(r)].life = sim->rng.between(180, 259);
 					parts[ID(r)].tmp = parts[ID(r)].ctype = 0;
 					if (elements[rt].Explosive)
-						sim->pv[y/CELL][x/CELL] += 0.25f * CFDS;
+						sim->pv[{ x/CELL, y/CELL }] += 0.25f * CFDS;
 				}
 			}
 		}
@@ -295,14 +295,14 @@ static int updateLegacy(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[{ x+rx, y+ry }];
 				if (!r)
 					continue;
-				if (sim->bmap[(y+ry)/CELL][(x+rx)/CELL] && sim->bmap[(y+ry)/CELL][(x+rx)/CELL]!=WL_STREAM)
+				if (sim->bmap[{ (x+rx)/CELL, (y+ry)/CELL }] && sim->bmap[{ (x+rx)/CELL, (y+ry)/CELL }]!=WL_STREAM)
 					continue;
 				auto rt = TYP(r);
 
-				auto lpv = (int)sim->pv[(y+ry)/CELL][(x+rx)/CELL];
+				auto lpv = (int)sim->pv[{ (x+rx)/CELL, (y+ry)/CELL }];
 				if (lpv < 1) lpv = 1;
 				if (elements[rt].Meltable &&
 				        ((rt!=PT_RBDM && rt!=PT_LRBD) || t!=PT_SPRK)

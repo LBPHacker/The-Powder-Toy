@@ -54,5 +54,3 @@ int Element_LOVE_RuleTable[9][9] =
 	{0,1,0,0,1,1,0,0,0},
 	{0,0,1,1,0,0,0,0,0},
 };
-
-int Element_LOVE_love[XRES/9][YRES/9];

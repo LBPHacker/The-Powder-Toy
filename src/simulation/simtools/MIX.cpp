@@ -18,7 +18,7 @@ static int perform(Simulation * sim, Particle * cpart, int x, int y, int brushX,
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	int thisPart = sim->pmap[y][x];
+	int thisPart = sim->pmap[{ x, y }];
 	if(!thisPart)
 		return 0;
 
@@ -36,18 +36,18 @@ static int perform(Simulation * sim, Particle * cpart, int x, int y, int brushX,
 	if(newX < 0 || newY < 0 || newX >= XRES || newY >= YRES)
 		return 0;
 
-	int thatPart = sim->pmap[newY][newX];
+	int thatPart = sim->pmap[{ newX, newY }];
 	if(!thatPart)
 		return 0;
 
 	if ((elements[TYP(thisPart)].Properties&STATE_FLAGS) != (elements[TYP(thatPart)].Properties&STATE_FLAGS))
 		return 0;
 
-	sim->pmap[y][x] = thatPart;
+	sim->pmap[{ x, y }] = thatPart;
 	sim->parts[ID(thatPart)].x = float(x);
 	sim->parts[ID(thatPart)].y = float(y);
 
-	sim->pmap[newY][newX] = thisPart;
+	sim->pmap[{ newX, newY }] = thisPart;
 	sim->parts[ID(thisPart)].x = float(newX);
 	sim->parts[ID(thisPart)].y = float(newY);
 
