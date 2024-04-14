@@ -15,6 +15,7 @@ on:
 jobs:
   prepare:
     runs-on: ubuntu-24.04
+    environment: resizable-sim
     outputs:
       do_release: ${{ steps.prepare.outputs.do_release }}
       build_matrix: ${{ steps.prepare.outputs.build_matrix }}
@@ -56,6 +57,7 @@ jobs:
         run: bash -c './.github/create-release.sh'
   build:
     runs-on: ${{ matrix.runs_on }}
+    environment: resizable-sim
     name: ${{ matrix.job_name }}
     needs: [prepare]
     strategy:
@@ -149,6 +151,7 @@ jobs:
           name: ${{ matrix.debug_asset_name }}
   publish:
     runs-on: ubuntu-24.04
+    environment: resizable-sim
     needs: [build, prepare]
     strategy:
       fail-fast: false
@@ -170,6 +173,7 @@ jobs:
           PUBLISH_FILENAME: ${{ matrix.starcatcher_name }}
   release:
     runs-on: ubuntu-24.04
+    environment: resizable-sim
     needs: [build, publish, prepare]
     if: needs.prepare.outputs.do_publish == 'yes'
     steps:
