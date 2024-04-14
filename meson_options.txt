@@ -66,7 +66,7 @@ option(
 	'build_num',
 	type: 'integer',
 	min: 0,
-	value: 384,
+	value: 8,
 	description: 'Build number, should be strictly monotonously increasing across public releases'
 )
 option(
@@ -94,7 +94,7 @@ option(
 	'mod_id',
 	type: 'integer',
 	min: 0,
-	value: 0,
+	value: 14,
 	description: 'Mod ID, used on the https://starcatcher.us/TPT build server, the build server will compile for all platforms for you and send updates in-game, see jacob1 to get a mod ID'
 )
 option(
@@ -216,25 +216,25 @@ option(
 option(
 	'app_name',
 	type: 'string',
-	value: 'The Powder Toy',
+	value: 'The Resizable Toy',
 	description: 'App name, used for desktop integration and the window title, change if you work on a mod'
 )
 option(
 	'app_comment',
 	type: 'string',
-	value: 'Physics sandbox game',
+	value: 'Resizable physics sandbox game, see The Powder Toy',
 	description: 'App comment, used for desktop integration, change if you work on a mod'
 )
 option(
 	'app_exe',
 	type: 'string',
-	value: 'powder',
+	value: 'powderresizable',
 	description: 'App executable name, used for desktop integration, change if you work on a mod'
 )
 option(
 	'app_id',
 	type: 'string',
-	value: 'uk.co.powdertoy.tpt',
+	value: 'net.trigraph.powderresizable',
 	description: 'App ID, a D-Bus well-known name, used for desktop integration, change if you work on a mod'
 )
 option(
