@@ -466,6 +466,8 @@ if [[ $PACKAGE_MODE == dmg ]]; then
 	mkdir $appdir/Contents
 	cp resources/Info.plist $appdir/Contents/Info.plist
 	mkdir $appdir/Contents/MacOS
+	# https://stackoverflow.com/questions/60654834/using-mprotect-to-make-text-segment-writable-on-macos
+	printf '\x07' | dd of=$APP_EXE bs=1 seek=160 count=1 conv=notrunc
 	cp $APP_EXE $appdir/Contents/MacOS/$APP_EXE
 	mkdir $appdir/Contents/Resources
 	mkdir icon_exe.iconset

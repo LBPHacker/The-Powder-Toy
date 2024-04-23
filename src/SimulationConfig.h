@@ -56,9 +56,11 @@ SIM_PARAMS(GEN_WRAPPER)
 #define WINDOWW (WINDOWW_Wrapper{})
 #define WINDOWH (WINDOWH_Wrapper{})
 
+int CELL_Div(int thing);
+
 inline int operator /(int thing, CELL_Wrapper)
 {
-	return thing / CELL_Getter();
+	return CELL_Div(thing);
 }
 
 constexpr int MAXSIGNS = 16;

@@ -317,6 +317,10 @@ else
 	]
 endif
 
+if host_libc == 'mingw'
+	project_link_args += [ '-T', join_paths(meson.current_source_dir(), 'mingw.ld') ]
+endif
+
 if host_platform == 'windows'
 	args_ccomp_win = [ '-D_WIN32_WINNT=0x0501', '-DNOMINMAX' ]
 	windows_mod = import('windows')
