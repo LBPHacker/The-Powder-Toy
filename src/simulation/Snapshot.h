@@ -11,25 +11,25 @@
 class Snapshot
 {
 public:
-	PlaneAdapter<std::vector<float>> AirPressure;
-	PlaneAdapter<std::vector<float>> AirVelocityX;
-	PlaneAdapter<std::vector<float>> AirVelocityY;
-	PlaneAdapter<std::vector<float>> AmbientHeat;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> AirPressure;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> AirVelocityX;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> AirVelocityY;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> AmbientHeat;
 
 	std::vector<Particle> Particles;
 
-	PlaneAdapter<std::vector<float>> GravVelocityX;
-	PlaneAdapter<std::vector<float>> GravVelocityY;
-	PlaneAdapter<std::vector<float>> GravValue;
-	PlaneAdapter<std::vector<float>> GravMap;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> GravVelocityX;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> GravVelocityY;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> GravValue;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> GravMap;
 
-	PlaneAdapter<std::vector<unsigned char>> BlockMap;
-	PlaneAdapter<std::vector<unsigned char>> ElecMap;
-	PlaneAdapter<std::vector<unsigned char>> BlockAir;
-	PlaneAdapter<std::vector<unsigned char>> BlockAirH;
+	PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent> BlockMap;
+	PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent> ElecMap;
+	PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent> BlockAir;
+	PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent> BlockAirH;
 
-	PlaneAdapter<std::vector<float>> FanVelocityX;
-	PlaneAdapter<std::vector<float>> FanVelocityY;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> FanVelocityX;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> FanVelocityY;
 
 
 	std::vector<Particle> PortalParticles;

@@ -1,14 +1,23 @@
 #pragma once
 
 #include <cstdint>
+#include <cassert>
 #include <functional>
 #include <limits>
 #include <type_traits>
 #include <utility>
 
 #include "common/Vec2.h"
+#include "SimulationConfig.h"
 
 constexpr size_t DynamicExtent = std::numeric_limits<size_t>::max();
+constexpr size_t XRESExtent    = DynamicExtent - 1;
+constexpr size_t YRESExtent    = XRESExtent    - 1;
+constexpr size_t XCELLSExtent  = YRESExtent    - 1;
+constexpr size_t YCELLSExtent  = XCELLSExtent  - 1;
+constexpr size_t WINDOWWExtent = YCELLSExtent  - 1;
+constexpr size_t WINDOWHExtent = WINDOWWExtent - 1;
+constexpr size_t CELL3Extent   = WINDOWHExtent - 1;
 
 template<size_t Extent>
 struct extentStorage
@@ -44,6 +53,32 @@ struct extentStorage<DynamicExtent>
 		this->extent = extent;
 	}
 };
+
+#define extentStorageP(param) \
+	template<> \
+	struct extentStorage<param ## Extent> \
+	{ \
+		constexpr extentStorage(size_t) \
+		{} \
+	 \
+		size_t getExtent() const \
+		{ \
+			return param; \
+		} \
+	 \
+		void setExtent(size_t extent) \
+		{ \
+			assert(param == int(extent)); \
+		} \
+	};
+
+extentStorageP(XRES   )
+extentStorageP(YRES   )
+extentStorageP(XCELLS )
+extentStorageP(YCELLS )
+extentStorageP(WINDOWW)
+extentStorageP(WINDOWH)
+extentStorageP(CELL3  )
 
 template<size_t Extent>
 struct xExtent: extentStorage<Extent>

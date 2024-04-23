@@ -9,6 +9,7 @@ constexpr float M_GRAV = 6.67300e-1f;
 
 //CELL, the size of the pressure, gravity, and wall maps. Larger than 1 to prevent extreme lag
 extern int CELL;
+extern int CELL3;
 extern Vec2<int> CELLS;
 extern Vec2<int> RES;
 

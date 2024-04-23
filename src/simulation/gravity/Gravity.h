@@ -18,11 +18,11 @@ protected:
 	bool enabled = false;
 
 	// Maps to be processed by the gravity thread
-	PlaneAdapter<std::vector<float>> th_ogravmap;
-	PlaneAdapter<std::vector<float>> th_gravmap;
-	PlaneAdapter<std::vector<float>> th_gravx;
-	PlaneAdapter<std::vector<float>> th_gravy;
-	PlaneAdapter<std::vector<float>> th_gravp;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> th_ogravmap;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> th_gravmap;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> th_gravx;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> th_gravy;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> th_gravp;
 
 	int th_gravchanged = 0;
 
@@ -34,13 +34,13 @@ protected:
 	bool ignoreNextResult = false;
 
 	struct mask_el {
-		PlaneAdapter<std::vector<char>> shape;
+		PlaneAdapter<std::vector<char>, XCELLSExtent, YCELLSExtent> shape;
 		char shapeout;
 		mask_el *next;
 	};
 	using mask_el = struct mask_el;
 
-	bool grav_mask_r(int x, int y, PlaneAdapter<std::vector<char>> &checkmap, PlaneAdapter<std::vector<char>> &shape);
+	bool grav_mask_r(int x, int y, PlaneAdapter<std::vector<char>, XCELLSExtent, YCELLSExtent> &checkmap, PlaneAdapter<std::vector<char>, XCELLSExtent, YCELLSExtent> &shape);
 	void mask_free(mask_el *c_mask_el);
 
 	void update_grav();
@@ -56,14 +56,14 @@ public:
 	~Gravity();
 
 	//Maps to be used by the main thread
-	PlaneAdapter<std::vector<float>> *gravmap{};
-	PlaneAdapter<std::vector<float>> *gravp{};
-	PlaneAdapter<std::vector<float>> *gravy{};
-	PlaneAdapter<std::vector<float>> *gravx{};
-	PlaneAdapter<std::vector<uint32_t>> gravmask;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> *gravmap{};
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> *gravp{};
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> *gravy{};
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> *gravx{};
+	PlaneAdapter<std::vector<uint32_t>, XCELLSExtent, YCELLSExtent> gravmask;
 	static_assert(sizeof(float) == sizeof(uint32_t));
 
-	PlaneAdapter<std::vector<unsigned char>> *bmap;
+	PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent> *bmap;
 
 	bool IsEnabled() { return enabled; }
 

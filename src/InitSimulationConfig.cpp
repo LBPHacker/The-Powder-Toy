@@ -5,6 +5,7 @@
 #include "prefs/GlobalPrefs.h"
 
 int CELL;
+int CELL3;
 Vec2<int> CELLS;
 Vec2<int> RES;
 int XCELLS;
@@ -24,6 +25,7 @@ namespace
 	struct FullSimulationConfig
 	{
 		int vCELL;
+		int vCELL3;
 		Vec2<int> vCELLS;
 		Vec2<int> vRES;
 		int vXCELLS;
@@ -43,6 +45,7 @@ namespace
 		FullSimulationConfig(SimulationConfig config)
 		{
 			vCELL    = config.vCELL;
+			vCELL3   = vCELL * 3;
 			vCELLS   = config.vCELLS;
 			vRES     = vCELLS * vCELL;
 			vXCELLS  = vCELLS.X;

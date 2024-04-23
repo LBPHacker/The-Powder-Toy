@@ -159,8 +159,8 @@ void FillHunkVector(const std::vector<Item> &oldItems, const std::vector<Item> &
 	FillHunkVectorPtr<Item>(&oldItems[0], &newItems[0], out, std::min(oldItems.size(), newItems.size()));
 }
 
-template<class Item>
-void FillHunkPlane(const PlaneAdapter<std::vector<Item>> &oldItems, const PlaneAdapter<std::vector<Item>> &newItems, SnapshotDelta::HunkVector<Item> &out)
+template<class Item, class Plane>
+void FillHunkPlane(const Plane &oldItems, const Plane &newItems, SnapshotDelta::HunkVector<Item> &out)
 {
 	auto size = oldItems.Size();
 	FillHunkVectorPtr<Item>(oldItems.data(), newItems.data(), out, size.X * size.Y);
@@ -197,8 +197,8 @@ void ApplyHunkVector(const SnapshotDelta::HunkVector<Item> &in, std::vector<Item
 	ApplyHunkVectorPtr<UseOld, Item>(in, &items[0]);
 }
 
-template<bool UseOld, class Item>
-void ApplyHunkPlane(const SnapshotDelta::HunkVector<Item> &in, PlaneAdapter<std::vector<Item>> &items)
+template<bool UseOld, class Item, class Plane>
+void ApplyHunkPlane(const SnapshotDelta::HunkVector<Item> &in, Plane &items)
 {
 	ApplyHunkVectorPtr<UseOld, Item>(in, items.data());
 }

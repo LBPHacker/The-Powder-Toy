@@ -3912,27 +3912,27 @@ Simulation::Simulation():
 	sandcolour_frame(0),
 	deco_space(DECOSPACE_SRGB)
 {
-	gravmap = PlaneAdapter<std::vector<float>>(CELLS);
-	gravy = PlaneAdapter<std::vector<float>>(CELLS);
-	gravx = PlaneAdapter<std::vector<float>>(CELLS);
-	gravp = PlaneAdapter<std::vector<float>>(CELLS);
+	gravmap = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	gravy = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	gravx = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	gravp = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
 	
-	vx = PlaneAdapter<std::vector<float>>(CELLS);
-	vy = PlaneAdapter<std::vector<float>>(CELLS);
-	pv = PlaneAdapter<std::vector<float>>(CELLS);
-	hv = PlaneAdapter<std::vector<float>>(CELLS);
+	vx = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	vy = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	pv = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	hv = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
 
-	gol = PlaneAdapter<std::vector<std::array<unsigned int, 5>>>(RES);
+	gol = PlaneAdapter<std::vector<std::array<unsigned int, 5>>, XRESExtent, YRESExtent>(RES);
 
-	bmap = PlaneAdapter<std::vector<unsigned char>>(CELLS);
-	emap = PlaneAdapter<std::vector<unsigned char>>(CELLS);
-	fvx = PlaneAdapter<std::vector<float>>(CELLS);
-	fvy = PlaneAdapter<std::vector<float>>(CELLS);
+	bmap = PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent>(CELLS);
+	emap = PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent>(CELLS);
+	fvx = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	fvy = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
 
 	parts = std::vector<Particle>(NPART);
-	pmap = PlaneAdapter<std::vector<int>>(RES);
-	photons = PlaneAdapter<std::vector<int>>(RES);
-	pmap_count = PlaneAdapter<std::vector<unsigned int>>(RES);
+	pmap = PlaneAdapter<std::vector<int>, XRESExtent, YRESExtent>(RES);
+	photons = PlaneAdapter<std::vector<int>, XRESExtent, YRESExtent>(RES);
+	pmap_count = PlaneAdapter<std::vector<unsigned int>, XRESExtent, YRESExtent>(RES);
 
 	Element_LOLZ_lolz = PlaneAdapter<std::vector<int>>({ XRES / 9, YRES / 9 });
 	Element_LOVE_love = PlaneAdapter<std::vector<int>>({ XRES / 9, YRES / 9 });

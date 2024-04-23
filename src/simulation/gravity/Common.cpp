@@ -9,12 +9,12 @@
 
 Gravity::Gravity(CtorTag)
 {
-	th_ogravmap = PlaneAdapter<std::vector<float>>(CELLS);
-	th_gravmap = PlaneAdapter<std::vector<float>>(CELLS);
-	th_gravy = PlaneAdapter<std::vector<float>>(CELLS);
-	th_gravx = PlaneAdapter<std::vector<float>>(CELLS);
-	th_gravp = PlaneAdapter<std::vector<float>>(CELLS);
-	gravmask = PlaneAdapter<std::vector<uint32_t>>(CELLS);
+	th_ogravmap = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	th_gravmap = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	th_gravy = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	th_gravx = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	th_gravp = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	gravmask = PlaneAdapter<std::vector<uint32_t>, XCELLSExtent, YCELLSExtent>(CELLS);
 }
 
 Gravity::~Gravity()
@@ -139,7 +139,7 @@ void Gravity::stop_grav_async()
 	std::fill(gravmap->begin(), gravmap->end(), 0.0f);
 }
 
-bool Gravity::grav_mask_r(int x, int y, PlaneAdapter<std::vector<char>> &checkmap, PlaneAdapter<std::vector<char>> &shape)
+bool Gravity::grav_mask_r(int x, int y, PlaneAdapter<std::vector<char>, XCELLSExtent, YCELLSExtent> &checkmap, PlaneAdapter<std::vector<char>, XCELLSExtent, YCELLSExtent> &shape)
 {
 	int x1, x2;
 	bool ret = false;
@@ -221,7 +221,7 @@ void Gravity::mask_free(mask_el *c_mask_el)
 
 void Gravity::gravity_mask()
 {
-	PlaneAdapter<std::vector<char>> checkmap(CELLS, 0);
+	PlaneAdapter<std::vector<char>, XCELLSExtent, YCELLSExtent> checkmap(CELLS, 0);
 	unsigned maskvalue;
 	mask_el *t_mask_el = nullptr;
 	mask_el *c_mask_el = nullptr;
@@ -235,7 +235,7 @@ void Gravity::gravity_mask()
 				if (t_mask_el == nullptr)
 				{
 					t_mask_el = new mask_el[sizeof(mask_el)];
-					t_mask_el->shape = PlaneAdapter<std::vector<char>>(CELLS, 0);
+					t_mask_el->shape = PlaneAdapter<std::vector<char>, XCELLSExtent, YCELLSExtent>(CELLS, 0);
 					t_mask_el->shapeout = 0;
 					t_mask_el->next = nullptr;
 					c_mask_el = t_mask_el;
@@ -244,7 +244,7 @@ void Gravity::gravity_mask()
 				{
 					c_mask_el->next = new mask_el[sizeof(mask_el)];
 					c_mask_el = c_mask_el->next;
-					c_mask_el->shape = PlaneAdapter<std::vector<char>>(CELLS, 0);
+					c_mask_el->shape = PlaneAdapter<std::vector<char>, XCELLSExtent, YCELLSExtent>(CELLS, 0);
 					c_mask_el->shapeout = 0;
 					c_mask_el->next = nullptr;
 				}

@@ -73,27 +73,27 @@ public:
 	//Gol sim
 	int CGOL;
 	int GSPEED;
-	PlaneAdapter<std::vector<std::array<unsigned int, 5>>> gol;
+	PlaneAdapter<std::vector<std::array<unsigned int, 5>>, XRESExtent, YRESExtent> gol;
 	//Air sim
-	PlaneAdapter<std::vector<float>> vx;
-	PlaneAdapter<std::vector<float>> vy;
-	PlaneAdapter<std::vector<float>> pv;
-	PlaneAdapter<std::vector<float>> hv;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> vx;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> vy;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> pv;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> hv;
 	//Gravity sim
-	PlaneAdapter<std::vector<float>> gravx;
-	PlaneAdapter<std::vector<float>> gravy;
-	PlaneAdapter<std::vector<float>> gravp;
-	PlaneAdapter<std::vector<float>> gravmap;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> gravx;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> gravy;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> gravp;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> gravmap;
 	//Walls
-	PlaneAdapter<std::vector<unsigned char>> bmap;
-	PlaneAdapter<std::vector<unsigned char>> emap;
-	PlaneAdapter<std::vector<float>> fvx;
-	PlaneAdapter<std::vector<float>> fvy;
+	PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent> bmap;
+	PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent> emap;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> fvx;
+	PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent> fvy;
 	//Particles
 	std::vector<Particle> parts;
-	PlaneAdapter<std::vector<int>> pmap;
-	PlaneAdapter<std::vector<int>> photons;
-	PlaneAdapter<std::vector<unsigned int>> pmap_count;
+	PlaneAdapter<std::vector<int>, XRESExtent, YRESExtent> pmap;
+	PlaneAdapter<std::vector<int>, XRESExtent, YRESExtent> photons;
+	PlaneAdapter<std::vector<unsigned int>, XRESExtent, YRESExtent> pmap_count;
 	//Lolz
 	PlaneAdapter<std::vector<int>> Element_LOLZ_lolz;
 	PlaneAdapter<std::vector<int>> Element_LOVE_love;

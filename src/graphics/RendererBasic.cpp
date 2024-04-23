@@ -239,16 +239,15 @@ Renderer::Renderer(Simulation *newSim):
 {
 	PopulateTables();
 
-	video = PlaneAdapter<std::vector<pixel>>(WINDOW, 0);
-	persistentVideo = PlaneAdapter<std::vector<pixel>>(WINDOW, 0);
-	warpVideo = PlaneAdapter<std::vector<pixel>>(WINDOW, 0);
+	video = PlaneAdapter<std::vector<pixel>, WINDOWWExtent, WINDOWHExtent>(WINDOW, 0);
+	persistentVideo = PlaneAdapter<std::vector<pixel>, WINDOWWExtent, WINDOWHExtent>(WINDOW, 0);
+	warpVideo = PlaneAdapter<std::vector<pixel>, WINDOWWExtent, WINDOWHExtent>(WINDOW, 0);
 
-	fire_alpha = PlaneAdapter<std::vector<pixel>>({ CELL * 3, CELL * 3 }, 0);
-	fire_alphaf = PlaneAdapter<std::vector<float>>({ CELL * 3, CELL * 3 }, 0.f);
+	fire_alpha = PlaneAdapter<std::vector<pixel>, CELL3Extent, CELL3Extent>({ CELL * 3, CELL * 3 }, 0);
 
-	fire_r = PlaneAdapter<std::vector<unsigned char>>(CELLS, 0);
-	fire_g = PlaneAdapter<std::vector<unsigned char>>(CELLS, 0);
-	fire_b = PlaneAdapter<std::vector<unsigned char>>(CELLS, 0);
+	fire_r = PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent>(CELLS, 0);
+	fire_g = PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent>(CELLS, 0);
+	fire_b = PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent>(CELLS, 0);
 
 	//Set defauly display modes
 	ResetModes();

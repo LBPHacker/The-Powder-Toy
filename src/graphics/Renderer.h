@@ -29,7 +29,7 @@ int HeatToColour(float temp);
 
 class Renderer: public RasterDrawMethods<Renderer>
 {
-	using Video = PlaneAdapter<std::vector<pixel>>;
+	using Video = PlaneAdapter<std::vector<pixel>, WINDOWWExtent, WINDOWHExtent>;
 	Video video;
 	Video persistentVideo;
 	Video warpVideo;
@@ -65,12 +65,11 @@ public:
 	unsigned int display_mode;
 	std::vector<RenderPreset> renderModePresets;
 	//
-	PlaneAdapter<std::vector<unsigned char>> fire_r;
-	PlaneAdapter<std::vector<unsigned char>> fire_g;
-	PlaneAdapter<std::vector<unsigned char>> fire_b;
-	PlaneAdapter<std::vector<unsigned int>> fire_alpha;
+	PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent> fire_r;
+	PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent> fire_g;
+	PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent> fire_b;
+	PlaneAdapter<std::vector<unsigned int>, CELL3Extent, CELL3Extent> fire_alpha;
 	
-	PlaneAdapter<std::vector<float>> fire_alphaf;
 	float glow_alphaf[11][11];
 	float blur_alphaf[7][7];
 	//

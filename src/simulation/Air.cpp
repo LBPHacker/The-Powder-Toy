@@ -397,12 +397,12 @@ Air::Air(Simulation & simulation):
 	airMode(AIR_ON),
 	ambientAirTemp(R_TEMP + 273.15f)
 {
-	ovx = PlaneAdapter<std::vector<float>>(CELLS);
-	ovy = PlaneAdapter<std::vector<float>>(CELLS);
-	opv = PlaneAdapter<std::vector<float>>(CELLS);
-	ohv = PlaneAdapter<std::vector<float>>(CELLS);
-	bmap_blockair = PlaneAdapter<std::vector<unsigned char>>(CELLS);
-	bmap_blockairh = PlaneAdapter<std::vector<unsigned char>>(CELLS);
+	ovx = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	ovy = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	opv = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	ohv = PlaneAdapter<std::vector<float>, XCELLSExtent, YCELLSExtent>(CELLS);
+	bmap_blockair = PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent>(CELLS);
+	bmap_blockairh = PlaneAdapter<std::vector<unsigned char>, XCELLSExtent, YCELLSExtent>(CELLS);
 
 	//Simulation should do this.
 	make_kernel();
