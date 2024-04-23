@@ -200,8 +200,8 @@ std::pair<bool, std::vector<char>> GameSave::Serialise() const
 void GameSave::Transform(Mat2<int> transform, Vec2<int> nudge)
 {
 	// undo translation by rotation
-	auto br  = transform * (blockSize * CELL - Vec2{ 1, 1 });
-	auto bbr = transform * (blockSize        - Vec2{ 1, 1 });
+	auto br  = transform * (blockSize * int(CELL) - Vec2{ 1, 1 });
+	auto bbr = transform * (blockSize             - Vec2{ 1, 1 });
 	auto translate  = Vec2{ std::max(0,  -br.X), std::max(0,  -br.Y) };
 	auto btranslate = Vec2{ std::max(0, -bbr.X), std::max(0, -bbr.Y) };
 	auto newBlockS = transform * blockSize;
@@ -210,14 +210,14 @@ void GameSave::Transform(Mat2<int> transform, Vec2<int> nudge)
 	translate += nudge;
 
 	// Grow as needed.
-	assert((Vec2{ CELL, CELL }.OriginRect().Contains(nudge)));
+	assert((Vec2{ int(CELL), int(CELL) }.OriginRect().Contains(nudge)));
 	if (nudge.X) newBlockS.X += 1;
 	if (nudge.Y) newBlockS.Y += 1;
 
 	// TODO: allow transforms to yield bigger saves. For this we'd need SaveRenderer (the singleton, not Renderer)
 	// to fully render them (possible with stitching) and Simulation::Load to be able to take only the part that fits.
-	newBlockS = newBlockS.Clamp(RectBetween({ 0, 0 }, CELLS));
-	auto newPartS = newBlockS * CELL;
+	newBlockS = newBlockS.Clamp(RectBetween({ 0, 0 }, Vec2<int>(CELLS)));
+	auto newPartS = newBlockS * int(CELL);
 
 	// Prepare to patch pipes.
 	std::array<int, 8> pipeOffsetMap;
@@ -432,18 +432,18 @@ void GameSave::readOPS(const std::vector<char> &data)
 	auto blockS = Vec2{ int(inputData[6]), int(inputData[7]) };
 
 	//Full size, normalised
-	auto partP = blockP * CELL;
-	auto partS = blockS * CELL;
+	auto partP = blockP * int(CELL);
+	auto partS = blockS * int(CELL);
 
 	//Incompatible cell size
 	if (inputData[5] != CELL)
 		throw ParseException(ParseException::InvalidDimensions, "Incorrect CELL size");
 
-	if (!RectBetween({ 0, 0 }, CELLS).Contains(blockS))
+	if (!RectBetween({ 0, 0 }, Vec2<int>(CELLS)).Contains(blockS))
 		throw ParseException(ParseException::InvalidDimensions, "Save is of invalid size");
 
 	//Too large/off screen
-	if (!RectBetween({ 0, 0 }, CELLS).Contains(blockP + blockS))
+	if (!RectBetween({ 0, 0 }, Vec2<int>(CELLS)).Contains(blockP + blockS))
 		throw ParseException(ParseException::InvalidDimensions, "Save extends beyond canvas");
 
 	setSize(blockS);
@@ -1354,8 +1354,8 @@ void GameSave::readPSv(const std::vector<char> &dataVec)
 		throw ParseException(ParseException::Corrupt, "Save data corrupt (missing data)");
 
 	// normalize coordinates
-	auto partS = blockS * CELL;
-	auto partP = blockP * CELL;
+	auto partS = blockS * int(CELL);
+	auto partP = blockP * int(CELL);
 
 	if (ver<46) {
 		gravityMode = GRAV_VERTICAL;
@@ -1927,11 +1927,11 @@ std::pair<bool, std::vector<char>> GameSave::serialiseOPS() const
 	auto blockP = Vec2{ 0, 0 };
 
 	//Snap full coords to block size
-	auto partP = blockP * CELL;
+	auto partP = blockP * int(CELL);
 
 	//Original size + offset of original corner from snapped corner, rounded up by adding CELL-1
 	auto blockS = blockSize;
-	auto partS = blockS * CELL;
+	auto partS = blockS * int(CELL);
 
 	// Copy fan and wall data
 	PlaneAdapter<std::vector<unsigned char>> wallData(blockSize);

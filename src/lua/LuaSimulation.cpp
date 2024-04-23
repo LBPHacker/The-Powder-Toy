@@ -112,7 +112,7 @@ template<bool Clamp, class Accessor, class ItemType = typename LuaBlockMapHelper
 static int LuaBlockMapImpl(lua_State *L, ItemType minValue, ItemType maxValue, Accessor accessor)
 {
 	auto pos = Vec2{ luaL_checkint(L, 1), luaL_checkint(L, 2) };
-	if (!CELLS.OriginRect().Contains(pos))
+	if (!Vec2<int>(CELLS).OriginRect().Contains(pos))
 	{
 		return luaL_error(L, "Coordinates (%i, %i) out of range", pos.X, pos.Y);
 	}
@@ -150,7 +150,7 @@ static int LuaBlockMapImpl(lua_State *L, ItemType minValue, ItemType maxValue, A
 		if (value > maxValue) value = maxValue;
 		if (value < minValue) value = minValue;
 	}
-	for (auto p : CELLS.OriginRect() & RectSized(pos, size))
+	for (auto p : Vec2<int>(CELLS).OriginRect() & RectSized(pos, size))
 	{
 		accessor(p) = value;
 	}
@@ -213,7 +213,7 @@ static int gravityField(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	auto pos = Vec2{ luaL_checkint(L, 1), luaL_checkint(L, 2) };
-	if (!CELLS.OriginRect().Contains(pos))
+	if (!Vec2<int>(CELLS).OriginRect().Contains(pos))
 	{
 		return luaL_error(L, "Coordinates (%i, %i) out of range", pos.X, pos.Y);
 	}
@@ -952,8 +952,8 @@ static int loadStamp(lua_State *L)
 	if (tempfile && tempfile->GetGameSave())
 	{
 		auto gameSave = tempfile->TakeGameSave();
-		auto [ quoX, remX ] = floorDiv(partP.X, CELL);
-		auto [ quoY, remY ] = floorDiv(partP.Y, CELL);
+		auto [ quoX, remX ] = floorDiv(partP.X, int(CELL));
+		auto [ quoY, remY ] = floorDiv(partP.Y, int(CELL));
 		if (remX || remY || hflip || rotation)
 		{
 			auto transform = Mat2<int>::Identity;

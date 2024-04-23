@@ -345,7 +345,7 @@ ui::Point GameController::PointTranslateNoClamp(ui::Point point)
 
 ui::Point GameController::NormaliseBlockCoord(ui::Point point)
 {
-	return (point/CELL)*CELL;
+	return (point/int(CELL))*int(CELL);
 }
 
 void GameController::DrawRect(int toolSelection, ui::Point point1, ui::Point point2)
@@ -437,8 +437,8 @@ void GameController::ToolClick(int toolSelection, ui::Point point)
 
 static Rect<int> SaneSaveRect(Vec2<int> point1, Vec2<int> point2)
 {
-	point1 = point1.Clamp(RES.OriginRect());
-	point2 = point2.Clamp(RES.OriginRect());
+	point1 = point1.Clamp(Vec2<int>(RES).OriginRect());
+	point2 = point2.Clamp(Vec2<int>(RES).OriginRect());
 	auto tlx = std::min(point1.X, point2.X);
 	auto tly = std::min(point1.Y, point2.Y);
 	auto brx = std::max(point1.X, point2.X);
@@ -1196,7 +1196,7 @@ void GameController::OpenSearch(String searchText)
 void GameController::OpenLocalSaveWindow(bool asCurrent)
 {
 	Simulation * sim = gameModel->GetSimulation();
-	auto gameSave = sim->Save(gameModel->GetIncludePressure() != gameView->ShiftBehaviour(), RES.OriginRect());
+	auto gameSave = sim->Save(gameModel->GetIncludePressure() != gameView->ShiftBehaviour(), Vec2<int>(RES).OriginRect());
 	if(!gameSave)
 	{
 		new ErrorMessage("Error", "Unable to build save.");
@@ -1412,7 +1412,7 @@ void GameController::OpenSaveWindow()
 	if(gameModel->GetUser().UserID)
 	{
 		Simulation * sim = gameModel->GetSimulation();
-		auto gameSave = sim->Save(gameModel->GetIncludePressure() != gameView->ShiftBehaviour(), RES.OriginRect());
+		auto gameSave = sim->Save(gameModel->GetIncludePressure() != gameView->ShiftBehaviour(), Vec2<int>(RES).OriginRect());
 		if(!gameSave)
 		{
 			new ErrorMessage("Error", "Unable to build save.");
@@ -1454,7 +1454,7 @@ void GameController::SaveAsCurrent()
 	if(gameModel->GetSave() && gameModel->GetUser().UserID && gameModel->GetUser().Username == gameModel->GetSave()->GetUserName())
 	{
 		Simulation * sim = gameModel->GetSimulation();
-		auto gameSave = sim->Save(gameModel->GetIncludePressure() != gameView->ShiftBehaviour(), RES.OriginRect());
+		auto gameSave = sim->Save(gameModel->GetIncludePressure() != gameView->ShiftBehaviour(), Vec2<int>(RES).OriginRect());
 		if(!gameSave)
 		{
 			new ErrorMessage("Error", "Unable to build save.");

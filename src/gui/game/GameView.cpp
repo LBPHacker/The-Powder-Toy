@@ -568,7 +568,7 @@ void GameView::NotifyToolListChanged(GameModel * sender)
 		else
 			tempButton = new ToolButton(ui::Point(currentX, YRES+1), ui::Point(30, 18), tool->Name, tool->Identifier, tool->Description);
 
-		tempButton->ClipRect = RectSized(Vec2(1, RES.Y + 1), Vec2(RES.X - 1, 18));
+		tempButton->ClipRect = RectSized(Vec2(1, YRES + 1), Vec2(XRES - 1, 18));
 
 		//currentY -= 17;
 		currentX -= 31;
@@ -1175,15 +1175,15 @@ void GameView::OnMouseDown(int x, int y, unsigned button)
 
 Vec2<int> GameView::PlaceSavePos() const
 {
-	auto [ trQuoX, trRemX ] = floorDiv(placeSaveTranslate.X, CELL);
-	auto [ trQuoY, trRemY ] = floorDiv(placeSaveTranslate.Y, CELL);
+	auto [ trQuoX, trRemX ] = floorDiv(placeSaveTranslate.X, int(CELL));
+	auto [ trQuoY, trRemY ] = floorDiv(placeSaveTranslate.Y, int(CELL));
 	auto usefulSize = placeSaveThumb->Size();
 	if (trRemX) usefulSize.X -= CELL;
 	if (trRemY) usefulSize.Y -= CELL;
-	auto cursorCell = (usefulSize - Vec2{ CELL, CELL }) / 2 - Vec2{ trQuoX, trQuoY } * CELL; // stamp coordinates
+	auto cursorCell = (usefulSize - Vec2{ int(CELL), int(CELL) }) / 2 - Vec2{ trQuoX, trQuoY } * int(CELL); // stamp coordinates
 	auto unaligned = selectPoint2 - cursorCell;
-	auto quoX = floorDiv(unaligned.X, CELL).first;
-	auto quoY = floorDiv(unaligned.Y, CELL).first;
+	auto quoX = floorDiv(unaligned.X, int(CELL)).first;
+	auto quoY = floorDiv(unaligned.Y, int(CELL)).first;
 	return { quoX, quoY };
 }
 
@@ -1972,8 +1972,8 @@ void GameView::TransformSave(Mat2<int> mulToTransform)
 
 void GameView::ApplyTransformPlaceSave()
 {
-	auto remX = floorDiv(placeSaveTranslate.X, CELL).second;
-	auto remY = floorDiv(placeSaveTranslate.Y, CELL).second;
+	auto remX = floorDiv(placeSaveTranslate.X, int(CELL)).second;
+	auto remY = floorDiv(placeSaveTranslate.Y, int(CELL)).second;
 	c->TransformPlaceSave(placeSaveTransform, { remX, remY });
 }
 
@@ -2207,7 +2207,7 @@ void GameView::OnDraw()
 			{
 				if(placeSaveThumb && selectPoint2.X!=-1)
 				{
-					auto rect = RectSized(PlaceSavePos() * CELL, placeSaveThumb->Size());
+					auto rect = RectSized(PlaceSavePos() * int(CELL), placeSaveThumb->Size());
 					ren->BlendImage(placeSaveThumb->Data(), 0x80, rect);
 					ren->XorDottedRect(rect);
 				}
@@ -2216,7 +2216,7 @@ void GameView::OnDraw()
 			{
 				if(selectPoint1.X==-1)
 				{
-					ren->BlendFilledRect(RectSized(Vec2{ 0, 0 }, RES), 0x000000_rgb .WithAlpha(100));
+					ren->BlendFilledRect(RectSized(Vec2{ 0, 0 }, Vec2<int>(RES)), 0x000000_rgb .WithAlpha(100));
 				}
 				else
 				{
@@ -2230,8 +2230,8 @@ void GameView::OnDraw()
 					if(y2>YRES-1)
 						y2 = YRES-1;
 
-					ren->BlendFilledRect(RectSized(Vec2{ 0, 0 }, Vec2{ XRES, y1 }), 0x000000_rgb .WithAlpha(100));
-					ren->BlendFilledRect(RectSized(Vec2{ 0, y2+1 }, Vec2{ XRES, YRES-y2-1 }), 0x000000_rgb .WithAlpha(100));
+					ren->BlendFilledRect(RectSized(Vec2{ 0, 0 }, Vec2{ int(XRES), y1 }), 0x000000_rgb .WithAlpha(100));
+					ren->BlendFilledRect(RectSized(Vec2{ 0, y2+1 }, Vec2{ int(XRES), YRES-y2-1 }), 0x000000_rgb .WithAlpha(100));
 
 					ren->BlendFilledRect(RectSized(Vec2{ 0, y1 }, Vec2{ x1, (y2-y1)+1 }), 0x000000_rgb .WithAlpha(100));
 					ren->BlendFilledRect(RectSized(Vec2{ x2+1, y1 }, Vec2{ XRES-x2-1, (y2-y1)+1 }), 0x000000_rgb .WithAlpha(100));
@@ -2523,7 +2523,7 @@ void GameView::OnDraw()
 	//Introduction text
 	if(introText && showHud)
 	{
-		g->BlendFilledRect(RectSized(Vec2{ 0, 0 }, WINDOW), 0x000000_rgb .WithAlpha(introText>51?102:introText*2));
+		g->BlendFilledRect(RectSized(Vec2{ 0, 0 }, Vec2<int>(WINDOW)), 0x000000_rgb .WithAlpha(introText>51?102:introText*2));
 		g->BlendText({ 16, 16 }, introTextMessage, 0xFFFFFF_rgb .WithAlpha(introText>51?255:introText*5));
 	}
 }

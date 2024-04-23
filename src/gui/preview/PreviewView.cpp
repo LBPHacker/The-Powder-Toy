@@ -49,7 +49,7 @@ PreviewView::PreviewView(std::unique_ptr<VideoBuffer> newSavePreview):
 {
 	if (newSavePreview)
 	{
-		newSavePreview->Resize(RES / 2, true);
+		newSavePreview->Resize(Vec2<int>(RES) / 2, true);
 		savePreview = std::move(newSavePreview);
 	}
 	showAvatars = ui::Engine::Ref().ShowAvatars;
@@ -321,9 +321,9 @@ void PreviewView::OnDraw()
 	//Save preview (top-left)
 	if (savePreview)
 	{
-		g->BlendImage(savePreview->Data(), 0xFF, RectSized(Position + Vec2(1, 1) + (RES / 2 - savePreview->Size()) / 2, savePreview->Size()));
+		g->BlendImage(savePreview->Data(), 0xFF, RectSized(Position + Vec2(1, 1) + (Vec2<int>(RES) / 2 - savePreview->Size()) / 2, savePreview->Size()));
 	}
-	g->BlendRect(RectSized(Position, RES / 2 + Vec2{ 1, 1 }), 0xFFFFFF_rgb .WithAlpha(100));
+	g->BlendRect(RectSized(Position, Vec2<int>(RES) / 2 + Vec2{ 1, 1 }), 0xFFFFFF_rgb .WithAlpha(100));
 	g->DrawLine(Position + Vec2{ XRES/2, 1 }, Position + Vec2{ XRES/2, Size.Y-2 }, 0xC8C8C8_rgb);
 
 	if(votesUp || votesDown)
@@ -348,13 +348,13 @@ void PreviewView::OnDraw()
 		nyu = nyu>50?50:nyu;
 		nyd = nyd>50?50:nyd;
 
-		g->DrawFilledRect(RectSized(Position + RES / 2 + Vec2{ -56, 3 }, Vec2{ 54, 7 }), 0x006B0A_rgb);
-		g->DrawFilledRect(RectSized(Position + RES / 2 + Vec2{ -56, 9 }, Vec2{ 54, 7 }), 0x6B0A00_rgb);
+		g->DrawFilledRect(RectSized(Position + Vec2<int>(RES) / 2 + Vec2{ -56, 3 }, Vec2{ 54, 7 }), 0x006B0A_rgb);
+		g->DrawFilledRect(RectSized(Position + Vec2<int>(RES) / 2 + Vec2{ -56, 9 }, Vec2{ 54, 7 }), 0x6B0A00_rgb);
 		g->DrawRect(RectSized(Position + Vec2{ (XRES/2)-56, (YRES/2)+3 }, { 54, 7 }), 0x808080_rgb);
 		g->DrawRect(RectSized(Position + Vec2{ (XRES/2)-56, (YRES/2)+9 }, { 54, 7 }), 0x808080_rgb);
 
-		g->DrawFilledRect(RectSized(Position + RES / 2 + Vec2{ -4-nyu, 5 }, Vec2{ nyu, 3 }), 0x39BB39_rgb);
-		g->DrawFilledRect(RectSized(Position + RES / 2 + Vec2{ -4-nyd, 11 }, Vec2{ nyd, 3 }), 0xBB3939_rgb);
+		g->DrawFilledRect(RectSized(Position + Vec2<int>(RES) / 2 + Vec2{ -4-nyu, 5 }, Vec2{ nyu, 3 }), 0x39BB39_rgb);
+		g->DrawFilledRect(RectSized(Position + Vec2<int>(RES) / 2 + Vec2{ -4-nyd, 11 }, Vec2{ nyd, 3 }), 0xBB3939_rgb);
 	}
 }
 
@@ -574,7 +574,7 @@ void PreviewView::NotifySaveChanged(PreviewModel * sender)
 			missingElements = save->GetGameSave()->missingElements;
 			savePreview = SaveRenderer::Ref().Render(save->GetGameSave(), false, true);
 			if (savePreview)
-				savePreview->ResizeToFit(RES / 2, true);
+				savePreview->ResizeToFit(Vec2<int>(RES) / 2, true);
 			missingElementsButton->Visible = missingElements;
 			UpdateLoadStatus();
 		}

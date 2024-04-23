@@ -79,9 +79,9 @@ constexpr int PMAPID(int id)
 }
 constexpr int PT_NUM = 1 << PMAPBITS;
 
-constexpr bool InBounds(int x, int y)
+inline bool InBounds(int x, int y)
 {
-	return RES.OriginRect().Contains({ x, y });
+	return Vec2<int>(RES).OriginRect().Contains({ x, y });
 }
 
 struct playerst;

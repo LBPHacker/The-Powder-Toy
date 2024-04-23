@@ -23,7 +23,7 @@ static float remainder_p(float x, float y)
 
 void Simulation::Load(const GameSave *save, bool includePressure, Vec2<int> blockP) // block coordinates
 {
-	auto partP = blockP * CELL;
+	auto partP = blockP * int(CELL);
 
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
@@ -36,7 +36,7 @@ void Simulation::Load(const GameSave *save, bool includePressure, Vec2<int> bloc
 		Vec2<int> pos;
 	};
 	std::vector<ExistingParticle> existingParticles;
-	auto pasteArea = RES.OriginRect() & RectSized(partP, save->blockSize * CELL);
+	auto pasteArea = Vec2<int>(RES).OriginRect() & RectSized(partP, save->blockSize * int(CELL));
 	for (int i = 0; i <= parts_lastActiveIndex; i++)
 	{
 		if (parts[i].type)
@@ -260,7 +260,7 @@ void Simulation::Load(const GameSave *save, bool includePressure, Vec2<int> bloc
 			signs.push_back(tempSign);
 		}
 	}
-	for (auto bpos : RectSized(blockP, save->blockSize) & CELLS.OriginRect())
+	for (auto bpos : RectSized(blockP, save->blockSize) & Vec2<int>(CELLS).OriginRect())
 	{
 		auto spos = bpos - blockP;
 		if (save->blockMap[spos])
@@ -298,7 +298,7 @@ void Simulation::Load(const GameSave *save, bool includePressure, Vec2<int> bloc
 
 std::unique_ptr<GameSave> Simulation::Save(bool includePressure, Rect<int> partR) // particle coordinates
 {
-	auto blockR = RectBetween(partR.TopLeft / CELL, partR.BottomRight / CELL);
+	auto blockR = RectBetween(partR.TopLeft / int(CELL), partR.BottomRight / int(CELL));
 	auto blockP = blockR.TopLeft;
 
 	auto newSave = std::make_unique<GameSave>(blockR.Size());
@@ -3937,7 +3937,7 @@ Simulation::Simulation():
 	Element_LOLZ_lolz = PlaneAdapter<std::vector<int>>({ XRES / 9, YRES / 9 });
 	Element_LOVE_love = PlaneAdapter<std::vector<int>>({ XRES / 9, YRES / 9 });
 
-	pstnTempParts = std::vector<int>(std::max(XRES, YRES));
+	pstnTempParts = std::vector<int>(std::max(int(XRES), int(YRES)));
 
 	portal_rx = {-1, 0, 1, 1, 1, 0,-1,-1};
 	portal_ry = {-1,-1,-1, 0, 1, 1, 1, 0};

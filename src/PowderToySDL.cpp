@@ -186,7 +186,7 @@ void SDLSetScreen()
 		return;
 	}
 
-	auto size = WINDOW * newFrameOpsNorm.scale;
+	auto size = Vec2<int>(WINDOW) * newFrameOpsNorm.scale;
 	if (sdl_window && newFrameOpsNorm.resizable)
 	{
 		SDL_GetWindowSize(sdl_window, &size.X, &size.Y);

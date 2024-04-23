@@ -156,7 +156,7 @@ void RenderView::NotifyColourChanged(RenderModel * sender)
 void RenderView::OnDraw()
 {
 	Graphics * g = GetGraphics();
-	g->DrawFilledRect(WINDOW.OriginRect(), 0x000000_rgb);
+	g->DrawFilledRect(Vec2<int>(WINDOW).OriginRect(), 0x000000_rgb);
 	if(ren)
 	{
 		// we're the main thread, we may write graphicscache

@@ -7,26 +7,59 @@ constexpr int BARSIZE  = 17;
 
 constexpr float M_GRAV = 6.67300e-1f;
 
-//CELL, the size of the pressure, gravity, and wall maps. Larger than 1 to prevent extreme lag
-extern int CELL;
-extern int CELL3;
-extern Vec2<int> CELLS;
-extern Vec2<int> RES;
+#define SIM_PARAMS(X) \
+	X(int      , CELL) \
+	X(int      , CELL3) \
+	X(Vec2<int>, CELLS) \
+	X(Vec2<int>, RES) \
+	X(int      , XCELLS) \
+	X(int      , YCELLS) \
+	X(int      , NCELL) \
+	X(int      , XRES) \
+	X(int      , YRES) \
+	X(int      , NPART) \
+	X(int      , XCNTR) \
+	X(int      , YCNTR) \
+	X(Vec2<int>, WINDOW) \
+	X(int      , WINDOWW) \
+	X(int      , WINDOWH) \
+	// last line of the macro
 
-extern int XCELLS;
-extern int YCELLS;
-extern int NCELL;
-extern int XRES;
-extern int YRES;
-extern int NPART;
+#define DECL_GETTER(t, n) t n ## _Getter();
+SIM_PARAMS(DECL_GETTER)
+#undef DECL_GETTER
 
-extern int XCNTR;
-extern int YCNTR;
+#define GEN_WRAPPER(t, n) \
+	struct n ## _Wrapper \
+	{ \
+		operator t() const \
+		{ \
+			return n ## _Getter(); \
+		} \
+	};
+SIM_PARAMS(GEN_WRAPPER)
+#undef GEN_WRAPPER
 
-extern Vec2<int> WINDOW;
+#define CELL    (   CELL_Wrapper{})
+#define CELL3   (  CELL3_Wrapper{})
+#define CELLS   (  CELLS_Wrapper{})
+#define RES     (    RES_Wrapper{})
+#define XCELLS  ( XCELLS_Wrapper{})
+#define YCELLS  ( YCELLS_Wrapper{})
+#define NCELL   (  NCELL_Wrapper{})
+#define XRES    (   XRES_Wrapper{})
+#define YRES    (   YRES_Wrapper{})
+#define NPART   (  NPART_Wrapper{})
+#define XCNTR   (  XCNTR_Wrapper{})
+#define YCNTR   (  YCNTR_Wrapper{})
+#define WINDOW  ( WINDOW_Wrapper{})
+#define WINDOWW (WINDOWW_Wrapper{})
+#define WINDOWH (WINDOWH_Wrapper{})
 
-extern int WINDOWW;
-extern int WINDOWH;
+inline int operator /(int thing, CELL_Wrapper)
+{
+	return thing / CELL_Getter();
+}
 
 constexpr int MAXSIGNS = 16;
 

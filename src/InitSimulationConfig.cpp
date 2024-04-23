@@ -4,41 +4,21 @@
 #include "common/String.h"
 #include "prefs/GlobalPrefs.h"
 
-int CELL;
-int CELL3;
-Vec2<int> CELLS;
-Vec2<int> RES;
-int XCELLS;
-int YCELLS;
-int NCELL;
-int XRES;
-int YRES;
-int NPART;
-int XCNTR;
-int YCNTR;
-Vec2<int> WINDOW;
-int WINDOWW;
-int WINDOWH;
+#define GEN_LOCAL(t, n) static t l ## n;
+SIM_PARAMS(GEN_LOCAL)
+#undef GEN_LOCAL
+
+#define DEF_GETTER(t, n) t n ## _Getter() { return l ## n; }
+SIM_PARAMS(DEF_GETTER)
+#undef DEF_GETTER
 
 namespace
 {
 	struct FullSimulationConfig
 	{
-		int vCELL;
-		int vCELL3;
-		Vec2<int> vCELLS;
-		Vec2<int> vRES;
-		int vXCELLS;
-		int vYCELLS;
-		int vNCELL;
-		int vXRES;
-		int vYRES;
-		int vNPART;
-		int vXCNTR;
-		int vYCNTR;
-		Vec2<int> vWINDOW;
-		int vWINDOWW;
-		int vWINDOWH;
+#define GEN_MEMBER(t, n) t v ## n;
+SIM_PARAMS(GEN_MEMBER)
+#undef GEN_MEMBER
 
 		FullSimulationConfig() = default;
 
@@ -74,20 +54,9 @@ void InitSimulationConfig(SimulationConfig newConfig)
 	currentConfig = newConfig;
 	nextConfig = currentConfig;
 	auto full = FullSimulationConfig(currentConfig);
-	CELL    = full.vCELL;
-	CELLS   = full.vCELLS;
-	RES     = full.vRES;
-	XCELLS  = full.vXCELLS;
-	YCELLS  = full.vYCELLS;
-	NCELL   = full.vNCELL;
-	XRES    = full.vXRES;
-	YRES    = full.vYRES;
-	NPART   = full.vNPART;
-	XCNTR   = full.vXCNTR;
-	YCNTR   = full.vYCNTR;
-	WINDOW  = full.vWINDOW;
-	WINDOWW = full.vWINDOWW;
-	WINDOWH = full.vWINDOWH;
+#define SET_LOCAL(t, n) l ## n = full.v ## n;
+SIM_PARAMS(SET_LOCAL)
+#undef SET_LOCAL
 }
 
 const SimulationConfig &GetCurrentSimulationConfig()
