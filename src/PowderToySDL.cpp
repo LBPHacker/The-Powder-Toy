@@ -7,6 +7,7 @@
 #include "common/platform/Platform.h"
 #include "common/clipboard/Clipboard.h"
 #include <iostream>
+#include <GL/glew.h>
 
 int desktopWidth = 1280;
 int desktopHeight = 1024;
@@ -211,7 +212,7 @@ void SDLSetScreen()
 			sdl_window = NULL;
 		}
 
-		unsigned int flags = 0;
+		unsigned int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
 		unsigned int rendererFlags = 0;
 		if (newFrameOpsNorm.fullscreen)
 		{
@@ -225,6 +226,13 @@ void SDLSetScreen()
 		{
 			rendererFlags |= SDL_RENDERER_PRESENTVSYNC;
 		}
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS        , 0);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK , SDL_GL_CONTEXT_PROFILE_CORE);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER         , 1);
+		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE           , 24);
+		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE         , 8);
 		sdl_window = SDL_CreateWindow(APPNAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, size.X, size.Y, flags);
 		if (!sdl_window)
 		{
@@ -250,6 +258,15 @@ void SDLSetScreen()
 			}
 			Platform::Exit(-1);
 		}
+		glewExperimental = GL_TRUE;
+		auto err = glewInit();
+		if (GLEW_OK != err)
+		{
+			fprintf(stderr, "glewInit failed: %s\n", glewGetErrorString(err));
+			Platform::Exit(-1);
+		}
+		fprintf(stderr, "glewInit seems to have succeeded; glDispatchComputeIndirect: %p\n", glDispatchComputeIndirect);
+		assert(glDispatchComputeIndirect);
 		SDL_RenderSetLogicalSize(sdl_renderer, WINDOWW, WINDOWH);
 		sdl_texture = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, WINDOWW, WINDOWH);
 		if (!sdl_texture)
