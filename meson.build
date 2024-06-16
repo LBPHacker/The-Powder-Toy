@@ -241,7 +241,10 @@ if host_platform == 'emscripten'
 	project_cpp_args += emcc_args
 else
 	png_dep = dependency('libpng16', static: is_static)
-	sdl2_dep = dependency('sdl2', static: is_static)
+	sdl2_dep = [
+		dependency('sdl2', static: is_static),
+		dependency('SDL2_ttf', static: is_static),
+	]
 	bzip2_dep = dependency('bzip2', static: is_static)
 endif
 json_dep = dependency('jsoncpp', static: is_static)
@@ -568,6 +571,7 @@ if get_option('build_render')
 		threads_dep,
 		sta_libs['common'],
 		sta_libs['simulation'],
+		sdl2_dep,
 	]
 	render_link_args = project_link_args
 	if host_platform == 'linux' and is_static

@@ -2,9 +2,12 @@
 
 #include "bzip2/bz2wrap.h"
 #include "font_bz2.h"
+#include "common/Defer.h"
 
 #include <array>
 #include <cstdint>
+#include <SDL2/SDL_ttf.h>
+#include <iostream>
 
 unsigned char *font_data = nullptr;
 unsigned int *font_ptrs = nullptr;
@@ -81,6 +84,113 @@ static bool InitFontData()
 	return true;
 }
 
+bool ttfInitDone = false;
+bool ttfOk = false;
+TTF_Font *ttf = NULL;
+int ttfOffsetX = 0;
+int ttfOffsetY = 4;
+int ttfSize = 12;
+
+static void ttfInit()
+{
+	ttfInitDone = true;
+	if (TTF_Init() < 0)
+	{
+		std::cerr << "TTF_Init failed: " << TTF_GetError() << std::endl;
+		return;
+	}
+	// ttf = TTF_OpenFont("zpix.ttf", 12);
+	ttf = TTF_OpenFont("/usr/share/fonts/noto-cjk/NotoSerifCJK-Regular.ttc", ttfSize);
+	if (!ttf)
+	{
+		std::cerr << "TTF_OpenFont failed: " << TTF_GetError() << std::endl;
+		return;
+	}
+	ttfOk = true;
+	TTF_SetFontStyle(ttf, TTF_STYLE_NORMAL);
+	TTF_SetFontOutline(ttf, 0);
+	TTF_SetFontKerning(ttf, 1);
+	TTF_SetFontHinting(ttf, TTF_HINTING_NONE);
+}
+
+std::vector<unsigned char> ttfBytes;
+static int ttfRenderChar(String::value_type ch)
+{
+	if (!ttfInitDone)
+	{
+		ttfInit();
+	}
+	if (!ttfOk)
+	{
+		return -1;
+	}
+	if (!TTF_GlyphIsProvided32(ttf, ch))
+	{
+		return -1;
+	}
+	SDL_Color fg{ 255, 255, 255, 255 };
+	auto *surf = TTF_RenderGlyph32_Blended(ttf, ch, fg);
+	if (!surf)
+	{
+		std::cerr << "TTF_RenderGlyph32_Blended failed: " << TTF_GetError() << std::endl;
+		return -1;
+	}
+	Defer freeSurface([surf]() {
+		SDL_FreeSurface(surf);
+	});
+	if (SDL_LockSurface(surf))
+	{
+		std::cerr << "SDL_LockSurface failed: " << SDL_GetError() << std::endl;
+		return -1;
+	}
+	Defer unlockSurface([surf]() {
+		SDL_UnlockSurface(surf);
+	});
+	auto base = int(ttfBytes.size());
+	auto access = [surf](int x, int y) -> uint8_t {
+		auto *pixels = reinterpret_cast<uint8_t *>(surf->pixels);
+		if (x >= 0 && y >= 0 && x < surf->w && y < surf->h)
+		{
+			return pixels[y * surf->pitch + x * 4 + 3]; // get alpha channel
+		}
+		return 0;
+	};
+	uint8_t width = surf->w;
+	static_assert(FONT_H % 4 == 0);
+	ttfBytes.resize(base + 1 + width * (FONT_H / 4), 0);
+	ttfBytes[base] = width;
+	for (auto x = 0; x < width; ++x)
+	{
+		for (auto y = 0; y < FONT_H; ++y)
+		{
+			auto pixel = access(x + ttfOffsetX, y + ttfOffsetY);
+			uint8_t pixel4 = 0;
+			     if (pixel > 140) pixel4 = 3;
+			else if (pixel >  80) pixel4 = 2;
+			else if (pixel >  40) pixel4 = 1;
+			auto index = y * width + x;
+			ttfBytes[base + 1 + (index / 4)] |= pixel4 << (index % 4 * 2);
+		}
+	}
+	return base;
+}
+
+std::unordered_map<String::value_type, int> ttfOffsets;
+static const unsigned char *ttfGetChar(String::value_type ch)
+{
+	auto it = ttfOffsets.find(ch);
+	if (it == ttfOffsets.end())
+	{
+		ttfOffsets.insert({ ch, ttfRenderChar(ch) });
+		it = ttfOffsets.find(ch);
+	}
+	if (it->second == -1)
+	{
+		return nullptr;
+	}
+	return ttfBytes.data() + it->second;
+}
+
 unsigned char const *FontReader::lookupChar(String::value_type ch)
 {
 	if (!font_data)
@@ -90,14 +200,22 @@ unsigned char const *FontReader::lookupChar(String::value_type ch)
 			throw std::runtime_error("font data corrupt");
 		}
 	}
-	size_t offset = 0;
-	for(int i = 0; font_ranges[i][1]; i++)
-		if(font_ranges[i][0] > ch)
-			break;
-		else if(font_ranges[i][1] >= ch)
-			return &font_data[font_ptrs[offset + (ch - font_ranges[i][0])]];
-		else
-			offset += font_ranges[i][1] - font_ranges[i][0] + 1;
+	if (ch >= 0xE000 && ch < 0xF8FF)
+	{
+		size_t offset = 0;
+		for(int i = 0; font_ranges[i][1]; i++)
+			if(font_ranges[i][0] > ch)
+				break;
+			else if(font_ranges[i][1] >= ch)
+				return &font_data[font_ptrs[offset + (ch - font_ranges[i][0])]];
+			else
+				offset += font_ranges[i][1] - font_ranges[i][0] + 1;
+	}
+	auto *ttfChar = ttfGetChar(ch);
+	if (ttfChar)
+	{
+		return ttfChar;
+	}
 	if(ch == 0xFFFD)
 		return &font_data[0];
 	else
