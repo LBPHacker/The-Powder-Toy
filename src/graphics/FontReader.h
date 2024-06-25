@@ -11,6 +11,7 @@ class FontReader
 	int width;
 	int pixels;
 	int data;
+	bool eight = false;
 
 	FontReader(unsigned char const *_pointer);
 	static unsigned char const *lookupChar(String::value_type ch);

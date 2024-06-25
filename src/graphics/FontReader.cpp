@@ -19,6 +19,11 @@ FontReader::FontReader(unsigned char const *_pointer):
 	pixels(0),
 	data(0)
 {
+	if (width & 0x80)
+	{
+		eight = true;
+	}
+	width &= 0x7F;
 }
 
 static bool InitFontData()
@@ -90,6 +95,8 @@ TTF_Font *ttf = NULL;
 int ttfOffsetX = 0;
 int ttfOffsetY = 4;
 int ttfSize = 12;
+int brightnessDenom = 256;
+int brightnessNum = 300;
 
 static void ttfInit()
 {
@@ -155,21 +162,17 @@ static int ttfRenderChar(String::value_type ch)
 		}
 		return 0;
 	};
-	uint8_t width = surf->w;
+	uint8_t width = std::min(0x7F, surf->w);
 	static_assert(FONT_H % 4 == 0);
-	ttfBytes.resize(base + 1 + width * (FONT_H / 4), 0);
-	ttfBytes[base] = width;
+	ttfBytes.resize(base + 1 + width * FONT_H, 0);
+	ttfBytes[base] = width | 0x80;
 	for (auto x = 0; x < width; ++x)
 	{
 		for (auto y = 0; y < FONT_H; ++y)
 		{
-			auto pixel = access(x + ttfOffsetX, y + ttfOffsetY);
-			uint8_t pixel4 = 0;
-			     if (pixel > 140) pixel4 = 3;
-			else if (pixel >  80) pixel4 = 2;
-			else if (pixel >  40) pixel4 = 1;
+			auto pixel = std::max(0, std::min(255, access(x + ttfOffsetX, y + ttfOffsetY) * brightnessNum / brightnessDenom));
 			auto index = y * width + x;
-			ttfBytes[base + 1 + (index / 4)] |= pixel4 << (index % 4 * 2);
+			ttfBytes[base + 1 + index] |= pixel;
 		}
 	}
 	return base;
@@ -200,7 +203,7 @@ unsigned char const *FontReader::lookupChar(String::value_type ch)
 			throw std::runtime_error("font data corrupt");
 		}
 	}
-	if (ch >= 0xE000 && ch < 0xF8FF)
+	if ((ch >= 0xE000 && ch < 0xF8FF) || ch == 0xFFFD)
 	{
 		size_t offset = 0;
 		for(int i = 0; font_ranges[i][1]; i++)
@@ -234,6 +237,10 @@ int FontReader::GetWidth() const
 
 int FontReader::NextPixel()
 {
+	if (eight)
+	{
+		return *(pointer++);
+	}
 	if(!pixels)
 	{
 		data = *(pointer++);
@@ -242,5 +249,5 @@ int FontReader::NextPixel()
 	int old = data;
 	pixels--;
 	data >>= 2;
-	return old & 0x3;
+	return (old & 0x3) * 0x55;
 }

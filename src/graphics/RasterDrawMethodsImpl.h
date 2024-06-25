@@ -234,7 +234,7 @@ int RasterDrawMethods<Derived>::BlendChar(Vec2<int> pos, String::value_type ch, 
 	FontReader reader(ch);
 	auto const rect = RectSized(Vec2(0, -2), Vec2(reader.GetWidth(), FONT_H));
 	for (auto off : rect.template Range<TOP_TO_BOTTOM, LEFT_TO_RIGHT>())
-		BlendPixel(pos + off, colour.NoAlpha().WithAlpha(reader.NextPixel() * colour.Alpha / 3));
+		BlendPixel(pos + off, colour.NoAlpha().WithAlpha(reader.NextPixel() * colour.Alpha / 255));
 	return reader.GetWidth();
 }
 
@@ -245,7 +245,7 @@ int RasterDrawMethods<Derived>::AddChar(Vec2<int> pos, String::value_type ch, RG
 	RGB const c = colour.NoAlpha();
 	auto const rect = RectSized(Vec2(0, -2), Vec2(reader.GetWidth(), FONT_H));
 	for (auto off : rect.template Range<TOP_TO_BOTTOM, LEFT_TO_RIGHT>())
-		AddPixel(pos + off, c.WithAlpha(reader.NextPixel() * colour.Alpha / 3));
+		AddPixel(pos + off, c.WithAlpha(reader.NextPixel() * colour.Alpha / 255));
 	return reader.GetWidth();
 }
 
