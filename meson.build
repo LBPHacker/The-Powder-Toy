@@ -96,6 +96,8 @@ if tpt_libs_static != 'none'
 		'x86_64-windows-msvc-dynamic',
 		'x86-windows-msvc-static',
 		'x86-windows-msvc-dynamic',
+		'aarch64-windows-msvc-static',
+		'aarch64-windows-msvc-dynamic',
 		'x86_64-darwin-macos-static',
 		'aarch64-darwin-macos-static',
 		'x86-android-bionic-static',
