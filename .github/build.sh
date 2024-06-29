@@ -32,6 +32,8 @@ x86_64-windows-msvc-static) ;;
 x86_64-windows-msvc-dynamic) ;;
 x86-windows-msvc-static) ;;
 x86-windows-msvc-dynamic) ;;
+aarch64-windows-msvc-static) ;;
+aarch64-windows-msvc-dynamic) ;;
 x86_64-darwin-macos-static) ;;
 x86_64-darwin-macos-dynamic) ;;
 aarch64-darwin-macos-static) ;;
@@ -116,10 +118,11 @@ function inplace_sed() {
 
 if [[ $BSH_HOST_PLATFORM-$BSH_HOST_LIBC == windows-msvc ]]; then
 	case $BSH_HOST_ARCH in
-	x86_64) vs_env_arch=x64;;
-	x86)    vs_env_arch=x86;;
+	x86_64)  vs_env_arch=x64      ; cmake_vs_toolset=v141; vcvars_ver=14.1;;
+	x86)     vs_env_arch=x86      ; cmake_vs_toolset=v141; vcvars_ver=14.1;;
+	aarch64) vs_env_arch=x64_arm64; cmake_vs_toolset=v143; vcvars_ver=14.3;;
 	esac
-	VS_ENV_PARAMS=$vs_env_arch$'\t'-vcvars_ver=14.1
+	VS_ENV_PARAMS=$vs_env_arch$'\t'-vcvars_ver=${BSH_VS_TOOLSET-$vcvars_ver}
 	. ./.github/vs-env.sh
 elif [[ $BSH_HOST_PLATFORM == darwin ]]; then
 	# may need export SDKROOT=$(xcrun --show-sdk-path --sdk macosx11.1)
@@ -309,6 +312,9 @@ if [[ $BSH_DEBUG_RELEASE-$BSH_STATIC_DYNAMIC == release-static ]]; then
 fi
 if [[ $BSH_HOST_PLATFORM-$BSH_HOST_ARCH == darwin-aarch64 ]]; then
 	meson_configure+=$'\t'--cross-file=.github/macaa64-ghactions.ini
+fi
+if [[ $BSH_HOST_ARCH-$BSH_HOST_PLATFORM-$BSH_HOST_LIBC == aarch64-windows-msvc ]]; then
+	meson_configure+=$'\t'--cross-file=.github/msvca64-ghactions.ini
 fi
 if [[ $BSH_HOST_PLATFORM == emscripten ]]; then
 	meson_configure+=$'\t'--cross-file=.github/emscripten-ghactions.ini
