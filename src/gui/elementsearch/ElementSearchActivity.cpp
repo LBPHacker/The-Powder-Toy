@@ -142,7 +142,7 @@ void ElementSearchActivity::searchTools(String query)
 	}
 
 	std::vector<Match> matches;
-	std::transform(indexToMatch.begin(), indexToMatch.end(), std::back_inserter(matches), [](decltype(indexToMatch)::value_type const &pair) {
+	std::transform(indexToMatch.begin(), indexToMatch.end(), std::back_inserter(matches), [](const auto &pair) {
 		return pair.second;
 	});
 	std::sort(matches.begin(), matches.end());

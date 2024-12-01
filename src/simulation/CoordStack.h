@@ -16,6 +16,7 @@
 #pragma once
 #include <cstdlib>
 #include <exception>
+#include "SimulationConfig.h"
 
 class CoordStackOverflowException: public std::exception
 {

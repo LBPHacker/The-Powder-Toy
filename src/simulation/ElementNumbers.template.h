@@ -8,6 +8,8 @@
 # define ELEMENT_DEFINE(name, id) constexpr int PT_ ## name = id
 #endif
 
+// clang-format off
 @element_defs@
+// clang-format on
 
 #undef ELEMENT_DEFINE

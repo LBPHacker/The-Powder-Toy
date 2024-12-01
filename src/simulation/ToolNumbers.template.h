@@ -8,6 +8,8 @@
 # define TOOL_DEFINE(name, id) constexpr int TOOL_ ## name = id
 #endif
 
+// clang-format off
 @tool_defs@
+// clang-format on
 
 #undef TOOL_DEFINE

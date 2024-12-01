@@ -5,6 +5,8 @@
 # define IMPL_DEFINE(subsystem, factory) { subsystem, factory },
 #endif
 
+// clang-format off
 @impl_defs@
+// clang-format on
 
 #undef IMPL_DEFINE

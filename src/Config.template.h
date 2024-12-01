@@ -2,6 +2,7 @@
 #include "VcsTag.h"
 #include "common/Version.h"
 
+// clang-format off
 constexpr bool SET_WINDOW_ICON          = @SET_WINDOW_ICON@;
 constexpr bool DEBUG                    = @DEBUG@;
 constexpr bool X86                      = @X86@;
@@ -26,6 +27,7 @@ constexpr bool ALLOW_QUIT               = @ALLOW_QUIT@;
 constexpr bool DEFAULT_TOUCH_UI         = @DEFAULT_TOUCH_UI@;
 constexpr bool ALLOW_DATA_FOLDER        = @ALLOW_DATA_FOLDER@;
 constexpr char PATH_SEP_CHAR            = '@PATH_SEP_CHAR@';
+// clang-format on
 
 enum ForceWindowFrameOps
 {
@@ -33,8 +35,11 @@ enum ForceWindowFrameOps
 	forceWindowFrameOpsEmbedded, // e.g. into a webpage; this sweeps a few emscripten limitations under the rug
 	forceWindowFrameOpsHandheld, // e.g. the system doesn't support windowed mode; includes odd setups like chromebooks
 };
+// clang-format off
 constexpr ForceWindowFrameOps FORCE_WINDOW_FRAME_OPS = @FORCE_WINDOW_FRAME_OPS@;
+// clang-format on
 
+// clang-format off
 constexpr char SERVER[]         = "@SERVER@";
 constexpr char STATICSERVER[]   = "@STATICSERVER@";
 constexpr char UPDATESERVER[]   = "@UPDATESERVER@";
@@ -47,16 +52,21 @@ constexpr char APPID[]          = "@APPID@";
 constexpr char APPDATA[]        = "@APPDATA@";
 constexpr char APPVENDOR[]      = "@APPVENDOR@";
 constexpr char PACKAGE_MODE[]   = "@PACKAGE_MODE@";
+// clang-format on
 
+// clang-format off
 constexpr int MOD_ID               = @MOD_ID@;
+// clang-format on
 
 struct DisplayVersionWithBuild
 {
 	Version<2> displayVersion;
 	size_t build;
 };
+// clang-format off
 constexpr DisplayVersionWithBuild APP_VERSION = { { @DISPLAY_VERSION_MAJOR@, @DISPLAY_VERSION_MINOR@ }, @BUILD_NUM@ };
 constexpr DisplayVersionWithBuild UPSTREAM_VERSION = { { @UPSTREAM_VERSION_MAJOR@, @UPSTREAM_VERSION_MINOR@ }, @UPSTREAM_BUILD_NUM@ };
+// clang-format on
 
 constexpr auto DISPLAY_VERSION = APP_VERSION.displayVersion;
 
