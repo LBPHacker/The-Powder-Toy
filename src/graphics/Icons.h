@@ -1,5 +1,6 @@
 #pragma once
-//Icon names, see Graphics::draw_icon
+
+// Icon names, see Graphics::draw_icon
 enum Icon
 {
 	NoIcon = 0,

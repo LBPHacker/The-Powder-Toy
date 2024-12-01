@@ -1,10 +1,10 @@
 #include "Sign.h"
 
-#include "graphics/Renderer.h"
 #include "Simulation.h"
 #include "SimulationData.h"
+#include "graphics/Renderer.h"
 
-sign::sign(String text_, int x_, int y_, Justification justification_):
+sign::sign(String text_, int x_, int y_, Justification justification_) :
 	x(x_),
 	y(y_),
 	ju(justification_),
@@ -12,7 +12,8 @@ sign::sign(String text_, int x_, int y_, Justification justification_):
 {
 }
 
-String sign::getDisplayText(const RenderableSimulation *sim, int &x0, int &y0, int &w, int &h, bool colorize, bool *v95) const
+String sign::getDisplayText(const RenderableSimulation *sim, int &x0, int &y0, int &w, int &h, bool colorize, bool *v95)
+	const
 {
 	auto &sd = SimulationData::CRef();
 	String drawable_text;
@@ -30,7 +31,7 @@ String sign::getDisplayText(const RenderableSimulation *sim, int &x0, int &y0, i
 		}
 		else
 		{
-			Particle const *part = nullptr;
+			const Particle *part = nullptr;
 			float pressure = 0.0f;
 			float aheat = 0.0f;
 			if (sim && x >= 0 && x < XRES && y >= 0 && y < YRES)
@@ -43,8 +44,8 @@ String sign::getDisplayText(const RenderableSimulation *sim, int &x0, int &y0, i
 				{
 					part = &(sim->parts[ID(sim->pmap[y][x])]);
 				}
-				pressure = sim->pv[y/CELL][x/CELL];
-				aheat = sim->hv[y/CELL][x/CELL] - 273.15f;
+				pressure = sim->pv[y / CELL][x / CELL];
+				aheat = sim->hv[y / CELL][x / CELL] - 273.15f;
 			}
 
 			String remaining_text = text;
@@ -65,49 +66,70 @@ String sign::getDisplayText(const RenderableSimulation *sim, int &x0, int &y0, i
 						//   upgrades such signs at load time anyway.
 						// * The same applies to "{p}" and "{aheat}" signs.
 						if (v95)
+						{
 							*v95 = true;
+						}
 					}
 					else if (between_curlies == "p" || between_curlies == "pres")
 					{
 						formatted_text << Format::Precision(Format::ShowPoint(pressure), 2);
 						if (v95)
+						{
 							*v95 = true;
+						}
 					}
 					else if (between_curlies == "a" || between_curlies == "aheat")
 					{
 						formatted_text << Format::Precision(Format::ShowPoint(aheat), 2);
 						if (v95)
+						{
 							*v95 = true;
+						}
 					}
 					else if (between_curlies == "type")
 					{
-						formatted_text << (part ? sd.BasicParticleInfo(*part) : (formatted_text.Size() ? String::Build("empty") : String::Build("Empty")));
+						formatted_text
+							<< (part ? sd.BasicParticleInfo(*part) :
+						               (formatted_text.Size() ? String::Build("empty") : String::Build("Empty")));
 						if (v95)
+						{
 							*v95 = true;
+						}
 					}
 					else if (between_curlies == "ctype")
 					{
-						formatted_text << (part ? (sd.IsElementOrNone(part->ctype) ? sd.ElementResolve(part->ctype, -1) : String::Build(part->ctype)) : (formatted_text.Size() ? String::Build("empty") : String::Build("Empty")));
+						formatted_text
+							<< (part ? (sd.IsElementOrNone(part->ctype) ? sd.ElementResolve(part->ctype, -1) :
+						                                                  String::Build(part->ctype)) :
+						               (formatted_text.Size() ? String::Build("empty") : String::Build("Empty")));
 						if (v95)
+						{
 							*v95 = true;
+						}
 					}
 					else if (between_curlies == "life")
 					{
 						formatted_text << (part ? part->life : 0);
 						if (v95)
+						{
 							*v95 = true;
+						}
 					}
 					else if (between_curlies == "tmp")
 					{
 						formatted_text << (part ? part->tmp : 0);
 						if (v95)
+						{
 							*v95 = true;
+						}
 					}
 					else if (between_curlies == "tmp2")
 					{
 						formatted_text << (part ? part->tmp2 : 0);
 						if (v95)
+						{
 							*v95 = true;
+						}
 					}
 					else
 					{
@@ -128,17 +150,26 @@ String sign::getDisplayText(const RenderableSimulation *sim, int &x0, int &y0, i
 	{
 		switch (si.second)
 		{
-		case Normal: break;
-		case Save:   drawable_text = "\bt" + drawable_text; break;
-		case Thread: drawable_text = "\bl" + drawable_text; break;
-		case Button: drawable_text = "\bo" + drawable_text; break;
-		case Search: drawable_text = "\bu" + drawable_text; break;
+		case Normal:
+			break;
+		case Save:
+			drawable_text = "\bt" + drawable_text;
+			break;
+		case Thread:
+			drawable_text = "\bl" + drawable_text;
+			break;
+		case Button:
+			drawable_text = "\bo" + drawable_text;
+			break;
+		case Search:
+			drawable_text = "\bu" + drawable_text;
+			break;
 		}
 	}
 
 	w = Renderer::TextSize(drawable_text.c_str()).X + 4;
 	h = 15;
-	x0 = (ju == Right) ? x - w : (ju == Left) ? x : x - w/2;
+	x0 = (ju == Right) ? x - w : (ju == Left) ? x : x - w / 2;
 	y0 = (y > 18) ? y - 18 : y + 4;
 
 	return drawable_text;

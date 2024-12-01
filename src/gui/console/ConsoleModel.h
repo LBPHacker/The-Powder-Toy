@@ -1,16 +1,18 @@
 #pragma once
 #include "ConsoleCommand.h"
-#include <vector>
 #include <deque>
+#include <vector>
 
 class ConsoleView;
+
 class ConsoleModel
 {
 	size_t currentCommandIndex;
-	std::vector<ConsoleView*> observers;
+	std::vector<ConsoleView *> observers;
 	std::deque<ConsoleCommand> previousCommands;
 	void notifyPreviousCommandsChanged();
 	void notifyCurrentCommandChanged();
+
 public:
 	size_t GetCurrentCommandIndex();
 	void SetCurrentCommandIndex(size_t index);
@@ -18,6 +20,6 @@ public:
 
 	std::deque<ConsoleCommand> GetPreviousCommands();
 	ConsoleModel();
-	void AddObserver(ConsoleView * observer);
+	void AddObserver(ConsoleView *observer);
 	void AddLastCommand(ConsoleCommand command);
 };

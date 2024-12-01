@@ -12,7 +12,9 @@ static void getDefaultProperties(lua_State *L, int id)
 	lua_newtable(L);
 	for (auto &prop : Particle::GetProperties())
 	{
-		auto propertyAddress = reinterpret_cast<intptr_t>((reinterpret_cast<const unsigned char*>(&elements[id].DefaultProperties)) + prop.Offset);
+		auto propertyAddress = reinterpret_cast<intptr_t>(
+			(reinterpret_cast<const unsigned char *>(&elements[id].DefaultProperties)) + prop.Offset
+		);
 		tpt_lua_pushByteString(L, prop.Name);
 		LuaGetProperty(L, prop, propertyAddress);
 		lua_settable(L, -3);
@@ -50,7 +52,9 @@ static void setDefaultProperties(lua_State *L, int id, int stackPos)
 			}
 			if (lua_type(L, -1) != LUA_TNIL)
 			{
-				auto propertyAddress = reinterpret_cast<intptr_t>((reinterpret_cast<unsigned char*>(&elements[id].DefaultProperties)) + prop.Offset);
+				auto propertyAddress = reinterpret_cast<intptr_t>(
+					(reinterpret_cast<unsigned char *>(&elements[id].DefaultProperties)) + prop.Offset
+				);
 				LuaSetProperty(L, prop, propertyAddress, -1);
 			}
 			lua_pop(L, 1);
@@ -109,9 +113,11 @@ static int luaUpdateWrapper(UPDATE_FUNC_ARGS)
 	if (builtinUpdate && customElements[parts[i].type].updateMode == UPDATE_AFTER)
 	{
 		if (builtinUpdate(UPDATE_FUNC_SUBCALL_ARGS))
+		{
 			return 1;
-		x = (int)(parts[i].x+0.5f);
-		y = (int)(parts[i].y+0.5f);
+		}
+		x = (int)(parts[i].x + 0.5f);
+		y = (int)(parts[i].y + 0.5f);
 	}
 	if (customElements[parts[i].type].update)
 	{
@@ -124,8 +130,11 @@ static int luaUpdateWrapper(UPDATE_FUNC_ARGS)
 		lua_pushinteger(lsi->L, nt);
 		callret = tpt_lua_pcall(lsi->L, 5, 1, 0, eventTraitSimRng);
 		if (callret)
+		{
 			lsi->Log(CommandInterface::LogError, LuaGetError());
-		if(lua_isboolean(lsi->L, -1)){
+		}
+		if (lua_isboolean(lsi->L, -1))
+		{
 			retval = lua_toboolean(lsi->L, -1);
 		}
 		lua_pop(lsi->L, 1);
@@ -133,15 +142,17 @@ static int luaUpdateWrapper(UPDATE_FUNC_ARGS)
 		{
 			return 1;
 		}
-		x = (int)(parts[i].x+0.5f);
-		y = (int)(parts[i].y+0.5f);
+		x = (int)(parts[i].x + 0.5f);
+		y = (int)(parts[i].y + 0.5f);
 	}
 	if (builtinUpdate && customElements[parts[i].type].updateMode == UPDATE_BEFORE)
 	{
 		if (builtinUpdate(UPDATE_FUNC_SUBCALL_ARGS))
+		{
 			return 1;
-		x = (int)(parts[i].x+0.5f);
-		y = (int)(parts[i].y+0.5f);
+		}
+		x = (int)(parts[i].x + 0.5f);
+		y = (int)(parts[i].y + 0.5f);
 	}
 	return 0;
 }
@@ -157,7 +168,8 @@ static int luaGraphicsWrapper(GRAPHICS_FUNC_ARGS)
 	auto *sim = lsi->sim;
 	if (customElements[cpart->type].graphics)
 	{
-		auto *pipeSubcallWcpart = gfctx.pipeSubcallCpart ? sim->parts + (gfctx.pipeSubcallCpart - gfctx.sim->parts) : nullptr;
+		auto *pipeSubcallWcpart =
+			gfctx.pipeSubcallCpart ? sim->parts + (gfctx.pipeSubcallCpart - gfctx.sim->parts) : nullptr;
 		if (pipeSubcallWcpart)
 		{
 			std::swap(*pipeSubcallWcpart, *gfctx.pipeSubcallTpart);
@@ -180,11 +192,13 @@ static int luaGraphicsWrapper(GRAPHICS_FUNC_ARGS)
 		{
 			bool valid = true;
 			for (int i = -10; i < 0; i++)
+			{
 				if (!lua_isnumber(lsi->L, i) && !lua_isnil(lsi->L, i))
 				{
 					valid = false;
 					break;
 				}
+			}
 			if (valid)
 			{
 				cache = luaL_optint(lsi->L, -10, 0);
@@ -260,7 +274,9 @@ static bool luaCreateAllowedWrapper(ELEMENT_CREATE_ALLOWED_FUNC_ARGS)
 		else
 		{
 			if (lua_isboolean(lsi->L, -1))
+			{
 				ret = lua_toboolean(lsi->L, -1);
+			}
 			lua_pop(lsi->L, 1);
 		}
 	}
@@ -314,7 +330,9 @@ static bool luaCtypeDrawWrapper(CTYPEDRAW_FUNC_ARGS)
 		else
 		{
 			if (lua_isboolean(lsi->L, -1))
+			{
 				ret = lua_toboolean(lsi->L, -1);
+			}
 			lua_pop(lsi->L, 1);
 		}
 	}
@@ -348,10 +366,12 @@ static int allocate(lua_State *L)
 	{
 		auto &sd = SimulationData::CRef();
 		auto &elements = sd.elements;
-		for(int i = 0; i < PT_NUM; i++)
+		for (int i = 0; i < PT_NUM; i++)
 		{
-			if(elements[i].Enabled && ByteString(elements[i].Identifier) == identifier)
+			if (elements[i].Enabled && ByteString(elements[i].Identifier) == identifier)
+			{
 				return luaL_error(L, "Element identifier already in use");
+			}
 		}
 
 		// Start out at 255 so that lua element IDs are still one byte (better save compatibility)
@@ -366,7 +386,7 @@ static int allocate(lua_State *L)
 		// If not enough space, then we start with the new maimum ID
 		if (newID == -1)
 		{
-			for (int i = PT_NUM-1; i >= 255; i--)
+			for (int i = PT_NUM - 1; i >= 255; i--)
 			{
 				if (!elements[i].Enabled)
 				{
@@ -426,14 +446,14 @@ static int element(lua_State *L)
 			std::unique_lock lk(sd.elementGraphicsMx);
 			auto &elements = sd.elements;
 			luaL_checktype(L, 2, LUA_TTABLE);
-			//Write values from native data to a table
+			// Write values from native data to a table
 			for (auto &prop : Element::GetProperties())
 			{
 				tpt_lua_pushByteString(L, prop.Name);
 				lua_gettable(L, -2);
 				if (lua_type(L, -1) != LUA_TNIL)
 				{
-					intptr_t propertyAddress = (intptr_t)(((unsigned char*)&elements[id]) + prop.Offset);
+					intptr_t propertyAddress = (intptr_t)(((unsigned char *)&elements[id]) + prop.Offset);
 					LuaSetProperty(L, prop, propertyAddress, -1);
 				}
 				lua_pop(L, 1);
@@ -535,12 +555,12 @@ static int element(lua_State *L)
 	{
 		auto &sd = SimulationData::CRef();
 		auto &elements = sd.elements;
-		//Write values from native data to a table
+		// Write values from native data to a table
 		lua_newtable(L);
 		for (auto &prop : Element::GetProperties())
 		{
 			tpt_lua_pushByteString(L, prop.Name);
-			intptr_t propertyAddress = (intptr_t)(((unsigned char*)&elements[id]) + prop.Offset);
+			intptr_t propertyAddress = (intptr_t)(((unsigned char *)&elements[id]) + prop.Offset);
 			LuaGetProperty(L, prop, propertyAddress);
 			lua_settable(L, -3);
 		}
@@ -568,7 +588,7 @@ static int property(lua_State *L)
 	ByteString propertyName = tpt_lua_checkByteString(L, 2);
 
 	auto &properties = Element::GetProperties();
-	auto prop = std::find_if(properties.begin(), properties.end(), [&propertyName](StructProperty const &p) {
+	auto prop = std::find_if(properties.begin(), properties.end(), [&propertyName](const StructProperty &p) {
 		return p.Name == propertyName;
 	});
 
@@ -589,7 +609,7 @@ static int property(lua_State *L)
 						return luaL_error(L, "Invalid element");
 					}
 				}
-				intptr_t propertyAddress = (intptr_t)(((unsigned char*)&elements[id]) + prop->Offset);
+				intptr_t propertyAddress = (intptr_t)(((unsigned char *)&elements[id]) + prop->Offset);
 				manageElementIdentifier(L, id, false);
 				LuaSetProperty(L, *prop, propertyAddress, 3);
 				manageElementIdentifier(L, id, true);
@@ -709,7 +729,7 @@ static int property(lua_State *L)
 		auto &elements = sd.elements;
 		if (prop != properties.end())
 		{
-			intptr_t propertyAddress = (intptr_t)(((const unsigned char*)&elements[id]) + prop->Offset);
+			intptr_t propertyAddress = (intptr_t)(((const unsigned char *)&elements[id]) + prop->Offset);
 			LuaGetProperty(L, *prop, propertyAddress);
 			return 1;
 		}
@@ -812,7 +832,9 @@ static int loadDefault(lua_State *L)
 			luaL_checktype(L, 1, LUA_TNUMBER);
 			int id = lua_tointeger(L, 1);
 			if (id < 0 || id >= PT_NUM)
+			{
 				return luaL_error(L, "Invalid element");
+			}
 			loadDefaultOne(id);
 		}
 		else
@@ -848,20 +870,19 @@ void LuaElements::Open(lua_State *L)
 	auto &sd = SimulationData::CRef();
 	static const luaL_Reg reg[] = {
 #define LFUNC(v) { #v, v }
-		LFUNC(allocate),
-		LFUNC(element),
-		LFUNC(property),
-		LFUNC(exists),
-		LFUNC(loadDefault),
-		LFUNC(getByName),
+		LFUNC(allocate),   LFUNC(element), LFUNC(property), LFUNC(exists), LFUNC(loadDefault), LFUNC(getByName),
 #undef LFUNC
 		{ "free", ffree },
-		{ NULL, NULL }
+  {   NULL,  NULL }
 	};
 	lua_newtable(L);
 	luaL_register(L, NULL, reg);
-#define LCONST(v) lua_pushinteger(L, int(v)); lua_setfield(L, -2, #v)
-#define LCONSTAS(k, v) lua_pushinteger(L, int(v)); lua_setfield(L, -2, k)
+#define LCONST(v)               \
+	lua_pushinteger(L, int(v)); \
+	lua_setfield(L, -2, #v)
+#define LCONSTAS(k, v)          \
+	lua_pushinteger(L, int(v)); \
+	lua_setfield(L, -2, k)
 	LCONST(TYPE_PART);
 	LCONST(TYPE_LIQUID);
 	LCONST(TYPE_SOLID);

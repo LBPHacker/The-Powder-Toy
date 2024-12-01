@@ -7,12 +7,12 @@ namespace ui
 {
 struct TextboxAction
 {
-	std::function<void ()> change;
+	std::function<void()> change;
 };
 
 struct TextboxDefocusAction
 {
-	std::function<void ()> callback;
+	std::function<void()> callback;
 };
 
 class Textbox : public Label
@@ -24,7 +24,15 @@ class Textbox : public Label
 
 public:
 	bool ReadOnly;
-	enum ValidInput { All, Multiline, Numeric, Number }; // Numeric doesn't delete trailing 0's
+
+	enum ValidInput
+	{
+		All,
+		Multiline,
+		Numeric,
+		Number
+	}; // Numeric doesn't delete trailing 0's
+
 	Textbox(Point position, Point size, String textboxText = String(), String textboxPlaceholder = String());
 	virtual ~Textbox() = default;
 
@@ -33,11 +41,27 @@ public:
 
 	virtual void SetPlaceholder(String text);
 
-	void SetBorder(bool border) { this->border = border; }
+	void SetBorder(bool border)
+	{
+		this->border = border;
+	}
+
 	void SetHidden(bool hidden);
-	bool GetHidden() { return masked; }
-	void SetActionCallback(TextboxAction action) { actionCallback = action; }
-	void SetDefocusCallback(TextboxDefocusAction action) { defocusCallback = action; }
+
+	bool GetHidden()
+	{
+		return masked;
+	}
+
+	void SetActionCallback(TextboxAction action)
+	{
+		actionCallback = action;
+	}
+
+	void SetDefocusCallback(TextboxDefocusAction action)
+	{
+		defocusCallback = action;
+	}
 
 	void SetLimit(size_t limit);
 	size_t GetLimit();
@@ -47,7 +71,7 @@ public:
 
 	void resetCursorPosition();
 	void TabFocus();
-	//Determines if the given character is valid given the input type
+	// Determines if the given character is valid given the input type
 	bool CharacterValid(int character);
 	bool StringValid(String text);
 
@@ -62,7 +86,7 @@ public:
 	void OnTextInput(String text) override;
 	void OnTextEditing(String text) override;
 	void OnDefocus() override;
-	void Draw(const Point& screenPos) override;
+	void Draw(const Point &screenPos) override;
 
 protected:
 	ValidInput inputType;
@@ -98,4 +122,3 @@ protected:
 };
 
 }
-

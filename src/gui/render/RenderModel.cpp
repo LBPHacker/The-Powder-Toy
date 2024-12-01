@@ -1,11 +1,11 @@
 #include "RenderModel.h"
 #include "RenderView.h"
-#include "gui/game/RenderPreset.h"
+#include "graphics/Renderer.h"
 #include "gui/game/GameController.h"
 #include "gui/game/GameView.h"
-#include "graphics/Renderer.h"
+#include "gui/game/RenderPreset.h"
 
-void RenderModel::AddObserver(RenderView * observer)
+void RenderModel::AddObserver(RenderView *observer)
 {
 	observers.push_back(observer);
 	observer->NotifyRendererChanged(this);
@@ -55,7 +55,7 @@ void RenderModel::LoadRenderPreset(int presetNum)
 	SetColorMode(preset.colorMode);
 }
 
-void RenderModel::SetRenderer(Renderer * ren, RendererSettings *newRendererSettings)
+void RenderModel::SetRenderer(Renderer *ren, RendererSettings *newRendererSettings)
 {
 	renderer = ren;
 	rendererSettings = newRendererSettings;
@@ -74,7 +74,7 @@ void RenderModel::SetSimulation(Simulation *newSim)
 	notifyColourChanged();
 }
 
-Renderer * RenderModel::GetRenderer()
+Renderer *RenderModel::GetRenderer()
 {
 	return renderer;
 }
@@ -129,5 +129,6 @@ void RenderModel::notifyColourChanged()
 	}
 }
 
-RenderModel::~RenderModel() {
+RenderModel::~RenderModel()
+{
 }

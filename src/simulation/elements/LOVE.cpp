@@ -16,7 +16,7 @@ void Element::Element_LOVE()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.0f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -42,17 +42,16 @@ void Element::Element_LOVE()
 	HighTemperatureTransition = NT;
 }
 
-int Element_LOVE_RuleTable[9][9] =
-{
-	{0,0,1,1,0,0,0,0,0},
-	{0,1,0,0,1,1,0,0,0},
-	{1,0,0,0,0,0,1,0,0},
-	{1,0,0,0,0,0,0,1,0},
-	{0,1,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,1,0},
-	{1,0,0,0,0,0,1,0,0},
-	{0,1,0,0,1,1,0,0,0},
-	{0,0,1,1,0,0,0,0,0},
+int Element_LOVE_RuleTable[9][9] = {
+	{ 0, 0, 1, 1, 0, 0, 0, 0, 0 },
+    { 0, 1, 0, 0, 1, 1, 0, 0, 0 },
+    { 1, 0, 0, 0, 0, 0, 1, 0, 0 },
+	{ 1, 0, 0, 0, 0, 0, 0, 1, 0 },
+    { 0, 1, 0, 0, 0, 0, 0, 0, 1 },
+    { 1, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 1, 0, 0, 0, 0, 0, 1, 0, 0 },
+    { 0, 1, 0, 0, 1, 1, 0, 0, 0 },
+    { 0, 0, 1, 1, 0, 0, 0, 0, 0 },
 };
 
-int Element_LOVE_love[XRES/9][YRES/9];
+int Element_LOVE_love[XRES / 9][YRES / 9];

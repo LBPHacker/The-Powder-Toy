@@ -1,26 +1,27 @@
 #pragma once
-#include "common/String.h"
 #include "client/Comment.h"
-#include <vector>
+#include "common/String.h"
 #include <memory>
 #include <optional>
+#include <vector>
 
 namespace http
 {
-	class GetSaveDataRequest;
-	class GetSaveRequest;
-	class GetCommentsRequest;
-	class FavouriteSaveRequest;
+class GetSaveDataRequest;
+class GetSaveRequest;
+class GetCommentsRequest;
+class FavouriteSaveRequest;
 }
 
 class PreviewView;
 class SaveInfo;
+
 class PreviewModel
 {
 	bool doOpen = false;
 	bool fromUrl = false;
 	bool canOpen = true;
-	std::vector<PreviewView*> observers;
+	std::vector<PreviewView *> observers;
 	std::unique_ptr<SaveInfo> saveInfo;
 	std::optional<std::vector<char>> saveData;
 	std::optional<std::vector<Comment>> saveComments;
@@ -46,6 +47,7 @@ class PreviewModel
 public:
 	const SaveInfo *GetSaveInfo() const;
 	std::unique_ptr<SaveInfo> TakeSaveInfo();
+
 	const std::vector<Comment> *GetComments() const
 	{
 		return saveComments ? &*saveComments : nullptr;
@@ -60,7 +62,7 @@ public:
 	void UpdateComments(int pageNumber);
 	void CommentAdded();
 
-	void AddObserver(PreviewView * observer);
+	void AddObserver(PreviewView *observer);
 	void UpdateSave(int saveID, int saveDate);
 	void SetFavourite(bool favourite);
 	bool GetDoOpen();

@@ -1,8 +1,8 @@
 #include "Platform.h"
-#include <iostream>
-#include <sys/time.h>
 #include <cstdint>
+#include <iostream>
 #include <mach-o/dyld.h>
+#include <sys/time.h>
 
 namespace Platform
 {

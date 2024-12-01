@@ -18,7 +18,7 @@ void Element::Element_PLUT()
 	Collision = 0.0f;
 	Gravity = 0.4f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;
@@ -33,7 +33,7 @@ void Element::Element_PLUT()
 	HeatConduct = 251;
 	Description = "Plutonium. Heavy, fissile particles. Generates neutrons under pressure.";
 
-	Properties = TYPE_PART|PROP_NEUTPASS|PROP_RADIOACTIVE;
+	Properties = TYPE_PART | PROP_NEUTPASS | PROP_RADIOACTIVE;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -49,7 +49,7 @@ void Element::Element_PLUT()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	if (sim->rng.chance(1, 100) && sim->rng.chance(int(5.0f*sim->pv[y/CELL][x/CELL]), 1000))
+	if (sim->rng.chance(1, 100) && sim->rng.chance(int(5.0f * sim->pv[y / CELL][x / CELL]), 1000))
 	{
 		sim->create_part(i, x, y, PT_NEUT);
 	}

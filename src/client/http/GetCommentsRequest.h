@@ -4,11 +4,11 @@
 
 namespace http
 {
-	class GetCommentsRequest : public APIRequest
-	{
-	public:
-		GetCommentsRequest(int saveID, int start, int count);
+class GetCommentsRequest : public APIRequest
+{
+public:
+	GetCommentsRequest(int saveID, int start, int count);
 
-		std::vector<Comment> Finish();
-	};
+	std::vector<Comment> Finish();
+};
 }

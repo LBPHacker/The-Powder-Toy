@@ -4,7 +4,7 @@
 
 const char LuaCheckbox::className[] = "checkbox";
 
-#define method(class, name) {#name, &class::name}
+#define method(class, name) { #name, &class ::name }
 Luna<LuaCheckbox>::RegType LuaCheckbox::methods[] = {
 	method(LuaCheckbox, action),
 	method(LuaCheckbox, text),
@@ -12,7 +12,7 @@ Luna<LuaCheckbox>::RegType LuaCheckbox::methods[] = {
 	method(LuaCheckbox, size),
 	method(LuaCheckbox, visible),
 	method(LuaCheckbox, checked),
-	{0, 0}
+	{ 0, 0 }
 };
 
 LuaCheckbox::LuaCheckbox(lua_State *L) :
@@ -26,13 +26,15 @@ LuaCheckbox::LuaCheckbox(lua_State *L) :
 
 	checkbox = new ui::Checkbox(ui::Point(posX, posY), ui::Point(sizeX, sizeY), text, "");
 	component = checkbox;
-	checkbox->SetActionCallback({ [this] { triggerAction(); } });
+	checkbox->SetActionCallback({ [this] {
+		triggerAction();
+	} });
 }
 
 int LuaCheckbox::checked(lua_State *L)
 {
 	int args = lua_gettop(L);
-	if(args)
+	if (args)
 	{
 		checkbox->SetChecked(lua_toboolean(L, 1));
 		return 0;
@@ -52,7 +54,7 @@ int LuaCheckbox::action(lua_State *L)
 int LuaCheckbox::text(lua_State *L)
 {
 	int args = lua_gettop(L);
-	if(args)
+	if (args)
 	{
 		checkbox->SetText(tpt_lua_checkString(L, 1));
 		return 0;
@@ -66,7 +68,7 @@ int LuaCheckbox::text(lua_State *L)
 
 void LuaCheckbox::triggerAction()
 {
-	if(actionFunction)
+	if (actionFunction)
 	{
 		lua_rawgeti(L, LUA_REGISTRYINDEX, actionFunction);
 		lua_rawgeti(L, LUA_REGISTRYINDEX, owner_ref);

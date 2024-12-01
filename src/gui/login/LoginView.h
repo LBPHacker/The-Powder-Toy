@@ -3,14 +3,15 @@
 
 namespace ui
 {
-	class Textbox;
-	class Button;
-	class Label;
+class Textbox;
+class Button;
+class Label;
 }
 
 class LoginController;
 class LoginModel;
-class LoginView: public ui::Window
+
+class LoginView : public ui::Window
 {
 	LoginController *c{};
 	ui::Button *loginButton{};
@@ -20,12 +21,18 @@ class LoginView: public ui::Window
 	ui::Textbox *usernameField{};
 	ui::Textbox *passwordField{};
 	ui::Point targetSize;
+
 public:
 	LoginView();
 	void OnKeyPress(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt) override;
 	void OnTryExit(ExitMethod method) override;
-	void AttachController(LoginController * c_) { c = c_; }
-	void NotifyStatusChanged(LoginModel * sender);
+
+	void AttachController(LoginController *c_)
+	{
+		c = c_;
+	}
+
+	void NotifyStatusChanged(LoginModel *sender);
 	void OnDraw() override;
 	void OnTick(float dt) override;
 };

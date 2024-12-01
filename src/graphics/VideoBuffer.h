@@ -1,16 +1,16 @@
 #pragma once
-#include <array>
-#include <memory>
-#include <vector>
-#include "common/Plane.h"
-#include "common/String.h"
-#include "gui/interface/Point.h"
 #include "Icons.h"
 #include "Pixel.h"
 #include "RasterDrawMethods.h"
 #include "SimulationConfig.h"
+#include "common/Plane.h"
+#include "common/String.h"
+#include "gui/interface/Point.h"
+#include <array>
+#include <memory>
+#include <vector>
 
-class VideoBuffer: public RasterDrawMethods<VideoBuffer>
+class VideoBuffer : public RasterDrawMethods<VideoBuffer>
 {
 	PlaneAdapter<std::vector<pixel>> video;
 
@@ -22,12 +22,13 @@ class VideoBuffer: public RasterDrawMethods<VideoBuffer>
 	friend struct RasterDrawMethods<VideoBuffer>;
 
 public:
-	VideoBuffer(pixel const *data, Vec2<int> size);
-	VideoBuffer(pixel const *data, Vec2<int> size, size_t rowStride);
+	VideoBuffer(const pixel *data, Vec2<int> size);
+	VideoBuffer(const pixel *data, Vec2<int> size, size_t rowStride);
 	VideoBuffer(Vec2<int> size);
 
 	template<class Plane>
-	VideoBuffer(const Plane &plane) : VideoBuffer(plane.data(), plane.Size())
+	VideoBuffer(const Plane &plane) :
+		VideoBuffer(plane.data(), plane.Size())
 	{
 	}
 
@@ -41,7 +42,7 @@ public:
 		return video.data();
 	}
 
-	pixel const *Data() const
+	const pixel *Data() const
 	{
 		return video.data();
 	}
@@ -53,7 +54,7 @@ public:
 	// Automatically choose a size to fit within the given box, keeping aspect ratio
 	void ResizeToFit(Vec2<int> bound, bool resample = false);
 
-	static std::unique_ptr<VideoBuffer> FromPNG(std::vector<char> const &);
+	static std::unique_ptr<VideoBuffer> FromPNG(const std::vector<char> &);
 	std::unique_ptr<std::vector<char>> ToPNG() const;
 	std::vector<char> ToPPM() const;
 };

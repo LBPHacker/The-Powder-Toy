@@ -1,11 +1,11 @@
 #include "Platform.h"
+#include <ctime>
+#include <dirent.h>
 #include <iostream>
 #include <memory>
 #include <sys/stat.h>
-#include <unistd.h>
-#include <ctime>
 #include <sys/time.h>
-#include <dirent.h>
+#include <unistd.h>
 
 namespace Platform
 {
@@ -47,7 +47,7 @@ bool FileExists(ByteString filename)
 	struct stat s;
 	if (stat(filename.c_str(), &s) == 0)
 	{
-		if(s.st_mode & S_IFREG)
+		if (s.st_mode & S_IFREG)
 		{
 			return true; // Is file
 		}
@@ -67,7 +67,7 @@ bool DirectoryExists(ByteString directory)
 	struct stat s;
 	if (stat(directory.c_str(), &s) == 0)
 	{
-		if(s.st_mode & S_IFDIR)
+		if (s.st_mode & S_IFDIR)
 		{
 			return true; // Is directory
 		}
@@ -137,7 +137,7 @@ bool ChangeDir(ByteString toDir)
 std::vector<ByteString> DirectoryList(ByteString directory)
 {
 	std::vector<ByteString> directoryList;
-	struct dirent * directoryEntry;
+	struct dirent *directoryEntry;
 	DIR *directoryHandle = opendir(directory.c_str());
 	if (!directoryHandle)
 	{

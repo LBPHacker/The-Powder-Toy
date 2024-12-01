@@ -18,7 +18,7 @@ void Element::Element_GOO()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -32,7 +32,7 @@ void Element::Element_GOO()
 	HeatConduct = 75;
 	Description = "Deforms and disappears under pressure.";
 
-	Properties = TYPE_SOLID | PROP_NEUTPENETRATE|PROP_LIFE_DEC|PROP_LIFE_KILL_DEC;
+	Properties = TYPE_SOLID | PROP_NEUTPENETRATE | PROP_LIFE_DEC | PROP_LIFE_KILL_DEC;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -50,12 +50,14 @@ constexpr float ADVECTION = 0.1f;
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	if (!parts[i].life && sim->pv[y/CELL][x/CELL]>1.0f)
+	if (!parts[i].life && sim->pv[y / CELL][x / CELL] > 1.0f)
+	{
 		parts[i].life = sim->rng.between(300, 379);
+	}
 	if (parts[i].life)
 	{
-		parts[i].vx += ADVECTION*sim->vx[y/CELL][x/CELL];
-		parts[i].vy += ADVECTION*sim->vy[y/CELL][x/CELL];
+		parts[i].vx += ADVECTION * sim->vx[y / CELL][x / CELL];
+		parts[i].vy += ADVECTION * sim->vy[y / CELL][x / CELL];
 	}
 	return 0;
 }

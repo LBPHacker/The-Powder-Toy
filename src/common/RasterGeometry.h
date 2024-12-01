@@ -19,7 +19,9 @@ void rasterizeLineZW(int dz, int dw, F f)
 			w += incW;
 			err -= 2 * dz;
 			if (Ortho && z < dz)
+			{
 				f(z, w);
+			}
 		}
 	}
 }
@@ -29,19 +31,23 @@ void rasterizeLineZW(int dz, int dw, F f)
 template<bool Ortho, typename F>
 void RasterizeLine(Vec2<int> p1, Vec2<int> p2, F f)
 {
-	if(std::abs(p1.X - p2.X) >= std::abs(p1.Y - p2.Y))
+	if (std::abs(p1.X - p2.X) >= std::abs(p1.Y - p2.Y))
 	{
 		// If it's more wide than tall, map Z to X and W to Y
 		auto source = p1.X < p2.X ? p1 : p2;
 		auto delta = p1.X < p2.X ? p2 - p1 : p1 - p2;
-		rasterizeLineZW<Ortho>(delta.X, delta.Y, [source, f](int z, int w) { f(source + Vec2(z, w)); });
+		rasterizeLineZW<Ortho>(delta.X, delta.Y, [source, f](int z, int w) {
+			f(source + Vec2(z, w));
+		});
 	}
 	else
 	{
 		// If it's more tall than wide, map Z to Y and W to X
 		auto source = p1.Y < p2.Y ? p1 : p2;
 		auto delta = p1.Y < p2.Y ? p2 - p1 : p1 - p2;
-		rasterizeLineZW<Ortho>(delta.Y, delta.X, [source, f](int z, int w) { f(source + Vec2(w, z)); });
+		rasterizeLineZW<Ortho>(delta.Y, delta.X, [source, f](int z, int w) {
+			f(source + Vec2(w, z));
+		});
 	}
 }
 
@@ -56,8 +62,7 @@ void rasterizeEllipseQuadrant(Vec2<float> radiusSquared, F f)
 	// The code below ensures 0 <= x <= rx and 0 <= y <= ry + 1.
 	// A false positive for y > ry can only happen if rx == 0 and does not
 	// affect the outcome
-	auto inEllipse = [=](int x, int y)
-	{
+	auto inEllipse = [=](int x, int y) {
 		return y * y * radiusSquared.X + x * x * radiusSquared.Y <= radiusSquared.X * radiusSquared.Y;
 	};
 	// Focusing on the bottom right quadrant, in every row we find the range of
@@ -81,7 +86,8 @@ void rasterizeEllipseQuadrant(Vec2<float> radiusSquared, F f)
 			do
 			{
 				x--;
-			} while (x >= 0 && !inEllipse(x, y + 1));
+			}
+			while (x >= 0 && !inEllipse(x, y + 1));
 			f(x + 1, xStart, y);
 		}
 	}
@@ -97,27 +103,37 @@ void rasterizeEllipseQuadrant(Vec2<float> radiusSquared, F f)
 template<typename F>
 void RasterizeEllipsePoints(Vec2<float> radiusSquared, F f)
 {
-	rasterizeEllipseQuadrant(radiusSquared, [f](int x1, int x2, int y)
+	rasterizeEllipseQuadrant(radiusSquared, [f](int x1, int x2, int y) {
+		for (int x = x1; x <= x2; x++)
 		{
-			for (int x = x1; x <= x2; x++)
+			f(Vec2(x, y));
+			if (x)
 			{
-				f(Vec2(x, y));
-				if (x) f(Vec2(-x, y));
-				if (y) f(Vec2(x, -y));
-				if (x && y) f(Vec2(-x, -y));
+				f(Vec2(-x, y));
 			}
-		});
+			if (y)
+			{
+				f(Vec2(x, -y));
+			}
+			if (x && y)
+			{
+				f(Vec2(-x, -y));
+			}
+		}
+	});
 }
 
 // Call f for every point inside the ellipse with the indicated radius.
 template<typename F>
 void RasterizeEllipseRows(Vec2<float> radiusSquared, F f)
 {
-	rasterizeEllipseQuadrant(radiusSquared, [f](int _, int xLim, int y)
+	rasterizeEllipseQuadrant(radiusSquared, [f](int _, int xLim, int y) {
+		f(xLim, y);
+		if (y)
 		{
-			f(xLim, y);
-			if (y) f(xLim, -y);
-		});
+			f(xLim, -y);
+		}
+	});
 }
 
 // Call f for every point on the boundary of the indicated rectangle (so that
@@ -126,19 +142,31 @@ template<typename F>
 void RasterizeRect(Rect<int> rect, F f)
 {
 	for (int x = rect.pos.X; x < rect.pos.X + rect.size.X; x++)
+	{
 		f(Vec2(x, rect.pos.Y));
+	}
 
 	if (rect.pos.Y != rect.pos.Y + rect.size.Y - 1)
+	{
 		for (int x = rect.pos.X; x < rect.pos.X + rect.size.X; x++)
+		{
 			f(Vec2(x, rect.pos.Y + rect.size.Y - 1));
+		}
+	}
 
 	// corners already drawn
 	for (int y = rect.pos.Y + 1; y < rect.pos.Y + rect.size.Y - 1; y++)
+	{
 		f(Vec2(rect.pos.X, y));
+	}
 
 	if (rect.pos.X != rect.pos.X + rect.size.X - 1)
+	{
 		for (int y = rect.pos.Y + 1; y < rect.pos.Y + rect.size.Y - 1; y++)
+		{
 			f(Vec2(rect.pos.X + rect.size.X - 1, y));
+		}
+	}
 }
 
 // Call f for every point on the dotted boundary of the indicated rectangle.
@@ -146,19 +174,31 @@ template<typename F>
 void RasterizeDottedRect(Rect<int> rect, F f)
 {
 	for (int x = rect.pos.X; x < rect.pos.X + rect.size.X; x += 2)
+	{
 		f(Vec2(x, rect.pos.Y));
+	}
 
 	int bottomOff = (rect.pos.Y + rect.size.Y - 1 - rect.pos.Y) % 2;
 	if (rect.pos.Y != rect.pos.Y + rect.size.Y - 1)
+	{
 		for (int x = rect.pos.X + bottomOff; x < rect.pos.X + rect.size.X; x += 2)
+		{
 			f(Vec2(x, rect.pos.Y + rect.size.Y - 1));
+		}
+	}
 
 	// corners already drawn
 	for (int y = rect.pos.Y + 1 + 1; y < rect.pos.Y + rect.size.Y - 1; y += 2)
+	{
 		f(Vec2(rect.pos.X, y));
+	}
 
 	int leftOff = (rect.pos.X + rect.size.X - 1 - rect.pos.X + 1) % 2;
 	if (rect.pos.X != rect.pos.X + rect.size.X - 1)
+	{
 		for (int y = rect.pos.Y + 1 + leftOff; y < rect.pos.Y + rect.size.Y - 1; y += 2)
+		{
 			f(Vec2(rect.pos.X + rect.size.X - 1, y));
+		}
+	}
 }

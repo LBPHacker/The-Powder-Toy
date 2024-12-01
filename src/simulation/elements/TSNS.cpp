@@ -18,7 +18,7 @@ void Element::Element_TSNS()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -53,7 +53,9 @@ static int update(UPDATE_FUNC_ARGS)
 	auto &elements = sd.elements;
 	int rd = parts[i].tmp2;
 	if (rd > 25)
+	{
 		parts[i].tmp2 = rd = 25;
+	}
 	if (parts[i].life)
 	{
 		parts[i].life = 0;
@@ -63,20 +65,26 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					int r = pmap[y+ry][x+rx];
+					int r = pmap[y + ry][x + rx];
 					if (!r)
-						r = sim->photons[y+ry][x+rx];
+					{
+						r = sim->photons[y + ry][x + rx];
+					}
 					if (!r)
+					{
 						continue;
+					}
 					int rt = TYP(r);
 					auto pavg = sim->parts_avg(i, ID(r), PT_INSL);
 					if (pavg != PT_INSL && pavg != PT_RSSS)
 					{
-						if ((elements[rt].Properties&PROP_CONDUCTS) && !(rt == PT_WATR || rt == PT_SLTW || rt == PT_NTCT || rt == PT_PTCT || rt == PT_INWR) && parts[ID(r)].life == 0)
+						if ((elements[rt].Properties & PROP_CONDUCTS) &&
+						    !(rt == PT_WATR || rt == PT_SLTW || rt == PT_NTCT || rt == PT_PTCT || rt == PT_INWR) &&
+						    parts[ID(r)].life == 0)
 						{
 							parts[ID(r)].life = 4;
 							parts[ID(r)].ctype = rt;
-							sim->part_change_type(ID(r), x+rx, y+ry, PT_SPRK);
+							sim->part_change_type(ID(r), x + rx, y + ry, PT_SPRK);
 						}
 					}
 				}
@@ -86,24 +94,36 @@ static int update(UPDATE_FUNC_ARGS)
 	bool setFilt = false;
 	int photonWl = 0;
 	for (int rx = -rd; rx <= rd; rx++)
+	{
 		for (int ry = -rd; ry <= rd; ry++)
+		{
 			if (x + rx >= 0 && y + ry >= 0 && x + rx < XRES && y + ry < YRES && (rx || ry))
 			{
-				int r = pmap[y+ry][x+rx];
+				int r = pmap[y + ry][x + rx];
 				if (!r)
-					r = sim->photons[y+ry][x+rx];
+				{
+					r = sim->photons[y + ry][x + rx];
+				}
 				if (!r)
+				{
 					continue;
+				}
 				if (parts[i].tmp == 0 && TYP(r) != PT_TSNS && TYP(r) != PT_METL && parts[ID(r)].temp > parts[i].temp)
+				{
 					parts[i].life = 1;
+				}
 				if (parts[i].tmp == 2 && TYP(r) != PT_TSNS && TYP(r) != PT_METL && parts[ID(r)].temp < parts[i].temp)
+				{
 					parts[i].life = 1;
+				}
 				if (parts[i].tmp == 1 && TYP(r) != PT_TSNS && TYP(r) != PT_FILT)
 				{
 					setFilt = true;
 					photonWl = int(parts[ID(r)].temp);
 				}
 			}
+		}
+	}
 	if (setFilt)
 	{
 		for (int rx = -1; rx <= 1; rx++)
@@ -112,9 +132,11 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					int r = pmap[y+ry][x+rx];
+					int r = pmap[y + ry][x + rx];
 					if (!r)
+					{
 						continue;
+					}
 					auto nx = x + rx;
 					auto ny = y + ry;
 					while (TYP(r) == PT_FILT)
@@ -123,7 +145,9 @@ static int update(UPDATE_FUNC_ARGS)
 						nx += rx;
 						ny += ry;
 						if (nx < 0 || ny < 0 || nx >= XRES || ny >= YRES)
+						{
 							break;
+						}
 						r = pmap[ny][nx];
 					}
 				}

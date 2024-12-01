@@ -1,11 +1,12 @@
 #include "Prefs.h"
+#include "client/User.h"
 #include "common/platform/Platform.h"
 #include "common/tpt-rand.h"
-#include "client/User.h"
 #include <fstream>
 #include <iostream>
 
-Prefs::Prefs(ByteString newPath) : path(newPath)
+Prefs::Prefs(ByteString newPath) :
+	path(newPath)
 {
 	Read();
 }
@@ -18,7 +19,7 @@ void Prefs::Read()
 		return;
 	}
 	Json::CharReaderBuilder rbuilder;
-	std::unique_ptr<Json::CharReader> const reader(rbuilder.newCharReader());
+	const std::unique_ptr<Json::CharReader> reader(rbuilder.newCharReader());
 	ByteString errs;
 	if (!data.size())
 	{
@@ -100,29 +101,101 @@ void Prefs::SetJson(Json::Value &node, ByteString path, Json::Value value)
 	SetJson(node[split.Before()], split.After(), value);
 }
 
-template<> Json::Value Prefs::Bipacker<int>::Pack  (const int         &value) { return Json::Value(value); }
-template<> int         Prefs::Bipacker<int>::Unpack(const Json::Value &value) { return value.asInt(); }
+template<>
+Json::Value Prefs::Bipacker<int>::Pack(const int &value)
+{
+	return Json::Value(value);
+}
 
-template<> Json::Value  Prefs::Bipacker<unsigned int>::Pack  (const unsigned int &value) { return Json::Value(value); }
-template<> unsigned int Prefs::Bipacker<unsigned int>::Unpack(const Json::Value  &value) { return value.asUInt(); }
+template<>
+int Prefs::Bipacker<int>::Unpack(const Json::Value &value)
+{
+	return value.asInt();
+}
 
-template<> Json::Value Prefs::Bipacker<uint64_t>::Pack  (const uint64_t    &value) { return Json::Value(Json::UInt64(value)); }
-template<> uint64_t    Prefs::Bipacker<uint64_t>::Unpack(const Json::Value &value) { return value.asUInt64(); }
+template<>
+Json::Value Prefs::Bipacker<unsigned int>::Pack(const unsigned int &value)
+{
+	return Json::Value(value);
+}
 
-template<> Json::Value Prefs::Bipacker<float>::Pack  (const float       &value) { return Json::Value(value); }
-template<> float       Prefs::Bipacker<float>::Unpack(const Json::Value &value) { return value.asFloat(); }
+template<>
+unsigned int Prefs::Bipacker<unsigned int>::Unpack(const Json::Value &value)
+{
+	return value.asUInt();
+}
 
-template<> Json::Value Prefs::Bipacker<bool>::Pack  (const bool        &value) { return Json::Value(value); }
-template<> bool        Prefs::Bipacker<bool>::Unpack(const Json::Value &value) { return value.asBool(); }
+template<>
+Json::Value Prefs::Bipacker<uint64_t>::Pack(const uint64_t &value)
+{
+	return Json::Value(Json::UInt64(value));
+}
 
-template<> Json::Value Prefs::Bipacker<ByteString>::Pack  (const ByteString  &value) { return Json::Value(value); }
-template<> ByteString  Prefs::Bipacker<ByteString>::Unpack(const Json::Value &value) { return value.asString(); }
+template<>
+uint64_t Prefs::Bipacker<uint64_t>::Unpack(const Json::Value &value)
+{
+	return value.asUInt64();
+}
 
-template<> Json::Value Prefs::Bipacker<String>::Pack  (const String      &value) { return Json::Value(value.ToUtf8()); }
-template<> String      Prefs::Bipacker<String>::Unpack(const Json::Value &value) { return ByteString(value.asString()).FromUtf8(); }
+template<>
+Json::Value Prefs::Bipacker<float>::Pack(const float &value)
+{
+	return Json::Value(value);
+}
 
-template<> Json::Value     Prefs::Bipacker<User::Elevation>::Pack  (const User::Elevation &value) { return Json::Value(User::ElevationToString(value)); }
-template<> User::Elevation Prefs::Bipacker<User::Elevation>::Unpack(const Json::Value     &value) { return User::ElevationFromString(value.asString()); }
+template<>
+float Prefs::Bipacker<float>::Unpack(const Json::Value &value)
+{
+	return value.asFloat();
+}
+
+template<>
+Json::Value Prefs::Bipacker<bool>::Pack(const bool &value)
+{
+	return Json::Value(value);
+}
+
+template<>
+bool Prefs::Bipacker<bool>::Unpack(const Json::Value &value)
+{
+	return value.asBool();
+}
+
+template<>
+Json::Value Prefs::Bipacker<ByteString>::Pack(const ByteString &value)
+{
+	return Json::Value(value);
+}
+
+template<>
+ByteString Prefs::Bipacker<ByteString>::Unpack(const Json::Value &value)
+{
+	return value.asString();
+}
+
+template<>
+Json::Value Prefs::Bipacker<String>::Pack(const String &value)
+{
+	return Json::Value(value.ToUtf8());
+}
+
+template<>
+String Prefs::Bipacker<String>::Unpack(const Json::Value &value)
+{
+	return ByteString(value.asString()).FromUtf8();
+}
+
+template<>
+Json::Value Prefs::Bipacker<User::Elevation>::Pack(const User::Elevation &value)
+{
+	return Json::Value(User::ElevationToString(value));
+}
+
+template<>
+User::Elevation Prefs::Bipacker<User::Elevation>::Unpack(const Json::Value &value)
+{
+	return User::ElevationFromString(value.asString());
+}
 
 template<class Item>
 struct Prefs::Bipacker<std::vector<Item>>

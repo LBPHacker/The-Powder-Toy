@@ -1,16 +1,12 @@
-#include "LuaScriptInterface.h"
 #include "LuaLabel.h"
+#include "LuaScriptInterface.h"
 #include "gui/interface/Label.h"
 
 const char LuaLabel::className[] = "label";
 
-#define method(class, name) {#name, &class::name}
+#define method(class, name) { #name, &class ::name }
 Luna<LuaLabel>::RegType LuaLabel::methods[] = {
-	method(LuaLabel, text),
-	method(LuaLabel, position),
-	method(LuaLabel, size),
-	method(LuaLabel, visible),
-	{0, 0}
+	method(LuaLabel, text), method(LuaLabel, position), method(LuaLabel, size), method(LuaLabel, visible), { 0, 0 }
 };
 
 LuaLabel::LuaLabel(lua_State *L) :
@@ -30,7 +26,7 @@ LuaLabel::LuaLabel(lua_State *L) :
 int LuaLabel::text(lua_State *L)
 {
 	int args = lua_gettop(L);
-	if(args)
+	if (args)
 	{
 		label->SetText(tpt_lua_checkString(L, 1));
 		return 0;

@@ -18,7 +18,7 @@ void Element::Element_LSNS()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -30,7 +30,8 @@ void Element::Element_LSNS()
 
 	DefaultProperties.temp = 4.0f + 273.15f;
 	HeatConduct = 0;
-	Description = "Life sensor, creates a spark when there's a nearby particle with a life higher than its temperature.";
+	Description =
+		"Life sensor, creates a spark when there's a nearby particle with a life higher than its temperature.";
 
 	Properties = TYPE_SOLID;
 
@@ -53,7 +54,10 @@ static int update(UPDATE_FUNC_ARGS)
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
 	int rd = parts[i].tmp2;
-	if (rd > 25) parts[i].tmp2 = rd = 25;
+	if (rd > 25)
+	{
+		parts[i].tmp2 = rd = 25;
+	}
 	if (parts[i].life)
 	{
 		parts[i].life = 0;
@@ -65,14 +69,20 @@ static int update(UPDATE_FUNC_ARGS)
 				{
 					int r = pmap[y + ry][x + rx];
 					if (!r)
+					{
 						r = sim->photons[y + ry][x + rx];
+					}
 					if (!r)
+					{
 						continue;
+					}
 					int rt = TYP(r);
 					auto pavg = sim->parts_avg(i, ID(r), PT_INSL);
 					if (pavg != PT_INSL && pavg != PT_RSSS)
 					{
-						if ((elements[rt].Properties&PROP_CONDUCTS) && !(rt == PT_WATR || rt == PT_SLTW || rt == PT_NTCT || rt == PT_PTCT || rt == PT_INWR) && parts[ID(r)].life == 0)
+						if ((elements[rt].Properties & PROP_CONDUCTS) &&
+						    !(rt == PT_WATR || rt == PT_SLTW || rt == PT_NTCT || rt == PT_PTCT || rt == PT_INWR) &&
+						    parts[ID(r)].life == 0)
 						{
 							parts[ID(r)].life = 4;
 							parts[ID(r)].ctype = rt;
@@ -94,9 +104,13 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				int r = pmap[y + ry][x + rx];
 				if (!r)
+				{
 					r = sim->photons[y + ry][x + rx];
+				}
 				if (!r)
+				{
 					continue;
+				}
 
 				switch (parts[i].tmp)
 				{
@@ -119,12 +133,16 @@ static int update(UPDATE_FUNC_ARGS)
 				case 2:
 					// Invert mode
 					if (TYP(r) != PT_METL && parts[ID(r)].life <= parts[i].temp - 273.15)
+					{
 						parts[i].life = 1;
+					}
 					break;
 				default:
 					// Normal mode
 					if (TYP(r) != PT_METL && parts[ID(r)].life > parts[i].temp - 273.15)
+					{
 						parts[i].life = 1;
+					}
 					break;
 				}
 			}
@@ -139,9 +157,13 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				int r = pmap[y + ry][x + rx];
 				if (!r)
+				{
 					r = sim->photons[y + ry][x + rx];
+				}
 				if (!r)
+				{
 					continue;
+				}
 				int nx = x + rx;
 				int ny = y + ry;
 				// .life serialization.
@@ -153,7 +175,9 @@ static int update(UPDATE_FUNC_ARGS)
 						nx += rx;
 						ny += ry;
 						if (nx < 0 || ny < 0 || nx >= XRES || ny >= YRES)
+						{
 							break;
+						}
 						r = pmap[ny][nx];
 					}
 				}
@@ -161,7 +185,9 @@ static int update(UPDATE_FUNC_ARGS)
 				else if (doDeserialization)
 				{
 					if (TYP(r) != PT_FILT)
+					{
 						parts[ID(r)].life = life - 0x10000000;
+					}
 				}
 			}
 		}

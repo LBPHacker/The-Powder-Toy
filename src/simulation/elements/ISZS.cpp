@@ -18,7 +18,7 @@ void Element::Element_ISZS()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = -0.0007f* CFDS;
+	HotAir = -0.0007f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -49,13 +49,13 @@ void Element::Element_ISZS()
 static int update(UPDATE_FUNC_ARGS)
 {
 	float rr, rrr;
-	if (sim->rng.chance(1, 200) && sim->rng.chance(int(-4.0f * sim->pv[y/CELL][x/CELL]), 1000))
+	if (sim->rng.chance(1, 200) && sim->rng.chance(int(-4.0f * sim->pv[y / CELL][x / CELL]), 1000))
 	{
 		sim->create_part(i, x, y, PT_PHOT);
 		rr = sim->rng.between(128, 355) / 127.0f;
 		rrr = sim->rng.between(0, 359) * 3.14159f / 180.0f;
-		parts[i].vx = rr*cosf(rrr);
-		parts[i].vy = rr*sinf(rrr);
+		parts[i].vx = rr * cosf(rrr);
+		parts[i].vy = rr * sinf(rrr);
 	}
 	return 0;
 }

@@ -1,6 +1,6 @@
 #pragma once
-#include "SimulationConfig.h"
 #include "Pixel.h"
+#include "SimulationConfig.h"
 #include "common/Plane.h"
 #include <array>
 

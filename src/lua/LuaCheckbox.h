@@ -1,23 +1,24 @@
 #pragma once
 
-#include "LuaLuna.h"
 #include "LuaComponent.h"
+#include "LuaLuna.h"
 
 namespace ui
 {
-	class Checkbox;
+class Checkbox;
 }
 
 class LuaScriptInterface;
 
-class LuaCheckbox: public LuaComponent
+class LuaCheckbox : public LuaComponent
 {
-	ui::Checkbox * checkbox;
+	ui::Checkbox *checkbox;
 	LuaComponentCallback actionFunction;
 	void triggerAction();
 	int action(lua_State *L);
 	int checked(lua_State *L);
 	int text(lua_State *L);
+
 public:
 	static const char className[];
 	static Luna<LuaCheckbox>::RegType methods[];

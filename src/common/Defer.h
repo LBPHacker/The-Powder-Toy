@@ -7,12 +7,13 @@ class Defer
 	Func func;
 
 public:
-	Defer(Func &&newFunc) : func(std::forward<Func>(newFunc))
+	Defer(Func &&newFunc) :
+		func(std::forward<Func>(newFunc))
 	{
 	}
 
 	Defer(const Defer &) = delete;
-	Defer &operator =(const Defer &) = delete;
+	Defer &operator=(const Defer &) = delete;
 
 	~Defer()
 	{

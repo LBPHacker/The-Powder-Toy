@@ -4,12 +4,11 @@
 
 #include "simulation/Simulation.h"
 
-ParticleDebug::ParticleDebug(unsigned int id, Simulation * sim, GameModel * model):
+ParticleDebug::ParticleDebug(unsigned int id, Simulation *sim, GameModel *model) :
 	DebugInfo(id),
 	sim(sim),
 	model(model)
 {
-
 }
 
 void ParticleDebug::Debug(int mode, int x, int y)
@@ -20,14 +19,22 @@ void ParticleDebug::Debug(int mode, int x, int y)
 	if (mode == 0)
 	{
 		if (!sim->NUM_PARTS)
+		{
 			return;
+		}
 		i = sim->debug_nextToUpdate;
 		while (i < NPART - 1 && !sim->parts[i].type)
+		{
 			i++;
+		}
 		if (i == NPART - 1)
+		{
 			logmessage = "End of particles reached, updated sim";
+		}
 		else
+		{
 			logmessage = String::Build("Updated particle #", i);
+		}
 	}
 	else if (mode == 1)
 	{
@@ -71,13 +78,21 @@ bool ParticleDebug::KeyPress(int key, int scan, bool shift, bool ctrl, bool alt,
 		{
 			ui::Point mouse = currentMouse;
 			if (mouse.X >= XRES)
-				mouse.X = XRES-1;
+			{
+				mouse.X = XRES - 1;
+			}
 			else if (mouse.X < 0)
+			{
 				mouse.X = 0;
+			}
 			if (mouse.Y >= YRES)
-				mouse.Y = YRES-1;
+			{
+				mouse.Y = YRES - 1;
+			}
 			else if (mouse.Y < 0)
+			{
 				mouse.Y = 0;
+			}
 
 			mouse = model->AdjustZoomCoords(mouse);
 			Debug(1, mouse.X, mouse.Y);
@@ -85,10 +100,13 @@ bool ParticleDebug::KeyPress(int key, int scan, bool shift, bool ctrl, bool alt,
 		else
 		{
 			if (ctrl)
+			{
 				return true;
+			}
 			if (sim->debug_nextToUpdate > 0)
 			{
-				String logmessage = String::Build("Updated particles from #", sim->debug_nextToUpdate, " to end due to frame step");
+				String logmessage =
+					String::Build("Updated particles from #", sim->debug_nextToUpdate, " to end due to frame step");
 				model->UpdateUpTo(NPART);
 				model->Log(logmessage, false);
 			}

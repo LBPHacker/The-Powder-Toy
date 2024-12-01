@@ -1,6 +1,6 @@
 #include "ElementCommon.h"
 
-std::array<Element, PT_NUM> const &GetElements()
+const std::array<Element, PT_NUM> &GetElements()
 {
 	struct DoOnce
 	{

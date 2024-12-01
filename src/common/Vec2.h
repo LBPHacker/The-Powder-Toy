@@ -14,14 +14,14 @@ struct Vec2
 {
 	T X, Y;
 
-	constexpr Vec2(T x, T y):
+	constexpr Vec2(T x, T y) :
 		X(x),
 		Y(y)
 	{
 	}
 
 	template<typename S, typename = std::enable_if_t<std::is_constructible_v<T, S>>>
-	constexpr explicit Vec2(Vec2<S> other):
+	constexpr explicit Vec2(Vec2<S> other) :
 		X(other.X),
 		Y(other.Y)
 	{
@@ -114,10 +114,7 @@ struct Vec2
 
 	Vec2<T> Min(Vec2<T> other) const
 	{
-		return Vec2<T>(
-			std::min(X, other.X),
-			std::min(Y, other.Y)
-		);
+		return Vec2<T>(std::min(X, other.X), std::min(Y, other.Y));
 	}
 
 	// Return a rectangle starting at origin, whose dimensions match this vector
@@ -127,11 +124,11 @@ struct Vec2
 		return RectSized(Vec2<T>(0, 0), *this);
 	}
 
-	static Vec2<T> const Zero;
+	static const Vec2<T> Zero;
 };
 
 template<typename T, typename V>
-Vec2<T> const Vec2<T, V>::Zero = Vec2<T>(0, 0);
+const Vec2<T> Vec2<T, V>::Zero = Vec2<T>(0, 0);
 
 template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
 struct Mat2
@@ -140,7 +137,7 @@ struct Mat2
 	// ⎝C D⎠, acting on column vectors
 	T A, B, C, D;
 
-	constexpr Mat2(T a, T b, T c, T d):
+	constexpr Mat2(T a, T b, T c, T d) :
 		A(a),
 		B(b),
 		C(c),
@@ -168,22 +165,21 @@ struct Mat2
 	constexpr Mat2<decltype(std::declval<T>() * std::declval<S>())> operator*(Mat2<S> mat) const
 	{
 		return Mat2<decltype(std::declval<T>() * std::declval<S>())>(
-			A * mat.A + B * mat.C, A * mat.B + B * mat.D,
-			C * mat.A + D * mat.C, C * mat.B + D * mat.D
+			A * mat.A + B * mat.C, A * mat.B + B * mat.D, C * mat.A + D * mat.C, C * mat.B + D * mat.D
 		);
 	}
 
-	static Mat2<T> const Identity, MirrorX, MirrorY, CCW;
+	static const Mat2<T> Identity, MirrorX, MirrorY, CCW;
 };
 
 template<typename T, typename V>
-Mat2<T> const Mat2<T, V>::Identity = Mat2<T>(1, 0, 0, 1);
+const Mat2<T> Mat2<T, V>::Identity = Mat2<T>(1, 0, 0, 1);
 template<typename T, typename V>
-Mat2<T> const Mat2<T, V>::MirrorX = Mat2<T>(-1, 0, 0, 1);
+const Mat2<T> Mat2<T, V>::MirrorX = Mat2<T>(-1, 0, 0, 1);
 template<typename T, typename V>
-Mat2<T> const Mat2<T, V>::MirrorY = Mat2<T>(1, 0, 0, -1);
+const Mat2<T> Mat2<T, V>::MirrorY = Mat2<T>(1, 0, 0, -1);
 template<typename T, typename V>
-Mat2<T> const Mat2<T, V>::CCW = Mat2<T>(0, 1, -1, 0); // reminder: the Y axis points down
+const Mat2<T> Mat2<T, V>::CCW = Mat2<T>(0, 1, -1, 0); // reminder: the Y axis points down
 
 template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
 constexpr static inline Rect<T> RectSized(Vec2<T>, Vec2<T>);
@@ -202,7 +198,7 @@ struct Rect
 	// Inclusive
 	Vec2<T> pos, size;
 
-	constexpr Rect(Vec2<T> newPos, Vec2<T> newSize):
+	constexpr Rect(Vec2<T> newPos, Vec2<T> newSize) :
 		pos(newPos),
 		size(newSize)
 	{
@@ -210,7 +206,8 @@ struct Rect
 
 private:
 	struct end_sentinel
-	{};
+	{
+	};
 
 	template<IterationDirection D1, IterationDirection D2>
 	struct range_row_major
@@ -222,7 +219,7 @@ private:
 		struct iterator
 		{
 			T x, y;
-			T const first_x, last_x, end_y;
+			const T first_x, last_x, end_y;
 
 			iterator &operator++()
 			{
@@ -230,16 +227,24 @@ private:
 				{
 					x = first_x;
 					if constexpr (D1 == TOP_TO_BOTTOM)
+					{
 						y++;
+					}
 					else
+					{
 						y--;
+					}
 				}
 				else
 				{
 					if constexpr (D2 == LEFT_TO_RIGHT)
+					{
 						x++;
+					}
 					else
+					{
 						x--;
+					}
 				}
 				return *this;
 			}
@@ -252,9 +257,13 @@ private:
 			bool operator!=(end_sentinel) const
 			{
 				if constexpr (D1 == TOP_TO_BOTTOM)
+				{
 					return y < end_y;
+				}
 				else
+				{
 					return y > end_y;
+				}
 			}
 
 			using difference_type = void;
@@ -270,7 +279,7 @@ private:
 			T last_x = D2 == LEFT_TO_RIGHT ? right : left;
 			T first_y = D1 == TOP_TO_BOTTOM ? top : bottom;
 			T end_y = D1 == TOP_TO_BOTTOM ? bottom + 1 : top - 1;
-			return iterator{first_x, right >= left ? first_y : end_y, first_x, last_x, end_y};
+			return iterator{ first_x, right >= left ? first_y : end_y, first_x, last_x, end_y };
 		}
 
 		end_sentinel end() const
@@ -289,7 +298,7 @@ private:
 		struct iterator
 		{
 			T x, y;
-			T const first_y, last_y, end_x;
+			const T first_y, last_y, end_x;
 
 			iterator &operator++()
 			{
@@ -297,16 +306,24 @@ private:
 				{
 					y = first_y;
 					if constexpr (D1 == LEFT_TO_RIGHT)
+					{
 						x++;
+					}
 					else
+					{
 						x--;
+					}
 				}
 				else
 				{
 					if constexpr (D2 == TOP_TO_BOTTOM)
+					{
 						y++;
+					}
 					else
+					{
 						y--;
+					}
 				}
 				return *this;
 			}
@@ -319,9 +336,13 @@ private:
 			bool operator!=(end_sentinel) const
 			{
 				if constexpr (D1 == LEFT_TO_RIGHT)
+				{
 					return x < end_x;
+				}
 				else
+				{
 					return x > end_x;
+				}
 			}
 
 			using difference_type = void;
@@ -337,7 +358,7 @@ private:
 			T last_y = D2 == TOP_TO_BOTTOM ? bottom : top;
 			T first_x = D1 == LEFT_TO_RIGHT ? left : right;
 			T end_x = D1 == LEFT_TO_RIGHT ? right + 1 : left - 1;
-			return iterator{bottom >= top ? first_x : end_x, first_y, first_y, last_y, end_x};
+			return iterator{ bottom >= top ? first_x : end_x, first_y, first_y, last_y, end_x };
 		}
 
 		end_sentinel end() const
@@ -365,8 +386,10 @@ public:
 	// Return the intersection of two rectangles (possibly empty)
 	Rect<T> operator&(Rect<T> other) const
 	{
-		auto tl  = Vec2<T>(std::max(pos.X         , other.pos.X               ), std::max(pos.Y         , other.pos.Y               ));
-		auto br1 = Vec2<T>(std::min(pos.X + size.X, other.pos.X + other.size.X), std::min(pos.Y + size.Y, other.pos.Y + other.size.Y));
+		auto tl = Vec2<T>(std::max(pos.X, other.pos.X), std::max(pos.Y, other.pos.Y));
+		auto br1 = Vec2<T>(
+			std::min(pos.X + size.X, other.pos.X + other.size.X), std::min(pos.Y + size.Y, other.pos.Y + other.size.Y)
+		);
 		return Rect<T>(tl, br1 - tl);
 	}
 
@@ -395,23 +418,31 @@ public:
 	template<typename S>
 	Rect<decltype(std::declval<T>() + std::declval<S>())> Inset(S delta) const
 	{
-		return Rect<decltype(std::declval<T>() + std::declval<S>())>(pos + Vec2(delta, delta), size - Vec2(delta, delta) * S(2));
+		return Rect<decltype(std::declval<T>() + std::declval<S>())>(
+			pos + Vec2(delta, delta), size - Vec2(delta, delta) * S(2)
+		);
 	}
 
-	template<IterationDirection D1, IterationDirection D2, typename S = T, typename = std::enable_if_t<std::is_integral_v<T>>>
+	template<
+		IterationDirection D1,
+		IterationDirection D2,
+		typename S = T,
+		typename = std::enable_if_t<std::is_integral_v<T>>>
 	constexpr auto Range() const
 	{
 		static_assert(
 			((D1 == TOP_TO_BOTTOM || D1 == BOTTOM_TO_TOP) && (D2 == LEFT_TO_RIGHT || D2 == RIGHT_TO_LEFT)) ||
-			((D1 == LEFT_TO_RIGHT || D1 == RIGHT_TO_LEFT) && (D2 == TOP_TO_BOTTOM || D2 == BOTTOM_TO_TOP)),
+				((D1 == LEFT_TO_RIGHT || D1 == RIGHT_TO_LEFT) && (D2 == TOP_TO_BOTTOM || D2 == BOTTOM_TO_TOP)),
 			"Must include exactly 1 of TOP_TO_BOTTOM/BOTTOM_TO_TOP and exactly 1 of LEFT_TO_RIGHT/RIGHT_TO_LEFT"
 		);
 		if constexpr (D1 == TOP_TO_BOTTOM || D1 == BOTTOM_TO_TOP)
 		{
-			return range_row_major<D1, D2>{pos.X, pos.Y, pos.X + size.X - T(1), pos.Y + size.Y - T(1)};
+			return range_row_major<D1, D2>{ pos.X, pos.Y, pos.X + size.X - T(1), pos.Y + size.Y - T(1) };
 		}
 		else
-			return range_column_major<D1, D2>{pos.X, pos.Y, pos.X + size.X - T(1), pos.Y + size.Y - T(1)};
+		{
+			return range_column_major<D1, D2>{ pos.X, pos.Y, pos.X + size.X - T(1), pos.Y + size.Y - T(1) };
+		}
 	}
 
 	// Use when the order isn't important

@@ -18,7 +18,7 @@ void Element::Element_YEST()
 	Collision = 0.0f;
 	Gravity = 0.1f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 1;
 
 	Flammable = 15;
@@ -53,17 +53,20 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
-					continue;
-				if (TYP(r)==PT_DYST && sim->rng.chance(1, 6) && !sim->legacy_enable)
 				{
-					sim->part_change_type(i,x,y,PT_DYST);
+					continue;
+				}
+				if (TYP(r) == PT_DYST && sim->rng.chance(1, 6) && !sim->legacy_enable)
+				{
+					sim->part_change_type(i, x, y, PT_DYST);
 				}
 			}
 		}
 	}
-	if (parts[i].temp > 303 && parts[i].temp < 317) {
+	if (parts[i].temp > 303 && parts[i].temp < 317)
+	{
 		sim->create_part(-1, x + sim->rng.between(-1, 1), y + sim->rng.between(-1, 1), PT_YEST);
 	}
 	return 0;

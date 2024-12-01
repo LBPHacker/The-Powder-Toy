@@ -18,7 +18,7 @@ void Element::Element_FRZZ()
 	Collision = -0.1f;
 	Gravity = 0.05f;
 	Diffusion = 0.01f;
-	HotAir = -0.00005f* CFDS;
+	HotAir = -0.00005f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;
@@ -54,12 +54,14 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
-					continue;
-				if (TYP(r)==PT_WATR && sim->rng.chance(1, 20))
 				{
-					sim->part_change_type(ID(r),x+rx,y+ry,PT_FRZW);
+					continue;
+				}
+				if (TYP(r) == PT_WATR && sim->rng.chance(1, 20))
+				{
+					sim->part_change_type(ID(r), x + rx, y + ry, PT_FRZW);
 					parts[ID(r)].life = 100;
 					sim->kill_part(i);
 					return 1;

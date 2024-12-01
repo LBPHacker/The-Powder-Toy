@@ -18,7 +18,7 @@ void Element::Element_DSTW()
 	Collision = 0.0f;
 	Gravity = 0.1f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 2;
 
 	Flammable = 0;
@@ -55,35 +55,37 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				switch (TYP(r))
 				{
 				case PT_SALT:
 					if (sim->rng.chance(1, 50))
 					{
-						sim->part_change_type(i,x,y,PT_SLTW);
+						sim->part_change_type(i, x, y, PT_SLTW);
 						// on average, convert 3 DSTW to SLTW before SALT turns into SLTW
 						if (sim->rng.chance(1, 3))
-							sim->part_change_type(ID(r),x+rx,y+ry,PT_SLTW);
+						{
+							sim->part_change_type(ID(r), x + rx, y + ry, PT_SLTW);
+						}
 					}
 					break;
 				case PT_SLTW:
 					if (sim->rng.chance(1, 2000))
 					{
-						sim->part_change_type(i,x,y,PT_SLTW);
+						sim->part_change_type(i, x, y, PT_SLTW);
 						break;
 					}
 				case PT_WATR:
 					if (sim->rng.chance(1, 100))
 					{
-						sim->part_change_type(i,x,y,PT_WATR);
+						sim->part_change_type(i, x, y, PT_WATR);
 					}
 					break;
 				case PT_RBDM:
 				case PT_LRBD:
-					if ((sim->legacy_enable||parts[i].temp>12.0f) && sim->rng.chance(1, 100))
+					if ((sim->legacy_enable || parts[i].temp > 12.0f) && sim->rng.chance(1, 100))
 					{
-						sim->part_change_type(i,x,y,PT_FIRE);
+						sim->part_change_type(i, x, y, PT_FIRE);
 						parts[i].life = 4;
 					}
 					break;

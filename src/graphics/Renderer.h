@@ -1,14 +1,14 @@
 #pragma once
 #include "Icons.h"
 #include "RasterDrawMethods.h"
-#include "gui/game/RenderPreset.h"
+#include "RendererFrame.h"
 #include "RendererSettings.h"
 #include "common/tpt-rand.h"
-#include "RendererFrame.h"
+#include "gui/game/RenderPreset.h"
 #include <cstdint>
-#include <optional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <vector>
 
 struct RenderPreset;
@@ -45,7 +45,7 @@ class Renderer : private RendererSettings, public RasterDrawMethods<Renderer>
 	unsigned char fire_r[YCELLS][XCELLS];
 	unsigned char fire_g[YCELLS][XCELLS];
 	unsigned char fire_b[YCELLS][XCELLS];
-	unsigned int fire_alpha[CELL*3][CELL*3];
+	unsigned int fire_alpha[CELL * 3][CELL * 3];
 
 	void DrawBlob(Vec2<int> pos, RGB<uint8_t> colour);
 	void DrawWalls();
@@ -85,20 +85,23 @@ public:
 		RGB<uint8_t> color;
 		float point;
 
-		bool operator <(const GradientStop &other) const;
+		bool operator<(const GradientStop &other) const;
 	};
+
 	static std::vector<RGB<uint8_t>> Gradient(std::vector<GradientStop> stops, int resolution);
 	static std::unique_ptr<VideoBuffer> WallIcon(int wallID, Vec2<int> size);
 	static const std::vector<RenderPreset> renderModePresets;
 
-#define RENDERER_TABLE(name) \
-	static std::vector<RGB<uint8_t>> name; \
-	static inline RGB<uint8_t> name ## At(int index) \
-	{ \
-		auto size = int(name.size()); \
-		if (index <        0) index =        0; \
-		if (index > size - 1) index = size - 1; \
-		return name[index]; \
+#define RENDERER_TABLE(name)                       \
+	static std::vector<RGB<uint8_t>> name;         \
+	static inline RGB<uint8_t> name##At(int index) \
+	{                                              \
+		auto size = int(name.size());              \
+		if (index < 0)                             \
+			index = 0;                             \
+		if (index > size - 1)                      \
+			index = size - 1;                      \
+		return name[index];                        \
 	}
 	RENDERER_TABLE(flameTable)
 	RENDERER_TABLE(plasmaTable)

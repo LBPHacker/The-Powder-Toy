@@ -18,7 +18,7 @@ void Element::Element_FOG()
 	Collision = -0.1f;
 	Gravity = 0.0f;
 	Diffusion = 0.99f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -32,7 +32,7 @@ void Element::Element_FOG()
 	HeatConduct = 100;
 	Description = "Fog, created when an electric current is passed through RIME.";
 
-	Properties = TYPE_GAS|PROP_LIFE_DEC;
+	Properties = TYPE_GAS | PROP_LIFE_DEC;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -56,14 +56,17 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
-					continue;
-				if ((elements[TYP(r)].Properties&TYPE_SOLID) && sim->rng.chance(1, 10) && parts[i].life==0 && !(TYP(r)==PT_CLNE || TYP(r)==PT_PCLN)) // TODO: should this also exclude BCLN?
 				{
-					sim->part_change_type(i,x,y,PT_RIME);
+					continue;
 				}
-				if (TYP(r)==PT_SPRK)
+				if ((elements[TYP(r)].Properties & TYPE_SOLID) && sim->rng.chance(1, 10) && parts[i].life == 0 &&
+				    !(TYP(r) == PT_CLNE || TYP(r) == PT_PCLN)) // TODO: should this also exclude BCLN?
+				{
+					sim->part_change_type(i, x, y, PT_RIME);
+				}
+				if (TYP(r) == PT_SPRK)
 				{
 					parts[i].life += sim->rng.between(0, 19);
 				}

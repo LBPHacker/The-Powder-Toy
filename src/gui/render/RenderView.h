@@ -10,9 +10,11 @@ struct RendererSettings;
 class Simulation;
 class RenderController;
 class RenderModel;
-class RenderView: public ui::Window {
-	RenderController * c;
-	Renderer * ren;
+
+class RenderView : public ui::Window
+{
+	RenderController *c;
+	Renderer *ren;
 	RendererSettings *rendererSettings = nullptr;
 	Simulation *sim = nullptr;
 	std::vector<ModeCheckbox *> renderModes;
@@ -23,14 +25,20 @@ class RenderView: public ui::Window {
 	bool isToolTipFadingIn;
 	int line1, line2, line3, line4;
 	uint32_t CalculateRenderMode();
+
 public:
 	RenderView();
-	void NotifyRendererChanged(RenderModel * sender);
-	void NotifySimulationChanged(RenderModel * sender);
-	void NotifyRenderChanged(RenderModel * sender);
-	void NotifyDisplayChanged(RenderModel * sender);
-	void NotifyColourChanged(RenderModel * sender);
-	void AttachController(RenderController * c_) { c = c_; }
+	void NotifyRendererChanged(RenderModel *sender);
+	void NotifySimulationChanged(RenderModel *sender);
+	void NotifyRenderChanged(RenderModel *sender);
+	void NotifyDisplayChanged(RenderModel *sender);
+	void NotifyColourChanged(RenderModel *sender);
+
+	void AttachController(RenderController *c_)
+	{
+		c = c_;
+	}
+
 	void OnMouseDown(int x, int y, unsigned button) override;
 	void OnTryExit(ExitMethod method) override;
 	void OnDraw() override;

@@ -3,9 +3,9 @@
 #include "Sign.h"
 #include "Stickman.h"
 #include "common/tpt-rand.h"
-#include <vector>
 #include <array>
 #include <json/json.h>
+#include <vector>
 
 class Snapshot
 {
@@ -28,7 +28,6 @@ public:
 
 	std::vector<float> FanVelocityX;
 	std::vector<float> FanVelocityY;
-
 
 	std::vector<Particle> PortalParticles;
 	std::vector<int> WirelessData;

@@ -1,15 +1,15 @@
+#include "Config.h"
 #include "Platform.h"
 #include "resource.h"
-#include "Config.h"
-#include <iostream>
-#include <sys/stat.h>
-#include <io.h>
+#include <crtdbg.h>
 #include <fcntl.h>
+#include <io.h>
+#include <iostream>
+#include <memory>
 #include <shlobj.h>
 #include <shlwapi.h>
+#include <sys/stat.h>
 #include <windows.h>
-#include <crtdbg.h>
-#include <memory>
 
 namespace Platform
 {
@@ -60,7 +60,7 @@ bool FileExists(ByteString filename)
 	struct _stat s;
 	if (_wstat(WinWiden(filename).c_str(), &s) == 0)
 	{
-		if(s.st_mode & S_IFREG)
+		if (s.st_mode & S_IFREG)
 		{
 			return true; // Is file
 		}
@@ -80,7 +80,7 @@ bool DirectoryExists(ByteString directory)
 	struct _stat s;
 	if (_wstat(WinWiden(directory).c_str(), &s) == 0)
 	{
-		if(s.st_mode & S_IFDIR)
+		if (s.st_mode & S_IFDIR)
 		{
 			return true; // Is directory
 		}
@@ -255,11 +255,25 @@ bool Install()
 		auto wExtraKey = Platform::WinWiden(extraKey);
 		auto wExtraValue = Platform::WinWiden(extraValue);
 		HKEY k;
-		ok = ok && RegCreateKeyExW(HKEY_CURRENT_USER, wPath.c_str(), 0, 0, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &k, NULL) == ERROR_SUCCESS;
-		ok = ok && RegSetValueExW(k, NULL, 0, REG_SZ, reinterpret_cast<const BYTE *>(wValue.c_str()), (wValue.size() + 1) * 2) == ERROR_SUCCESS;
+		ok = ok &&
+			RegCreateKeyExW(
+				HKEY_CURRENT_USER, wPath.c_str(), 0, 0, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &k, NULL
+			) == ERROR_SUCCESS;
+		ok = ok &&
+			RegSetValueExW(
+				k, NULL, 0, REG_SZ, reinterpret_cast<const BYTE *>(wValue.c_str()), (wValue.size() + 1) * 2
+			) == ERROR_SUCCESS;
 		if (wExtraKey.size())
 		{
-			ok = ok && RegSetValueExW(k, wExtraKey.c_str(), 0, REG_SZ, reinterpret_cast<const BYTE *>(wExtraValue.c_str()), (wExtraValue.size() + 1) * 2) == ERROR_SUCCESS;
+			ok = ok &&
+				RegSetValueExW(
+					k,
+					wExtraKey.c_str(),
+					0,
+					REG_SZ,
+					reinterpret_cast<const BYTE *>(wExtraValue.c_str()),
+					(wExtraValue.size() + 1) * 2
+				) == ERROR_SUCCESS;
 		}
 		RegCloseKey(k);
 		return ok;
@@ -291,12 +305,17 @@ bool Install()
 	IPersistFile *shellLinkPersist = NULL;
 	wchar_t programsPath[MAX_PATH];
 	ok = ok && SHGetFolderPathW(NULL, CSIDL_PROGRAMS, NULL, SHGFP_TYPE_CURRENT, programsPath) == S_OK;
-	ok = ok && CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLinkW, (LPVOID *)&shellLink) == S_OK;
+	ok = ok &&
+		CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLinkW, (LPVOID *)&shellLink) == S_OK;
 	ok = ok && shellLink->SetPath(Platform::WinWiden(exe).c_str()) == S_OK;
 	ok = ok && shellLink->SetWorkingDirectory(Platform::WinWiden(path).c_str()) == S_OK;
 	ok = ok && shellLink->SetDescription(Platform::WinWiden(APPNAME).c_str()) == S_OK;
 	ok = ok && shellLink->QueryInterface(IID_IPersistFile, (LPVOID *)&shellLinkPersist) == S_OK;
-	ok = ok && shellLinkPersist->Save(Platform::WinWiden(ByteString::Build(Platform::WinNarrow(programsPath), "\\", APPNAME, ".lnk")).c_str(), TRUE) == S_OK;
+	ok = ok &&
+		shellLinkPersist->Save(
+			Platform::WinWiden(ByteString::Build(Platform::WinNarrow(programsPath), "\\", APPNAME, ".lnk")).c_str(),
+			TRUE
+		) == S_OK;
 	if (shellLinkPersist)
 	{
 		shellLinkPersist->Release();
@@ -314,16 +333,22 @@ bool UpdateStart(const std::vector<char> &data)
 	ByteString exeName = Platform::ExecutableName(), updName;
 
 	if (!exeName.length())
+	{
 		return false;
+	}
 
 	updName = exeName;
 	ByteString extension = exeName.substr(exeName.length() - 4);
 	if (extension == ".exe")
+	{
 		updName = exeName.substr(0, exeName.length() - 4);
+	}
 	updName = updName + "_upd.exe";
 
 	if (!RenameFile(exeName, updName, false))
+	{
 		return false;
+	}
 
 	if (!WriteFile(data, exeName))
 	{
@@ -351,7 +376,9 @@ bool UpdateFinish()
 	updName = exeName;
 	ByteString extension = exeName.substr(exeName.length() - 4);
 	if (extension == ".exe")
+	{
 		updName = exeName.substr(0, exeName.length() - 4);
+	}
 	updName = updName + "_upd.exe";
 	if constexpr (DEBUG)
 	{
@@ -370,7 +397,9 @@ bool UpdateFinish()
 			updName = exeName;
 			ByteString extension = exeName.substr(exeName.length() - 4);
 			if (extension == ".exe")
+			{
 				updName = exeName.substr(0, exeName.length() - 4);
+			}
 			updName = updName + "_update.exe";
 			Platform::RemoveFile(updName);
 			return true;

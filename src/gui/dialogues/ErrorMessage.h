@@ -7,7 +7,7 @@ class ErrorMessage : public ui::Window
 {
 	struct DismissCallback
 	{
-		std::function<void ()> dismiss;
+		std::function<void()> dismiss;
 	};
 
 	DismissCallback callback;

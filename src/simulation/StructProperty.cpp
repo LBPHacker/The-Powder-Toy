@@ -1,27 +1,23 @@
 #include "StructProperty.h"
 #include <cassert>
 
-StructProperty::StructProperty(ByteString name, PropertyType type, intptr_t offset):
-Name(name),
-Type(type),
-Offset(offset)
+StructProperty::StructProperty(ByteString name, PropertyType type, intptr_t offset) :
+	Name(name),
+	Type(type),
+	Offset(offset)
 {
-
 }
 
-StructProperty::StructProperty():
-Name(""),
-Type(Integer),
-Offset(0)
+StructProperty::StructProperty() :
+	Name(""),
+	Type(Integer),
+	Offset(0)
 {
-
 }
 
-bool StructProperty::operator ==(const StructProperty &other) const
+bool StructProperty::operator==(const StructProperty &other) const
 {
-	return Name == other.Name &&
-	       Type == other.Type &&
-	       Offset == other.Offset;
+	return Name == other.Name && Type == other.Type && Offset == other.Offset;
 }
 
 String StructProperty::ToString(const PropertyValue &value) const

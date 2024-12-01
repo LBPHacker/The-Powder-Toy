@@ -6,11 +6,11 @@ class SaveInfo;
 
 namespace http
 {
-	class GetSaveRequest : public Request
-	{
-	public:
-		GetSaveRequest(int saveID, int saveDate);
+class GetSaveRequest : public Request
+{
+public:
+	GetSaveRequest(int saveID, int saveDate);
 
-		std::unique_ptr<SaveInfo> Finish();
-	};
+	std::unique_ptr<SaveInfo> Finish();
+};
 }

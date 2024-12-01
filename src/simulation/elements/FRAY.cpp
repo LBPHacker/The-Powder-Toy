@@ -18,7 +18,7 @@ void Element::Element_FRAY()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f  * CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -52,32 +52,43 @@ static int update(UPDATE_FUNC_ARGS)
 	auto &elements = sd.elements;
 	int curlen;
 	if (parts[i].tmp > 0)
+	{
 		curlen = parts[i].tmp;
+	}
 	else
+	{
 		curlen = 10;
+	}
 	for (auto rx = -1; rx <= 1; rx++)
 	{
 		for (auto ry = -1; ry <= 1; ry++)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
-					continue;
-				if (TYP(r)==PT_SPRK)
 				{
-					for (auto nxx = 0, nyy = 0, nxi = rx*-1, nyi = ry*-1, len = 0; ; nyy+=nyi, nxx+=nxi, len++)
+					continue;
+				}
+				if (TYP(r) == PT_SPRK)
+				{
+					for (auto nxx = 0, nyy = 0, nxi = rx * -1, nyi = ry * -1, len = 0;; nyy += nyi, nxx += nxi, len++)
 					{
-						if (!(x+nxi+nxx<XRES && y+nyi+nyy<YRES && x+nxi+nxx >= 0 && y+nyi+nyy >= 0) || len>curlen)
+						if (!(x + nxi + nxx < XRES && y + nyi + nyy < YRES && x + nxi + nxx >= 0 && y + nyi + nyy >= 0
+						    ) ||
+						    len > curlen)
 						{
 							break;
 						}
-						r = pmap[y+nyi+nyy][x+nxi+nxx];
+						r = pmap[y + nyi + nyy][x + nxi + nxx];
 						if (!r)
-							r = sim->photons[y+nyi+nyy][x+nxi+nxx];
-						if (r && !(elements[TYP(r)].Properties & TYPE_SOLID)){
-							parts[ID(r)].vx += nxi*((parts[i].temp-273.15f)/10.0f);
-							parts[ID(r)].vy += nyi*((parts[i].temp-273.15f)/10.0f);
+						{
+							r = sim->photons[y + nyi + nyy][x + nxi + nxx];
+						}
+						if (r && !(elements[TYP(r)].Properties & TYPE_SOLID))
+						{
+							parts[ID(r)].vx += nxi * ((parts[i].temp - 273.15f) / 10.0f);
+							parts[ID(r)].vy += nyi * ((parts[i].temp - 273.15f) / 10.0f);
 						}
 					}
 				}

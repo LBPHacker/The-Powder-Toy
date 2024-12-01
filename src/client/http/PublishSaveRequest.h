@@ -3,11 +3,11 @@
 
 namespace http
 {
-	class PublishSaveRequest : public APIRequest
-	{
-	public:
-		PublishSaveRequest(int saveID);
+class PublishSaveRequest : public APIRequest
+{
+public:
+	PublishSaveRequest(int saveID);
 
-		void Finish();
-	};
+	void Finish();
+};
 }

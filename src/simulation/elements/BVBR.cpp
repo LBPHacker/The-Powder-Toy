@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "VIBR.h"
+#include "simulation/ElementCommon.h"
 
 void Element::Element_BVBR()
 {
@@ -17,7 +17,7 @@ void Element::Element_BVBR()
 	Collision = 0.0f;
 	Gravity = 0.15f;
 	Diffusion = 0.00f;
-	HotAir = 0.0000f	* CFDS;
+	HotAir = 0.0000f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;
@@ -31,7 +31,7 @@ void Element::Element_BVBR()
 	HeatConduct = 164;
 	Description = "Broken vibranium.";
 
-	Properties = TYPE_PART|PROP_LIFE_DEC;
+	Properties = TYPE_PART | PROP_LIFE_DEC;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

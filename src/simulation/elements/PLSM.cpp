@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "FIRE.h"
+#include "simulation/ElementCommon.h"
 
 static int graphics(GRAPHICS_FUNC_ARGS);
 static void create(ELEMENT_CREATE_FUNC_ARGS);
@@ -20,7 +20,7 @@ void Element::Element_PLSM()
 	Collision = 0.0f;
 	Gravity = -0.1f;
 	Diffusion = 0.30f;
-	HotAir = 0.001f	* CFDS;
+	HotAir = 0.001f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -34,7 +34,7 @@ void Element::Element_PLSM()
 	HeatConduct = 5;
 	Description = "Plasma, extremely hot.";
 
-	Properties = TYPE_GAS|PROP_LIFE_DEC|PROP_LIFE_KILL;
+	Properties = TYPE_GAS | PROP_LIFE_DEC | PROP_LIFE_KILL;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -62,9 +62,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	*fireg = *colg;
 	*fireb = *colb;
 
-	*pixel_mode = PMODE_GLOW | PMODE_ADD; //Clear default, don't draw pixel
+	*pixel_mode = PMODE_GLOW | PMODE_ADD; // Clear default, don't draw pixel
 	*pixel_mode |= FIRE_ADD;
-	//Returning 0 means dynamic, do not cache
+	// Returning 0 means dynamic, do not cache
 	return 0;
 }
 

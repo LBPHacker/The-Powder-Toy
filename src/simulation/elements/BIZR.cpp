@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "BIZR.h"
+#include "simulation/ElementCommon.h"
 
 void Element::Element_BIZR()
 {
@@ -17,7 +17,7 @@ void Element::Element_BIZR()
 	Collision = 0.0f;
 	Gravity = 0.1f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 2;
 
 	Flammable = 0;
@@ -51,7 +51,7 @@ constexpr float BLEND = 0.95f;
 
 int Element_BIZR_update(UPDATE_FUNC_ARGS)
 {
-	if(parts[i].dcolour)
+	if (parts[i].dcolour)
 	{
 		for (auto rx = -2; rx <= 2; rx++)
 		{
@@ -59,27 +59,29 @@ int Element_BIZR_update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[y + ry][x + rx];
 					if (!r)
-						continue;
-					if (TYP(r)!=PT_BIZR && TYP(r)!=PT_BIZRG  && TYP(r)!=PT_BIZRS)
 					{
-						auto tr = float((parts[ID(r)].dcolour>>16)&0xFF);
-						auto tg = float((parts[ID(r)].dcolour>>8)&0xFF);
-						auto tb = float((parts[ID(r)].dcolour)&0xFF);
-						auto ta = float((parts[ID(r)].dcolour>>24)&0xFF);
+						continue;
+					}
+					if (TYP(r) != PT_BIZR && TYP(r) != PT_BIZRG && TYP(r) != PT_BIZRS)
+					{
+						auto tr = float((parts[ID(r)].dcolour >> 16) & 0xFF);
+						auto tg = float((parts[ID(r)].dcolour >> 8) & 0xFF);
+						auto tb = float((parts[ID(r)].dcolour) & 0xFF);
+						auto ta = float((parts[ID(r)].dcolour >> 24) & 0xFF);
 
-						auto mr = float((parts[i].dcolour>>16)&0xFF);
-						auto mg = float((parts[i].dcolour>>8)&0xFF);
-						auto mb = float((parts[i].dcolour)&0xFF);
-						auto ma = float((parts[i].dcolour>>24)&0xFF);
+						auto mr = float((parts[i].dcolour >> 16) & 0xFF);
+						auto mg = float((parts[i].dcolour >> 8) & 0xFF);
+						auto mb = float((parts[i].dcolour) & 0xFF);
+						auto ma = float((parts[i].dcolour >> 24) & 0xFF);
 
-						auto nr = int((tr*BLEND) + (mr*(1 - BLEND)));
-						auto ng = int((tg*BLEND) + (mg*(1 - BLEND)));
-						auto nb = int((tb*BLEND) + (mb*(1 - BLEND)));
-						auto na = int((ta*BLEND) + (ma*(1 - BLEND)));
+						auto nr = int((tr * BLEND) + (mr * (1 - BLEND)));
+						auto ng = int((tg * BLEND) + (mg * (1 - BLEND)));
+						auto nb = int((tb * BLEND) + (mb * (1 - BLEND)));
+						auto na = int((ta * BLEND) + (ma * (1 - BLEND)));
 
-						parts[ID(r)].dcolour = nr<<16 | ng<<8 | nb | na<<24;
+						parts[ID(r)].dcolour = nr << 16 | ng << 8 | nb | na << 24;
 					}
 				}
 			}
@@ -89,28 +91,31 @@ int Element_BIZR_update(UPDATE_FUNC_ARGS)
 }
 
 int Element_BIZR_graphics(GRAPHICS_FUNC_ARGS)
- //BIZR, BIZRG, BIZRS
+// BIZR, BIZRG, BIZRS
 {
 	int x = 0;
 	float brightness = fabs(cpart->vx) + fabs(cpart->vy);
-	if (cpart->ctype&0x3FFFFFFF)
+	if (cpart->ctype & 0x3FFFFFFF)
 	{
 		*colg = 0;
 		*colb = 0;
 		*colr = 0;
-		for (x=0; x<12; x++) {
-			*colr += (cpart->ctype >> (x+18)) & 1;
-			*colb += (cpart->ctype >>  x)     & 1;
+		for (x = 0; x < 12; x++)
+		{
+			*colr += (cpart->ctype >> (x + 18)) & 1;
+			*colb += (cpart->ctype >> x) & 1;
 		}
-		for (x=0; x<12; x++)
-			*colg += (cpart->ctype >> (x+9))  & 1;
+		for (x = 0; x < 12; x++)
+		{
+			*colg += (cpart->ctype >> (x + 9)) & 1;
+		}
 		x = 624 / (*colr + *colg + *colb + 1);
 		*colr *= x;
 		*colg *= x;
 		*colb *= x;
 	}
 
-	if(brightness>0)
+	if (brightness > 0)
 	{
 		brightness /= 5;
 		*firea = 255;

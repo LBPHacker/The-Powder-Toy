@@ -1,11 +1,11 @@
 #pragma once
-#include "simulation/AccessProperty.h"
 #include "Tool.h"
+#include "simulation/AccessProperty.h"
 #include <optional>
 
 class GameModel;
 
-class PropertyTool: public Tool
+class PropertyTool : public Tool
 {
 public:
 	struct Configuration
@@ -24,18 +24,30 @@ private:
 	friend class PropertyWindow;
 
 public:
-	PropertyTool(GameModel &newGameModel):
-		Tool(0, "PROP", "Property Drawing Tool. Use to alter the properties of elements in the field.",
-			0xFEA900_rgb, "DEFAULT_UI_PROPERTY", NULL
-		), gameModel(newGameModel)
-	{}
+	PropertyTool(GameModel &newGameModel) :
+		Tool(
+			0,
+			"PROP",
+			"Property Drawing Tool. Use to alter the properties of elements in the field.",
+			0xFEA900_rgb,
+			"DEFAULT_UI_PROPERTY",
+			NULL
+		),
+		gameModel(newGameModel)
+	{
+	}
 
 	void OpenWindow(Simulation *sim, std::optional<int> takePropertyFrom);
-	void Click(Simulation * sim, Brush const &brush, ui::Point position) override { }
-	void Draw(Simulation *sim, Brush const &brush, ui::Point position) override;
-	void DrawLine(Simulation * sim, Brush const &brush, ui::Point position1, ui::Point position2, bool dragging) override;
-	void DrawRect(Simulation * sim, Brush const &brush, ui::Point position1, ui::Point position2) override;
-	void DrawFill(Simulation * sim, Brush const &brush, ui::Point position) override;
+
+	void Click(Simulation *sim, const Brush &brush, ui::Point position) override
+	{
+	}
+
+	void Draw(Simulation *sim, const Brush &brush, ui::Point position) override;
+	void
+		DrawLine(Simulation *sim, const Brush &brush, ui::Point position1, ui::Point position2, bool dragging) override;
+	void DrawRect(Simulation *sim, const Brush &brush, ui::Point position1, ui::Point position2) override;
+	void DrawFill(Simulation *sim, const Brush &brush, ui::Point position) override;
 
 	std::optional<Configuration> GetConfiguration() const
 	{

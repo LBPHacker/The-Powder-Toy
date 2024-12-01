@@ -7,7 +7,7 @@ class ConfirmPrompt : public ui::Window
 {
 	struct ResultCallback
 	{
-		std::function<void ()> okay, cancel;
+		std::function<void()> okay, cancel;
 	};
 
 	ResultCallback callback;

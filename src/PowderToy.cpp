@@ -1,37 +1,37 @@
-#include "PowderToySDL.h"
+#include "Config.h"
 #include "Format.h"
+#include "PowderToySDL.h"
+#include "SimulationConfig.h"
 #include "X86KillDenormals.h"
-#include "prefs/GlobalPrefs.h"
 #include "client/Client.h"
 #include "client/GameSave.h"
 #include "client/SaveFile.h"
 #include "client/SaveInfo.h"
-#include "client/http/requestmanager/RequestManager.h"
-#include "client/http/GetSaveRequest.h"
 #include "client/http/GetSaveDataRequest.h"
+#include "client/http/GetSaveRequest.h"
+#include "client/http/requestmanager/RequestManager.h"
 #include "common/platform/Platform.h"
-#include "graphics/Graphics.h"
-#include "simulation/SaveRenderer.h"
-#include "simulation/SimulationData.h"
 #include "common/tpt-rand.h"
-#include "gui/game/Favorite.h"
+#include "graphics/Graphics.h"
 #include "gui/Style.h"
+#include "gui/dialogues/ConfirmPrompt.h"
+#include "gui/dialogues/ErrorMessage.h"
+#include "gui/game/Favorite.h"
 #include "gui/game/GameController.h"
 #include "gui/game/GameView.h"
 #include "gui/game/IntroText.h"
-#include "gui/dialogues/ConfirmPrompt.h"
-#include "gui/dialogues/ErrorMessage.h"
 #include "gui/interface/Engine.h"
 #include "gui/interface/TextWrapper.h"
-#include "Config.h"
-#include "SimulationConfig.h"
-#include <optional>
-#include <climits>
-#include <iostream>
-#include <csignal>
+#include "prefs/GlobalPrefs.h"
+#include "simulation/SaveRenderer.h"
+#include "simulation/SimulationData.h"
 #include <SDL.h>
-#include <exception>
+#include <climits>
+#include <csignal>
 #include <cstdlib>
+#include <exception>
+#include <iostream>
+#include <optional>
 
 void LoadWindowPosition()
 {
@@ -49,7 +49,9 @@ void LoadWindowPosition()
 	// Sometimes (Windows), the border size may not be reported for 200+ frames
 	// So just have a default of 5 to ensure the window doesn't get stuck where it can't be moved
 	if (borderTop == 0)
+	{
 		borderTop = 5;
+	}
 
 	int numDisplays = SDL_GetNumVideoDisplays();
 	SDL_Rect displayBounds;
@@ -58,15 +60,17 @@ void LoadWindowPosition()
 	{
 		SDL_GetDisplayBounds(i, &displayBounds);
 		if (savedWindowX + borderTop > displayBounds.x && savedWindowY + borderLeft > displayBounds.y &&
-				savedWindowX + borderTop < displayBounds.x + displayBounds.w &&
-				savedWindowY + borderLeft < displayBounds.y + displayBounds.h)
+		    savedWindowX + borderTop < displayBounds.x + displayBounds.w &&
+		    savedWindowY + borderLeft < displayBounds.y + displayBounds.h)
 		{
 			ok = true;
 			break;
 		}
 	}
 	if (ok)
+	{
 		SDL_SetWindowPosition(sdl_window, savedWindowX + borderLeft, savedWindowY + borderTop);
+	}
 }
 
 void SaveWindowPosition()
@@ -87,12 +91,13 @@ void LargeScreenDialog()
 	StringBuilder message;
 	auto scale = ui::Engine::Ref().windowFrameOps.scale;
 	message << "Switching to " << scale << "x size mode since your screen was determined to be large enough: ";
-	message << desktopWidth << "x" << desktopHeight << " detected, " << WINDOWW * scale << "x" << WINDOWH * scale << " required";
+	message << desktopWidth << "x" << desktopHeight << " detected, " << WINDOWW * scale << "x" << WINDOWH * scale
+			<< " required";
 	message << "\nTo undo this, hit Cancel. You can change this in settings at any time.";
 	new ConfirmPrompt("Large screen detected", message.Build(), { nullptr, []() {
-		GlobalPrefs::Ref().Set("Scale", 1);
-		ui::Engine::Ref().windowFrameOps.scale = 1;
-	} });
+																	 GlobalPrefs::Ref().Set("Scale", 1);
+																	 ui::Engine::Ref().windowFrameOps.scale = 1;
+																 } });
 }
 
 void TickClient()
@@ -111,8 +116,10 @@ static void BlueScreen(String detailMessage, std::optional<std::vector<String>> 
 
 	StringBuilder crashInfo;
 	crashInfo << "ERROR - Details: " << detailMessage << "\n";
-	crashInfo << "An unrecoverable fault has occurred, please report it by visiting the website below\n\n  " << SERVER << "\n\n";
-	crashInfo << "An attempt will be made to save all of this information to " << crashLogPath.FromUtf8() << " in your data folder.\n";
+	crashInfo << "An unrecoverable fault has occurred, please report it by visiting the website below\n\n  " << SERVER
+			  << "\n\n";
+	crashInfo << "An attempt will be made to save all of this information to " << crashLogPath.FromUtf8()
+			  << " in your data folder.\n";
 	crashInfo << "Please attach this file to your report.\n\n";
 	crashInfo << "Version: " << VersionInfo().FromUtf8() << "\n";
 	crashInfo << "Tag: " << VCS_TAG << "\n";
@@ -133,13 +140,15 @@ static void BlueScreen(String detailMessage, std::optional<std::vector<String>> 
 	constexpr auto width = 440;
 	ui::TextWrapper tw;
 	tw.Update(errorText, true, width);
-	engine.g->BlendText(ui::Point((engine.g->Size().X - width) / 2, 80), tw.WrappedText(), 0xFFFFFF_rgb .WithAlpha(0xFF));
+	engine.g->BlendText(
+		ui::Point((engine.g->Size().X - width) / 2, 80), tw.WrappedText(), 0xFFFFFF_rgb .WithAlpha(0xFF)
+	);
 
 	auto crashLogData = errorText.ToUtf8();
 	std::cerr << crashLogData << std::endl;
 	Platform::WriteFile(std::vector<char>(crashLogData.begin(), crashLogData.end()), crashLogPath);
 
-	//Death loop
+	// Death loop
 	SDL_Event event;
 	auto running = true;
 	while (running)
@@ -168,11 +177,11 @@ static struct
 	int sig;
 	const char *message;
 } signalMessages[] = {
-	{ SIGSEGV, "Memory read/write error" },
-	{ SIGFPE, "Floating point exception" },
-	{ SIGILL, "Program execution exception" },
-	{ SIGABRT, "Unexpected program abort" },
-	{ 0, nullptr },
+	{ SIGSEGV,     "Memory read/write error" },
+	{  SIGFPE,    "Floating point exception" },
+	{  SIGILL, "Program execution exception" },
+	{ SIGABRT,    "Unexpected program abort" },
+	{	   0,					   nullptr },
 };
 
 static void SigHandler(int signal)
@@ -223,8 +232,10 @@ int GuessBestScale()
 	const int heightGuess = heightNoMargin / WINDOWH;
 
 	int guess = std::min(widthGuess, heightGuess);
-	if(guess < 1 || guess > SCALE_MAXIMUM)
+	if (guess < 1 || guess > SCALE_MAXIMUM)
+	{
 		guess = 1;
+	}
 
 	return guess;
 }
@@ -241,6 +252,7 @@ struct ExplicitSingletons
 	std::unique_ptr<SimulationData> simulationData;
 	std::unique_ptr<GameController> gameController;
 };
+
 static std::unique_ptr<ExplicitSingletons> explicitSingletons;
 
 int main(int argc, char *argv[])
@@ -262,7 +274,6 @@ int Main(int argc, char *argv[])
 		explicitSingletons.reset();
 	});
 	explicitSingletons = std::make_unique<ExplicitSingletons>();
-
 
 	// https://bugzilla.libsdl.org/show_bug.cgi?id=3796
 	if (SDL_Init(0) < 0)
@@ -317,9 +328,13 @@ int Main(int argc, char *argv[])
 	if (ddirArg.has_value())
 	{
 		if (Platform::ChangeDir(ddirArg.value()))
+		{
 			Platform::sharedCwd = Platform::GetCwd();
+		}
 		else
+		{
 			perror("failed to chdir to requested ddir");
+		}
 	}
 	else if constexpr (SHARED_DATA_FOLDER)
 	{
@@ -360,13 +375,8 @@ int Main(int argc, char *argv[])
 
 	auto true_string = [](ByteString str) {
 		str = str.ToLower();
-		return str == "true" ||
-		       str == "t" ||
-		       str == "on" ||
-		       str == "yes" ||
-		       str == "y" ||
-		       str == "1" ||
-		       str == ""; // standalone "redirect" or "disable-bluescreen" or similar arguments
+		return str == "true" || str == "t" || str == "on" || str == "yes" || str == "y" || str == "1" ||
+			str == ""; // standalone "redirect" or "disable-bluescreen" or similar arguments
 	};
 	auto true_arg = [&true_string](Argument arg) {
 		return arg.has_value() && true_string(arg.value());
@@ -424,7 +434,8 @@ int Main(int argc, char *argv[])
 	ByteString cafileString = clientConfig(arguments["cafile"], "CAFile", "");
 	ByteString capathString = clientConfig(arguments["capath"], "CAPath", "");
 	bool disableNetwork = true_arg(arguments["disable-network"]);
-	explicitSingletons->requestManager = http::RequestManager::Create(proxyString, cafileString, capathString, disableNetwork);
+	explicitSingletons->requestManager =
+		http::RequestManager::Create(proxyString, cafileString, capathString, disableNetwork);
 
 	explicitSingletons->client = std::make_unique<Client>();
 	Client::Ref().Initialize();
@@ -434,8 +445,10 @@ int Main(int argc, char *argv[])
 	explicitSingletons->engine = std::make_unique<ui::Engine>();
 
 	// TODO: maybe bind the maximum allowed scale to screen size somehow
-	if(windowFrameOps.scale < 1 || windowFrameOps.scale > SCALE_MAXIMUM)
+	if (windowFrameOps.scale < 1 || windowFrameOps.scale > SCALE_MAXIMUM)
+	{
 		windowFrameOps.scale = 1;
+	}
 
 	auto &engine = ui::Engine::Ref();
 	engine.g = new Graphics();
@@ -463,7 +476,7 @@ int Main(int argc, char *argv[])
 	bool enableBluescreen = USE_BLUESCREEN && !true_arg(arguments["disable-bluescreen"]);
 	if (enableBluescreen)
 	{
-		//Get ready to catch any dodgy errors
+		// Get ready to catch any dodgy errors
 		for (auto *msg = signalMessages; msg->message; ++msg)
 		{
 			signal(msg->sig, SigHandler);
@@ -504,11 +517,10 @@ int Main(int argc, char *argv[])
 					newFile->SetGameSave(std::move(newSave));
 					gameController->LoadSaveFile(std::move(newFile));
 				}
-
 			}
-			catch (std::exception & e)
+			catch (std::exception &e)
 			{
-				new ErrorMessage("Error", "Could not open save file:\n" + ByteString(e.what()).FromUtf8()) ;
+				new ErrorMessage("Error", "Could not open save file:\n" + ByteString(e.what()).FromUtf8());
 			}
 		}
 		else
@@ -523,7 +535,11 @@ int Main(int argc, char *argv[])
 		engine.g->Clear();
 		engine.g->DrawRect(RectSized(engine.g->Size() / 2 - Vec2(100, 25), Vec2(200, 50)), 0xB4B4B4_rgb);
 		String loadingText = "Loading save...";
-		engine.g->BlendText(engine.g->Size() / 2 - Vec2((Graphics::TextSize(loadingText).X - 1) / 2, 5), loadingText, style::Colour::InformationTitle);
+		engine.g->BlendText(
+			engine.g->Size() / 2 - Vec2((Graphics::TextSize(loadingText).X - 1) / 2, 5),
+			loadingText,
+			style::Colour::InformationTitle
+		);
 
 		blit(engine.g->Data());
 		try
@@ -532,14 +548,20 @@ int Main(int argc, char *argv[])
 			if (ByteString::Split split = ptsaveArg.value().SplitBy(':'))
 			{
 				if (split.Before() != "ptsave")
+				{
 					throw std::runtime_error("Not a ptsave link");
+				}
 				saveIdPart = split.After().SplitBy('#').Before();
 			}
 			else
+			{
 				throw std::runtime_error("Invalid save link");
+			}
 
 			if (!saveIdPart.size())
+			{
 				throw std::runtime_error("No Save ID");
+			}
 			if constexpr (DEBUG)
 			{
 				std::cout << "Got Ptsave: id: " << saveIdPart << std::endl;
@@ -554,7 +576,7 @@ int Main(int argc, char *argv[])
 			int saveHistory = saveHistoryPart.ToNumber<int>();
 			gameController->OpenSavePreview(saveId, saveHistory, savePreviewUrl);
 		}
-		catch (std::exception & e)
+		catch (std::exception &e)
 		{
 			new ErrorMessage("Error", ByteString(e.what()).FromUtf8());
 			Platform::MarkPresentable();

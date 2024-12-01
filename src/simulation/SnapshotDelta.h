@@ -1,7 +1,7 @@
 #pragma once
-#include <memory>
-#include <cstdint>
 #include "Snapshot.h"
+#include <cstdint>
+#include <memory>
 
 struct SnapshotDelta
 {
@@ -60,7 +60,6 @@ struct SnapshotDelta
 
 	HunkVector<float> FanVelocityX;
 	HunkVector<float> FanVelocityY;
-
 
 	HunkVector<uint32_t> PortalParticles;
 	HunkVector<int> WirelessData;

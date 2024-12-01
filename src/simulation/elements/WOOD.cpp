@@ -20,7 +20,7 @@ void Element::Element_WOOD()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 20;
@@ -51,9 +51,11 @@ void Element::Element_WOOD()
 static int update(UPDATE_FUNC_ARGS)
 {
 	if (parts[i].temp > 450 && parts[i].temp > parts[i].tmp)
+	{
 		parts[i].tmp = (int)parts[i].temp;
+	}
 
-	if (parts[i].temp > 773.0f && sim->pv[y/CELL][x/CELL] <= -10.0f)
+	if (parts[i].temp > 773.0f && sim->pv[y / CELL][x / CELL] <= -10.0f)
 	{
 		float temp = parts[i].temp;
 		sim->create_part(i, x, y, PT_BCOL);
@@ -68,15 +70,15 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	float maxtemp = std::max((float)cpart->tmp, cpart->temp);
 	if (maxtemp > 400)
 	{
-		*colr -= (int)restrict_flt((maxtemp-400)/3,0,172);
-		*colg -= (int)restrict_flt((maxtemp-400)/4,0,140);
-		*colb -= (int)restrict_flt((maxtemp-400)/20,0,44);
+		*colr -= (int)restrict_flt((maxtemp - 400) / 3, 0, 172);
+		*colg -= (int)restrict_flt((maxtemp - 400) / 4, 0, 140);
+		*colb -= (int)restrict_flt((maxtemp - 400) / 20, 0, 44);
 	}
 	if (maxtemp < 273)
 	{
-		*colr -= (int)restrict_flt((273-maxtemp)/5,0,40);
-		*colg += (int)restrict_flt((273-maxtemp)/4,0,40);
-		*colb += (int)restrict_flt((273-maxtemp)/1.5,0,150);
+		*colr -= (int)restrict_flt((273 - maxtemp) / 5, 0, 40);
+		*colg += (int)restrict_flt((273 - maxtemp) / 4, 0, 40);
+		*colb += (int)restrict_flt((273 - maxtemp) / 1.5, 0, 150);
 	}
 	return 0;
 }

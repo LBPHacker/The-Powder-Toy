@@ -1,12 +1,13 @@
 #pragma once
 #include "common/Vec2.h"
-#include "tasks/AbandonableTask.h"
 #include "graphics/RendererSettings.h"
+#include "tasks/AbandonableTask.h"
 
 #include <memory>
 
 class GameSave;
 class VideoBuffer;
+
 class ThumbnailRendererTask : public AbandonableTask
 {
 	std::unique_ptr<GameSave> save;
@@ -18,7 +19,9 @@ class ThumbnailRendererTask : public AbandonableTask
 	static int queueSize;
 
 public:
-	ThumbnailRendererTask(GameSave const &, Vec2<int> size, RendererSettings::DecorationLevel newDecorationLevel, bool fire);
+	ThumbnailRendererTask(
+		const GameSave &, Vec2<int> size, RendererSettings::DecorationLevel newDecorationLevel, bool fire
+	);
 	virtual ~ThumbnailRendererTask();
 
 	virtual bool doWork() override;

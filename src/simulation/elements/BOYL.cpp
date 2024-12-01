@@ -18,7 +18,7 @@ void Element::Element_BOYL()
 	Collision = -0.1f;
 	Gravity = 0.0f;
 	Diffusion = 0.18f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -50,16 +50,22 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	float limit = parts[i].temp / 100;
 	if (sim->pv[y / CELL][x / CELL] < limit)
-		sim->pv[y / CELL][x / CELL] += 0.001f*(limit - sim->pv[y / CELL][x / CELL]);
+	{
+		sim->pv[y / CELL][x / CELL] += 0.001f * (limit - sim->pv[y / CELL][x / CELL]);
+	}
 	if (sim->pv[y / CELL + 1][x / CELL] < limit)
-		sim->pv[y / CELL + 1][x / CELL] += 0.001f*(limit - sim->pv[y / CELL + 1][x / CELL]);
+	{
+		sim->pv[y / CELL + 1][x / CELL] += 0.001f * (limit - sim->pv[y / CELL + 1][x / CELL]);
+	}
 	if (sim->pv[y / CELL - 1][x / CELL] < limit)
-		sim->pv[y / CELL - 1][x / CELL] += 0.001f*(limit - sim->pv[y / CELL - 1][x / CELL]);
+	{
+		sim->pv[y / CELL - 1][x / CELL] += 0.001f * (limit - sim->pv[y / CELL - 1][x / CELL]);
+	}
 
-	sim->pv[y / CELL][x / CELL + 1]	+= 0.001f*(limit - sim->pv[y / CELL][x / CELL + 1]);
-	sim->pv[y / CELL + 1][x / CELL + 1] += 0.001f*(limit - sim->pv[y / CELL + 1][x / CELL + 1]);
-	sim->pv[y / CELL][x / CELL - 1]	+= 0.001f*(limit - sim->pv[y / CELL][x / CELL - 1]);
-	sim->pv[y / CELL - 1][x / CELL - 1] += 0.001f*(limit - sim->pv[y / CELL - 1][x / CELL - 1]);
+	sim->pv[y / CELL][x / CELL + 1] += 0.001f * (limit - sim->pv[y / CELL][x / CELL + 1]);
+	sim->pv[y / CELL + 1][x / CELL + 1] += 0.001f * (limit - sim->pv[y / CELL + 1][x / CELL + 1]);
+	sim->pv[y / CELL][x / CELL - 1] += 0.001f * (limit - sim->pv[y / CELL][x / CELL - 1]);
+	sim->pv[y / CELL - 1][x / CELL - 1] += 0.001f * (limit - sim->pv[y / CELL - 1][x / CELL - 1]);
 
 	for (auto rx = -1; rx <= 1; rx++)
 	{
@@ -67,21 +73,25 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
+				{
 					continue;
-				if (TYP(r)==PT_WATR)
+				}
+				if (TYP(r) == PT_WATR)
 				{
 					if (sim->rng.chance(1, 30))
-						sim->part_change_type(ID(r),x+rx,y+ry,PT_FOG);
+					{
+						sim->part_change_type(ID(r), x + rx, y + ry, PT_FOG);
+					}
 				}
-				else if (TYP(r)==PT_O2)
+				else if (TYP(r) == PT_O2)
 				{
 					if (sim->rng.chance(1, 9))
 					{
 						sim->kill_part(ID(r));
-						sim->part_change_type(i,x,y,PT_WATR);
-						sim->pv[y/CELL][x/CELL] += 4.0;
+						sim->part_change_type(i, x, y, PT_WATR);
+						sim->pv[y / CELL][x / CELL] += 4.0;
 					}
 				}
 			}

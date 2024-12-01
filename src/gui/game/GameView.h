@@ -1,33 +1,40 @@
 #pragma once
 #include "common/String.h"
-#include "gui/interface/Window.h"
-#include "simulation/Sample.h"
 #include "graphics/FindingElement.h"
 #include "graphics/RendererFrame.h"
+#include "gui/interface/Window.h"
+#include "simulation/Sample.h"
+#include <condition_variable>
 #include <ctime>
 #include <deque>
 #include <memory>
-#include <vector>
+#include <mutex>
 #include <optional>
 #include <thread>
-#include <mutex>
-#include <condition_variable>
+#include <vector>
 
 enum DrawMode
 {
-	DrawPoints, DrawLine, DrawRect, DrawFill
+	DrawPoints,
+	DrawLine,
+	DrawRect,
+	DrawFill
 };
 
 enum SelectMode
 {
-	SelectNone, SelectStamp, SelectCopy, SelectCut, PlaceSave
+	SelectNone,
+	SelectStamp,
+	SelectCopy,
+	SelectCut,
+	PlaceSave
 };
 
 namespace ui
 {
-	class Button;
-	class Slider;
-	class Textbox;
+class Button;
+class Slider;
+class Textbox;
 }
 
 class SplitButton;
@@ -42,7 +49,8 @@ class ToolButton;
 class GameController;
 class Brush;
 class GameModel;
-class GameView: public ui::Window
+
+class GameView : public ui::Window
 {
 private:
 	bool isMouseDown;
@@ -85,36 +93,36 @@ private:
 	int recordingFolder;
 
 	ui::Point currentPoint, lastPoint;
-	GameController * c;
+	GameController *c;
 	Renderer *ren = nullptr;
 	RendererSettings *rendererSettings = nullptr;
 	Simulation *sim = nullptr;
-	Brush const *activeBrush;
-	//UI Elements
-	std::vector<ui::Button*> quickOptionButtons;
+	const Brush *activeBrush;
+	// UI Elements
+	std::vector<ui::Button *> quickOptionButtons;
 
-	std::vector<MenuButton*> menuButtons;
+	std::vector<MenuButton *> menuButtons;
 
-	std::vector<ToolButton*> toolButtons;
-	std::vector<ui::Component*> notificationComponents;
-	std::deque<std::pair<String, int> > logEntries;
-	ui::Button * scrollBar;
-	ui::Button * searchButton;
-	ui::Button * reloadButton;
-	SplitButton * saveSimulationButton;
+	std::vector<ToolButton *> toolButtons;
+	std::vector<ui::Component *> notificationComponents;
+	std::deque<std::pair<String, int>> logEntries;
+	ui::Button *scrollBar;
+	ui::Button *searchButton;
+	ui::Button *reloadButton;
+	SplitButton *saveSimulationButton;
 	bool saveSimulationButtonEnabled;
 	bool saveReuploadAllowed;
-	ui::Button * downVoteButton;
-	ui::Button * upVoteButton;
-	ui::Button * tagSimulationButton;
-	ui::Button * clearSimButton;
-	SplitButton * loginButton;
-	ui::Button * simulationOptionButton;
-	ui::Button * displayModeButton;
-	ui::Button * pauseButton;
+	ui::Button *downVoteButton;
+	ui::Button *upVoteButton;
+	ui::Button *tagSimulationButton;
+	ui::Button *clearSimButton;
+	SplitButton *loginButton;
+	ui::Button *simulationOptionButton;
+	ui::Button *displayModeButton;
+	ui::Button *pauseButton;
 
-	ui::Button * colourPicker;
-	std::vector<ToolButton*> colourPresets;
+	ui::Button *colourPicker;
+	std::vector<ToolButton *> colourPresets;
 
 	DrawMode drawMode;
 	ui::Point drawPoint1;
@@ -152,6 +160,7 @@ private:
 	Vec2<int> PlaceSavePos() const;
 
 	std::optional<FindingElement> FindingElementCandidate() const;
+
 	enum RendererThreadState
 	{
 		rendererThreadAbsent,
@@ -159,6 +168,7 @@ private:
 		rendererThreadPaused,
 		rendererThreadStopping,
 	};
+
 	RendererThreadState rendererThreadState = rendererThreadAbsent;
 	std::thread rendererThread;
 	std::mutex rendererThreadMx;
@@ -178,7 +188,7 @@ public:
 	GameView();
 	~GameView();
 
-	//Breaks MVC, but any other way is going to be more of a mess.
+	// Breaks MVC, but any other way is going to be more of a mess.
 	ui::Point GetMousePosition();
 	void SetSample(SimulationSample sample);
 	void SetHudEnable(bool hudState);
@@ -189,49 +199,97 @@ public:
 	bool GetDebugHUD();
 	bool GetPlacingSave();
 	bool GetPlacingZoom();
-	void SetActiveMenuDelayed(int activeMenu) { delayedActiveMenu = activeMenu; }
-	bool CtrlBehaviour(){ return ctrlBehaviour; }
-	bool ShiftBehaviour(){ return shiftBehaviour; }
-	bool AltBehaviour(){ return altBehaviour; }
-	SelectMode GetSelectMode() { return selectMode; }
+
+	void SetActiveMenuDelayed(int activeMenu)
+	{
+		delayedActiveMenu = activeMenu;
+	}
+
+	bool CtrlBehaviour()
+	{
+		return ctrlBehaviour;
+	}
+
+	bool ShiftBehaviour()
+	{
+		return shiftBehaviour;
+	}
+
+	bool AltBehaviour()
+	{
+		return altBehaviour;
+	}
+
+	SelectMode GetSelectMode()
+	{
+		return selectMode;
+	}
+
 	void BeginStampSelection();
 	ByteString TakeScreenshot(int captureUI, int fileType);
 	int Record(bool record);
 
-	//all of these are only here for one debug lines
-	bool GetMouseDown() { return isMouseDown; }
-	bool GetDrawingLine() { return drawMode == DrawLine && isMouseDown && selectMode == SelectNone; }
-	bool GetDrawSnap() { return drawSnap; }
-	ui::Point GetLineStartCoords() { return drawPoint1; }
-	ui::Point GetLineFinishCoords() { return currentMouse; }
-	ui::Point GetCurrentMouse() { return currentMouse; }
+	// all of these are only here for one debug lines
+	bool GetMouseDown()
+	{
+		return isMouseDown;
+	}
+
+	bool GetDrawingLine()
+	{
+		return drawMode == DrawLine && isMouseDown && selectMode == SelectNone;
+	}
+
+	bool GetDrawSnap()
+	{
+		return drawSnap;
+	}
+
+	ui::Point GetLineStartCoords()
+	{
+		return drawPoint1;
+	}
+
+	ui::Point GetLineFinishCoords()
+	{
+		return currentMouse;
+	}
+
+	ui::Point GetCurrentMouse()
+	{
+		return currentMouse;
+	}
+
 	ui::Point lineSnapCoords(ui::Point point1, ui::Point point2);
 	ui::Point rectSnapCoords(ui::Point point1, ui::Point point2);
 
-	void AttachController(GameController * _c){ c = _c; }
-	void NotifyRendererChanged(GameModel * sender);
-	void NotifySimulationChanged(GameModel * sender);
-	void NotifyPausedChanged(GameModel * sender);
-	void NotifySaveChanged(GameModel * sender);
-	void NotifyBrushChanged(GameModel * sender);
-	void NotifyMenuListChanged(GameModel * sender);
-	void NotifyActiveMenuToolListChanged(GameModel * sender);
-	void NotifyActiveToolsChanged(GameModel * sender);
-	void NotifyUserChanged(GameModel * sender);
-	void NotifyZoomChanged(GameModel * sender);
-	void NotifyColourSelectorVisibilityChanged(GameModel * sender);
-	void NotifyColourSelectorColourChanged(GameModel * sender);
-	void NotifyColourPresetsChanged(GameModel * sender);
-	void NotifyColourActivePresetChanged(GameModel * sender);
-	void NotifyPlaceSaveChanged(GameModel * sender);
-	void NotifyTransformedPlaceSaveChanged(GameModel *sender);
-	void NotifyNotificationsChanged(GameModel * sender);
-	void NotifyLogChanged(GameModel * sender, String entry);
-	void NotifyToolTipChanged(GameModel * sender);
-	void NotifyInfoTipChanged(GameModel * sender);
-	void NotifyQuickOptionsChanged(GameModel * sender);
-	void NotifyLastToolChanged(GameModel * sender);
+	void AttachController(GameController *_c)
+	{
+		c = _c;
+	}
 
+	void NotifyRendererChanged(GameModel *sender);
+	void NotifySimulationChanged(GameModel *sender);
+	void NotifyPausedChanged(GameModel *sender);
+	void NotifySaveChanged(GameModel *sender);
+	void NotifyBrushChanged(GameModel *sender);
+	void NotifyMenuListChanged(GameModel *sender);
+	void NotifyActiveMenuToolListChanged(GameModel *sender);
+	void NotifyActiveToolsChanged(GameModel *sender);
+	void NotifyUserChanged(GameModel *sender);
+	void NotifyZoomChanged(GameModel *sender);
+	void NotifyColourSelectorVisibilityChanged(GameModel *sender);
+	void NotifyColourSelectorColourChanged(GameModel *sender);
+	void NotifyColourPresetsChanged(GameModel *sender);
+	void NotifyColourActivePresetChanged(GameModel *sender);
+	void NotifyPlaceSaveChanged(GameModel *sender);
+	void NotifyTransformedPlaceSaveChanged(GameModel *sender);
+	void NotifyNotificationsChanged(GameModel *sender);
+	void NotifyLogChanged(GameModel *sender, String entry);
+	void NotifyToolTipChanged(GameModel *sender);
+	void NotifyInfoTipChanged(GameModel *sender);
+	void NotifyQuickOptionsChanged(GameModel *sender);
+	void NotifyLastToolChanged(GameModel *sender);
 
 	void ToolTip(ui::Point senderPosition, String toolTip) override;
 
@@ -246,7 +304,7 @@ public:
 	void OnBlur() override;
 	void OnFileDrop(ByteString filename) override;
 
-	//Top-level handlers, for Lua interface
+	// Top-level handlers, for Lua interface
 	void DoExit() override;
 	void DoDraw() override;
 	void DoMouseMove(int x, int y, int dx, int dy) override;
@@ -267,6 +325,7 @@ public:
 	{
 		return *rendererFrame;
 	}
+
 	// Call this before accessing Renderer "out of turn", e.g. from RenderView or GameModel. This *does not*
 	// include OptionsModel or Lua setting functions because they only access the RendererSettings
 	// in GameModel, or Lua drawing functions because they only access Renderer in eventTraitSimGraphics

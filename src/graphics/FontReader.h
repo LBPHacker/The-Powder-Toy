@@ -7,13 +7,13 @@ constexpr auto FONT_H = 12;
 
 class FontReader
 {
-	unsigned char const *pointer;
+	const unsigned char *pointer;
 	int width;
 	int pixels;
 	int data;
 
-	FontReader(unsigned char const *_pointer);
-	static unsigned char const *lookupChar(String::value_type ch);
+	FontReader(const unsigned char *_pointer);
+	static const unsigned char *lookupChar(String::value_type ch);
 
 public:
 	FontReader(String::value_type ch);

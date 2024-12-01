@@ -18,7 +18,7 @@ void Element::Element_IRON()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -31,7 +31,7 @@ void Element::Element_IRON()
 	HeatConduct = 251;
 	Description = "Rusts with salt, can be used for electrolysis of WATR.";
 
-	Properties = TYPE_SOLID|PROP_CONDUCTS|PROP_LIFE_DEC|PROP_HOT_GLOW;
+	Properties = TYPE_SOLID | PROP_CONDUCTS | PROP_LIFE_DEC | PROP_HOT_GLOW;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -48,31 +48,41 @@ void Element::Element_IRON()
 static int update(UPDATE_FUNC_ARGS)
 {
 	if (parts[i].life)
+	{
 		return 0;
+	}
 	for (auto rx = -1; rx <= 1; rx++)
 	{
 		for (auto ry = -1; ry <= 1; ry++)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				switch (TYP(r))
 				{
 				case PT_SALT:
 					if (sim->rng.chance(1, 47))
+					{
 						goto succ;
+					}
 					break;
 				case PT_SLTW:
 					if (sim->rng.chance(1, 67))
+					{
 						goto succ;
+					}
 					break;
 				case PT_WATR:
 					if (sim->rng.chance(1, 1200))
+					{
 						goto succ;
+					}
 					break;
 				case PT_O2:
 					if (sim->rng.chance(1, 250))
+					{
 						goto succ;
+					}
 					break;
 				case PT_LO2:
 					goto succ;
@@ -84,7 +94,7 @@ static int update(UPDATE_FUNC_ARGS)
 	}
 	return 0;
 succ:
-	sim->part_change_type(i,x,y,PT_BMTL);
+	sim->part_change_type(i, x, y, PT_BMTL);
 	parts[i].tmp = sim->rng.between(20, 29);
 	return 0;
 }

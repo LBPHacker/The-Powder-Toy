@@ -1,6 +1,6 @@
 #pragma once
-#include "User.h"
 #include "ServerNotification.h"
+#include "User.h"
 #include <vector>
 
 struct LoginInfo

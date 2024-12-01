@@ -5,7 +5,7 @@ CommandInterfacePtr CommandInterface::Create(GameController *newGameController, 
 	return CommandInterfacePtr(new CommandInterface(newGameController, newGameModel));
 }
 
-void CommandInterfaceDeleter::operator ()(CommandInterface *ptr) const
+void CommandInterfaceDeleter::operator()(CommandInterface *ptr) const
 {
 	delete ptr;
 }

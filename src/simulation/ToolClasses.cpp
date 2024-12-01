@@ -1,6 +1,6 @@
 #include "ToolClasses.h"
 
-std::vector<SimTool> const &GetTools()
+const std::vector<SimTool> &GetTools()
 {
 	struct DoOnce
 	{

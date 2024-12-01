@@ -5,11 +5,11 @@
 
 namespace http
 {
-	class SearchSavesRequest : public APIRequest
-	{
-	public:
-		SearchSavesRequest(int start, int count, ByteString query, Period period, Sort sort, Category category);
+class SearchSavesRequest : public APIRequest
+{
+public:
+	SearchSavesRequest(int start, int count, ByteString query, Period period, Sort sort, Category category);
 
-		std::pair<int, std::vector<std::unique_ptr<SaveInfo>>> Finish();
-	};
+	std::pair<int, std::vector<std::unique_ptr<SaveInfo>>> Finish();
+};
 }

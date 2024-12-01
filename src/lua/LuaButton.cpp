@@ -4,7 +4,7 @@
 
 const char LuaButton::className[] = "button";
 
-#define method(class, name) {#name, &class::name}
+#define method(class, name) { #name, &class ::name }
 Luna<LuaButton>::RegType LuaButton::methods[] = {
 	method(LuaButton, action),
 	method(LuaButton, text),
@@ -12,7 +12,7 @@ Luna<LuaButton>::RegType LuaButton::methods[] = {
 	method(LuaButton, size),
 	method(LuaButton, visible),
 	method(LuaButton, enabled),
-	{0, 0}
+	{ 0, 0 }
 };
 
 LuaButton::LuaButton(lua_State *L) :
@@ -27,13 +27,15 @@ LuaButton::LuaButton(lua_State *L) :
 
 	button = new ui::Button(ui::Point(posX, posY), ui::Point(sizeX, sizeY), text, toolTip);
 	component = button;
-	button->SetActionCallback({ [this] { triggerAction(); } });
+	button->SetActionCallback({ [this] {
+		triggerAction();
+	} });
 }
 
 int LuaButton::enabled(lua_State *L)
 {
 	int args = lua_gettop(L);
-	if(args)
+	if (args)
 	{
 		luaL_checktype(L, 1, LUA_TBOOLEAN);
 		button->Enabled = lua_toboolean(L, 1);
@@ -54,7 +56,7 @@ int LuaButton::action(lua_State *L)
 int LuaButton::text(lua_State *L)
 {
 	int args = lua_gettop(L);
-	if(args)
+	if (args)
 	{
 		button->SetText(tpt_lua_checkString(L, 1));
 		return 0;
@@ -68,7 +70,7 @@ int LuaButton::text(lua_State *L)
 
 void LuaButton::triggerAction()
 {
-	if(actionFunction)
+	if (actionFunction)
 	{
 		lua_rawgeti(L, LUA_REGISTRYINDEX, actionFunction);
 		lua_rawgeti(L, LUA_REGISTRYINDEX, owner_ref);

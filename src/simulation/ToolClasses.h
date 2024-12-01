@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "SimTool.h"
 
@@ -8,4 +8,4 @@
 #include "ToolNumbers.h"
 #undef TOOL_NUMBERS_ENUMERATE
 
-std::vector<SimTool> const &GetTools();
+const std::vector<SimTool> &GetTools();

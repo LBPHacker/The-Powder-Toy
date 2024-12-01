@@ -1,8 +1,8 @@
 #include "LocalBrowserModel.h"
 #include "LocalBrowserView.h"
 #include "client/Client.h"
-#include "client/SaveFile.h"
 #include "client/GameSave.h"
+#include "client/SaveFile.h"
 #include <algorithm>
 
 constexpr auto pageSize = 20;
@@ -21,7 +21,7 @@ std::vector<SaveFile *> LocalBrowserModel::GetSavesList() // non-owning
 	return nonOwningSaveList;
 }
 
-void LocalBrowserModel::AddObserver(LocalBrowserView * observer)
+void LocalBrowserModel::AddObserver(LocalBrowserView *observer)
 {
 	observers.push_back(observer);
 	observer->NotifySavesListChanged(this);
@@ -129,7 +129,7 @@ void LocalBrowserModel::notifySelectedChanged()
 {
 	for (size_t i = 0; i < observers.size(); i++)
 	{
-		LocalBrowserView* cObserver = observers[i];
+		LocalBrowserView *cObserver = observers[i];
 		cObserver->NotifySelectedChanged(this);
 	}
 }

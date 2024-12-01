@@ -1,20 +1,20 @@
 #include "GOLTool.h"
-#include "prefs/GlobalPrefs.h"
 #include "client/Client.h"
 #include "common/tpt-rand.h"
-#include "simulation/GOLString.h"
-#include "simulation/SimulationData.h"
+#include "graphics/Graphics.h"
 #include "gui/Style.h"
+#include "gui/colourpicker/ColourPickerActivity.h"
+#include "gui/dialogues/ErrorMessage.h"
+#include "gui/game/GameModel.h"
 #include "gui/interface/Button.h"
 #include "gui/interface/Label.h"
 #include "gui/interface/Textbox.h"
 #include "gui/interface/Window.h"
-#include "gui/colourpicker/ColourPickerActivity.h"
-#include "gui/dialogues/ErrorMessage.h"
-#include "gui/game/GameModel.h"
-#include "graphics/Graphics.h"
+#include "prefs/GlobalPrefs.h"
+#include "simulation/GOLString.h"
+#include "simulation/SimulationData.h"
 
-class GOLWindow: public ui::Window
+class GOLWindow : public ui::Window
 {
 	ui::Colour highColour, lowColour;
 	ui::Button *highColourButton, *lowColourButton;
@@ -29,13 +29,14 @@ public:
 	GOLWindow(GameModel &gameModel, int toolSelection, int rule, RGB<uint8_t> colour1, RGB<uint8_t> colour2);
 
 	virtual ~GOLWindow()
-	{}
+	{
+	}
 
 	void OnDraw() override;
 	void OnTryExit(ExitMethod method) override;
 };
 
-GOLWindow::GOLWindow(GameModel &gameModel_, int toolSelection, int rule, RGB<uint8_t> colour1, RGB<uint8_t> colour2):
+GOLWindow::GOLWindow(GameModel &gameModel_, int toolSelection, int rule, RGB<uint8_t> colour1, RGB<uint8_t> colour2) :
 	ui::Window(ui::Point(-1, -1), ui::Point(200, 108)),
 	highColour(colour1.WithAlpha(0xFF)),
 	lowColour(colour2.WithAlpha(0xFF)),
@@ -44,13 +45,13 @@ GOLWindow::GOLWindow(GameModel &gameModel_, int toolSelection, int rule, RGB<uin
 {
 	highColour.Alpha = 255;
 	lowColour.Alpha = 255;
-	ui::Label * messageLabel = new ui::Label(ui::Point(4, 5), ui::Point(Size.X-8, 14), "Edit custom GOL type");
+	ui::Label *messageLabel = new ui::Label(ui::Point(4, 5), ui::Point(Size.X - 8, 14), "Edit custom GOL type");
 	messageLabel->SetTextColour(style::Colour::InformationTitle);
 	messageLabel->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
 	messageLabel->Appearance.VerticalAlign = ui::Appearance::AlignTop;
 	AddComponent(messageLabel);
 
-	auto *okayButton = new ui::Button(ui::Point(0, Size.Y-17), ui::Point(Size.X, 17), "OK");
+	auto *okayButton = new ui::Button(ui::Point(0, Size.Y - 17), ui::Point(Size.X, 17), "OK");
 	okayButton->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
 	okayButton->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
 	okayButton->Appearance.BorderInactive = ui::Colour(200, 200, 200);
@@ -65,14 +66,14 @@ GOLWindow::GOLWindow(GameModel &gameModel_, int toolSelection, int rule, RGB<uin
 	AddComponent(okayButton);
 	SetOkayButton(okayButton);
 
-	nameField = new ui::Textbox(ui::Point(8, 25), ui::Point(Size.X-16, 16), "", "[name]");
+	nameField = new ui::Textbox(ui::Point(8, 25), ui::Point(Size.X - 16, 16), "", "[name]");
 	nameField->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
 	nameField->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
 	nameField->SetLimit(7);
 	AddComponent(nameField);
 	FocusComponent(nameField);
 
-	ruleField = new ui::Textbox(ui::Point(8, 46), ui::Point(Size.X-16, 16), "", "[rule]");
+	ruleField = new ui::Textbox(ui::Point(8, 46), ui::Point(Size.X - 16, 16), "", "[rule]");
 	ruleField->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
 	ruleField->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
 	AddComponent(ruleField);
@@ -177,7 +178,7 @@ void GOLWindow::OnTryExit(ExitMethod method)
 
 void GOLWindow::OnDraw()
 {
-	Graphics * g = GetGraphics();
+	Graphics *g = GetGraphics();
 
 	g->DrawFilledRect(RectSized(Position - Vec2{ 1, 1 }, Size + Vec2{ 2, 2 }), 0x000000_rgb);
 	g->DrawRect(RectSized(Position, Size), 0xC8C8C8_rgb);

@@ -1,13 +1,14 @@
 #pragma once
-#include "Component.h"
 #include "Colour.h"
+#include "Component.h"
 #include "graphics/Graphics.h"
-#include <iostream>
 #include <cmath>
-#include <vector>
 #include <functional>
+#include <iostream>
+#include <vector>
 
-namespace ui {
+namespace ui
+{
 
 class DirectionSelector : public ui::Component
 {
@@ -25,6 +26,7 @@ class DirectionSelector : public ui::Component
 		float xValue;
 		float yValue;
 	};
+
 	std::vector<Value> snapPoints;
 
 	bool autoReturn;
@@ -53,22 +55,53 @@ private:
 	Value PositionToValue(ui::Point position);
 
 public:
-	DirectionSelector(ui::Point position, float scale, int radius, int handleRadius, int snapPointRadius, int snapPointEffectRadius);
+	DirectionSelector(
+		ui::Point position, float scale, int radius, int handleRadius, int snapPointRadius, int snapPointEffectRadius
+	);
 	virtual ~DirectionSelector() = default;
 
 	void SetSnapPoints(int newSnapPointEffectRadius, int points, float maxMagnitude);
 	void ClearSnapPoints();
 
-	inline void EnableSnapPoints() { useSnapPoints = true; }
-	inline void DisableSnapPoints() { useSnapPoints = false; }
+	inline void EnableSnapPoints()
+	{
+		useSnapPoints = true;
+	}
 
-	inline void EnableAutoReturn() { autoReturn = true; }
-	inline void DisableAutoReturn() { autoReturn = false; }
+	inline void DisableSnapPoints()
+	{
+		useSnapPoints = false;
+	}
 
-	inline void SetBackgroundColor(ui::Colour color) { backgroundColor = color; }
-	inline void SetForegroundColor(ui::Colour color) { foregroundColor = color; }
-	inline void SetBorderColor(ui::Colour color) { borderColor = color; }
-	inline void SetSnapPointColor(ui::Colour color) { snapPointColor = color; }
+	inline void EnableAutoReturn()
+	{
+		autoReturn = true;
+	}
+
+	inline void DisableAutoReturn()
+	{
+		autoReturn = false;
+	}
+
+	inline void SetBackgroundColor(ui::Colour color)
+	{
+		backgroundColor = color;
+	}
+
+	inline void SetForegroundColor(ui::Colour color)
+	{
+		foregroundColor = color;
+	}
+
+	inline void SetBorderColor(ui::Colour color)
+	{
+		borderColor = color;
+	}
+
+	inline void SetSnapPointColor(ui::Colour color)
+	{
+		snapPointColor = color;
+	}
 
 	float GetXValue();
 	float GetYValue();
@@ -77,15 +110,30 @@ public:
 	void SetPosition(ui::Point position);
 	void SetValues(float x, float y);
 
-	void Draw(const ui::Point& screenPos) override;
+	void Draw(const ui::Point &screenPos) override;
 	void OnMouseMoved(int x, int y) override;
 	void OnMouseDown(int x, int y, unsigned int button) override;
 	void OnMouseUp(int x, int y, unsigned button) override;
-	inline void OnKeyPress(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt) override { altDown = alt; }
-	inline void OnKeyRelease(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt) override { altDown = alt; }
 
-	inline void SetUpdateCallback(DirectionSelectorCallback callback) { updateCallback = callback; }
-	inline void SetChangeCallback(DirectionSelectorCallback callback) { changeCallback = callback; }
+	inline void OnKeyPress(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt) override
+	{
+		altDown = alt;
+	}
+
+	inline void OnKeyRelease(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt) override
+	{
+		altDown = alt;
+	}
+
+	inline void SetUpdateCallback(DirectionSelectorCallback callback)
+	{
+		updateCallback = callback;
+	}
+
+	inline void SetChangeCallback(DirectionSelectorCallback callback)
+	{
+		changeCallback = callback;
+	}
 };
 
 } /* namespace ui */

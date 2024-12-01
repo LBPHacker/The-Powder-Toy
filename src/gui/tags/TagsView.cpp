@@ -11,22 +11,24 @@
 
 #include "gui/dialogues/ErrorMessage.h"
 #include "gui/interface/Button.h"
-#include "gui/interface/Textbox.h"
 #include "gui/interface/Label.h"
+#include "gui/interface/Textbox.h"
 
 #include <SDL.h>
 
-TagsView::TagsView():
+TagsView::TagsView() :
 	ui::Window(ui::Point(-1, -1), ui::Point(195, 250))
 {
-	closeButton = new ui::Button(ui::Point(0, Size.Y-16), ui::Point(195, 16), "Close");
+	closeButton = new ui::Button(ui::Point(0, Size.Y - 16), ui::Point(195, 16), "Close");
 	closeButton->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
 	closeButton->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
-	closeButton->SetActionCallback({ [this] { c->Exit(); } });
+	closeButton->SetActionCallback({ [this] {
+		c->Exit();
+	} });
 	AddComponent(closeButton);
 	SetCancelButton(closeButton);
 
-	tagInput = new ui::Textbox(ui::Point(8, Size.Y-40), ui::Point(Size.X-60, 16), "", "[new tag]");
+	tagInput = new ui::Textbox(ui::Point(8, Size.Y - 40), ui::Point(Size.X - 60, 16), "", "[new tag]");
 	tagInput->Appearance.icon = IconTag;
 	tagInput->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
 	tagInput->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
@@ -34,17 +36,25 @@ TagsView::TagsView():
 	AddComponent(tagInput);
 	FocusComponent(tagInput);
 
-	addButton = new ui::Button(ui::Point(tagInput->Position.X+tagInput->Size.X+4, tagInput->Position.Y), ui::Point(40, 16), "Add");
+	addButton = new ui::Button(
+		ui::Point(tagInput->Position.X + tagInput->Size.X + 4, tagInput->Position.Y), ui::Point(40, 16), "Add"
+	);
 	addButton->Appearance.icon = IconAdd;
 	addButton->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
 	addButton->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
-	addButton->SetActionCallback({ [this] { addTag(); } });
+	addButton->SetActionCallback({ [this] {
+		addTag();
+	} });
 	AddComponent(addButton);
 
 	if (!Client::Ref().GetAuthUser().UserID)
+	{
 		addButton->Enabled = false;
+	}
 
-	title = new ui::Label(ui::Point(5, 5), ui::Point(185, 28), "Manage tags:    \bgTags are only to \nbe used to improve search results");
+	title = new ui::Label(
+		ui::Point(5, 5), ui::Point(185, 28), "Manage tags:    \bgTags are only to \nbe used to improve search results"
+	);
 	title->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
 	title->Appearance.VerticalAlign = ui::Appearance::AlignTop;
 	title->SetMultiline(true);
@@ -58,12 +68,12 @@ void TagsView::OnTick(float dt)
 
 void TagsView::OnDraw()
 {
-	Graphics * g = GetGraphics();
+	Graphics *g = GetGraphics();
 	g->DrawFilledRect(RectSized(Position - Vec2{ 1, 1 }, Size + Vec2{ 2, 2 }), 0x000000_rgb);
 	g->DrawRect(RectSized(Position, Size), 0xFFFFFF_rgb);
 }
 
-void TagsView::NotifyTagsChanged(TagsModel * sender)
+void TagsView::NotifyTagsChanged(TagsModel *sender)
 {
 	for (size_t i = 0; i < tags.size(); i++)
 	{
@@ -71,21 +81,24 @@ void TagsView::NotifyTagsChanged(TagsModel * sender)
 		delete tags[i];
 	}
 	tags.clear();
-	
-	if(sender->GetSave())
+
+	if (sender->GetSave())
 	{
 		std::list<ByteString> Tags = sender->GetSave()->GetTags();
 		int i = 0;
 		for (auto &tag : Tags)
 		{
-			ui::Label * tempLabel = new ui::Label(ui::Point(35, 35+(16*i)), ui::Point(120, 16), tag.FromUtf8());
-			tempLabel->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;			tempLabel->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
+			ui::Label *tempLabel = new ui::Label(ui::Point(35, 35 + (16 * i)), ui::Point(120, 16), tag.FromUtf8());
+			tempLabel->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
+			tempLabel->Appearance.VerticalAlign = ui::Appearance::AlignMiddle;
 			tags.push_back(tempLabel);
 			AddComponent(tempLabel);
 
-			if(sender->GetSave()->GetUserName() == Client::Ref().GetAuthUser().Username || Client::Ref().GetAuthUser().UserElevation == User::ElevationAdmin || Client::Ref().GetAuthUser().UserElevation == User::ElevationMod)
+			if (sender->GetSave()->GetUserName() == Client::Ref().GetAuthUser().Username ||
+			    Client::Ref().GetAuthUser().UserElevation == User::ElevationAdmin ||
+			    Client::Ref().GetAuthUser().UserElevation == User::ElevationMod)
 			{
-				ui::Button * tempButton = new ui::Button(ui::Point(15, 37+(16*i)), ui::Point(11, 12));
+				ui::Button *tempButton = new ui::Button(ui::Point(15, 37 + (16 * i)), ui::Point(11, 12));
 				tempButton->Appearance.icon = IconDelete;
 				tempButton->Appearance.Border = ui::Border(0);
 				tempButton->Appearance.Margin.Top += 2;
@@ -105,12 +118,14 @@ void TagsView::NotifyTagsChanged(TagsModel * sender)
 void TagsView::OnKeyPress(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt)
 {
 	if (repeat)
+	{
 		return;
-	switch(key)
+	}
+	switch (key)
 	{
 	case SDLK_KP_ENTER:
 	case SDLK_RETURN:
-		if(IsFocused(tagInput))
+		if (IsFocused(tagInput))
 		{
 			addTag();
 		}

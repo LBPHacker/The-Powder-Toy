@@ -1,12 +1,12 @@
 #include "Favorite.h"
 #include "prefs/GlobalPrefs.h"
-#include <json/json.h>
 #include <algorithm>
+#include <json/json.h>
 
-Favorite::Favorite():
-    favoritesList(std::vector<ByteString>())
-{}
-
+Favorite::Favorite() :
+	favoritesList(std::vector<ByteString>())
+{
+}
 
 std::vector<ByteString> Favorite::GetFavoritesList()
 {

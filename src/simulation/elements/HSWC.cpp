@@ -19,7 +19,7 @@ void Element::Element_HSWC()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -49,10 +49,12 @@ void Element::Element_HSWC()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	if (parts[i].life!=10)
+	if (parts[i].life != 10)
 	{
-		if (parts[i].life>0)
+		if (parts[i].life > 0)
+		{
 			parts[i].life--;
+		}
 	}
 	else
 	{
@@ -63,17 +65,25 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[y + ry][x + rx];
 					if (!r)
-						r = sim->photons[y+ry][x+rx];
+					{
+						r = sim->photons[y + ry][x + rx];
+					}
 					if (!r)
+					{
 						continue;
+					}
 					if (TYP(r) == PT_HSWC)
 					{
-						if (parts[ID(r)].life<10&&parts[ID(r)].life>0)
+						if (parts[ID(r)].life < 10 && parts[ID(r)].life > 0)
+						{
 							parts[i].life = 9;
-						else if (parts[ID(r)].life==0)
+						}
+						else if (parts[ID(r)].life == 0)
+						{
 							parts[ID(r)].life = 10;
+						}
 					}
 					if (deserializeTemp && TYP(r) == PT_FILT)
 					{
@@ -81,7 +91,9 @@ static int update(UPDATE_FUNC_ARGS)
 						{
 							int newTemp = parts[ID(r)].ctype - 0x10000000;
 							if (newTemp >= MIN_TEMP && newTemp <= MAX_TEMP)
+							{
 								parts[i].temp = float(parts[ID(r)].ctype - 0x10000000);
+							}
 						}
 					}
 				}
@@ -93,7 +105,7 @@ static int update(UPDATE_FUNC_ARGS)
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
-	int lifemod = ((cpart->life>10?10:cpart->life)*19);
+	int lifemod = ((cpart->life > 10 ? 10 : cpart->life) * 19);
 	*colr += lifemod;
 	return 0;
 }

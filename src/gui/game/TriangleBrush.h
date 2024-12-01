@@ -2,7 +2,7 @@
 #include "Brush.h"
 #include <cmath>
 
-class TriangleBrush: public Brush
+class TriangleBrush : public Brush
 {
 public:
 	virtual ~TriangleBrush() override = default;
@@ -14,17 +14,18 @@ public:
 
 		int rx = radius.X;
 		int ry = radius.Y;
-		for(int x = -rx; x <= rx; x++)
+		for (int x = -rx; x <= rx; x++)
 		{
-			for(int y = -ry; y <= ry; y++)
+			for (int y = -ry; y <= ry; y++)
 			{
-				if ((abs((rx+2*x)*ry+rx*y) + abs(2*rx*(y-ry)) + abs((rx-2*x)*ry+rx*y))<=(4*rx*ry))
+				if ((abs((rx + 2 * x) * ry + rx * y) + abs(2 * rx * (y - ry)) + abs((rx - 2 * x) * ry + rx * y)) <=
+				    (4 * rx * ry))
 				{
-					bitmap[{ x+rx, y+ry }] = 255;
+					bitmap[{ x + rx, y + ry }] = 255;
 				}
 				else
 				{
-					bitmap[{ x+rx, y+ry }] = 0;
+					bitmap[{ x + rx, y + ry }] = 0;
 				}
 			}
 		}

@@ -1,32 +1,40 @@
 #include "DropDown.h"
 
+#include "Button.h"
 #include "graphics/Graphics.h"
 #include "gui/Style.h"
-#include "Button.h"
 #include "gui/interface/Window.h"
 
-namespace ui {
+namespace ui
+{
 
 class DropDownWindow : public ui::Window
 {
-	DropDown * dropDown;
+	DropDown *dropDown;
 	Appearance appearance;
 	std::vector<Button> buttons;
 
 public:
-	DropDownWindow(DropDown * dropDown):
-		Window(dropDown->GetScreenPos() + ui::Point(-1, -1 - (dropDown->optionIndex*16 < dropDown->GetScreenPos().Y ? dropDown->optionIndex*16 : 0)),
-						  ui::Point(dropDown->Size.X+2, 2+dropDown->options.size()*16)),
+	DropDownWindow(DropDown *dropDown) :
+		Window(
+			dropDown->GetScreenPos() +
+				ui::Point(
+					-1, -1 - (dropDown->optionIndex * 16 < dropDown->GetScreenPos().Y ? dropDown->optionIndex * 16 : 0)
+				),
+			ui::Point(dropDown->Size.X + 2, 2 + dropDown->options.size() * 16)
+		),
 		dropDown(dropDown),
 		appearance(dropDown->Appearance)
 	{
 		int currentY = 1;
 		for (size_t i = 0; i < dropDown->options.size(); i++)
 		{
-			Button * tempButton = new Button(Point(1, currentY), Point(Size.X-2, 16), dropDown->options[i].first);
+			Button *tempButton = new Button(Point(1, currentY), Point(Size.X - 2, 16), dropDown->options[i].first);
 			tempButton->Appearance = appearance;
 			if (i)
+			{
 				tempButton->Appearance.Border = ui::Border(0, 1, 1, 1);
+			}
 			auto option = dropDown->options[i].first;
 			tempButton->SetActionCallback({ [this, option] {
 				CloseActiveWindow();
@@ -37,11 +45,13 @@ public:
 			currentY += 16;
 		}
 	}
+
 	void OnDraw() override
 	{
-		Graphics * g = GetGraphics();
+		Graphics *g = GetGraphics();
 		g->DrawFilledRect(RectSized(Position, Size), 0x000000_rgb);
 	}
+
 	void setOption(String option)
 	{
 		dropDown->SetOption(option);
@@ -50,15 +60,19 @@ public:
 			dropDown->actionCallback.change();
 		}
 	}
+
 	void OnTryExit(ExitMethod method) override
 	{
 		CloseActiveWindow();
 		SelfDestruct();
 	}
-	virtual ~DropDownWindow() {}
+
+	virtual ~DropDownWindow()
+	{
+	}
 };
 
-DropDown::DropDown(Point position, Point size):
+DropDown::DropDown(Point position, Point size) :
 	Component(position, size),
 	isMouseInside(false),
 	optionIndex(-1)
@@ -67,19 +81,21 @@ DropDown::DropDown(Point position, Point size):
 
 void DropDown::OnMouseClick(int x, int y, unsigned int button)
 {
-	DropDownWindow * newWindow = new DropDownWindow(this);
+	DropDownWindow *newWindow = new DropDownWindow(this);
 	newWindow->MakeActiveWindow();
 }
 
-void DropDown::Draw(const Point& screenPos)
+void DropDown::Draw(const Point &screenPos)
 {
-	if(!drawn)
+	if (!drawn)
 	{
-		if(optionIndex!=-1)
+		if (optionIndex != -1)
+		{
 			TextPosition(options[optionIndex].first);
+		}
 		drawn = true;
 	}
-	Graphics * g = GetGraphics();
+	Graphics *g = GetGraphics();
 	Point Position = screenPos;
 
 	ui::Colour textColour = Appearance.TextInactive;
@@ -101,8 +117,10 @@ void DropDown::Draw(const Point& screenPos)
 
 	g->BlendFilledRect(RectSized(Position - Vec2{ 1, 1 }, Size + Vec2{ 2, 2 }), backgroundColour);
 	g->BlendRect(RectSized(Position, Size), borderColour);
-	if(optionIndex!=-1)
+	if (optionIndex != -1)
+	{
 		g->BlendText(Position + textPosition, options[optionIndex].first, textColour);
+	}
 }
 
 void DropDown::OnMouseEnter(int x, int y)
@@ -117,7 +135,7 @@ void DropDown::OnMouseLeave(int x, int y)
 
 std::pair<String, int> DropDown::GetOption()
 {
-	if(optionIndex!=-1)
+	if (optionIndex != -1)
 	{
 		return options[optionIndex];
 	}
@@ -155,7 +173,9 @@ void DropDown::AddOption(std::pair<String, int> option)
 	for (size_t i = 0; i < options.size(); i++)
 	{
 		if (options[i] == option)
+		{
 			return;
+		}
 	}
 	options.push_back(option);
 }
@@ -168,14 +188,16 @@ start:
 		if (options[i].first == option)
 		{
 			if ((int)i == optionIndex)
+			{
 				optionIndex = -1;
-			options.erase(options.begin()+i);
+			}
+			options.erase(options.begin() + i);
 			goto start;
 		}
 	}
 }
 
-void DropDown::SetOptions(std::vector<std::pair<String, int> > options)
+void DropDown::SetOptions(std::vector<std::pair<String, int>> options)
 {
 	this->options = options;
 }

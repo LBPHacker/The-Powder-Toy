@@ -4,14 +4,10 @@
 
 const char LuaProgressBar::className[] = "progressBar";
 
-#define method(class, name) {#name, &class::name}
+#define method(class, name) { #name, &class ::name }
 Luna<LuaProgressBar>::RegType LuaProgressBar::methods[] = {
-	method(LuaProgressBar, position),
-	method(LuaProgressBar, size),
-	method(LuaProgressBar, visible),
-	method(LuaProgressBar, progress),
-	method(LuaProgressBar, status),
-	{0, 0}
+	method(LuaProgressBar, position), method(LuaProgressBar, size),   method(LuaProgressBar, visible),
+	method(LuaProgressBar, progress), method(LuaProgressBar, status), { 0, 0 }
 };
 
 LuaProgressBar::LuaProgressBar(lua_State *L) :
@@ -31,7 +27,7 @@ LuaProgressBar::LuaProgressBar(lua_State *L) :
 int LuaProgressBar::progress(lua_State *L)
 {
 	int args = lua_gettop(L);
-	if(args)
+	if (args)
 	{
 		progressBar->SetProgress(lua_tointeger(L, 1));
 		return 0;
@@ -46,7 +42,7 @@ int LuaProgressBar::progress(lua_State *L)
 int LuaProgressBar::status(lua_State *L)
 {
 	int args = lua_gettop(L);
-	if(args)
+	if (args)
 	{
 		progressBar->SetStatus(tpt_lua_checkString(L, 1));
 		return 0;

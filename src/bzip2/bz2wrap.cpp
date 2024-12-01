@@ -1,9 +1,9 @@
 #include "bz2wrap.h"
 #include "bzlib.h"
-#include <memory>
-#include <functional>
-#include <vector>
 #include <algorithm>
+#include <functional>
+#include <memory>
+#include <vector>
 
 static size_t outputSizeIncrement = 0x100000U;
 
@@ -17,7 +17,7 @@ BZ2WCompressResult BZ2WCompress(std::vector<char> &dest, const char *srcData, si
 	{
 		return BZ2WCompressNomem;
 	}
-	std::unique_ptr<bz_stream, std::function<int (bz_stream *)>> bz2Data(&stream, BZ2_bzCompressEnd);
+	std::unique_ptr<bz_stream, std::function<int(bz_stream *)>> bz2Data(&stream, BZ2_bzCompressEnd);
 	stream.next_in = const_cast<char *>(srcData); // I hope bz2 doesn't actually write anything here...
 	stream.avail_in = srcSize;
 	dest.resize(0);
@@ -63,7 +63,7 @@ BZ2WDecompressResult BZ2WDecompress(std::vector<char> &dest, const char *srcData
 	{
 		return BZ2WDecompressNomem;
 	}
-	std::unique_ptr<bz_stream, std::function<int (bz_stream *)>> bz2Data(&stream, BZ2_bzDecompressEnd); 
+	std::unique_ptr<bz_stream, std::function<int(bz_stream *)>> bz2Data(&stream, BZ2_bzDecompressEnd);
 	stream.next_in = const_cast<char *>(srcData); // I hope bz2 doesn't actually write anything here...
 	stream.avail_in = srcSize;
 	dest.resize(0);

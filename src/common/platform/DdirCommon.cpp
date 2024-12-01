@@ -1,6 +1,6 @@
+#include "Config.h"
 #include "Platform.h"
 #include "common/String.h"
-#include "Config.h"
 #include <SDL.h>
 #include <memory>
 

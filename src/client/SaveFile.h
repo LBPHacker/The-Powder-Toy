@@ -4,7 +4,8 @@
 
 class GameSave;
 
-class SaveFile {
+class SaveFile
+{
 public:
 	SaveFile(ByteString filename, bool newLazyLoad = false);
 
@@ -20,6 +21,7 @@ public:
 	void SetLoadingError(String error);
 
 	void LazyUnload();
+
 private:
 	std::unique_ptr<GameSave> gameSave;
 	ByteString filename;

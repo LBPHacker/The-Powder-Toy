@@ -1,8 +1,8 @@
+#include "Config.h"
 #include "LuaScriptInterface.h"
 #include "client/http/Request.h"
 #include "common/platform/Platform.h"
 #include "compat.lua.h"
-#include "Config.h"
 #include "gui/dialogues/ErrorMessage.h"
 #include "gui/dialogues/InformationMessage.h"
 #include "gui/game/GameController.h"
@@ -36,7 +36,8 @@ static int installScriptManager(lua_State *L)
 		new ErrorMessage("Script download", "You must run this function from the console");
 		return 0;
 	}
-	lsi->scriptManagerDownload = std::make_unique<http::Request>(ByteString::Build("https://starcatcher.us/scripts/main.lua?get=1"));
+	lsi->scriptManagerDownload =
+		std::make_unique<http::Request>(ByteString::Build("https://starcatcher.us/scripts/main.lua?get=1"));
 	lsi->scriptManagerDownload->Start();
 	return 0;
 }
@@ -47,26 +48,27 @@ void LuaMisc::Tick(lua_State *L)
 	if (lsi->scriptManagerDownload && lsi->scriptManagerDownload->CheckDone())
 	{
 		auto scriptManagerDownload = std::move(lsi->scriptManagerDownload);
+
 		struct Status
 		{
 			struct Ok
 			{
 			};
+
 			struct GetFailed
 			{
 				String error;
 			};
+
 			struct RunFailed
 			{
 				String error;
 			};
-			using Value = std::variant<
-				Ok,
-				GetFailed,
-				RunFailed
-			>;
+
+			using Value = std::variant<Ok, GetFailed, RunFailed>;
 			Value value;
 		};
+
 		auto complete = [](Status status) {
 			if (std::get_if<Status::Ok>(&status.value))
 			{
@@ -121,7 +123,7 @@ static int flog(lua_State *L)
 	int args = lua_gettop(L);
 	String text;
 	bool hasText = false;
-	for(int i = 1; i <= args; i++)
+	for (int i = 1; i <= args; i++)
 	{
 		LuaToLoggableString(L, -1);
 		if (hasText)
@@ -139,13 +141,17 @@ static int flog(lua_State *L)
 	{
 		auto lastError = lsi->GetLastError();
 		if (lsi->luacon_hasLastError)
+		{
 			lastError += "; ";
+		}
 		lastError += text;
 		lsi->SetLastError(lastError);
 		lsi->luacon_hasLastError = true;
 	}
 	else
+	{
 		lsi->Log(CommandInterface::LogNotice, text);
+	}
 	return 0;
 }
 
@@ -167,7 +173,9 @@ static int screenshot(lua_State *L)
 static int record(lua_State *L)
 {
 	if (!lua_isboolean(L, -1))
+	{
 		return luaL_typerror(L, 1, lua_typename(L, LUA_TBOOLEAN));
+	}
 	bool record = lua_toboolean(L, -1);
 	auto *lsi = GetLSI();
 	int recordingFolder = lsi->gameController->Record(record);
@@ -180,6 +188,7 @@ static int compatChunk(lua_State *L)
 	lua_pushlstring(L, reinterpret_cast<const char *>(compat_lua), compat_lua_size);
 	return 1;
 }
+
 static int debug(lua_State *L)
 {
 	auto *lsi = GetLSI();
@@ -242,8 +251,10 @@ static int drawCap(lua_State *L)
 		return 1;
 	}
 	int drawcap = luaL_checkint(L, 1);
-	if(drawcap < 0)
+	if (drawcap < 0)
+	{
 		return luaL_error(L, "draw cap too small");
+	}
 	ui::Engine::Ref().SetDrawingFrequencyLimit(drawcap);
 	return 0;
 }
@@ -252,21 +263,19 @@ void LuaMisc::Open(lua_State *L)
 {
 	static const luaL_Reg reg[] = {
 #define LFUNC(v) { #v, v }
-		LFUNC(getUserName),
-		LFUNC(installScriptManager),
-		LFUNC(screenshot),
-		LFUNC(record),
-		LFUNC(debug),
-		LFUNC(fpsCap),
-		LFUNC(drawCap),
-		LFUNC(compatChunk),
+		LFUNC(getUserName), LFUNC(installScriptManager),
+		LFUNC(screenshot),  LFUNC(record),
+		LFUNC(debug),       LFUNC(fpsCap),
+		LFUNC(drawCap),     LFUNC(compatChunk),
 #undef LFUNC
 		{ "log", flog },
-		{ NULL, NULL }
+  {  NULL, NULL }
 	};
 	lua_newtable(L);
 	luaL_register(L, NULL, reg);
-#define LCONST(v) lua_pushinteger(L, int(v)); lua_setfield(L, -2, #v)
+#define LCONST(v)               \
+	lua_pushinteger(L, int(v)); \
+	lua_setfield(L, -2, #v)
 	LCONST(DEBUG_PARTS);
 	LCONST(DEBUG_ELEMENTPOP);
 	LCONST(DEBUG_LINES);
@@ -275,14 +284,16 @@ void LuaMisc::Open(lua_State *L)
 #undef LCONST
 	{
 		lua_newtable(L);
-#define LCONSTAS(k, v) lua_pushinteger(L, int(v)); lua_setfield(L, -2, k)
-		LCONSTAS("major"        , DISPLAY_VERSION[0]);
-		LCONSTAS("minor"        , DISPLAY_VERSION[1]);
-		LCONSTAS("build"        , APP_VERSION.build);
+#define LCONSTAS(k, v)          \
+	lua_pushinteger(L, int(v)); \
+	lua_setfield(L, -2, k)
+		LCONSTAS("major", DISPLAY_VERSION[0]);
+		LCONSTAS("minor", DISPLAY_VERSION[1]);
+		LCONSTAS("build", APP_VERSION.build);
 		LCONSTAS("upstreamMajor", UPSTREAM_VERSION.displayVersion[0]);
 		LCONSTAS("upstreamMinor", UPSTREAM_VERSION.displayVersion[1]);
 		LCONSTAS("upstreamBuild", UPSTREAM_VERSION.build);
-		LCONSTAS("modid"        , MOD_ID);
+		LCONSTAS("modid", MOD_ID);
 #undef LCONSTAS
 		lua_pushboolean(L, SNAPSHOT);
 		lua_setfield(L, -2, "snapshot");

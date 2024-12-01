@@ -18,7 +18,7 @@ void Element::Element_SLTW()
 	Collision = 0.0f;
 	Gravity = 0.1f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 2;
 
 	Flammable = 0;
@@ -54,28 +54,32 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				switch (TYP(r))
 				{
 				case PT_SALT:
 					if (sim->rng.chance(1, 2000))
-						sim->part_change_type(ID(r),x+rx,y+ry,PT_SLTW);
+					{
+						sim->part_change_type(ID(r), x + rx, y + ry, PT_SLTW);
+					}
 					break;
 				case PT_PLNT:
 					if (sim->rng.chance(1, 40))
+					{
 						sim->kill_part(ID(r));
+					}
 					break;
 				case PT_RBDM:
 				case PT_LRBD:
-					if ((sim->legacy_enable||parts[i].temp>(273.15f+12.0f)) && sim->rng.chance(1, 100))
+					if ((sim->legacy_enable || parts[i].temp > (273.15f + 12.0f)) && sim->rng.chance(1, 100))
 					{
-						sim->part_change_type(i,x,y,PT_FIRE);
+						sim->part_change_type(i, x, y, PT_FIRE);
 						parts[i].life = 4;
 						parts[i].ctype = PT_WATR;
 					}
 					break;
 				case PT_FIRE:
-					if (parts[ID(r)].ctype!=PT_WATR)
+					if (parts[ID(r)].ctype != PT_WATR)
 					{
 						sim->kill_part(ID(r));
 						if (sim->rng.chance(1, 30))

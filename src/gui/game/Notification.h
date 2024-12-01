@@ -4,9 +4,15 @@
 class Notification
 {
 public:
-	Notification(String message) : Message(message) {}
+	Notification(String message) :
+		Message(message)
+	{
+	}
+
 	virtual ~Notification() {};
 	String Message;
 
-	virtual void Action() { }
+	virtual void Action()
+	{
+	}
 };

@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "QRTZ.h"
+#include "simulation/ElementCommon.h"
 
 static void create(ELEMENT_CREATE_FUNC_ARGS);
 
@@ -19,7 +19,7 @@ void Element::Element_PQRT()
 	Collision = -0.1f;
 	Gravity = 0.27f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;

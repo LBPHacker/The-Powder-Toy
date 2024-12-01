@@ -18,7 +18,7 @@ void Element::Element_MORT()
 	Collision = -0.99f;
 	Gravity = 0.0f;
 	Diffusion = 0.01f;
-	HotAir = 0.002f	* CFDS;
+	HotAir = 0.002f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -51,6 +51,6 @@ void Element::Element_MORT()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	sim->create_part(-1, x, y-1, PT_SMKE);
+	sim->create_part(-1, x, y - 1, PT_SMKE);
 	return 0;
 }

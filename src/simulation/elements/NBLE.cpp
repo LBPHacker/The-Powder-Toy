@@ -18,7 +18,7 @@ void Element::Element_NBLE()
 	Collision = -0.1f;
 	Gravity = 0.0f;
 	Diffusion = 0.75f;
-	HotAir = 0.001f	* CFDS;
+	HotAir = 0.001f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -33,7 +33,7 @@ void Element::Element_NBLE()
 	HeatConduct = 106;
 	Description = "Noble Gas. Diffuses and conductive. Ionizes into plasma when introduced to electricity.";
 
-	Properties = TYPE_GAS|PROP_CONDUCTS|PROP_LIFE_DEC;
+	Properties = TYPE_GAS | PROP_CONDUCTS | PROP_LIFE_DEC;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -51,25 +51,29 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	auto &sd = SimulationData::CRef();
 	auto &can_move = sd.can_move;
-	if (parts[i].temp > 5273.15 && sim->pv[y/CELL][x/CELL] > 100.0f)
+	if (parts[i].temp > 5273.15 && sim->pv[y / CELL][x / CELL] > 100.0f)
 	{
 		parts[i].tmp |= 0x1;
 		if (sim->rng.chance(1, 5))
 		{
 			int j;
 			float temp = parts[i].temp;
-			sim->create_part(i,x,y,PT_CO2);
+			sim->create_part(i, x, y, PT_CO2);
 
-			j = sim->create_part(-3,x,y,PT_NEUT);
+			j = sim->create_part(-3, x, y, PT_NEUT);
 			if (j != -1)
+			{
 				parts[j].temp = temp;
+			}
 			if (sim->rng.chance(1, 25))
 			{
-				j = sim->create_part(-3,x,y,PT_ELEC);
+				j = sim->create_part(-3, x, y, PT_ELEC);
 				if (j != -1)
+				{
 					parts[j].temp = temp;
+				}
 			}
-			j = sim->create_part(-3,x,y,PT_PHOT);
+			j = sim->create_part(-3, x, y, PT_PHOT);
 			if (j != -1)
 			{
 				parts[j].ctype = 0xF800000;
@@ -79,7 +83,7 @@ static int update(UPDATE_FUNC_ARGS)
 			int rx = x + sim->rng.between(-1, 1), ry = y + sim->rng.between(-1, 1), rt = TYP(pmap[ry][rx]);
 			if (can_move[PT_PLSM][rt] || rt == PT_NBLE)
 			{
-				j = sim->create_part(-3,rx,ry,PT_PLSM);
+				j = sim->create_part(-3, rx, ry, PT_PLSM);
 				if (j != -1)
 				{
 					parts[j].temp = temp;
@@ -87,7 +91,7 @@ static int update(UPDATE_FUNC_ARGS)
 				}
 			}
 			parts[i].temp = temp + 1750 + sim->rng.between(0, 499);
-			sim->pv[y/CELL][x/CELL] += 50;
+			sim->pv[y / CELL][x / CELL] += 50;
 		}
 	}
 	return 0;

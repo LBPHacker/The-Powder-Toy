@@ -6,7 +6,7 @@ class Simulation;
 class Air
 {
 public:
-	Simulation & sim;
+	Simulation &sim;
 	int airMode;
 	float ambientAirTemp;
 	float ovx[YCELLS][XCELLS];
@@ -23,5 +23,5 @@ public:
 	void ClearAirH();
 	void Invert();
 	void ApproximateBlockAirMaps();
-	Air(Simulation & sim);
+	Air(Simulation &sim);
 };

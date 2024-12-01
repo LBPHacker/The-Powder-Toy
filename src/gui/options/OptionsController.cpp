@@ -1,11 +1,11 @@
 #include "OptionsController.h"
 
-#include "OptionsView.h"
 #include "OptionsModel.h"
+#include "OptionsView.h"
 
 #include "Controller.h"
 
-OptionsController::OptionsController(GameModel * gModel_, std::function<void ()> onDone_):
+OptionsController::OptionsController(GameModel *gModel_, std::function<void()> onDone_) :
 	gModel(gModel_),
 	onDone(onDone_),
 	HasExited(false)
@@ -132,7 +132,7 @@ void OptionsController::SetDecoSpace(int decoSpace)
 	model->SetDecoSpace(decoSpace);
 }
 
-OptionsView * OptionsController::GetView()
+OptionsView *OptionsController::GetView()
 {
 	return view;
 }
@@ -162,10 +162,11 @@ void OptionsController::Exit()
 	view->CloseActiveWindow();
 
 	if (onDone)
+	{
 		onDone();
+	}
 	HasExited = true;
 }
-
 
 OptionsController::~OptionsController()
 {
@@ -173,4 +174,3 @@ OptionsController::~OptionsController()
 	view->CloseActiveWindow();
 	delete view;
 }
-

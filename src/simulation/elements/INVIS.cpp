@@ -19,7 +19,7 @@ void Element::Element_INVIS()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -51,21 +51,29 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	float pressureResistance = 0.0f;
 	if (parts[i].tmp > 0)
-		pressureResistance = (float) parts[i].tmp;
+	{
+		pressureResistance = (float)parts[i].tmp;
+	}
 	else
+	{
 		pressureResistance = 4.0f;
+	}
 
-	if (sim->pv[y/CELL][x/CELL] < -pressureResistance || sim->pv[y/CELL][x/CELL] > pressureResistance)
+	if (sim->pv[y / CELL][x / CELL] < -pressureResistance || sim->pv[y / CELL][x / CELL] > pressureResistance)
+	{
 		parts[i].tmp2 = 1;
+	}
 	else
+	{
 		parts[i].tmp2 = 0;
+	}
 	return 0;
 }
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
-	//pv[ny/CELL][nx/CELL]>4.0f || pv[ny/CELL][nx/CELL]<-4.0f
-	if(cpart->tmp2)
+	// pv[ny/CELL][nx/CELL]>4.0f || pv[ny/CELL][nx/CELL]<-4.0f
+	if (cpart->tmp2)
 	{
 		*cola = 100;
 		*colr = 15;

@@ -4,11 +4,11 @@
 
 namespace http
 {
-	class LoginRequest : public Request
-	{
-	public:
-		LoginRequest(ByteString username, ByteString password);
+class LoginRequest : public Request
+{
+public:
+	LoginRequest(ByteString username, ByteString password);
 
-		LoginInfo Finish();
-	};
+	LoginInfo Finish();
+};
 }

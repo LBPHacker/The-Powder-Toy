@@ -19,7 +19,7 @@ void Element::Element_GPMP()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -51,17 +51,23 @@ void Element::Element_GPMP()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	if (parts[i].life!=10)
+	if (parts[i].life != 10)
 	{
-		if (parts[i].life>0)
+		if (parts[i].life > 0)
+		{
 			parts[i].life--;
+		}
 	}
 	else
 	{
-		if (parts[i].temp>=256.0f+273.15f)
-			parts[i].temp=256.0f+273.15f;
-		if (parts[i].temp<= -256.0f+273.15f)
-			parts[i].temp = -256.0f+273.15f;
+		if (parts[i].temp >= 256.0f + 273.15f)
+		{
+			parts[i].temp = 256.0f + 273.15f;
+		}
+		if (parts[i].temp <= -256.0f + 273.15f)
+		{
+			parts[i].temp = -256.0f + 273.15f;
+		}
 
 		sim->gravIn.mass[Vec2{ x, y } / CELL] = 0.2f * (parts[i].temp - 273.15);
 		for (auto rx = -2; rx <= 2; rx++)
@@ -70,15 +76,21 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[y + ry][x + rx];
 					if (!r)
-						continue;
-					if (TYP(r)==PT_GPMP)
 					{
-						if (parts[ID(r)].life<10&&parts[ID(r)].life>0)
+						continue;
+					}
+					if (TYP(r) == PT_GPMP)
+					{
+						if (parts[ID(r)].life < 10 && parts[ID(r)].life > 0)
+						{
 							parts[i].life = 9;
-						else if (parts[ID(r)].life==0)
+						}
+						else if (parts[ID(r)].life == 0)
+						{
 							parts[ID(r)].life = 10;
+						}
 					}
 				}
 			}
@@ -89,7 +101,7 @@ static int update(UPDATE_FUNC_ARGS)
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
-	int lifemod = ((cpart->life>10?10:cpart->life)*19);
+	int lifemod = ((cpart->life > 10 ? 10 : cpart->life) * 19);
 	*colg += lifemod;
 	*colb += lifemod;
 	return 0;

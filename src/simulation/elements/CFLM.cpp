@@ -19,7 +19,7 @@ void Element::Element_CFLM()
 	Collision = 0.0f;
 	Gravity = -0.1f;
 	Diffusion = 0.00f;
-	HotAir = 0.0005f	* CFDS;
+	HotAir = 0.0005f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -33,7 +33,7 @@ void Element::Element_CFLM()
 	HeatConduct = 88;
 	Description = "Sub-zero flame.";
 
-	Properties = TYPE_GAS|PROP_LIFE_DEC|PROP_LIFE_KILL;
+	Properties = TYPE_GAS | PROP_LIFE_DEC | PROP_LIFE_KILL;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -60,9 +60,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	*fireg = *colg;
 	*fireb = *colb;
 
-	*pixel_mode = PMODE_NONE; //Clear default, don't draw pixel
+	*pixel_mode = PMODE_NONE; // Clear default, don't draw pixel
 	*pixel_mode |= FIRE_ADD;
-	//Returning 0 means dynamic, do not cache
+	// Returning 0 means dynamic, do not cache
 	return 0;
 }
 

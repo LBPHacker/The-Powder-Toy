@@ -11,12 +11,13 @@ public:
 	LuaSmartRef(const LuaSmartRef &other) = delete;
 	~LuaSmartRef();
 
-	LuaSmartRef(LuaSmartRef &&other) noexcept : LuaSmartRef()
+	LuaSmartRef(LuaSmartRef &&other) noexcept :
+		LuaSmartRef()
 	{
 		swap(*this, other);
 	}
 
-	LuaSmartRef &operator =(LuaSmartRef other)
+	LuaSmartRef &operator=(LuaSmartRef other)
 	{
 		swap(*this, other);
 		return *this;

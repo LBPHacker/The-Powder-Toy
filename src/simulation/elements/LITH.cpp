@@ -19,7 +19,7 @@ void Element::Element_LITH()
 	Collision = -0.1f;
 	Gravity = 0.2f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;
@@ -120,7 +120,8 @@ static int update(UPDATE_FUNC_ARGS)
 					}
 					else
 					{
-						self.temp = restrict_flt(self.temp + 20.365f + storedEnergy * storedEnergy * 1.5f, MIN_TEMP, MAX_TEMP);
+						self.temp =
+							restrict_flt(self.temp + 20.365f + storedEnergy * storedEnergy * 1.5f, MIN_TEMP, MAX_TEMP);
 						sim->part_change_type(ID(neighborData), x + rx, y + ry, PT_H2);
 						hydrogenationFactor += 1;
 					}
@@ -179,7 +180,7 @@ static int update(UPDATE_FUNC_ARGS)
 						sim->part_change_type(ID(neighborData), x + rx, y + ry, PT_PLSM);
 						sim->pv[y / CELL][x / CELL] += 4.0;
 						return 0;
-					}						
+					}
 					break;
 				}
 			}
@@ -212,7 +213,9 @@ static int update(UPDATE_FUNC_ARGS)
 			int &neighborStoredEnergy = neighbor.ctype;
 			// Transfer overcharge explosion status to nearby LITH
 			if (burnTimer < 1000 && storedEnergy > 90 && neighbor.life > 1000)
+			{
 				burnTimer = 1024;
+			}
 			if (storedEnergy > neighborStoredEnergy)
 			{
 				int transfer = storedEnergy - neighborStoredEnergy;
@@ -226,7 +229,9 @@ static int update(UPDATE_FUNC_ARGS)
 
 	// Overcharged - begin explosion
 	if (burnTimer < 1000 && storedEnergy >= 100)
+	{
 		burnTimer = 1024;
+	}
 	if (burnTimer == 1000)
 	{
 		burnTimer = 0;

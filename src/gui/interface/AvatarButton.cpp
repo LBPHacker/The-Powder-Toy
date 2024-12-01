@@ -1,21 +1,21 @@
-#include "Button.h"
 #include "AvatarButton.h"
+#include "Button.h"
+#include "Config.h"
+#include "ContextMenu.h"
 #include "Format.h"
 #include "graphics/Graphics.h"
 #include "graphics/VideoBuffer.h"
-#include "ContextMenu.h"
-#include "Config.h"
-#include <iostream>
 #include <SDL.h>
+#include <iostream>
 
-namespace ui {
+namespace ui
+{
 
-AvatarButton::AvatarButton(Point position, Point size, ByteString username):
+AvatarButton::AvatarButton(Point position, Point size, ByteString username) :
 	Component(position, size),
 	name(username),
 	tried(false)
 {
-
 }
 
 void AvatarButton::Tick(float dt)
@@ -23,7 +23,8 @@ void AvatarButton::Tick(float dt)
 	if (!avatar && !tried && name.size() > 0)
 	{
 		tried = true;
-		imageRequest = std::make_unique<http::ImageRequest>(ByteString::Build(STATICSERVER, "/avatars/", name, ".png"), Size);
+		imageRequest =
+			std::make_unique<http::ImageRequest>(ByteString::Build(STATICSERVER, "/avatars/", name, ".png"), Size);
 		imageRequest->Start();
 	}
 
@@ -41,11 +42,11 @@ void AvatarButton::Tick(float dt)
 	}
 }
 
-void AvatarButton::Draw(const Point& screenPos)
+void AvatarButton::Draw(const Point &screenPos)
 {
-	Graphics * g = GetGraphics();
+	Graphics *g = GetGraphics();
 
-	if(avatar)
+	if (avatar)
 	{
 		auto *tex = avatar.get();
 		g->BlendImage(tex->Data(), 255, RectSized(screenPos, tex->Size()));
@@ -54,12 +55,12 @@ void AvatarButton::Draw(const Point& screenPos)
 
 void AvatarButton::OnMouseClick(int x, int y, unsigned int button)
 {
-	if(button != 1)
+	if (button != 1)
 	{
-		return; //left click only!
+		return; // left click only!
 	}
 
-	if(isButtonDown)
+	if (isButtonDown)
 	{
 		isButtonDown = false;
 		DoAction();
@@ -68,17 +69,19 @@ void AvatarButton::OnMouseClick(int x, int y, unsigned int button)
 
 void AvatarButton::OnContextMenuAction(int item)
 {
-	//Do nothing
+	// Do nothing
 }
 
 void AvatarButton::OnMouseDown(int x, int y, unsigned int button)
 {
 	if (MouseDownInside)
 	{
-		if(button == SDL_BUTTON_RIGHT)
+		if (button == SDL_BUTTON_RIGHT)
 		{
-			if(menu)
+			if (menu)
+			{
 				menu->Show(GetContainerPos() + ui::Point(x, y));
+			}
 		}
 		else
 		{
@@ -99,8 +102,10 @@ void AvatarButton::OnMouseLeave(int x, int y)
 
 void AvatarButton::DoAction()
 {
-	if( actionCallback.action)
+	if (actionCallback.action)
+	{
 		actionCallback.action();
+	}
 }
 
 } /* namespace ui */

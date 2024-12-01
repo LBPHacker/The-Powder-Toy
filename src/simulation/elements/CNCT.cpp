@@ -16,7 +16,7 @@ void Element::Element_CNCT()
 	Collision = -0.1f;
 	Gravity = 0.3f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;
@@ -29,7 +29,7 @@ void Element::Element_CNCT()
 	HeatConduct = 100;
 	Description = "Concrete, stronger than stone.";
 
-	Properties = TYPE_PART|PROP_HOT_GLOW;
+	Properties = TYPE_PART | PROP_HOT_GLOW;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

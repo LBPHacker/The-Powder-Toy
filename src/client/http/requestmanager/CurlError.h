@@ -4,13 +4,13 @@
 
 namespace http
 {
-	struct CurlError : public std::runtime_error
-	{
-		using runtime_error::runtime_error;
-	};
+struct CurlError : public std::runtime_error
+{
+	using runtime_error::runtime_error;
+};
 
-	void UseSystemCertProvider(CURL *easy);
-	void SetupCurlEasyCiphers(CURL *easy);
-	void HandleCURLcode(CURLcode code);
-	void HandleCURLMcode(CURLMcode code);
+void UseSystemCertProvider(CURL *easy);
+void SetupCurlEasyCiphers(CURL *easy);
+void HandleCURLcode(CURLcode code);
+void HandleCURLMcode(CURLMcode code);
 }

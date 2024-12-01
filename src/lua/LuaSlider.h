@@ -1,23 +1,24 @@
 #pragma once
 
-#include "LuaLuna.h"
 #include "LuaComponent.h"
+#include "LuaLuna.h"
 
 namespace ui
 {
-	class Slider;
+class Slider;
 }
 
 class LuaScriptInterface;
 
-class LuaSlider: public LuaComponent
+class LuaSlider : public LuaComponent
 {
-	ui::Slider * slider;
+	ui::Slider *slider;
 	LuaComponentCallback onValueChangedFunction;
 	void triggerOnValueChanged();
 	int onValueChanged(lua_State *L);
 	int steps(lua_State *L);
 	int value(lua_State *L);
+
 public:
 	static const char className[];
 	static Luna<LuaSlider>::RegType methods[];

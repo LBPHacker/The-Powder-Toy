@@ -1,48 +1,48 @@
 #pragma once
 #include "common/String.h"
-#include <vector>
-#include <variant>
 #include <memory>
 #include <optional>
+#include <variant>
+#include <vector>
 
 class GameSave;
 
 namespace Clipboard
 {
-	class ClipboardImpl
+class ClipboardImpl
+{
+public:
+	virtual ~ClipboardImpl() = default;
+
+	virtual void SetClipboardData() = 0;
+
+	struct GetClipboardDataUnchanged
 	{
-	public:
-		virtual ~ClipboardImpl() = default;
-
-		virtual void SetClipboardData() = 0;
-
-		struct GetClipboardDataUnchanged
-		{
-		};
-		struct GetClipboardDataChanged
-		{
-			std::vector<char> data;
-		};
-		struct GetClipboardDataFailed
-		{
-		};
-		struct GetClipboardDataUnknown
-		{
-		};
-		using GetClipboardDataResult = std::variant<
-			GetClipboardDataUnchanged,
-			GetClipboardDataChanged,
-			GetClipboardDataFailed,
-			GetClipboardDataUnknown
-		>;
-		virtual GetClipboardDataResult GetClipboardData() = 0;
-
-		virtual std::optional<String> Explanation() = 0;
 	};
 
-	extern std::unique_ptr<GameSave> clipboardData;
+	struct GetClipboardDataChanged
+	{
+		std::vector<char> data;
+	};
 
-	void SerializeClipboard(std::vector<char> &saveData);
+	struct GetClipboardDataFailed
+	{
+	};
 
-	extern int currentSubsystem;
+	struct GetClipboardDataUnknown
+	{
+	};
+
+	using GetClipboardDataResult = std::
+		variant<GetClipboardDataUnchanged, GetClipboardDataChanged, GetClipboardDataFailed, GetClipboardDataUnknown>;
+	virtual GetClipboardDataResult GetClipboardData() = 0;
+
+	virtual std::optional<String> Explanation() = 0;
+};
+
+extern std::unique_ptr<GameSave> clipboardData;
+
+void SerializeClipboard(std::vector<char> &saveData);
+
+extern int currentSubsystem;
 }

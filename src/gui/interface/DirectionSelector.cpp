@@ -1,8 +1,11 @@
 #include "DirectionSelector.h"
 
-namespace ui {
+namespace ui
+{
 
-DirectionSelector::DirectionSelector(ui::Point position, float scale, int radius, int handleRadius, int snapPointRadius, int snapPointEffectRadius):
+DirectionSelector::DirectionSelector(
+	ui::Point position, float scale, int radius, int handleRadius, int snapPointRadius, int snapPointEffectRadius
+) :
 	ui::Component(position, ui::Point(radius * 5 / 2, radius * 5 / 2)),
 	scale(scale),
 	radius(radius),
@@ -20,7 +23,10 @@ DirectionSelector::DirectionSelector(ui::Point position, float scale, int radius
 	mouseDown(false),
 	mouseHover(false),
 	altDown(false),
-	value({ { 0, 0 }, 0, 0 })
+	value({
+		{ 0, 0 },
+        0, 0
+})
 {
 }
 
@@ -31,7 +37,10 @@ void DirectionSelector::CheckHovering(int x, int y)
 
 DirectionSelector::Value DirectionSelector::GravityValueToValue(float x, float y)
 {
-	return { { int(x / scale), int(y / scale) }, x, y };
+	return {
+		{ int(x / scale), int(y / scale) },
+        x, y
+	};
 }
 
 DirectionSelector::Value DirectionSelector::PositionToValue(ui::Point position)
@@ -53,10 +62,10 @@ void DirectionSelector::SetSnapPoints(int newSnapPointEffectRadius, int points, 
 	for (int i = 1; i < points; i++)
 	{
 		auto dist = i / float(points - 1) * maxMagnitude;
-		snapPoints.push_back(GravityValueToValue( dist,     0));
-		snapPoints.push_back(GravityValueToValue(    0,  dist));
-		snapPoints.push_back(GravityValueToValue(-dist,     0));
-		snapPoints.push_back(GravityValueToValue(    0, -dist));
+		snapPoints.push_back(GravityValueToValue(dist, 0));
+		snapPoints.push_back(GravityValueToValue(0, dist));
+		snapPoints.push_back(GravityValueToValue(-dist, 0));
+		snapPoints.push_back(GravityValueToValue(0, -dist));
 	}
 	useSnapPoints = true;
 }
@@ -109,9 +118,9 @@ void DirectionSelector::SetValues(float x, float y)
 	SetPosition(GravityValueToValue(x, y).offset);
 }
 
-void DirectionSelector::Draw(const ui::Point& screenPos)
+void DirectionSelector::Draw(const ui::Point &screenPos)
 {
-	Graphics * g = GetGraphics();
+	Graphics *g = GetGraphics();
 	auto handleTrackRadius = radius + handleRadius;
 	ui::Point center = screenPos + Vec2{ handleTrackRadius, handleTrackRadius };
 
@@ -129,7 +138,13 @@ void DirectionSelector::Draw(const ui::Point& screenPos)
 		);
 	}
 
-	g->BlendFilledEllipse(center + value.offset, { handleRadius, handleRadius }, foregroundColor.NoAlpha().WithAlpha((mouseHover || mouseDown) ? std::min(int(foregroundColor.Alpha * 1.5f), 255) : foregroundColor.Alpha));
+	g->BlendFilledEllipse(
+		center + value.offset,
+		{ handleRadius, handleRadius },
+		foregroundColor.NoAlpha().WithAlpha(
+			(mouseHover || mouseDown) ? std::min(int(foregroundColor.Alpha * 1.5f), 255) : foregroundColor.Alpha
+		)
+	);
 	g->BlendEllipse(center + value.offset, { handleRadius, handleRadius }, borderColor);
 }
 

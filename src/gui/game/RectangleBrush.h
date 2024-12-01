@@ -1,7 +1,7 @@
 #pragma once
 #include "Brush.h"
 
-class RectangleBrush: public Brush
+class RectangleBrush : public Brush
 {
 public:
 	virtual ~RectangleBrush() override = default;

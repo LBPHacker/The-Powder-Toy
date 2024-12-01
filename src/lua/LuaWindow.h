@@ -1,15 +1,16 @@
 #pragma once
-#include "LuaLuna.h"
 #include "LuaComponent.h"
+#include "LuaLuna.h"
 #include "LuaSmartRef.h"
 #include <map>
 
 namespace ui
 {
-	class Window;
+class Window;
 }
 
 class LuaScriptInterface;
+
 class LuaWindow
 {
 	LuaComponentCallback onInitializedFunction;
@@ -29,14 +30,14 @@ class LuaWindow
 
 	std::map<LuaComponent *, LuaSmartRef> grabbedComponents;
 
-	ui::Window * window;
+	ui::Window *window;
 	lua_State *L;
 	int position(lua_State *L);
 	int size(lua_State *L);
 	int addComponent(lua_State *L);
 	int removeComponent(lua_State *L);
 
-	//Set event handlers
+	// Set event handlers
 	int onInitialized(lua_State *L);
 	int onExit(lua_State *L);
 	int onTick(lua_State *L);
@@ -68,11 +69,15 @@ class LuaWindow
 	void triggerOnKeyRelease(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt);
 
 public:
-	LuaScriptInterface * ci;
+	LuaScriptInterface *ci;
 	static const char className[];
 	static Luna<LuaWindow>::RegType methods[];
 
-	ui::Window * GetWindow() { return window; }
+	ui::Window *GetWindow()
+	{
+		return window;
+	}
+
 	void ClearRef(LuaComponent *luaComponent);
 
 	LuaWindow(lua_State *L);

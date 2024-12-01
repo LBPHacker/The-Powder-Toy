@@ -98,16 +98,8 @@ void LuaFileSystem::Open(lua_State *L)
 {
 	static const luaL_Reg reg[] = {
 #define LFUNC(v) { #v, v }
-		LFUNC(list),
-		LFUNC(exists),
-		LFUNC(isFile),
-		LFUNC(isDirectory),
-		LFUNC(isLink),
-		LFUNC(makeDirectory),
-		LFUNC(removeDirectory),
-		LFUNC(removeFile),
-		LFUNC(move),
-		LFUNC(copy),
+		LFUNC(list),          LFUNC(exists),          LFUNC(isFile),     LFUNC(isDirectory), LFUNC(isLink),
+		LFUNC(makeDirectory), LFUNC(removeDirectory), LFUNC(removeFile), LFUNC(move),        LFUNC(copy),
 #undef LFUNC
 		{ NULL, NULL }
 	};

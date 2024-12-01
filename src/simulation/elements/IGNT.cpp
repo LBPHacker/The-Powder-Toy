@@ -18,7 +18,7 @@ void Element::Element_IGNT()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -49,7 +49,7 @@ void Element::Element_IGNT()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	if(parts[i].tmp==0)
+	if (parts[i].tmp == 0)
 	{
 		for (auto rx = -1; rx <= 1; rx++)
 		{
@@ -57,11 +57,14 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[y + ry][x + rx];
 					if (!r)
+					{
 						continue;
+					}
 					auto rt = TYP(r);
-					if (rt==PT_FIRE || rt==PT_PLSM || rt==PT_SPRK || rt==PT_LIGH || (rt==PT_IGNT && parts[ID(r)].life==1))
+					if (rt == PT_FIRE || rt == PT_PLSM || rt == PT_SPRK || rt == PT_LIGH ||
+					    (rt == PT_IGNT && parts[ID(r)].life == 1))
 					{
 						parts[i].tmp = 1;
 					}
@@ -69,17 +72,18 @@ static int update(UPDATE_FUNC_ARGS)
 			}
 		}
 	}
-	else if(parts[i].life > 0)
+	else if (parts[i].life > 0)
 	{
 		if (sim->rng.chance(2, 3))
 		{
 			int nb = sim->create_part(-1, x + sim->rng.between(-1, 1), y + sim->rng.between(-1, 1), PT_EMBR);
-			if (nb!=-1) {
+			if (nb != -1)
+			{
 				parts[nb].tmp = 0;
 				parts[nb].life = 30;
 				parts[nb].vx = float(sim->rng.between(-10, 10));
 				parts[nb].vy = float(sim->rng.between(-10, 10));
-				parts[nb].temp = restrict_flt(parts[i].temp-273.15f+400.0f, MIN_TEMP, MAX_TEMP);
+				parts[nb].temp = restrict_flt(parts[i].temp - 273.15f + 400.0f, MIN_TEMP, MAX_TEMP);
 			}
 		}
 		else

@@ -9,7 +9,7 @@ GravityPtr Gravity::Create()
 	return GravityPtr(new Gravity());
 }
 
-void GravityDeleter::operator ()(Gravity *ptr) const
+void GravityDeleter::operator()(Gravity *ptr) const
 {
 	delete ptr;
 }

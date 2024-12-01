@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "FIRE.h"
+#include "simulation/ElementCommon.h"
 
 static int graphics(GRAPHICS_FUNC_ARGS);
 static void create(ELEMENT_CREATE_FUNC_ARGS);
@@ -20,7 +20,7 @@ void Element::Element_LAVA()
 	Collision = 0.0f;
 	Gravity = 0.15f;
 	Diffusion = 0.00f;
-	HotAir = 0.0003f	* CFDS;
+	HotAir = 0.0003f * CFDS;
 	Falldown = 2;
 
 	Flammable = 0;
@@ -33,16 +33,17 @@ void Element::Element_LAVA()
 
 	DefaultProperties.temp = R_TEMP + 1500.0f + 273.15f;
 	HeatConduct = 60;
-	Description = "Molten lava. Ignites flammable materials. Generated when metals and other materials melt, solidifies when cold.";
+	Description =
+		"Molten lava. Ignites flammable materials. Generated when metals and other materials melt, solidifies when cold.";
 
-	Properties = TYPE_LIQUID|PROP_LIFE_DEC;
+	Properties = TYPE_LIQUID | PROP_LIFE_DEC;
 	CarriesTypeIn = 1U << FIELD_CTYPE;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
 	HighPressure = IPH;
 	HighPressureTransition = NT;
-	LowTemperature = MAX_TEMP;// check for lava solidification at all temperatures
+	LowTemperature = MAX_TEMP; // check for lava solidification at all temperatures
 	LowTemperatureTransition = ST;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
@@ -57,16 +58,25 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	*colr = cpart->life * 2 + 0xE0;
 	*colg = cpart->life * 1 + 0x50;
 	*colb = cpart->life / 2 + 0x10;
-	if (*colr>255) *colr = 255;
-	if (*colg>192) *colg = 192;
-	if (*colb>128) *colb = 128;
+	if (*colr > 255)
+	{
+		*colr = 255;
+	}
+	if (*colg > 192)
+	{
+		*colg = 192;
+	}
+	if (*colb > 128)
+	{
+		*colb = 128;
+	}
 	*firea = 40;
 	*firer = *colr;
 	*fireg = *colg;
 	*fireb = *colb;
 	*pixel_mode |= FIRE_ADD;
 	*pixel_mode |= PMODE_BLUR;
-	//Returning 0 means dynamic, do not cache
+	// Returning 0 means dynamic, do not cache
 	return 0;
 }
 

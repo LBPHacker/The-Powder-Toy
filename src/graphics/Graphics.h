@@ -1,12 +1,12 @@
 #pragma once
 #include "Icons.h"
-#include "gui/interface/Point.h"
-#include "common/Plane.h"
-#include "SimulationConfig.h"
 #include "RasterDrawMethods.h"
+#include "SimulationConfig.h"
+#include "common/Plane.h"
+#include "gui/interface/Point.h"
 #include <array>
 
-class Graphics: public RasterDrawMethods<Graphics>
+class Graphics : public RasterDrawMethods<Graphics>
 {
 	PlaneAdapter<std::array<pixel, WINDOW.X * WINDOW.Y>, WINDOW.X, WINDOW.Y> video;
 	Rect<int> clipRect = video.Size().OriginRect();
@@ -19,7 +19,7 @@ public:
 		return video.Size();
 	}
 
-	pixel const *Data() const
+	const pixel *Data() const
 	{
 		return video.data();
 	}

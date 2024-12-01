@@ -1,11 +1,11 @@
+#include "Config.h"
 #include "PowderToySDL.h"
-#include "graphics/Graphics.h"
+#include "SimulationConfig.h"
 #include "common/platform/Platform.h"
 #include "common/tpt-rand.h"
+#include "graphics/Graphics.h"
 #include "gui/font/FontEditor.h"
 #include "gui/interface/Engine.h"
-#include "Config.h"
-#include "SimulationConfig.h"
 #include <iostream>
 #include <memory>
 
@@ -30,9 +30,10 @@ struct ExplicitSingletons
 	// These need to be listed in the order they are populated in main.
 	std::unique_ptr<ui::Engine> engine;
 };
+
 static std::unique_ptr<ExplicitSingletons> explicitSingletons;
 
-int main(int argc, char * argv[])
+int main(int argc, char *argv[])
 {
 	Platform::SetupCrt();
 	Platform::Atexit([]() {
@@ -40,7 +41,7 @@ int main(int argc, char * argv[])
 		explicitSingletons.reset();
 	});
 	explicitSingletons = std::make_unique<ExplicitSingletons>();
-	
+
 	WindowFrameOps windowFrameOps;
 	if (argc >= 3)
 	{

@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "COAL.h"
+#include "simulation/ElementCommon.h"
 
 void Element::Element_BCOL()
 {
@@ -17,7 +17,7 @@ void Element::Element_BCOL()
 	Collision = -0.1f;
 	Gravity = 0.3f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;

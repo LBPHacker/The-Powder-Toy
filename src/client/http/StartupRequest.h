@@ -4,13 +4,13 @@
 
 namespace http
 {
-	class StartupRequest : public Request
-	{
-		bool alternate;
+class StartupRequest : public Request
+{
+	bool alternate;
 
-	public:
-		StartupRequest(bool newAlternate);
+public:
+	StartupRequest(bool newAlternate);
 
-		StartupInfo Finish();
-	};
+	StartupInfo Finish();
+};
 }

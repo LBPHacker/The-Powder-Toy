@@ -1,6 +1,6 @@
 #include "X86KillDenormals.h"
-#include <xmmintrin.h>
 #include <pmmintrin.h>
+#include <xmmintrin.h>
 
 void X86KillDenormals()
 {

@@ -1,22 +1,22 @@
 #pragma once
+#include "CommandInterface.h"
 #include "LuaCompat.h"
 #include "LuaSmartRef.h"
-#include "CommandInterface.h"
 #include "gui/game/GameControllerEvents.h"
-#include "simulation/StructProperty.h"
 #include "simulation/ElementDefs.h"
+#include "simulation/StructProperty.h"
 #include <cstdint>
 #include <map>
 #include <memory>
 
 namespace http
 {
-	class Request;
+class Request;
 }
 
 namespace ui
 {
-	class Window;
+class Window;
 }
 
 class Graphics;
@@ -28,15 +28,18 @@ int LuaToLoggableString(lua_State *L, int n);
 String LuaGetError();
 void LuaGetProperty(lua_State *L, StructProperty property, intptr_t propertyAddress);
 void LuaSetProperty(lua_State *L, StructProperty property, intptr_t propertyAddress, int stackPos);
-void LuaSetParticleProperty(lua_State *L, int particleID, StructProperty property, intptr_t propertyAddress, int stackPos);
+void LuaSetParticleProperty(
+	lua_State *L, int particleID, StructProperty property, intptr_t propertyAddress, int stackPos
+);
 
 struct LuaStateDeleter
 {
-	void operator ()(lua_State *L) const
+	void operator()(lua_State *L) const
 	{
 		lua_close(L);
 	}
 };
+
 using LuaStatePtr = std::unique_ptr<lua_State, LuaStateDeleter>;
 
 enum UpdateMode
@@ -153,74 +156,74 @@ int tpt_lua_pcall(lua_State *L, int numArgs, int numResults, int errorFunc, Even
 
 namespace LuaHttp
 {
-	void Open(lua_State *L);
+void Open(lua_State *L);
 }
 
 namespace LuaBz2
 {
-	void Open(lua_State *L);
+void Open(lua_State *L);
 }
 
 namespace LuaElements
 {
-	void Open(lua_State *L);
+void Open(lua_State *L);
 }
 
 namespace LuaEvent
 {
-	void Open(lua_State *L);
+void Open(lua_State *L);
 }
 
 namespace LuaFileSystem
 {
-	void Open(lua_State *L);
+void Open(lua_State *L);
 }
 
 namespace LuaGraphics
 {
-	void Open(lua_State *L);
+void Open(lua_State *L);
 }
 
 namespace LuaInterface
 {
-	void Open(lua_State *L);
+void Open(lua_State *L);
 }
 
 namespace LuaMisc
 {
-	void Open(lua_State *L);
-	void Tick(lua_State *L);
+void Open(lua_State *L);
+void Tick(lua_State *L);
 }
 
 namespace LuaPlatform
 {
-	void Open(lua_State *L);
+void Open(lua_State *L);
 }
 
 namespace LuaRenderer
 {
-	void Open(lua_State *L);
+void Open(lua_State *L);
 }
 
 namespace LuaSimulation
 {
-	void Open(lua_State *L);
+void Open(lua_State *L);
 }
 
 namespace LuaSocket
 {
-	int GetTime(lua_State *L);
-	int Sleep(lua_State *L);
-	double Now();
-	void Timeout(double timeout);
-	void Open(lua_State *L);
-	void OpenTCP(lua_State *L);
+int GetTime(lua_State *L);
+int Sleep(lua_State *L);
+double Now();
+void Timeout(double timeout);
+void Open(lua_State *L);
+void OpenTCP(lua_State *L);
 }
 
 namespace LuaTools
 {
-	void Open(lua_State *L);
-	void SetToolIndex(lua_State *L, ByteString identifier, std::optional<int> index);
+void Open(lua_State *L);
+void SetToolIndex(lua_State *L, ByteString identifier, std::optional<int> index);
 }
 
 inline LuaScriptInterface *GetLSI()

@@ -1,6 +1,6 @@
 #include "TagsModel.h"
-#include "TagsView.h"
 #include "TagsModelException.h"
+#include "TagsView.h"
 #include "client/Client.h"
 #include "client/SaveInfo.h"
 #include "client/http/AddTagRequest.h"
@@ -60,7 +60,7 @@ void TagsModel::Tick()
 	if (!addTagRequest && !removeTagRequest && !queuedTags.empty())
 	{
 		auto it = queuedTags.begin();
-		auto [ tag, add ] = *it;
+		auto [tag, add] = *it;
 		queuedTags.erase(it);
 		if (save)
 		{
@@ -88,7 +88,7 @@ void TagsModel::AddTag(ByteString tag)
 	queuedTags[tag] = true;
 }
 
-void TagsModel::AddObserver(TagsView * observer)
+void TagsModel::AddObserver(TagsView *observer)
 {
 	observers.push_back(observer);
 	observer->NotifyTagsChanged(this);

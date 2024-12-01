@@ -1,32 +1,32 @@
 #include "Client.h"
-#include "prefs/GlobalPrefs.h"
-#include "client/http/StartupRequest.h"
 #include "ClientListener.h"
+#include "Config.h"
 #include "Format.h"
 #include "client/GameSave.h"
 #include "client/SaveFile.h"
 #include "client/SaveInfo.h"
 #include "client/UserInfo.h"
-#include "common/platform/Platform.h"
+#include "client/http/StartupRequest.h"
 #include "common/String.h"
+#include "common/platform/Platform.h"
 #include "graphics/Graphics.h"
 #include "gui/dialogues/ErrorMessage.h"
-#include "prefs/Prefs.h"
 #include "lua/CommandInterface.h"
-#include "Config.h"
-#include <cstring>
-#include <cstdlib>
-#include <vector>
-#include <map>
-#include <iostream>
-#include <iomanip>
-#include <cstdio>
-#include <fstream>
-#include <chrono>
+#include "prefs/GlobalPrefs.h"
+#include "prefs/Prefs.h"
 #include <algorithm>
+#include <chrono>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <map>
 #include <set>
+#include <vector>
 
-Client::Client():
+Client::Client() :
 	messageOfTheDay("Fetching the message of the day..."),
 	usingAltUpdateServer(false),
 	updateAvailable(false),
@@ -71,7 +71,7 @@ void Client::Initialize()
 		RescanStamps();
 	}
 
-	//Begin version check
+	// Begin version check
 	versionCheckRequest = std::make_unique<http::StartupRequest>(false);
 	versionCheckRequest->Start();
 	if constexpr (USE_UPDATESERVER)
@@ -181,7 +181,8 @@ std::optional<UpdateInfo> Client::GetUpdateInfo()
 
 void Client::notifyUpdateAvailable()
 {
-	for (std::vector<ClientListener*>::iterator iterator = listeners.begin(), end = listeners.end(); iterator != end; ++iterator)
+	for (std::vector<ClientListener *>::iterator iterator = listeners.begin(), end = listeners.end(); iterator != end;
+	     ++iterator)
 	{
 		(*iterator)->NotifyUpdateAvailable(this);
 	}
@@ -189,7 +190,8 @@ void Client::notifyUpdateAvailable()
 
 void Client::notifyMessageOfTheDay()
 {
-	for (std::vector<ClientListener*>::iterator iterator = listeners.begin(), end = listeners.end(); iterator != end; ++iterator)
+	for (std::vector<ClientListener *>::iterator iterator = listeners.begin(), end = listeners.end(); iterator != end;
+	     ++iterator)
 	{
 		(*iterator)->NotifyMessageOfTheDay(this);
 	}
@@ -197,7 +199,8 @@ void Client::notifyMessageOfTheDay()
 
 void Client::notifyAuthUserChanged()
 {
-	for (std::vector<ClientListener*>::iterator iterator = listeners.begin(), end = listeners.end(); iterator != end; ++iterator)
+	for (std::vector<ClientListener *>::iterator iterator = listeners.begin(), end = listeners.end(); iterator != end;
+	     ++iterator)
 	{
 		(*iterator)->NotifyAuthUserChanged(this);
 	}
@@ -205,22 +208,24 @@ void Client::notifyAuthUserChanged()
 
 void Client::notifyNewNotification(ServerNotification notification)
 {
-	for (std::vector<ClientListener*>::iterator iterator = listeners.begin(), end = listeners.end(); iterator != end; ++iterator)
+	for (std::vector<ClientListener *>::iterator iterator = listeners.begin(), end = listeners.end(); iterator != end;
+	     ++iterator)
 	{
 		(*iterator)->NotifyNewNotification(this, notification);
 	}
 }
 
-void Client::AddListener(ClientListener * listener)
+void Client::AddListener(ClientListener *listener)
 {
 	listeners.push_back(listener);
 }
 
-void Client::RemoveListener(ClientListener * listener)
+void Client::RemoveListener(ClientListener *listener)
 {
-	for (std::vector<ClientListener*>::iterator iterator = listeners.begin(), end = listeners.end(); iterator != end; ++iterator)
+	for (std::vector<ClientListener *>::iterator iterator = listeners.begin(), end = listeners.end(); iterator != end;
+	     ++iterator)
 	{
-		if((*iterator) == listener)
+		if ((*iterator) == listener)
 		{
 			listeners.erase(iterator);
 			return;
@@ -270,9 +275,13 @@ std::unique_ptr<SaveFile> Client::GetStamp(ByteString stampID)
 	ByteString stampFile = ByteString(ByteString::Build(STAMPS_DIR, PATH_SEP_CHAR, stampID, ".stm"));
 	auto saveFile = LoadSaveFile(stampFile);
 	if (!saveFile)
+	{
 		saveFile = LoadSaveFile(stampID);
+	}
 	else
+	{
 		saveFile->SetDisplayName(stampID.FromUtf8());
+	}
 	return saveFile;
 }
 
@@ -323,7 +332,9 @@ ByteString Client::AddStamp(std::unique_ptr<GameSave> saveData)
 	ByteString saveID, filename;
 	while (true)
 	{
-		saveID = ByteString::Build(Format::Hex(Format::Width(lastStampTime, 8)), Format::Hex(Format::Width(lastStampName, 2)));
+		saveID = ByteString::Build(
+			Format::Hex(Format::Width(lastStampTime, 8)), Format::Hex(Format::Width(lastStampName, 2))
+		);
 		filename = ByteString::Build(STAMPS_DIR, PATH_SEP_CHAR, saveID, ".stm");
 		if (!Platform::FileExists(filename))
 		{
@@ -349,7 +360,9 @@ ByteString Client::AddStamp(std::unique_ptr<GameSave> saveData)
 	std::vector<char> gameData;
 	std::tie(std::ignore, gameData) = saveData->Serialise();
 	if (!gameData.size())
+	{
 		return "";
+	}
 
 	Platform::WriteFile(gameData, filename);
 	MoveStampToFront(saveID);
@@ -457,7 +470,9 @@ void Client::MergeStampAuthorInfo(Json::Value stampAuthors)
 		{
 			// Don't add if it's exactly the same
 			if (stampAuthors["links"].size() == 1 && stampAuthors["links"][0] == Client::Ref().authors)
+			{
 				return;
+			}
 			if (authors["username"] != stampAuthors["username"])
 			{
 				// 2nd arg of MergeAuthorInfo needs to be an array
@@ -471,7 +486,9 @@ void Client::MergeStampAuthorInfo(Json::Value stampAuthors)
 			}
 		}
 		else
+		{
 			authors = stampAuthors;
+		}
 	}
 }
 
@@ -482,41 +499,56 @@ void Client::MergeAuthorInfo(Json::Value linksToAdd)
 	{
 		// link is the same exact json we have open, don't do anything
 		if (linksToAdd[i] == authors)
+		{
 			return;
+		}
 
 		bool hasLink = false;
 		for (Json::Value::ArrayIndex j = 0; j < authors["links"].size(); j++)
 		{
 			// check everything in authors["links"] to see if it's the same json as what we are already adding
 			if (authors["links"][j] == linksToAdd[i])
+			{
 				hasLink = true;
+			}
 		}
 		if (!hasLink)
+		{
 			authors["links"].append(linksToAdd[i]);
+		}
 	}
 }
 
-// load current authors information into a json value (when saving everything: stamps, clipboard, local saves, and online saves)
+// load current authors information into a json value (when saving everything: stamps, clipboard, local saves, and
+// online saves)
 void Client::SaveAuthorInfo(Json::Value *saveInto)
 {
 	if (authors.size() != 0)
 	{
 		// Different username? Save full original save info
 		if (authors["username"] != (*saveInto)["username"])
+		{
 			(*saveInto)["links"].append(authors);
+		}
 		// This is probalby the same save
 		// Don't append another layer of links, just keep existing links
 		else if (authors["links"].size())
+		{
 			(*saveInto)["links"] = authors["links"];
+		}
 	}
 }
 
 String Client::DoMigration(ByteString fromDir, ByteString toDir)
 {
 	if (fromDir.at(fromDir.length() - 1) != '/')
+	{
 		fromDir = fromDir + '/';
+	}
 	if (toDir.at(toDir.length() - 1) != '/')
+	{
 		toDir = toDir + '/';
+	}
 
 	std::ofstream logFile(fromDir + "/migrationlog.txt", std::ios::out);
 	logFile << "Running migration of data from " << fromDir + " to " << toDir << std::endl;
@@ -531,7 +563,8 @@ String Client::DoMigration(ByteString fromDir, ByteString toDir)
 	bool hasAutorun = Platform::FileExists(fromDir + "autorun.lua");
 	bool hasPref = Platform::FileExists(fromDir + "powder.pref");
 
-	if (stamps.empty() && saves.empty() && scripts.empty() && downloadedScripts.empty() && screenshots.empty() && !hasAutorun && !hasPref)
+	if (stamps.empty() && saves.empty() && scripts.empty() && downloadedScripts.empty() && screenshots.empty() &&
+	    !hasAutorun && !hasPref)
 	{
 		logFile << "Nothing to migrate.";
 		return "Nothing to migrate. This button is used to migrate data from pre-96.0 TPT installations to the shared directory";
@@ -544,7 +577,9 @@ String Client::DoMigration(ByteString fromDir, ByteString toDir)
 	auto migrateList = [&](std::vector<ByteString> list, ByteString directory, String niceName) {
 		result << '\n' << niceName << ": ";
 		if (!list.empty() && !directory.empty())
+		{
 			Platform::MakeDirectory(toDir + directory);
+		}
 		int migratedCount = 0, failedCount = 0;
 		for (auto &item : list)
 		{
@@ -573,7 +608,9 @@ String Client::DoMigration(ByteString fromDir, ByteString toDir)
 		result << "\bt" << migratedCount << " migratated\x0E, \br" << failedCount << " failed\x0E";
 		int duplicates = list.size() - migratedCount - failedCount;
 		if (duplicates)
+		{
 			result << ", " << list.size() - migratedCount - failedCount << " skipped (duplicate)";
+		}
 	};
 
 	// Migrate a single file
@@ -599,7 +636,8 @@ String Client::DoMigration(ByteString fromDir, ByteString toDir)
 			result << '\n' << filename.FromUtf8() << " skipped (already exists)";
 		}
 
-		if (!Platform::RemoveFile(fromDir + filename)) {
+		if (!Platform::RemoveFile(fromDir + filename))
+		{
 			logFile << "failed to delete " << filename << std::endl;
 		}
 	};
@@ -610,24 +648,33 @@ String Client::DoMigration(ByteString fromDir, ByteString toDir)
 	migrateList(stamps, "stamps", "Stamps");
 	migrateList(saves, "Saves", "Saves");
 	if (!scripts.empty())
+	{
 		migrateList(scripts, "scripts", "Scripts");
+	}
 	if (!hasScriptinfo && !downloadedScripts.empty())
 	{
 		migrateList(downloadedScripts, "scripts/downloaded", "Downloaded scripts");
 		migrateFile("scripts/downloaded/scriptinfo");
 	}
 	if (!screenshots.empty())
+	{
 		migrateList(screenshots, "", "Screenshots");
+	}
 	if (hasAutorun)
+	{
 		migrateFile("autorun.lua");
+	}
 	if (hasPref)
+	{
 		migrateFile("powder.pref");
+	}
 
 	// Delete leftover directories
 	while (!dirsToDelete.empty())
 	{
 		ByteString toDelete = dirsToDelete.top();
-		if (!Platform::DeleteDirectory(fromDir + toDelete)) {
+		if (!Platform::DeleteDirectory(fromDir + toDelete))
+		{
 			logFile << "failed to delete " << toDelete << std::endl;
 		}
 		dirsToDelete.pop();

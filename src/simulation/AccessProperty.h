@@ -17,6 +17,6 @@ struct AccessProperty
 	{
 		using runtime_error::runtime_error;
 	};
+
 	static AccessProperty Parse(int prop, String value);
 };
-

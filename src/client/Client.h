@@ -1,13 +1,13 @@
 #pragma once
-#include "common/String.h"
-#include "common/ExplicitSingleton.h"
 #include "StartupInfo.h"
 #include "User.h"
-#include <vector>
+#include "common/ExplicitSingleton.h"
+#include "common/String.h"
 #include <cstdint>
+#include <json/json.h>
 #include <list>
 #include <memory>
-#include <json/json.h>
+#include <vector>
 
 class SaveInfo;
 class SaveFile;
@@ -17,11 +17,14 @@ class VideoBuffer;
 class Prefs;
 class RequestListener;
 class ClientListener;
+
 namespace http
 {
-	class StartupRequest;
+class StartupRequest;
 }
-class Client: public ExplicitSingleton<Client> {
+
+class Client : public ExplicitSingleton<Client>
+{
 private:
 	String messageOfTheDay;
 	std::vector<ServerNotification> serverNotifications;
@@ -38,7 +41,7 @@ private:
 	uint64_t lastStampTime = 0;
 	int lastStampName = 0;
 
-	//Auth session
+	// Auth session
 	User authUser;
 
 	void notifyUpdateAvailable();
@@ -57,17 +60,33 @@ private:
 	void SaveAuthUser();
 
 public:
-
-	std::vector<ClientListener*> listeners;
+	std::vector<ClientListener *> listeners;
 
 	// Save stealing info
 	void MergeStampAuthorInfo(Json::Value linksToAdd);
 	void MergeAuthorInfo(Json::Value linksToAdd);
-	void OverwriteAuthorInfo(Json::Value overwrite) { authors = overwrite; }
-	Json::Value GetAuthorInfo() { return authors; }
+
+	void OverwriteAuthorInfo(Json::Value overwrite)
+	{
+		authors = overwrite;
+	}
+
+	Json::Value GetAuthorInfo()
+	{
+		return authors;
+	}
+
 	void SaveAuthorInfo(Json::Value *saveInto);
-	void ClearAuthorInfo() { authors.clear(); }
-	bool IsAuthorsEmpty() { return authors.size() == 0; }
+
+	void ClearAuthorInfo()
+	{
+		authors.clear();
+	}
+
+	bool IsAuthorsEmpty()
+	{
+		return authors.size() == 0;
+	}
 
 	std::optional<UpdateInfo> GetUpdateInfo();
 
@@ -75,7 +94,7 @@ public:
 	~Client();
 
 	ByteString FileOpenDialogue();
-	//std::string FileSaveDialogue();
+	// std::string FileSaveDialogue();
 
 	void AddServerNotification(ServerNotification notification);
 	std::vector<ServerNotification> GetServerNotifications();
@@ -86,8 +105,8 @@ public:
 	void Initialize();
 	bool IsFirstRun();
 
-	void AddListener(ClientListener * listener);
-	void RemoveListener(ClientListener * listener);
+	void AddListener(ClientListener *listener);
+	void RemoveListener(ClientListener *listener);
 
 	std::unique_ptr<SaveFile> GetStamp(ByteString stampID);
 	void DeleteStamp(ByteString stampID);
@@ -102,6 +121,6 @@ public:
 	void SetAuthUser(User user);
 	User GetAuthUser();
 	void Tick();
-	
+
 	String DoMigration(ByteString fromDir, ByteString toDir);
 };

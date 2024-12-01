@@ -19,7 +19,7 @@ void Element::Element_C5()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -57,17 +57,21 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
+				{
 					continue;
-				if ((TYP(r)!=PT_C5 && parts[ID(r)].temp<100 && elements[TYP(r)].HeatConduct && (TYP(r)!=PT_HSWC||parts[ID(r)].life==10)) || TYP(r)==PT_CFLM)
+				}
+				if ((TYP(r) != PT_C5 && parts[ID(r)].temp < 100 && elements[TYP(r)].HeatConduct &&
+				     (TYP(r) != PT_HSWC || parts[ID(r)].life == 10)) ||
+				    TYP(r) == PT_CFLM)
 				{
 					if (sim->rng.chance(1, 6))
 					{
-						sim->part_change_type(i,x,y,PT_CFLM);
+						sim->part_change_type(i, x, y, PT_CFLM);
 						parts[ID(r)].temp = parts[i].temp = 0;
 						parts[i].life = sim->rng.between(50, 199);
-						sim->pv[y/CELL][x/CELL] += 1.5;
+						sim->pv[y / CELL][x / CELL] += 1.5;
 					}
 				}
 			}
@@ -98,18 +102,23 @@ static int update(UPDATE_FUNC_ARGS)
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
-	if(!cpart->ctype)
+	if (!cpart->ctype)
+	{
 		return 0;
+	}
 
 	int x = 0;
 	*colr = *colg = *colb = 0;
-	for (x=0; x<12; x++) {
-		*colr += (cpart->ctype >> (x+18)) & 1;
-		*colb += (cpart->ctype >>  x)     & 1;
+	for (x = 0; x < 12; x++)
+	{
+		*colr += (cpart->ctype >> (x + 18)) & 1;
+		*colb += (cpart->ctype >> x) & 1;
 	}
-	for (x=0; x<12; x++)
-		*colg += (cpart->ctype >> (x+9))  & 1;
-	x = 624/(*colr+*colg+*colb+1);
+	for (x = 0; x < 12; x++)
+	{
+		*colg += (cpart->ctype >> (x + 9)) & 1;
+	}
+	x = 624 / (*colr + *colg + *colb + 1);
 	*colr *= x;
 	*colg *= x;
 	*colb *= x;

@@ -18,7 +18,7 @@ void Element::Element_RIME()
 	Collision = 0.00f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f  * CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -54,17 +54,19 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
-					continue;
-				if (TYP(r)==PT_SPRK)
 				{
-					sim->part_change_type(i,x,y,PT_FOG);
+					continue;
+				}
+				if (TYP(r) == PT_SPRK)
+				{
+					sim->part_change_type(i, x, y, PT_FOG);
 					parts[i].life = sim->rng.between(60, 119);
 				}
-				else if (TYP(r)==PT_FOG&&parts[ID(r)].life>0)
+				else if (TYP(r) == PT_FOG && parts[ID(r)].life > 0)
 				{
-					sim->part_change_type(i,x,y,PT_FOG);
+					sim->part_change_type(i, x, y, PT_FOG);
 					parts[i].life = parts[ID(r)].life;
 				}
 			}

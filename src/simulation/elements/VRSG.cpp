@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "VIRS.h"
+#include "simulation/ElementCommon.h"
 
 static int graphics(GRAPHICS_FUNC_ARGS);
 
@@ -19,7 +19,7 @@ void Element::Element_VRSG()
 	Collision = -0.1f;
 	Gravity = 0.0f;
 	Diffusion = 0.75f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 500;
@@ -33,7 +33,7 @@ void Element::Element_VRSG()
 	HeatConduct = 251;
 	Description = "Gas Virus. Turns everything it touches into virus.";
 
-	Properties = TYPE_GAS|PROP_DEADLY;
+	Properties = TYPE_GAS | PROP_DEADLY;
 	CarriesTypeIn = 1U << FIELD_TMP2;
 
 	LowPressure = IPL;
@@ -55,9 +55,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 {
 	*pixel_mode &= ~PMODE;
 	*pixel_mode |= FIRE_BLEND;
-	*firer = *colr/2;
-	*fireg = *colg/2;
-	*fireb = *colb/2;
+	*firer = *colr / 2;
+	*fireg = *colg / 2;
+	*fireb = *colb / 2;
 	*firea = 125;
 	*pixel_mode |= NO_DECO;
 	return 1;

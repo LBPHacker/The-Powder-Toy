@@ -2,17 +2,19 @@
 #include "common/String.h"
 
 class Tool;
+
 class Menu
 {
 	String::value_type icon;
 	String description;
-	std::vector<Tool*> tools;
+	std::vector<Tool *> tools;
 	bool visible;
+
 public:
 	Menu(String::value_type icon_, String description_, int visible_);
 	virtual ~Menu();
 
-	std::vector<Tool*> GetToolList()
+	std::vector<Tool *> GetToolList()
 	{
 		return tools;
 	}
@@ -32,7 +34,6 @@ public:
 		return visible;
 	}
 
-	void AddTool(Tool * tool_);
+	void AddTool(Tool *tool_);
 	void ClearTools();
 };
-

@@ -1,3 +1,5 @@
+#include "Format.h"
+#include "graphics/VideoBuffer.h"
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -5,14 +7,12 @@
 #include <iostream>
 #include <iterator>
 #include <optional>
-#include <stdexcept>
 #include <png.h>
-#include "Format.h"
-#include "graphics/VideoBuffer.h"
+#include <stdexcept>
 
 ByteString format::UnixtimeToDate(time_t unixtime, ByteString dateFormat, bool local)
 {
-	struct tm * timeData;
+	struct tm *timeData;
 	char buffer[128];
 
 	if (local)
@@ -34,11 +34,11 @@ ByteString format::UnixtimeToDateMini(time_t unixtime)
 	struct tm currentTimeData = *gmtime(&currentTime);
 	struct tm timeData = *gmtime(&unixtime);
 
-	if(currentTimeData.tm_year != timeData.tm_year)
+	if (currentTimeData.tm_year != timeData.tm_year)
 	{
 		return UnixtimeToDate(unixtime, "%d %b %Y");
 	}
-	else if(currentTimeData.tm_mon != timeData.tm_mon || currentTimeData.tm_mday != timeData.tm_mday)
+	else if (currentTimeData.tm_mon != timeData.tm_mon || currentTimeData.tm_mday != timeData.tm_mday)
 	{
 		return UnixtimeToDate(unixtime, "%d %B");
 	}
@@ -52,7 +52,7 @@ String format::CleanString(String dirtyString, bool ascii, bool color, bool newl
 {
 	for (size_t i = 0; i < dirtyString.size(); i++)
 	{
-		switch(dirtyString[i])
+		switch (dirtyString[i])
 		{
 		case '\b':
 			if (color)
@@ -61,7 +61,9 @@ String format::CleanString(String dirtyString, bool ascii, bool color, bool newl
 				i--;
 			}
 			else
+			{
 				i++;
+			}
 			break;
 		case '\x0E':
 			if (color)
@@ -77,12 +79,16 @@ String format::CleanString(String dirtyString, bool ascii, bool color, bool newl
 				i--;
 			}
 			else
+			{
 				i += 3;
+			}
 			break;
 		case '\r':
 		case '\n':
 			if (newlines)
+			{
 				dirtyString[i] = ' ';
+			}
 			break;
 		default:
 			if (numeric && (dirtyString[i] < '0' || dirtyString[i] > '9'))
@@ -102,7 +108,7 @@ String format::CleanString(String dirtyString, bool ascii, bool color, bool newl
 	return dirtyString;
 }
 
-std::vector<char> format::PixelsToPPM(PlaneAdapter<std::vector<pixel>> const &input)
+std::vector<char> format::PixelsToPPM(const PlaneAdapter<std::vector<pixel>> &input)
 {
 	std::vector<char> data;
 	char buffer[256];
@@ -123,13 +129,13 @@ std::vector<char> format::PixelsToPPM(PlaneAdapter<std::vector<pixel>> const &in
 }
 
 static std::unique_ptr<PlaneAdapter<std::vector<uint32_t>>> readPNG(
-	std::vector<char> const &data,
+	const std::vector<char> &data,
 	// If omitted,
-	//   RGB data is returned with A=0xFF
-	//   RGBA data is returned as itself
-	// If specified
-	//   RGB data is returned with A=0x00
-	//   RGBA data is blended against the background and returned with A=0x00
+    //   RGB data is returned with A=0xFF
+    //   RGBA data is returned as itself
+    // If specified
+    //   RGB data is returned with A=0x00
+    //   RGBA data is blended against the background and returned with A=0x00
 	std::optional<RGB<uint8_t>> background
 )
 {
@@ -138,39 +144,52 @@ static std::unique_ptr<PlaneAdapter<std::vector<uint32_t>>> readPNG(
 		png_destroy_read_struct(&png, &info, NULL);
 	};
 	auto png = std::unique_ptr<png_struct, decltype(deleter)>(
-		png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL,
+		png_create_read_struct(
+			PNG_LIBPNG_VER_STRING,
+			NULL,
 			[](png_structp png, png_const_charp msg) {
 				fprintf(stderr, "PNG error: %s\n", msg);
 			},
 			[](png_structp png, png_const_charp msg) {
 				fprintf(stderr, "PNG warning: %s\n", msg);
 			}
-		), deleter
+		),
+		deleter
 	);
 	if (!png)
+	{
 		return nullptr;
+	}
 
 	// libpng might longjmp() here in case of error
 	// Every time we create an object with a non-trivial destructor we must call setjmp again
 	if (setjmp(png_jmpbuf(png.get())))
+	{
 		return nullptr;
+	}
 
 	info = png_create_info_struct(png.get());
 	if (!info)
+	{
 		return nullptr;
+	}
 
 	auto it = data.begin();
-	auto const end = data.end();
+	const auto end = data.end();
 	auto readFn = [&it, end](png_structp png, png_bytep data, size_t length) {
 		if (size_t(end - it) < length)
+		{
 			png_error(png, "Tried to read beyond the buffer");
+		}
 		std::copy_n(it, length, data);
 		it += length;
 	};
 
 	// See above
 	if (setjmp(png_jmpbuf(png.get())))
+	{
 		return nullptr;
+	}
 
 	png_set_read_fn(png.get(), static_cast<void *>(&readFn), [](png_structp png, png_bytep data, size_t length) {
 		(*static_cast<decltype(readFn) *>(png_get_io_ptr(png)))(png, data, length);
@@ -184,11 +203,15 @@ static std::unique_ptr<PlaneAdapter<std::vector<uint32_t>>> readPNG(
 
 	std::vector<png_bytep> rowPointers(output->Size().Y);
 	for (int y = 0; y < output->Size().Y; y++)
+	{
 		rowPointers[y] = reinterpret_cast<png_bytep>(&*output->RowIterator(Vec2(0, y)));
+	}
 
 	// See above
 	if (setjmp(png_jmpbuf(png.get())))
+	{
 		return nullptr;
+	}
 
 	png_set_filler(png.get(), background ? 0x00 : 0xFF, PNG_FILLER_AFTER);
 	png_set_bgr(png.get());
@@ -196,15 +219,25 @@ static std::unique_ptr<PlaneAdapter<std::vector<uint32_t>>> readPNG(
 	auto bitDepth = png_get_bit_depth(png.get(), info);
 	auto colorType = png_get_color_type(png.get(), info);
 	if (colorType == PNG_COLOR_TYPE_PALETTE)
+	{
 		png_set_palette_to_rgb(png.get());
+	}
 	if (colorType == PNG_COLOR_TYPE_GRAY && bitDepth < 8)
+	{
 		png_set_expand_gray_1_2_4_to_8(png.get());
+	}
 	if (bitDepth == 16)
+	{
 		png_set_scale_16(png.get());
+	}
 	if (png_get_valid(png.get(), info, PNG_INFO_tRNS))
+	{
 		png_set_tRNS_to_alpha(png.get());
+	}
 	if (colorType == PNG_COLOR_TYPE_GRAY || colorType == PNG_COLOR_TYPE_GRAY_ALPHA)
+	{
 		png_set_gray_to_rgb(png.get());
+	}
 	if (background)
 	{
 		png_color_16 colour;
@@ -218,44 +251,53 @@ static std::unique_ptr<PlaneAdapter<std::vector<uint32_t>>> readPNG(
 	return output;
 }
 
-std::unique_ptr<PlaneAdapter<std::vector<pixel_rgba>>> format::PixelsFromPNG(std::vector<char> const &data)
+std::unique_ptr<PlaneAdapter<std::vector<pixel_rgba>>> format::PixelsFromPNG(const std::vector<char> &data)
 {
 	return readPNG(data, std::nullopt);
 }
 
-std::unique_ptr<PlaneAdapter<std::vector<pixel>>> format::PixelsFromPNG(std::vector<char> const &data, RGB<uint8_t> background)
+std::unique_ptr<PlaneAdapter<std::vector<pixel>>>
+	format::PixelsFromPNG(const std::vector<char> &data, RGB<uint8_t> background)
 {
 	return readPNG(data, background);
 }
 
-std::unique_ptr<std::vector<char>> format::PixelsToPNG(PlaneAdapter<std::vector<pixel>> const &input)
+std::unique_ptr<std::vector<char>> format::PixelsToPNG(const PlaneAdapter<std::vector<pixel>> &input)
 {
 	png_infop info = nullptr;
 	auto deleter = [&info](png_struct *png) {
 		png_destroy_write_struct(&png, &info);
 	};
 	auto png = std::unique_ptr<png_struct, decltype(deleter)>(
-		png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL,
+		png_create_write_struct(
+			PNG_LIBPNG_VER_STRING,
+			NULL,
 			[](png_structp png, png_const_charp msg) {
 				fprintf(stderr, "PNG error: %s\n", msg);
 			},
 			[](png_structp png, png_const_charp msg) {
 				fprintf(stderr, "PNG warning: %s\n", msg);
 			}
-		), deleter
+		),
+		deleter
 	);
 	if (!png)
+	{
 		return nullptr;
+	}
 
 	// libpng might longjmp() here in case of error
 	// Every time we create an object with a non-trivial destructor we must call setjmp again
 	if (setjmp(png_jmpbuf(png.get())))
+	{
 		return nullptr;
-
+	}
 
 	info = png_create_info_struct(png.get());
 	if (!info)
+	{
 		return nullptr;
+	}
 
 	std::vector<char> output;
 	auto writeFn = [&output](png_structp png, png_bytep data, size_t length) {
@@ -264,16 +306,35 @@ std::unique_ptr<std::vector<char>> format::PixelsToPNG(PlaneAdapter<std::vector<
 
 	std::vector<png_const_bytep> rowPointers(input.Size().Y);
 	for (int y = 0; y < input.Size().Y; y++)
+	{
 		rowPointers[y] = reinterpret_cast<png_const_bytep>(&*input.RowIterator(Vec2(0, y)));
+	}
 
 	// See above
 	if (setjmp(png_jmpbuf(png.get())))
+	{
 		return nullptr;
+	}
 
-	png_set_write_fn(png.get(), static_cast<void *>(&writeFn), [](png_structp png, png_bytep data, size_t length) {
-		(*static_cast<decltype(writeFn) *>(png_get_io_ptr(png)))(png, data, length);
-	}, NULL);
-	png_set_IHDR(png.get(), info, input.Size().X, input.Size().Y, 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+	png_set_write_fn(
+		png.get(),
+		static_cast<void *>(&writeFn),
+		[](png_structp png, png_bytep data, size_t length) {
+			(*static_cast<decltype(writeFn) *>(png_get_io_ptr(png)))(png, data, length);
+		},
+		NULL
+	);
+	png_set_IHDR(
+		png.get(),
+		info,
+		input.Size().X,
+		input.Size().Y,
+		8,
+		PNG_COLOR_TYPE_RGB,
+		PNG_INTERLACE_NONE,
+		PNG_COMPRESSION_TYPE_DEFAULT,
+		PNG_FILTER_TYPE_DEFAULT
+	);
 	png_write_info(png.get(), info);
 	png_set_filler(png.get(), 0x00, PNG_FILLER_AFTER);
 	png_set_bgr(png.get());
@@ -290,14 +351,12 @@ ByteString format::URLEncode(ByteString source)
 	ByteString result;
 	for (auto it = source.begin(); it < source.end(); ++it)
 	{
-		if (!((*it >= 'a' && *it <= 'z') ||
-		      (*it >= 'A' && *it <= 'Z') ||
-		      (*it >= '0' && *it <= '9')))
+		if (!((*it >= 'a' && *it <= 'z') || (*it >= 'A' && *it <= 'Z') || (*it >= '0' && *it <= '9')))
 		{
 			auto byte = uint8_t(*it);
 			result.append(1, '%');
 			result.append(1, hex[(byte >> 4) & 0xF]);
-			result.append(1, hex[ byte       & 0xF]);
+			result.append(1, hex[byte & 0xF]);
 		}
 		else
 		{

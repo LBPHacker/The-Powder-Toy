@@ -19,7 +19,20 @@ public:
 	int topicReplies;
 	int reputation;
 
-	UserInfo(int id, int age, ByteString username, String biography, String location, ByteString website, int saveCount, float averageScore, int highestScore, int topicCount, int topicReplies, int reputation):
+	UserInfo(
+		int id,
+		int age,
+		ByteString username,
+		String biography,
+		String location,
+		ByteString website,
+		int saveCount,
+		float averageScore,
+		int highestScore,
+		int topicCount,
+		int topicReplies,
+		int reputation
+	) :
 		UserID(id),
 		age(age),
 		username(username),
@@ -32,6 +45,10 @@ public:
 		topicCount(topicCount),
 		topicReplies(topicReplies),
 		reputation(reputation)
-	{ }
-	UserInfo() {}
+	{
+	}
+
+	UserInfo()
+	{
+	}
 };

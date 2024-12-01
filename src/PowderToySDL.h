@@ -1,10 +1,10 @@
 #pragma once
+#include "FpsLimit.h"
 #include "common/String.h"
 #include "graphics/Pixel.h"
 #include "gui/WindowFrameOps.h"
-#include "FpsLimit.h"
-#include <cstdint>
 #include <SDL.h>
+#include <cstdint>
 #include <variant>
 
 extern int desktopWidth;

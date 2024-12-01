@@ -1,11 +1,11 @@
-#include "Platform.h"
 #include "Android.h"
-#include "common/Defer.h"
 #include "Config.h"
-#include <ctime>
+#include "Platform.h"
+#include "common/Defer.h"
 #include <SDL.h>
-#include <jni.h>
 #include <android/log.h>
+#include <ctime>
+#include <jni.h>
 
 namespace Platform
 {
@@ -38,10 +38,12 @@ void SetupCrt()
 std::optional<ByteString> CallActivityStringFunc(const char *funcName)
 {
 	ByteString result;
+
 	struct CheckFailed : public std::runtime_error
 	{
 		using runtime_error::runtime_error;
 	};
+
 	try
 	{
 		auto CHECK = [](auto thing, const char *what) {
@@ -52,21 +54,28 @@ std::optional<ByteString> CallActivityStringFunc(const char *funcName)
 			return thing;
 		};
 #define CHECK(a) CHECK(a, #a)
-		auto *env              = CHECK((JNIEnv *)SDL_AndroidGetJNIEnv());
-		auto activityInst      = CHECK((jobject)SDL_AndroidGetActivity());
-		auto activityCls       = CHECK(env->GetObjectClass(activityInst));
+		auto *env = CHECK((JNIEnv *)SDL_AndroidGetJNIEnv());
+		auto activityInst = CHECK((jobject)SDL_AndroidGetActivity());
+		auto activityCls = CHECK(env->GetObjectClass(activityInst));
 		auto getClassLoaderMth = CHECK(env->GetMethodID(activityCls, "getClassLoader", "()Ljava/lang/ClassLoader;"));
-		auto classLoaderInst   = CHECK(env->CallObjectMethod(activityInst, getClassLoaderMth));
-		auto classLoaderCls    = CHECK(env->FindClass("java/lang/ClassLoader"));
-		auto findClassMth      = CHECK(env->GetMethodID(classLoaderCls, "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;"));
-		auto strClassName      = CHECK(env->NewStringUTF(ByteString::Build(APPID, ".PowderActivity").c_str()));
-		Defer deleteStrClassName([env, strClassName]() { env->DeleteLocalRef(strClassName); });
-		auto mPowderActivity   = CHECK((jclass)(env->CallObjectMethod(classLoaderInst, findClassMth, strClassName)));
-		auto funcMth           = CHECK(env->GetMethodID(mPowderActivity, funcName, "()Ljava/lang/String;"));
-		auto resultRef         = CHECK((jstring)env->CallObjectMethod(activityInst, funcMth));
-		Defer deleteStr([env, resultRef]() { env->DeleteLocalRef(resultRef); });
-		auto *resultBytes      = CHECK(env->GetStringUTFChars(resultRef, 0));
-		Defer deleteUtf([env, resultRef, resultBytes]() { env->ReleaseStringUTFChars(resultRef, resultBytes); });
+		auto classLoaderInst = CHECK(env->CallObjectMethod(activityInst, getClassLoaderMth));
+		auto classLoaderCls = CHECK(env->FindClass("java/lang/ClassLoader"));
+		auto findClassMth =
+			CHECK(env->GetMethodID(classLoaderCls, "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;"));
+		auto strClassName = CHECK(env->NewStringUTF(ByteString::Build(APPID, ".PowderActivity").c_str()));
+		Defer deleteStrClassName([env, strClassName]() {
+			env->DeleteLocalRef(strClassName);
+		});
+		auto mPowderActivity = CHECK((jclass)(env->CallObjectMethod(classLoaderInst, findClassMth, strClassName)));
+		auto funcMth = CHECK(env->GetMethodID(mPowderActivity, funcName, "()Ljava/lang/String;"));
+		auto resultRef = CHECK((jstring)env->CallObjectMethod(activityInst, funcMth));
+		Defer deleteStr([env, resultRef]() {
+			env->DeleteLocalRef(resultRef);
+		});
+		auto *resultBytes = CHECK(env->GetStringUTFChars(resultRef, 0));
+		Defer deleteUtf([env, resultRef, resultBytes]() {
+			env->ReleaseStringUTFChars(resultRef, resultBytes);
+		});
 		result = resultBytes;
 	}
 	catch (const CheckFailed &ex)

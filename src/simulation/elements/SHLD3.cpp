@@ -18,7 +18,7 @@ void Element::Element_SHLD3()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -31,7 +31,7 @@ void Element::Element_SHLD3()
 	HeatConduct = 0;
 	Description = "Shield lvl 3.";
 
-	Properties = TYPE_SOLID|PROP_LIFE_DEC;
+	Properties = TYPE_SOLID | PROP_LIFE_DEC;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -53,40 +53,45 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
 				{
 					if (sim->rng.chance(1, 2500))
 					{
-						auto np = sim->create_part(-1,x+rx,y+ry,PT_SHLD1);
-						if (np<0) continue;
-						parts[np].life=7;
-						sim->part_change_type(i,x,y,PT_SHLD2);
+						auto np = sim->create_part(-1, x + rx, y + ry, PT_SHLD1);
+						if (np < 0)
+						{
+							continue;
+						}
+						parts[np].life = 7;
+						sim->part_change_type(i, x, y, PT_SHLD2);
 					}
 					continue;
 				}
-				if (TYP(r)==PT_SHLD1 && parts[i].life>3)
+				if (TYP(r) == PT_SHLD1 && parts[i].life > 3)
 				{
-					sim->part_change_type(ID(r),x+rx,y+ry,PT_SHLD2);
-					parts[ID(r)].life=7;
+					sim->part_change_type(ID(r), x + rx, y + ry, PT_SHLD2);
+					parts[ID(r)].life = 7;
 				}
-				else if (TYP(r)==PT_SPRK&&parts[i].life==0)
+				else if (TYP(r) == PT_SPRK && parts[i].life == 0)
 				{
 					if (sim->rng.chance(3, 500))
 					{
-						sim->part_change_type(i,x,y,PT_SHLD4);
+						sim->part_change_type(i, x, y, PT_SHLD4);
 						parts[i].life = 7;
 					}
 					for (auto nnx = -1; nnx <= 1; nnx++)
 					{
 						for (auto nny = -1; nny <= 1; nny++)
 						{
-
-							if (!pmap[y+ry+nny][x+rx+nnx])
+							if (!pmap[y + ry + nny][x + rx + nnx])
 							{
-								auto np = sim->create_part(-1,x+rx+nnx,y+ry+nny,PT_SHLD1);
-								if (np<0) continue;
-								parts[np].life=7;
+								auto np = sim->create_part(-1, x + rx + nnx, y + ry + nny, PT_SHLD1);
+								if (np < 0)
+								{
+									continue;
+								}
+								parts[np].life = 7;
 							}
 						}
 					}

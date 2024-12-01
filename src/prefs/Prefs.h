@@ -30,7 +30,7 @@ class Prefs
 	ByteString path;
 
 	Prefs(const Prefs &) = delete;
-	Prefs &operator =(const Prefs &) = delete;
+	Prefs &operator=(const Prefs &) = delete;
 
 public:
 	Prefs(ByteString path);
@@ -95,9 +95,10 @@ public:
 		Prefs &prefs;
 
 		DeferWrite(const DeferWrite &) = delete;
-		DeferWrite &operator =(const DeferWrite &) = delete;
+		DeferWrite &operator=(const DeferWrite &) = delete;
 
-		DeferWrite(Prefs &newPrefs) : prefs(newPrefs)
+		DeferWrite(Prefs &newPrefs) :
+			prefs(newPrefs)
 		{
 			prefs.GrabDeferWriteLevel({});
 		}

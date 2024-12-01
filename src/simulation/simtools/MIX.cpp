@@ -3,7 +3,8 @@
 #include "common/tpt-rand.h"
 #include <cmath>
 
-static int perform(SimTool *tool, Simulation * sim, Particle * cpart, int x, int y, int brushX, int brushY, float strength);
+static int
+	perform(SimTool *tool, Simulation *sim, Particle *cpart, int x, int y, int brushX, int brushY, float strength);
 
 void SimTool::Tool_MIX()
 {
@@ -14,34 +15,47 @@ void SimTool::Tool_MIX()
 	Perform = &perform;
 }
 
-static int perform(SimTool *tool, Simulation * sim, Particle * cpart, int x, int y, int brushX, int brushY, float strength)
+static int
+	perform(SimTool *tool, Simulation *sim, Particle *cpart, int x, int y, int brushX, int brushY, float strength)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
 	int thisPart = sim->pmap[y][x];
-	if(!thisPart)
+	if (!thisPart)
+	{
 		return 0;
+	}
 
-	if(sim->rng() % 100 != 0)
+	if (sim->rng() % 100 != 0)
+	{
 		return 0;
+	}
 
 	int distance = (int)(std::pow(strength, .5f) * 10);
 
-	if(!(elements[TYP(thisPart)].Properties & (TYPE_PART | TYPE_LIQUID | TYPE_GAS)))
+	if (!(elements[TYP(thisPart)].Properties & (TYPE_PART | TYPE_LIQUID | TYPE_GAS)))
+	{
 		return 0;
+	}
 
-	int newX = x + (sim->rng() % distance) - (distance/2);
-	int newY = y + (sim->rng() % distance) - (distance/2);
+	int newX = x + (sim->rng() % distance) - (distance / 2);
+	int newY = y + (sim->rng() % distance) - (distance / 2);
 
-	if(newX < 0 || newY < 0 || newX >= XRES || newY >= YRES)
+	if (newX < 0 || newY < 0 || newX >= XRES || newY >= YRES)
+	{
 		return 0;
+	}
 
 	int thatPart = sim->pmap[newY][newX];
-	if(!thatPart)
+	if (!thatPart)
+	{
 		return 0;
+	}
 
-	if ((elements[TYP(thisPart)].Properties&STATE_FLAGS) != (elements[TYP(thatPart)].Properties&STATE_FLAGS))
+	if ((elements[TYP(thisPart)].Properties & STATE_FLAGS) != (elements[TYP(thatPart)].Properties & STATE_FLAGS))
+	{
 		return 0;
+	}
 
 	sim->pmap[y][x] = thatPart;
 	sim->parts[ID(thatPart)].x = float(x);

@@ -20,7 +20,7 @@ void Element::Element_PLNT()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 20;
@@ -34,7 +34,7 @@ void Element::Element_PLNT()
 	HeatConduct = 65;
 	Description = "Plant, drinks water and grows.";
 
-	Properties = TYPE_SOLID|PROP_NEUTPENETRATE|PROP_LIFE_DEC;
+	Properties = TYPE_SOLID | PROP_NEUTPENETRATE | PROP_LIFE_DEC;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -57,21 +57,24 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				switch (TYP(r))
 				{
 				case PT_WATR:
 					if (sim->rng.chance(1, 50))
 					{
-						auto np = sim->create_part(ID(r),x+rx,y+ry,PT_PLNT);
-						if (np<0) continue;
+						auto np = sim->create_part(ID(r), x + rx, y + ry, PT_PLNT);
+						if (np < 0)
+						{
+							continue;
+						}
 						parts[np].life = 0;
 					}
 					break;
 				case PT_LAVA:
 					if (sim->rng.chance(1, 50))
 					{
-						sim->part_change_type(i,x,y,PT_FIRE);
+						sim->part_change_type(i, x, y, PT_FIRE);
 						parts[i].life = 4;
 					}
 					break;
@@ -84,32 +87,37 @@ static int update(UPDATE_FUNC_ARGS)
 					}
 					break;
 				case PT_WOOD:
+				{
+					auto rndstore = sim->rng.gen();
+					if (surround_space && !(rndstore % 4) && parts[i].tmp == 1)
 					{
-						auto rndstore = sim->rng.gen();
-						if (surround_space && !(rndstore%4) && parts[i].tmp==1)
+						rndstore >>= 3;
+						int nnx = (rndstore % 3) - 1;
+						rndstore >>= 2;
+						int nny = (rndstore % 3) - 1;
+						if (nnx || nny)
 						{
-							rndstore >>= 3;
-							int nnx = (rndstore%3) -1;
-							rndstore >>= 2;
-							int nny = (rndstore%3) -1;
-							if (nnx || nny)
+							if (pmap[y + ry + nny][x + rx + nnx])
 							{
-								if (pmap[y+ry+nny][x+rx+nnx])
-									continue;
-								auto np = sim->create_part(-1,x+rx+nnx,y+ry+nny,PT_VINE);
-								if (np<0) continue;
-								parts[np].temp = parts[i].temp;
+								continue;
 							}
+							auto np = sim->create_part(-1, x + rx + nnx, y + ry + nny, PT_VINE);
+							if (np < 0)
+							{
+								continue;
+							}
+							parts[np].temp = parts[i].temp;
 						}
 					}
-					break;
+				}
+				break;
 				default:
 					continue;
 				}
 			}
 		}
 	}
-	if (parts[i].life==2)
+	if (parts[i].life == 2)
 	{
 		for (auto rx = -1; rx <= 1; rx++)
 		{
@@ -117,16 +125,20 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[y+ry][x+rx];
+					auto r = pmap[y + ry][x + rx];
 					if (!r)
-						sim->create_part(-1,x+rx,y+ry,PT_O2);
+					{
+						sim->create_part(-1, x + rx, y + ry, PT_O2);
+					}
 				}
 			}
 		}
 		parts[i].life = 0;
 	}
 	if (parts[i].temp > 350 && parts[i].temp > parts[i].tmp2)
+	{
 		parts[i].tmp2 = (int)parts[i].temp;
+	}
 	return 0;
 }
 
@@ -135,14 +147,14 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	float maxtemp = std::max((float)cpart->tmp2, cpart->temp);
 	if (maxtemp > 300)
 	{
-		*colr += (int)restrict_flt((maxtemp-300)/5,0,58);
-		*colg -= (int)restrict_flt((maxtemp-300)/2,0,102);
-		*colb += (int)restrict_flt((maxtemp-300)/5,0,70);
+		*colr += (int)restrict_flt((maxtemp - 300) / 5, 0, 58);
+		*colg -= (int)restrict_flt((maxtemp - 300) / 2, 0, 102);
+		*colb += (int)restrict_flt((maxtemp - 300) / 5, 0, 70);
 	}
 	if (maxtemp < 273)
 	{
-		*colg += (int)restrict_flt((273-maxtemp)/4,0,255);
-		*colb += (int)restrict_flt((273-maxtemp)/1.5,0,255);
+		*colg += (int)restrict_flt((273 - maxtemp) / 4, 0, 255);
+		*colb += (int)restrict_flt((273 - maxtemp) / 1.5, 0, 255);
 	}
 	return 0;
 }

@@ -1,12 +1,12 @@
 #include "LoginController.h"
+#include "Controller.h"
+#include "LoginModel.h"
+#include "LoginView.h"
 #include "client/Client.h"
 #include "client/http/LoginRequest.h"
 #include "client/http/LogoutRequest.h"
-#include "LoginView.h"
-#include "LoginModel.h"
-#include "Controller.h"
 
-LoginController::LoginController(std::function<void ()> onDone_):
+LoginController::LoginController(std::function<void()> onDone_) :
 	HasExited(false)
 {
 	loginView = new LoginView();
@@ -37,7 +37,9 @@ void LoginController::Exit()
 {
 	loginView->CloseActiveWindow();
 	if (onDone)
+	{
 		onDone();
+	}
 	HasExited = true;
 }
 
@@ -47,4 +49,3 @@ LoginController::~LoginController()
 	loginView->CloseActiveWindow();
 	delete loginView;
 }
-

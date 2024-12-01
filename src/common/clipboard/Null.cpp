@@ -3,34 +3,34 @@
 
 namespace Clipboard
 {
-	void SetClipboardData(std::unique_ptr<GameSave> data)
-	{
-	}
+void SetClipboardData(std::unique_ptr<GameSave> data)
+{
+}
 
-	const GameSave *GetClipboardData()
-	{
-		return nullptr;
-	}
+const GameSave *GetClipboardData()
+{
+	return nullptr;
+}
 
-	void Init()
-	{
-	}
+void Init()
+{
+}
 
-	bool GetEnabled()
-	{
-		return false;
-	}
+bool GetEnabled()
+{
+	return false;
+}
 
-	void SetEnabled(bool)
-	{
-	}
+void SetEnabled(bool)
+{
+}
 
-	void RecreateWindow()
-	{
-	}
+void RecreateWindow()
+{
+}
 
-	std::optional<String> Explanation()
-	{
-		return std::nullopt;
-	}
+std::optional<String> Explanation()
+{
+	return std::nullopt;
+}
 }

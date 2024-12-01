@@ -1,9 +1,10 @@
 #pragma once
 #include "Component.h"
-#include <utility>
 #include <functional>
+#include <utility>
 
-namespace ui {
+namespace ui
+{
 
 class DropDownWindow;
 
@@ -15,12 +16,13 @@ class DropDown : public ui::Component
 
 	struct DropDownAction
 	{
-		std::function<void ()> change;
+		std::function<void()> change;
 	};
+
 	DropDownAction actionCallback;
 
-	std::vector<std::pair<String, int> > options;
-	
+	std::vector<std::pair<String, int>> options;
+
 public:
 	DropDown(Point position, Point size);
 	virtual ~DropDown() = default;
@@ -30,9 +32,14 @@ public:
 	void SetOption(String option);
 	void AddOption(std::pair<String, int> option);
 	void RemoveOption(String option);
-	void SetOptions(std::vector<std::pair<String, int> > options);
-	inline void SetActionCallback(DropDownAction action) { actionCallback = action; }
-	void Draw(const Point& screenPos) override;
+	void SetOptions(std::vector<std::pair<String, int>> options);
+
+	inline void SetActionCallback(DropDownAction action)
+	{
+		actionCallback = action;
+	}
+
+	void Draw(const Point &screenPos) override;
 	void OnMouseClick(int x, int y, unsigned int button) override;
 	void OnMouseEnter(int x, int y) override;
 	void OnMouseLeave(int x, int y) override;

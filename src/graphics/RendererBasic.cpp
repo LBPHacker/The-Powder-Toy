@@ -1,82 +1,60 @@
-#include <cmath>
-#include "gui/game/RenderPreset.h"
 #include "RasterDrawMethodsImpl.h"
 #include "Renderer.h"
+#include "gui/game/RenderPreset.h"
 #include "simulation/ElementClasses.h"
 #include "simulation/ElementGraphics.h"
+#include <cmath>
 
 const std::vector<RenderPreset> Renderer::renderModePresets = {
 	{
-		"Alternative Velocity Display",
-		RENDER_EFFE | RENDER_BASC,
-		DISPLAY_AIRC,
-		0,
-	},
+     "Alternative Velocity Display",														 RENDER_EFFE | RENDER_BASC,
+     DISPLAY_AIRC,		   0,
+	 },
 	{
-		"Velocity Display",
-		RENDER_EFFE | RENDER_BASC,
-		DISPLAY_AIRV,
-		0,
-	},
+     "Velocity Display",														 RENDER_EFFE | RENDER_BASC,
+     DISPLAY_AIRV,		   0,
+	 },
 	{
-		"Pressure Display",
-		RENDER_EFFE | RENDER_BASC,
-		DISPLAY_AIRP,
-		0,
-	},
+     "Pressure Display",														 RENDER_EFFE | RENDER_BASC,
+     DISPLAY_AIRP,		   0,
+	 },
 	{
-		"Persistent Display",
-		RENDER_EFFE | RENDER_BASC,
-		DISPLAY_PERS,
-		0,
-	},
+     "Persistent Display",														 RENDER_EFFE | RENDER_BASC,
+     DISPLAY_PERS,		   0,
+	 },
 	{
-		"Fire Display",
-		RENDER_FIRE | RENDER_SPRK | RENDER_EFFE | RENDER_BASC,
-		0,
-		0,
-	},
+     "Fire Display",							 RENDER_FIRE | RENDER_SPRK | RENDER_EFFE | RENDER_BASC,
+     0,		   0,
+	 },
 	{
-		"Blob Display",
-		RENDER_FIRE | RENDER_SPRK | RENDER_EFFE | RENDER_BLOB,
-		0,
-		0,
-	},
+     "Blob Display",							 RENDER_FIRE | RENDER_SPRK | RENDER_EFFE | RENDER_BLOB,
+     0,		   0,
+	 },
 	{
-		"Heat Display",
-		RENDER_BASC,
-		DISPLAY_AIRH,
-		COLOUR_HEAT,
-	},
+     "Heat Display",																	   RENDER_BASC,
+     DISPLAY_AIRH, COLOUR_HEAT,
+	 },
 	{
-		"Fancy Display",
-		RENDER_FIRE | RENDER_SPRK | RENDER_GLOW | RENDER_BLUR | RENDER_EFFE | RENDER_BASC,
-		DISPLAY_WARP,
-		0,
-	},
+     "Fancy Display", RENDER_FIRE | RENDER_SPRK | RENDER_GLOW | RENDER_BLUR | RENDER_EFFE | RENDER_BASC,
+     DISPLAY_WARP,		   0,
+	 },
 	{
-		"Nothing Display",
-		RENDER_BASC,
-		0,
-		0,
-	},
+     "Nothing Display",																	   RENDER_BASC,
+     0,		   0,
+	 },
 	{
-		"Heat Gradient Display",
-		RENDER_BASC,
-		0,
-		COLOUR_GRAD,
-	},
+     "Heat Gradient Display",																	   RENDER_BASC,
+     0, COLOUR_GRAD,
+	 },
 	{
-		"Life Gradient Display",
-		RENDER_BASC,
-		0,
-		COLOUR_LIFE,
-	},
+     "Life Gradient Display",																	   RENDER_BASC,
+     0, COLOUR_LIFE,
+	 },
 };
 
 void Renderer::Clear()
 {
-	if(displayMode & DISPLAY_PERS)
+	if (displayMode & DISPLAY_PERS)
 	{
 		std::copy(persistentVideo.begin(), persistentVideo.end(), video.RowIterator({ 0, 0 }));
 	}
@@ -88,37 +66,49 @@ void Renderer::Clear()
 
 void Renderer::DrawBlob(Vec2<int> pos, RGB<uint8_t> colour)
 {
-	BlendPixel(pos + Vec2{ +1,  0 }, colour.WithAlpha(112));
-	BlendPixel(pos + Vec2{ -1,  0 }, colour.WithAlpha(112));
-	BlendPixel(pos + Vec2{  0,  1 }, colour.WithAlpha(112));
-	BlendPixel(pos + Vec2{  0, -1 }, colour.WithAlpha(112));
-	BlendPixel(pos + Vec2{  1, -1 }, colour.WithAlpha(64));
+	BlendPixel(pos + Vec2{ +1, 0 }, colour.WithAlpha(112));
+	BlendPixel(pos + Vec2{ -1, 0 }, colour.WithAlpha(112));
+	BlendPixel(pos + Vec2{ 0, 1 }, colour.WithAlpha(112));
+	BlendPixel(pos + Vec2{ 0, -1 }, colour.WithAlpha(112));
+	BlendPixel(pos + Vec2{ 1, -1 }, colour.WithAlpha(64));
 	BlendPixel(pos + Vec2{ -1, -1 }, colour.WithAlpha(64));
-	BlendPixel(pos + Vec2{  1,  1 }, colour.WithAlpha(64));
+	BlendPixel(pos + Vec2{ 1, 1 }, colour.WithAlpha(64));
 	BlendPixel(pos + Vec2{ -1, +1 }, colour.WithAlpha(64));
 }
 
-float temp[CELL*3][CELL*3];
-float fire_alphaf[CELL*3][CELL*3];
+float temp[CELL * 3][CELL * 3];
+float fire_alphaf[CELL * 3][CELL * 3];
 float glow_alphaf[11][11];
 float blur_alphaf[7][7];
+
 void Renderer::prepare_alpha(int size, float intensity)
 {
 	fireIntensity = intensity;
-	//TODO: implement size
-	int x,y,i,j;
-	float multiplier = 255.0f*fireIntensity;
+	// TODO: implement size
+	int x, y, i, j;
+	float multiplier = 255.0f * fireIntensity;
 
 	memset(temp, 0, sizeof(temp));
-	for (x=0; x<CELL; x++)
-		for (y=0; y<CELL; y++)
-			for (i=-CELL; i<CELL; i++)
-				for (j=-CELL; j<CELL; j++)
-					temp[y+CELL+j][x+CELL+i] += expf(-0.1f*(i*i+j*j));
-	for (x=0; x<CELL*3; x++)
-		for (y=0; y<CELL*3; y++)
-			fire_alpha[y][x] = (int)(multiplier*temp[y][x]/(CELL*CELL));
-
+	for (x = 0; x < CELL; x++)
+	{
+		for (y = 0; y < CELL; y++)
+		{
+			for (i = -CELL; i < CELL; i++)
+			{
+				for (j = -CELL; j < CELL; j++)
+				{
+					temp[y + CELL + j][x + CELL + i] += expf(-0.1f * (i * i + j * j));
+				}
+			}
+		}
+	}
+	for (x = 0; x < CELL * 3; x++)
+	{
+		for (y = 0; y < CELL * 3; y++)
+		{
+			fire_alpha[y][x] = (int)(multiplier * temp[y][x] / (CELL * CELL));
+		}
+	}
 }
 
 std::vector<RGB<uint8_t>> Renderer::flameTable;
@@ -128,55 +118,71 @@ std::vector<RGB<uint8_t>> Renderer::clfmTable;
 std::vector<RGB<uint8_t>> Renderer::firwTable;
 static bool tablesPopulated = false;
 static std::mutex tablesPopulatedMx;
+
 void Renderer::PopulateTables()
 {
 	std::lock_guard g(tablesPopulatedMx);
 	if (!tablesPopulated)
 	{
 		tablesPopulated = true;
-		flameTable = Gradient({
-			{ 0x000000_rgb, 0.00f },
-			{ 0x60300F_rgb, 0.50f },
-			{ 0xDFBF6F_rgb, 0.90f },
-			{ 0xAF9F0F_rgb, 1.00f },
-		}, 200);
-		plasmaTable = Gradient({
-			{ 0x000000_rgb, 0.00f },
-			{ 0x301040_rgb, 0.25f },
-			{ 0x301060_rgb, 0.50f },
-			{ 0xAFFFFF_rgb, 0.90f },
-			{ 0xAFFFFF_rgb, 1.00f },
-		}, 200);
-		heatTable = Gradient({
-			{ 0x2B00FF_rgb, 0.00f },
-			{ 0x003CFF_rgb, 0.01f },
-			{ 0x00C0FF_rgb, 0.05f },
-			{ 0x00FFEB_rgb, 0.08f },
-			{ 0x00FF14_rgb, 0.19f },
-			{ 0x4BFF00_rgb, 0.25f },
-			{ 0xC8FF00_rgb, 0.37f },
-			{ 0xFFDC00_rgb, 0.45f },
-			{ 0xFF0000_rgb, 0.71f },
-			{ 0xFF00DC_rgb, 1.00f },
-		}, 1024);
-		clfmTable = Gradient({
-			{ 0x000000_rgb, 0.00f },
-			{ 0x0A0917_rgb, 0.10f },
-			{ 0x19163C_rgb, 0.20f },
-			{ 0x28285E_rgb, 0.30f },
-			{ 0x343E77_rgb, 0.40f },
-			{ 0x49769A_rgb, 0.60f },
-			{ 0x57A0B4_rgb, 0.80f },
-			{ 0x5EC4C6_rgb, 1.00f },
-		}, 200);
-		firwTable = Gradient({
-			{ 0xFF00FF_rgb, 0.00f },
-			{ 0x0000FF_rgb, 0.20f },
-			{ 0x00FFFF_rgb, 0.40f },
-			{ 0x00FF00_rgb, 0.60f },
-			{ 0xFFFF00_rgb, 0.80f },
-			{ 0xFF0000_rgb, 1.00f },
-		}, 200);
+		flameTable = Gradient(
+			{
+				{ 0x000000_rgb, 0.00f },
+				{ 0x60300F_rgb, 0.50f },
+				{ 0xDFBF6F_rgb, 0.90f },
+				{ 0xAF9F0F_rgb, 1.00f },
+        },
+			200
+		);
+		plasmaTable = Gradient(
+			{
+				{ 0x000000_rgb, 0.00f },
+				{ 0x301040_rgb, 0.25f },
+				{ 0x301060_rgb, 0.50f },
+				{ 0xAFFFFF_rgb, 0.90f },
+				{ 0xAFFFFF_rgb, 1.00f },
+        },
+			200
+		);
+		heatTable = Gradient(
+			{
+				{ 0x2B00FF_rgb, 0.00f },
+				{ 0x003CFF_rgb, 0.01f },
+				{ 0x00C0FF_rgb, 0.05f },
+				{ 0x00FFEB_rgb, 0.08f },
+				{ 0x00FF14_rgb, 0.19f },
+				{ 0x4BFF00_rgb, 0.25f },
+				{ 0xC8FF00_rgb, 0.37f },
+				{ 0xFFDC00_rgb, 0.45f },
+				{ 0xFF0000_rgb, 0.71f },
+				{ 0xFF00DC_rgb, 1.00f },
+        },
+			1024
+		);
+		clfmTable = Gradient(
+			{
+				{ 0x000000_rgb, 0.00f },
+				{ 0x0A0917_rgb, 0.10f },
+				{ 0x19163C_rgb, 0.20f },
+				{ 0x28285E_rgb, 0.30f },
+				{ 0x343E77_rgb, 0.40f },
+				{ 0x49769A_rgb, 0.60f },
+				{ 0x57A0B4_rgb, 0.80f },
+				{ 0x5EC4C6_rgb, 1.00f },
+        },
+			200
+		);
+		firwTable = Gradient(
+			{
+				{ 0xFF00FF_rgb, 0.00f },
+				{ 0x0000FF_rgb, 0.20f },
+				{ 0x00FFFF_rgb, 0.40f },
+				{ 0x00FF00_rgb, 0.60f },
+				{ 0xFFFF00_rgb, 0.80f },
+				{ 0xFF0000_rgb, 1.00f },
+        },
+			200
+		);
 	}
 }
 
@@ -188,7 +194,7 @@ Renderer::Renderer()
 	memset(fire_g, 0, sizeof(fire_g));
 	memset(fire_b, 0, sizeof(fire_b));
 
-	//Set defauly display modes
+	// Set defauly display modes
 	prepare_alpha(CELL, 1.0f);
 	ClearAccumulation();
 }
@@ -216,7 +222,7 @@ void Renderer::ApplySettings(const RendererSettings &newSettings)
 
 template struct RasterDrawMethods<Renderer>;
 
-bool Renderer::GradientStop::operator <(const GradientStop &other) const
+bool Renderer::GradientStop::operator<(const GradientStop &other) const
 {
 	return point < other.point;
 }

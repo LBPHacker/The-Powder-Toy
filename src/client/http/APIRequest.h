@@ -5,19 +5,20 @@
 
 namespace http
 {
-	class APIRequest : public Request
+class APIRequest : public Request
+{
+	bool checkStatus;
+
+public:
+	enum AuthMode
 	{
-		bool checkStatus;
-
-	public:
-		enum AuthMode
-		{
-			authRequire,
-			authUse,
-			authOmit,
-		};
-		APIRequest(ByteString url, AuthMode authMode, bool newCheckStatus);
-
-		Json::Value Finish();
+		authRequire,
+		authUse,
+		authOmit,
 	};
+
+	APIRequest(ByteString url, AuthMode authMode, bool newCheckStatus);
+
+	Json::Value Finish();
+};
 }

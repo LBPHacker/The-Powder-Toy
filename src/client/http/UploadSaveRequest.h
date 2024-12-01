@@ -5,11 +5,11 @@ class SaveInfo;
 
 namespace http
 {
-	class UploadSaveRequest : public Request
-	{
-	public:
-		UploadSaveRequest(const SaveInfo &saveInfo);
+class UploadSaveRequest : public Request
+{
+public:
+	UploadSaveRequest(const SaveInfo &saveInfo);
 
-		int Finish();
-	};
+	int Finish();
+};
 }

@@ -1,14 +1,14 @@
 #include "SampleTool.h"
-#include "PropertyTool.h"
 #include "GOLTool.h"
+#include "PropertyTool.h"
 #include "graphics/Graphics.h"
 #include "graphics/Renderer.h"
 #include "gui/game/GameModel.h"
 #include "gui/game/GameView.h"
-#include "gui/interface/Colour.h"
-#include "simulation/Simulation.h"
-#include "simulation/ElementClasses.h"
 #include "gui/game/Menu.h"
+#include "gui/interface/Colour.h"
+#include "simulation/ElementClasses.h"
+#include "simulation/Simulation.h"
 
 std::unique_ptr<VideoBuffer> SampleTool::GetIcon(int toolID, Vec2<int> size)
 {
@@ -19,9 +19,9 @@ std::unique_ptr<VideoBuffer> SampleTool::GetIcon(int toolID, Vec2<int> size)
 	return texture;
 }
 
-void SampleTool::Draw(Simulation * sim, Brush const &brush, ui::Point position)
+void SampleTool::Draw(Simulation *sim, const Brush &brush, ui::Point position)
 {
-	if(gameModel.GetColourSelectorVisibility())
+	if (gameModel.GetColourSelectorVisibility())
 	{
 		pixel colour = gameModel.GetView()->GetPixelUnderMouse();
 		gameModel.SetColourSelectorColour(RGB<uint8_t>::Unpack(colour).WithAlpha(0xFF));
@@ -60,7 +60,14 @@ void SampleTool::Draw(Simulation * sim, Brush const &brush, ui::Point position)
 				}
 				if (!found)
 				{
-					static_cast<GOLTool *>(gameModel.GetToolFromIdentifier("DEFAULT_UI_ADDLIFE"))->OpenWindow(gameModel.GetSimulation(), 0, part->ctype, RGB<uint8_t>::Unpack(part->dcolour & 0xFFFFFF), RGB<uint8_t>::Unpack(part->tmp & 0xFFFFFF));
+					static_cast<GOLTool *>(gameModel.GetToolFromIdentifier("DEFAULT_UI_ADDLIFE"))
+						->OpenWindow(
+							gameModel.GetSimulation(),
+							0,
+							part->ctype,
+							RGB<uint8_t>::Unpack(part->dcolour & 0xFFFFFF),
+							RGB<uint8_t>::Unpack(part->tmp & 0xFFFFFF)
+						);
 				}
 			}
 			else

@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "RFRG.h"
+#include "simulation/ElementCommon.h"
 
 void Element::Element_RFGL()
 {
@@ -17,7 +17,7 @@ void Element::Element_RFGL()
 	Collision = 0.0f;
 	Gravity = 0.1f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 2;
 
 	Flammable = 0;
@@ -30,7 +30,7 @@ void Element::Element_RFGL()
 	HeatConduct = 3;
 	Description = "Liquid refrigerant.";
 
-	Properties = TYPE_LIQUID|PROP_DEADLY;
+	Properties = TYPE_LIQUID | PROP_DEADLY;
 
 	LowPressure = 2;
 	LowPressureTransition = PT_RFRG;

@@ -1,12 +1,14 @@
 #pragma once
 #include "common/String.h"
-#include <thread>
 #include <mutex>
+#include <thread>
 
 class TaskListener;
-class Task {
+
+class Task
+{
 public:
-	void AddTaskListener(TaskListener * listener);
+	void AddTaskListener(TaskListener *listener);
 	virtual void Start();
 	int GetProgress();
 	bool GetDone();

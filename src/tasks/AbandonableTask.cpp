@@ -20,7 +20,9 @@ void AbandonableTask::Finish()
 {
 	{
 		std::unique_lock<std::mutex> l(taskMutex);
-		done_cv.wait(l, [this]() { return thDone; });
+		done_cv.wait(l, [this]() {
+			return thDone;
+		});
 	}
 
 	// Poll to make sure that the rest of the Task knows that it's
@@ -68,4 +70,3 @@ AbandonableTask::AbandonableTask() :
 AbandonableTask::~AbandonableTask()
 {
 }
-

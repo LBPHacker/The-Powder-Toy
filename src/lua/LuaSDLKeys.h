@@ -4,7 +4,9 @@
 
 static void initLuaSDLKeys(lua_State *L)
 {
-#define LCONST(v) lua_pushinteger(L, int(v)); lua_setfield(L, -2, #v)
+#define LCONST(v)               \
+	lua_pushinteger(L, int(v)); \
+	lua_setfield(L, -2, #v)
 	LCONST(SDL_SCANCODE_UNKNOWN);
 	LCONST(SDL_SCANCODE_A);
 	LCONST(SDL_SCANCODE_B);

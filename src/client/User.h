@@ -1,7 +1,6 @@
 #pragma once
 #include "common/String.h"
 
-
 class User
 {
 public:
@@ -12,6 +11,7 @@ public:
 		ElevationMod,
 		ElevationAdmin,
 	};
+
 	static Elevation ElevationFromString(ByteString str);
 	static ByteString ElevationToString(Elevation elevation);
 
@@ -20,14 +20,13 @@ public:
 	ByteString SessionID;
 	ByteString SessionKey;
 	Elevation UserElevation;
-	User(int id, ByteString username):
+
+	User(int id, ByteString username) :
 		UserID(id),
 		Username(username),
 		SessionID(""),
 		SessionKey(""),
 		UserElevation(ElevationNone)
 	{
-
 	}
 };
-

@@ -4,15 +4,17 @@
 class GameModel;
 class Simulation;
 class OptionsView;
+
 class OptionsModel
 {
-	GameModel * gModel;
-	Simulation * sim;
-	std::vector<OptionsView*> observers;
+	GameModel *gModel;
+	Simulation *sim;
+	std::vector<OptionsView *> observers;
 	void notifySettingsChanged();
+
 public:
-	OptionsModel(GameModel * gModel);
-	void AddObserver(OptionsView* view);
+	OptionsModel(GameModel *gModel);
+	void AddObserver(OptionsView *view);
 	bool GetHeatSimulation();
 	void SetHeatSimulation(bool state);
 	bool GetAmbientHeatSimulation();

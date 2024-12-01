@@ -19,7 +19,7 @@ void Element::Element_ACID()
 	Collision = 0.0f;
 	Gravity = 0.1f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 2;
 
 	Flammable = 40;
@@ -33,7 +33,7 @@ void Element::Element_ACID()
 	HeatConduct = 34;
 	Description = "Dissolves almost everything.";
 
-	Properties = TYPE_LIQUID|PROP_DEADLY;
+	Properties = TYPE_LIQUID | PROP_DEADLY;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -60,16 +60,18 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
+				{
 					continue;
+				}
 				int rt = TYP(r);
 				if (rt != PT_ACID && rt != PT_CAUS)
 				{
 					if (rt == PT_PLEX || rt == PT_NITR || rt == PT_GUNP || rt == PT_RBDM || rt == PT_LRBD)
 					{
-						sim->part_change_type(i,x,y,PT_FIRE);
-						sim->part_change_type(ID(r),x+rx,y+ry,PT_FIRE);
+						sim->part_change_type(i, x, y, PT_FIRE);
+						sim->part_change_type(ID(r), x + rx, y + ry, PT_FIRE);
 						parts[i].life = 4;
 						parts[ID(r)].life = 4;
 					}
@@ -82,12 +84,14 @@ static int update(UPDATE_FUNC_ARGS)
 							sim->kill_part(ID(r));
 						}
 					}
-					else if (rt != PT_CLNE && rt != PT_PCLN && parts[i].life >= 50 && sim->rng.chance(elements[rt].Hardness, 1000))
+					else if (rt != PT_CLNE && rt != PT_PCLN && parts[i].life >= 50 &&
+					         sim->rng.chance(elements[rt].Hardness, 1000))
 					{
-						if (sim->parts_avg(i, ID(r),PT_GLAS)!= PT_GLAS)//GLAS protects stuff from acid
+						if (sim->parts_avg(i, ID(r), PT_GLAS) != PT_GLAS) // GLAS protects stuff from acid
 						{
-							float newtemp = ((60.0f-(float)elements[rt].Hardness))*7.0f;
-							if(newtemp < 0){
+							float newtemp = ((60.0f - (float)elements[rt].Hardness)) * 7.0f;
+							if (newtemp < 0)
+							{
 								newtemp = 0;
 							}
 							parts[i].temp += newtemp;
@@ -104,7 +108,7 @@ static int update(UPDATE_FUNC_ARGS)
 							}
 						}
 					}
-					else if (parts[i].life<=50)
+					else if (parts[i].life <= 50)
 					{
 						sim->kill_part(i);
 						return 1;
@@ -113,16 +117,18 @@ static int update(UPDATE_FUNC_ARGS)
 			}
 		}
 	}
-	for (auto trade = 0; trade<2; trade++)
+	for (auto trade = 0; trade < 2; trade++)
 	{
 		auto rx = sim->rng.between(-2, 2);
 		auto ry = sim->rng.between(-2, 2);
 		if (rx || ry)
 		{
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[y + ry][x + rx];
 			if (!r)
+			{
 				continue;
-			if (TYP(r) == PT_ACID && (parts[i].life > parts[ID(r)].life) && parts[i].life>0)//diffusion
+			}
+			if (TYP(r) == PT_ACID && (parts[i].life > parts[ID(r)].life) && parts[i].life > 0) // diffusion
 			{
 				int temp = parts[i].life - parts[ID(r)].life;
 				if (temp == 1)
@@ -130,10 +136,10 @@ static int update(UPDATE_FUNC_ARGS)
 					parts[ID(r)].life++;
 					parts[i].life--;
 				}
-				else if (temp>0)
+				else if (temp > 0)
 				{
-					parts[ID(r)].life += temp/2;
-					parts[i].life -= temp/2;
+					parts[ID(r)].life += temp / 2;
+					parts[i].life -= temp / 2;
 				}
 			}
 		}
@@ -144,13 +150,22 @@ static int update(UPDATE_FUNC_ARGS)
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
 	int s = cpart->life;
-	if (s>75) s = 75; //These two should not be here.
-	if (s<49) s = 49;
-	s = (s-49)*3;
-	if (s==0) s = 1;
-	*colr += s*4;
-	*colg += s*1;
-	*colb += s*2;
+	if (s > 75)
+	{
+		s = 75; // These two should not be here.
+	}
+	if (s < 49)
+	{
+		s = 49;
+	}
+	s = (s - 49) * 3;
+	if (s == 0)
+	{
+		s = 1;
+	}
+	*colr += s * 4;
+	*colg += s * 1;
+	*colb += s * 2;
 	*pixel_mode |= PMODE_BLUR;
 	return 0;
 }

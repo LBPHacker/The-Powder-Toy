@@ -19,7 +19,7 @@ void Element::Element_GBMB()
 	Collision = 0.0f;
 	Gravity = 0.1f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;
@@ -33,7 +33,7 @@ void Element::Element_GBMB()
 	HeatConduct = 29;
 	Description = "Gravity bomb. Sticks to the first object it touches then produces a strong gravity push.";
 
-	Properties = TYPE_PART|PROP_LIFE_DEC|PROP_LIFE_KILL_DEC;
+	Properties = TYPE_PART | PROP_LIFE_DEC | PROP_LIFE_KILL_DEC;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -50,20 +50,21 @@ void Element::Element_GBMB()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	if (parts[i].life<=0)
+	if (parts[i].life <= 0)
 	{
 		for (auto rx = -1; rx <= 1; rx++)
 		{
 			for (auto ry = -1; ry <= 1; ry++)
 			{
-				auto r = pmap[y+ry][x+rx];
-				if(!r)
-					continue;
-				if(TYP(r)!=PT_BOMB && TYP(r)!=PT_GBMB &&
-				   TYP(r)!=PT_CLNE && TYP(r)!=PT_PCLN &&
-				   TYP(r)!=PT_DMND)
+				auto r = pmap[y + ry][x + rx];
+				if (!r)
 				{
-					parts[i].life=60;
+					continue;
+				}
+				if (TYP(r) != PT_BOMB && TYP(r) != PT_GBMB && TYP(r) != PT_CLNE && TYP(r) != PT_PCLN &&
+				    TYP(r) != PT_DMND)
+				{
+					parts[i].life = 60;
 					break;
 				}
 			}
@@ -82,7 +83,8 @@ static int update(UPDATE_FUNC_ARGS)
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
-	if (cpart->life <= 0) {
+	if (cpart->life <= 0)
+	{
 		*pixel_mode |= PMODE_FLARE;
 	}
 	else

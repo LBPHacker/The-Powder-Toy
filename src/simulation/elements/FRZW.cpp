@@ -18,7 +18,7 @@ void Element::Element_FRZW()
 	Collision = 0.0f;
 	Gravity = 0.1f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 2;
 
 	Flammable = 0;
@@ -56,21 +56,23 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
-					continue;
-				if (TYP(r)==PT_WATR && sim->rng.chance(1, 14))
 				{
-					sim->part_change_type(ID(r),x+rx,y+ry,PT_FRZW);
+					continue;
+				}
+				if (TYP(r) == PT_WATR && sim->rng.chance(1, 14))
+				{
+					sim->part_change_type(ID(r), x + rx, y + ry, PT_FRZW);
 				}
 			}
 		}
 	}
-	if ((parts[i].life==0 && sim->rng.chance(1, 192)) || sim->rng.chance(100-parts[i].life, 50000))
+	if ((parts[i].life == 0 && sim->rng.chance(1, 192)) || sim->rng.chance(100 - parts[i].life, 50000))
 	{
-		sim->part_change_type(i,x,y,PT_ICEI);
-		parts[i].ctype=PT_FRZW;
-		parts[i].temp = restrict_flt(parts[i].temp-200.0f, MIN_TEMP, MAX_TEMP);
+		sim->part_change_type(i, x, y, PT_ICEI);
+		parts[i].ctype = PT_FRZW;
+		parts[i].temp = restrict_flt(parts[i].temp - 200.0f, MIN_TEMP, MAX_TEMP);
 	}
 	return 0;
 }

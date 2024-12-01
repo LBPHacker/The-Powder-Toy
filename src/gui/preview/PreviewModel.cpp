@@ -1,16 +1,16 @@
 #include "PreviewModel.h"
-#include "client/http/GetSaveDataRequest.h"
-#include "client/http/GetSaveRequest.h"
-#include "client/http/GetCommentsRequest.h"
-#include "client/http/FavouriteSaveRequest.h"
+#include "Config.h"
 #include "Format.h"
 #include "Misc.h"
+#include "PreviewView.h"
 #include "client/Client.h"
 #include "client/GameSave.h"
 #include "client/SaveInfo.h"
+#include "client/http/FavouriteSaveRequest.h"
+#include "client/http/GetCommentsRequest.h"
+#include "client/http/GetSaveDataRequest.h"
+#include "client/http/GetSaveRequest.h"
 #include "gui/dialogues/ErrorMessage.h"
-#include "PreviewView.h"
-#include "Config.h"
 #include <cmath>
 #include <iostream>
 
@@ -31,7 +31,7 @@ bool PreviewModel::GetCommentBoxEnabled()
 
 void PreviewModel::SetCommentBoxEnabled(bool enabledState)
 {
-	if(enabledState != commentBoxEnabled)
+	if (enabledState != commentBoxEnabled)
 	{
 		commentBoxEnabled = enabledState;
 		notifyCommentBoxEnabledChanged();
@@ -59,7 +59,9 @@ void PreviewModel::UpdateSave(int saveID, int saveDate)
 	{
 		commentsLoaded = false;
 
-		commentsDownload = std::make_unique<http::GetCommentsRequest>(saveID, (commentsPageNumber - 1) * commentsPerPage, commentsPerPage);
+		commentsDownload = std::make_unique<http::GetCommentsRequest>(
+			saveID, (commentsPageNumber - 1) * commentsPerPage, commentsPerPage
+		);
 		commentsDownload->Start();
 	}
 }
@@ -124,7 +126,9 @@ void PreviewModel::UpdateComments(int pageNumber)
 		commentsPageNumber = pageNumber;
 		if (!GetDoOpen())
 		{
-			commentsDownload = std::make_unique<http::GetCommentsRequest>(saveID, (commentsPageNumber - 1) * commentsPerPage, commentsPerPage);
+			commentsDownload = std::make_unique<http::GetCommentsRequest>(
+				saveID, (commentsPageNumber - 1) * commentsPerPage, commentsPerPage
+			);
 			commentsDownload->Start();
 		}
 
@@ -136,7 +140,9 @@ void PreviewModel::UpdateComments(int pageNumber)
 void PreviewModel::CommentAdded()
 {
 	if (saveInfo)
+	{
 		saveInfo->Comments++;
+	}
 	commentsTotal++;
 }
 
@@ -147,19 +153,25 @@ void PreviewModel::OnSaveReady()
 	{
 		auto gameSave = std::make_unique<GameSave>(*saveData);
 		if (gameSave->fromNewerVersion)
-			new ErrorMessage("This save is from a newer version", String::Build("Please update TPT in game or at ", SERVER));
+		{
+			new ErrorMessage(
+				"This save is from a newer version", String::Build("Please update TPT in game or at ", SERVER)
+			);
+		}
 		saveInfo->SetGameSave(std::move(gameSave));
 	}
-	catch(ParseException &e)
+	catch (ParseException &e)
 	{
 		new ErrorMessage("Error", ByteString(e.what()).FromUtf8());
 		canOpen = false;
 	}
 	notifySaveChanged();
 	notifyCommentsPageChanged();
-	//make sure author name comments are red
+	// make sure author name comments are red
 	if (commentsLoaded)
+	{
 		notifySaveCommentsChanged();
+	}
 }
 
 void PreviewModel::Update()
@@ -295,7 +307,7 @@ void PreviewModel::notifySaveCommentsChanged()
 	}
 }
 
-void PreviewModel::AddObserver(PreviewView * observer)
+void PreviewModel::AddObserver(PreviewView *observer)
 {
 	observers.push_back(observer);
 	observer->NotifySaveChanged(this);

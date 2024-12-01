@@ -1,13 +1,18 @@
 #include "SurfaceNormals.h"
-#include "gui/game/GameView.h"
-#include "gui/game/GameController.h"
-#include "gui/interface/Engine.h"
-#include "simulation/Simulation.h"
-#include "simulation/ElementClasses.h"
 #include "graphics/Graphics.h"
+#include "gui/game/GameController.h"
+#include "gui/game/GameView.h"
+#include "gui/interface/Engine.h"
+#include "simulation/ElementClasses.h"
+#include "simulation/Simulation.h"
 
-SurfaceNormals::SurfaceNormals(unsigned int id, const Simulation *newSim, GameView *newView, GameController *newController) :
-	DebugInfo(id), sim(newSim), view(newView), controller(newController)
+SurfaceNormals::SurfaceNormals(
+	unsigned int id, const Simulation *newSim, GameView *newView, GameController *newController
+) :
+	DebugInfo(id),
+	sim(newSim),
+	view(newView),
+	controller(newController)
 {
 }
 
@@ -54,7 +59,10 @@ void SurfaceNormals::Draw()
 		return;
 	}
 	g->XorLine({ x, y }, { mr.fin_x, mr.fin_y });
-	g->XorLine({ mr.fin_x, mr.fin_y }, { int((mr.fin_x + gn.nx * SURF_RANGE) + 0.5f), int((mr.fin_y + gn.ny * SURF_RANGE) + 0.5f) });
+	g->XorLine(
+		{ mr.fin_x, mr.fin_y },
+		{ int((mr.fin_x + gn.nx * SURF_RANGE) + 0.5f), int((mr.fin_y + gn.ny * SURF_RANGE) + 0.5f) }
+	);
 	g->XorLine({ mr.fin_x, mr.fin_y }, { gn.lx, gn.ly });
 	g->XorLine({ mr.fin_x, mr.fin_y }, { gn.rx, gn.ry });
 }

@@ -1,10 +1,11 @@
 #include "RichLabel.h"
-#include "common/platform/Platform.h"
 #include "Format.h"
+#include "common/platform/Platform.h"
 
 using namespace ui;
 
-RichLabel::RichLabel(Point position, Point size, String text) : Label(position, size, "")
+RichLabel::RichLabel(Point position, Point size, String text) :
+	Label(position, size, "")
 {
 	SetText(text);
 }
@@ -68,8 +69,9 @@ void RichLabel::OnMouseDown(int x, int y, unsigned button)
 {
 	if (MouseDownInside)
 	{
-		int cursorPosition = displayTextWrapper.Point2Index(x - Position.X - textPosition.X, y - Position.Y - textPosition.Y).raw_index;
-		for (auto const &region : regions)
+		int cursorPosition =
+			displayTextWrapper.Point2Index(x - Position.X - textPosition.X, y - Position.Y - textPosition.Y).raw_index;
+		for (const auto &region : regions)
 		{
 			if (region.begin <= cursorPosition && region.end > cursorPosition)
 			{

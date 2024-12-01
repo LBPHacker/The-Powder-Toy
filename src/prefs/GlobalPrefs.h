@@ -5,7 +5,8 @@
 class GlobalPrefs : public Prefs, public ExplicitSingleton<GlobalPrefs>
 {
 public:
-	GlobalPrefs() : Prefs("powder.pref")
+	GlobalPrefs() :
+		Prefs("powder.pref")
 	{
 	}
 };

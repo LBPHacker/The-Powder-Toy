@@ -1,11 +1,11 @@
 #include "Platform.h"
+#include <ctime>
+#include <dirent.h>
 #include <iostream>
 #include <memory>
 #include <sys/stat.h>
-#include <unistd.h>
-#include <ctime>
 #include <sys/time.h>
-#include <dirent.h>
+#include <unistd.h>
 
 namespace Platform
 {
@@ -42,7 +42,9 @@ bool UpdateStart(const std::vector<char> &data)
 	ByteString exeName = Platform::ExecutableName();
 
 	if (!exeName.length())
+	{
 		return false;
+	}
 
 	auto updName = exeName + "-update";
 

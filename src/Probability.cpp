@@ -15,15 +15,15 @@
 
 #include "Probability.h"
 #include "common/tpt-rand.h"
-#include <numeric>
 #include <cstdlib>
+#include <numeric>
 
 namespace Probability
 {
 
 float binomial_gte1(int n, float p)
 {
-	return 1.0f - std::pow(1.0f-p, n);
+	return 1.0f - std::pow(1.0f - p, n);
 }
 
 SmallKBinomialGenerator::SmallKBinomialGenerator(unsigned int n, float p, unsigned int maxK_)
@@ -33,17 +33,17 @@ SmallKBinomialGenerator::SmallKBinomialGenerator(unsigned int n, float p, unsign
 
 	float *pdf = new float[maxK];
 	// initial values, k=0:
-	float pTerm = std::pow(1.0f-p, static_cast<float>(n)); // the p^k * (1-p)^(n-k) term
+	float pTerm = std::pow(1.0f - p, static_cast<float>(n)); // the p^k * (1-p)^(n-k) term
 	unsigned int coeffN = 1, coeffD = 1; // (N / D) evaluates to the same result as the n!/(k!(n-k)!) term
-	for (unsigned int k=0; k<maxK; k++)
+	for (unsigned int k = 0; k < maxK; k++)
 	{
 		pdf[k] = pTerm * (float(coeffN) / coeffD);
-		pTerm *= p/(1.0f-p);
-		coeffN *= n-k; // Part of the n! will no longer cancelled out by (n-k)!
-		coeffD *= k+1; // k! (k+1 because this is for next k)
+		pTerm *= p / (1.0f - p);
+		coeffN *= n - k; // Part of the n! will no longer cancelled out by (n-k)!
+		coeffD *= k + 1; // k! (k+1 because this is for next k)
 	}
 
-	std::partial_sum(pdf, pdf+maxK, cdf);
+	std::partial_sum(pdf, pdf + maxK, cdf);
 	delete[] pdf;
 }
 
@@ -54,10 +54,12 @@ SmallKBinomialGenerator::~SmallKBinomialGenerator()
 
 unsigned int SmallKBinomialGenerator::calc(float randFloat)
 {
-	for (unsigned int k=0; k<maxK; k++)
+	for (unsigned int k = 0; k < maxK; k++)
 	{
-		if (randFloat<cdf[k])
+		if (randFloat < cdf[k])
+		{
 			return k;
+		}
 	}
 	return maxK;
 }

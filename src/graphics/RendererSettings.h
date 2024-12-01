@@ -1,7 +1,7 @@
 #pragma once
+#include "FindingElement.h"
 #include "gui/interface/Point.h"
 #include "simulation/ElementGraphics.h"
-#include "FindingElement.h"
 #include <cstdint>
 #include <optional>
 
@@ -13,12 +13,14 @@ struct RendererSettings
 	std::optional<FindingElement> findingElement;
 	bool gravityZonesEnabled = false;
 	bool gravityFieldEnabled = false;
+
 	enum DecorationLevel
 	{
 		decorationDisabled,
 		decorationEnabled,
 		decorationAntiClickbait,
 	};
+
 	DecorationLevel decorationLevel = decorationEnabled;
 	bool debugLines = false;
 	ui::Point mousePos = { 0, 0 };

@@ -1,9 +1,9 @@
-#include "common/platform/Platform.h"
 #include "common/Defer.h"
-#include <execinfo.h>
-#include <cstdint>
+#include "common/platform/Platform.h"
 #include <array>
+#include <cstdint>
 #include <cxxabi.h>
+#include <execinfo.h>
 #include <iostream>
 
 namespace Platform

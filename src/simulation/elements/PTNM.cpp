@@ -20,7 +20,7 @@ void Element::Element_PTNM()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -58,11 +58,14 @@ static void wtrv_reactions(int wtrv1_id, UPDATE_FUNC_ARGS)
 			{
 				int r = pmap[y + ry][x + rx];
 				if (!r || ID(r) == wtrv1_id)
+				{
 					continue;
+				}
 				int rt = TYP(r);
 
 				// WTRV + BCOL -> OIL
-				if (rt == PT_BCOL && parts[ID(r)].temp > 200.0f + 273.15f && parts[wtrv1_id].temp > 200.0f + 273.15f && sim->pv[(y + ry) / CELL][(x + rx) / CELL] > 7.f)
+				if (rt == PT_BCOL && parts[ID(r)].temp > 200.0f + 273.15f && parts[wtrv1_id].temp > 200.0f + 273.15f &&
+				    sim->pv[(y + ry) / CELL][(x + rx) / CELL] > 7.f)
 				{
 					sim->part_change_type(ID(r), x + rx, y + ry, PT_OIL);
 					sim->kill_part(wtrv1_id);
@@ -83,14 +86,18 @@ static void hygn_reactions(int hygn1_id, UPDATE_FUNC_ARGS)
 			{
 				int r = pmap[y + ry][x + rx];
 				if (!r || ID(r) == hygn1_id)
+				{
 					continue;
+				}
 				int rt = TYP(r);
 
 				// HYGN + DESL -> OIL + WATR
 				if (rt == PT_DESL)
 				{
 					sim->part_change_type(ID(r), x + rx, y + ry, PT_WATR);
-					sim->part_change_type(hygn1_id, (int)(parts[hygn1_id].x + 0.5f), (int)(parts[hygn1_id].y + 0.5f), PT_OIL);
+					sim->part_change_type(
+						hygn1_id, (int)(parts[hygn1_id].x + 0.5f), (int)(parts[hygn1_id].y + 0.5f), PT_OIL
+					);
 					return;
 				}
 
@@ -98,7 +105,9 @@ static void hygn_reactions(int hygn1_id, UPDATE_FUNC_ARGS)
 				if (rt == PT_O2 && !parts[i].life)
 				{
 					sim->part_change_type(ID(r), x + rx, y + ry, PT_DSTW);
-					sim->part_change_type(hygn1_id, (int)(parts[hygn1_id].x + 0.5f), (int)(parts[hygn1_id].y + 0.5f), PT_DSTW);
+					sim->part_change_type(
+						hygn1_id, (int)(parts[hygn1_id].x + 0.5f), (int)(parts[hygn1_id].y + 0.5f), PT_DSTW
+					);
 					parts[ID(r)].temp += 5.0f;
 					parts[hygn1_id].temp += 5.0f;
 
@@ -109,10 +118,13 @@ static void hygn_reactions(int hygn1_id, UPDATE_FUNC_ARGS)
 				}
 
 				// Cold fusion: 2 hydrogen > 500 C has a chance to fuse
-				if (rt == PT_H2 && sim->rng.chance(1, 1000) && parts[ID(r)].temp > 500.0f + 273.15f && parts[hygn1_id].temp > 500.0f + 273.15f)
+				if (rt == PT_H2 && sim->rng.chance(1, 1000) && parts[ID(r)].temp > 500.0f + 273.15f &&
+				    parts[hygn1_id].temp > 500.0f + 273.15f)
 				{
 					sim->part_change_type(ID(r), x + rx, y + ry, PT_NBLE);
-					sim->part_change_type(hygn1_id, (int)(parts[hygn1_id].x + 0.5f), (int)(parts[hygn1_id].y + 0.5f), PT_NEUT);
+					sim->part_change_type(
+						hygn1_id, (int)(parts[hygn1_id].x + 0.5f), (int)(parts[hygn1_id].y + 0.5f), PT_NEUT
+					);
 
 					parts[ID(r)].temp += 1000.0f;
 					parts[hygn1_id].temp += 1000.0f;
@@ -129,7 +141,9 @@ static void hygn_reactions(int hygn1_id, UPDATE_FUNC_ARGS)
 					{
 						int j = sim->create_part(-3, x + rx, y + ry, PT_ELEC);
 						if (j > -1)
+						{
 							parts[j].temp = parts[ID(r)].temp;
+						}
 					}
 					return;
 				}
@@ -171,14 +185,20 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				int r = pmap[y + ry][x + rx];
 				if (!r)
+				{
 					continue;
+				}
 				int rt = TYP(r);
 
 				if (rt == PT_H2 && hygn1_id < 0)
+				{
 					hygn1_id = ID(r);
+				}
 
 				if (rt == PT_WTRV && wtrv1_id < 0)
+				{
 					wtrv1_id = ID(r);
+				}
 
 				// These reactions will occur instantly in contact with PTNM
 				// --------------------------------------------------------
@@ -189,9 +209,15 @@ static int update(UPDATE_FUNC_ARGS)
 					int next = PT_SHLD1;
 					switch (rt)
 					{
-					case PT_SHLD1: next = PT_SHLD2; break;
-					case PT_SHLD2: next = PT_SHLD3; break;
-					case PT_SHLD3: next = PT_SHLD4; break;
+					case PT_SHLD1:
+						next = PT_SHLD2;
+						break;
+					case PT_SHLD2:
+						next = PT_SHLD3;
+						break;
+					case PT_SHLD3:
+						next = PT_SHLD4;
+						break;
 					}
 					sim->part_change_type(ID(r), x + rx, y + ry, next);
 					parts[ID(r)].life = 7;
@@ -264,12 +290,16 @@ static int update(UPDATE_FUNC_ARGS)
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
 	if (cpart->tmp)
+	{
 		*pixel_mode |= PMODE_FLARE;
+	}
 	return 0;
 }
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
 	if (sim->rng.chance(1, 15))
+	{
 		sim->parts[i].tmp = 1;
+	}
 }

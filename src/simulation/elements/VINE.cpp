@@ -20,7 +20,7 @@ void Element::Element_VINE()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 20;
@@ -59,19 +59,26 @@ static int update(UPDATE_FUNC_ARGS)
 	rndstore >>= 2;
 	if (rx || ry)
 	{
-		auto r = pmap[y+ry][x+rx];
+		auto r = pmap[y + ry][x + rx];
 		if (!(rndstore % 15))
+		{
 			sim->part_change_type(i, x, y, PT_PLNT);
+		}
 		else if (!r)
 		{
-			auto np = sim->create_part(-1,x+rx,y+ry,PT_VINE);
-			if (np<0) return 0;
+			auto np = sim->create_part(-1, x + rx, y + ry, PT_VINE);
+			if (np < 0)
+			{
+				return 0;
+			}
 			parts[np].temp = parts[i].temp;
-			sim->part_change_type(i,x,y,PT_PLNT);
+			sim->part_change_type(i, x, y, PT_PLNT);
 		}
 	}
 	if (parts[i].temp > 350 && parts[i].temp > parts[i].tmp2)
+	{
 		parts[i].tmp2 = (int)parts[i].temp;
+	}
 	return 0;
 }
 
@@ -80,14 +87,14 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	float maxtemp = std::max((float)cpart->tmp2, cpart->temp);
 	if (maxtemp > 300)
 	{
-		*colr += (int)restrict_flt((maxtemp-300)/5,0,58);
-		*colg -= (int)restrict_flt((maxtemp-300)/2,0,102);
-		*colb += (int)restrict_flt((maxtemp-300)/5,0,70);
+		*colr += (int)restrict_flt((maxtemp - 300) / 5, 0, 58);
+		*colg -= (int)restrict_flt((maxtemp - 300) / 2, 0, 102);
+		*colb += (int)restrict_flt((maxtemp - 300) / 5, 0, 70);
 	}
 	if (maxtemp < 273)
 	{
-		*colg += (int)restrict_flt((273-maxtemp)/4,0,255);
-		*colb += (int)restrict_flt((273-maxtemp)/1.5,0,255);
+		*colg += (int)restrict_flt((273 - maxtemp) / 4, 0, 255);
+		*colb += (int)restrict_flt((273 - maxtemp) / 1.5, 0, 255);
 	}
 	return 0;
 }

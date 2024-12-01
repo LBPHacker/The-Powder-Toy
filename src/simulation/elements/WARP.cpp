@@ -20,7 +20,7 @@ void Element::Element_WARP()
 	Collision = -0.1f;
 	Gravity = 0.0f;
 	Diffusion = 3.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -33,7 +33,7 @@ void Element::Element_WARP()
 	HeatConduct = 100;
 	Description = "Displaces other elements.";
 
-	Properties = TYPE_GAS|PROP_LIFE_DEC|PROP_LIFE_KILL;
+	Properties = TYPE_GAS | PROP_LIFE_DEC | PROP_LIFE_KILL;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -54,11 +54,13 @@ static int update(UPDATE_FUNC_ARGS)
 	if (parts[i].tmp2 > 2000)
 	{
 		parts[i].temp = 10000;
-		sim->pv[y/CELL][x/CELL] += (parts[i].tmp2 / 5000) * CFDS;
+		sim->pv[y / CELL][x / CELL] += (parts[i].tmp2 / 5000) * CFDS;
 		if (sim->rng.chance(1, 50))
+		{
 			sim->create_part(-3, x, y, PT_ELEC);
+		}
 	}
-	for (int trade = 0; trade < 5; trade ++)
+	for (int trade = 0; trade < 5; trade++)
 	{
 		int rx = sim->rng.between(-1, 1);
 		int ry = sim->rng.between(-1, 1);
@@ -66,8 +68,11 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			int r = pmap[y + ry][x + rx];
 			if (!r)
+			{
 				continue;
-			if (TYP(r) != PT_WARP && TYP(r) != PT_STKM && TYP(r) != PT_STKM2 && TYP(r) != PT_DMND && TYP(r) != PT_CLNE && TYP(r) != PT_BCLN && TYP(r) != PT_PCLN)
+			}
+			if (TYP(r) != PT_WARP && TYP(r) != PT_STKM && TYP(r) != PT_STKM2 && TYP(r) != PT_DMND &&
+			    TYP(r) != PT_CLNE && TYP(r) != PT_BCLN && TYP(r) != PT_PCLN)
 			{
 				parts[i].x = parts[ID(r)].x;
 				parts[i].y = parts[ID(r)].y;

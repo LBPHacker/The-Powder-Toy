@@ -7,16 +7,16 @@
 #include "client/GameSave.h"
 #include "client/SaveFile.h"
 #include "gui/dialogues/ConfirmPrompt.h"
-#include "gui/dialogues/TextPrompt.h"
 #include "gui/dialogues/ErrorMessage.h"
-#include "tasks/TaskWindow.h"
+#include "gui/dialogues/TextPrompt.h"
 #include "tasks/Task.h"
+#include "tasks/TaskWindow.h"
 
 #include "Controller.h"
 
 #include <algorithm>
 
-LocalBrowserController::LocalBrowserController(std::function<void ()> onDone_):
+LocalBrowserController::LocalBrowserController(std::function<void()> onDone_) :
 	HasDone(false)
 {
 	browserModel = new LocalBrowserModel();
@@ -43,10 +43,14 @@ void LocalBrowserController::RemoveSelected()
 {
 	StringBuilder desc;
 	desc << "Are you sure you want to delete " << browserModel->GetSelected().size() << " stamp";
-	if(browserModel->GetSelected().size()>1)
+	if (browserModel->GetSelected().size() > 1)
+	{
 		desc << "s";
+	}
 	desc << "?";
-	new ConfirmPrompt("Delete stamps", desc.Build(), { [this] { removeSelectedC(); } });
+	new ConfirmPrompt("Delete stamps", desc.Build(), { [this] {
+						  removeSelectedC();
+					  } });
 }
 
 void LocalBrowserController::removeSelectedC()
@@ -54,9 +58,15 @@ void LocalBrowserController::removeSelectedC()
 	class RemoveSavesTask : public Task
 	{
 		std::vector<ByteString> saves;
-		LocalBrowserController * c;
+		LocalBrowserController *c;
+
 	public:
-		RemoveSavesTask(LocalBrowserController * c, std::vector<ByteString> saves_) : c(c) { saves = saves_; }
+		RemoveSavesTask(LocalBrowserController *c, std::vector<ByteString> saves_) :
+			c(c)
+		{
+			saves = saves_;
+		}
+
 		bool doWork() override
 		{
 			for (size_t i = 0; i < saves.size(); i++)
@@ -67,6 +77,7 @@ void LocalBrowserController::removeSelectedC()
 			}
 			return true;
 		}
+
 		void after() override
 		{
 			c->RefreshSavesList();
@@ -81,17 +92,24 @@ void LocalBrowserController::RenameSelected()
 {
 	ByteString save = browserModel->GetSelected()[0];
 
-	new TextPrompt("Rename stamp", "Enter a new name for the stamp:", "", "[new name]", false, { [this, save](const String &newName) {
-		if (newName.length() == 0)
-		{
-			new ErrorMessage("Error renaming stamp", "You have to specify the filename.");
-			return;
-		}
+	new TextPrompt(
+		"Rename stamp",
+		"Enter a new name for the stamp:",
+		"",
+		"[new name]",
+		false,
+		{ [this, save](const String &newName) {
+			if (newName.length() == 0)
+			{
+				new ErrorMessage("Error renaming stamp", "You have to specify the filename.");
+				return;
+			}
 
-		Client::Ref().RenameStamp(save, newName.ToUtf8());
+			Client::Ref().RenameStamp(save, newName.ToUtf8());
 
-		RefreshSavesList();
-	} });
+			RefreshSavesList();
+		} }
+	);
 }
 
 void LocalBrowserController::RescanStamps()
@@ -114,14 +132,18 @@ void LocalBrowserController::ClearSelection()
 void LocalBrowserController::SetPage(int page)
 {
 	if (page != browserModel->GetPageNum() && page >= 0 && page < browserModel->GetPageCount())
+	{
 		browserModel->UpdateSavesList(page);
+	}
 }
 
 void LocalBrowserController::SetPageRelative(int offset)
 {
 	int page = std::max(std::min(browserModel->GetPageNum() + offset, browserModel->GetPageCount() - 1), 0);
 	if (page != browserModel->GetPageNum())
+	{
 		browserModel->UpdateSavesList(page);
+	}
 }
 
 void LocalBrowserController::Update()
@@ -134,10 +156,14 @@ void LocalBrowserController::Update()
 
 void LocalBrowserController::Selected(ByteString saveName, bool selected)
 {
-	if(selected)
+	if (selected)
+	{
 		browserModel->SelectSave(saveName);
+	}
 	else
+	{
 		browserModel->DeselectSave(saveName);
+	}
 }
 
 bool LocalBrowserController::GetMoveToFront()
@@ -154,7 +180,9 @@ void LocalBrowserController::Exit()
 {
 	browserView->CloseActiveWindow();
 	if (onDone)
+	{
 		onDone();
+	}
 	HasDone = true;
 }
 
@@ -164,4 +192,3 @@ LocalBrowserController::~LocalBrowserController()
 	browserView->CloseActiveWindow();
 	delete browserView;
 }
-

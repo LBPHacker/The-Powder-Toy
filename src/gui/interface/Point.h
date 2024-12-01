@@ -4,5 +4,5 @@
 
 namespace ui
 {
-	using Point = Vec2<int>;
+using Point = Vec2<int>;
 }

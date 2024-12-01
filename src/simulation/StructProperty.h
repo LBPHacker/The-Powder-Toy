@@ -3,11 +3,7 @@
 #include <cstdint>
 #include <variant>
 
-using PropertyValue = std::variant<
-	int,
-	unsigned int,
-	float
->;
+using PropertyValue = std::variant<int, unsigned int, float>;
 
 struct StructProperty
 {
@@ -24,6 +20,7 @@ struct StructProperty
 		UChar,
 		Removed
 	};
+
 	ByteString Name;
 	PropertyType Type;
 	intptr_t Offset;
@@ -31,7 +28,7 @@ struct StructProperty
 	StructProperty();
 	StructProperty(ByteString name, PropertyType type, intptr_t offset);
 
-	bool operator ==(const StructProperty &other) const;
+	bool operator==(const StructProperty &other) const;
 	::String ToString(const PropertyValue &value) const;
 };
 

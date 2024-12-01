@@ -1,6 +1,6 @@
 #include "LuaScriptInterface.h"
-#include "common/VariantIndex.h"
 #include "PowderToySDL.h"
+#include "common/VariantIndex.h"
 
 static int fregister(lua_State *L)
 {
@@ -59,26 +59,28 @@ void LuaEvent::Open(lua_State *L)
 		LFUNC(getModifiers),
 #undef LFUNC
 		{ "register", fregister },
-		{ NULL, NULL }
+		{       NULL,      NULL }
 	};
 	lua_newtable(L);
 	luaL_register(L, NULL, reg);
-#define LVICONST(id, v) lua_pushinteger(L, VariantIndex<GameControllerEvent, id>()); lua_setfield(L, -2, v)
-	LVICONST(TextInputEvent    , "TEXTINPUT"    );
-	LVICONST(TextEditingEvent  , "TEXTEDITING"  );
-	LVICONST(KeyPressEvent     , "KEYPRESS"     );
-	LVICONST(KeyReleaseEvent   , "KEYRELEASE"   );
-	LVICONST(MouseDownEvent    , "MOUSEDOWN"    );
-	LVICONST(MouseUpEvent      , "MOUSEUP"      );
-	LVICONST(MouseMoveEvent    , "MOUSEMOVE"    );
-	LVICONST(MouseWheelEvent   , "MOUSEWHEEL"   );
-	LVICONST(TickEvent         , "TICK"         );
-	LVICONST(BlurEvent         , "BLUR"         );
-	LVICONST(CloseEvent        , "CLOSE"        );
-	LVICONST(BeforeSimEvent    , "BEFORESIM"    );
-	LVICONST(AfterSimEvent     , "AFTERSIM"     );
+#define LVICONST(id, v)                                          \
+	lua_pushinteger(L, VariantIndex<GameControllerEvent, id>()); \
+	lua_setfield(L, -2, v)
+	LVICONST(TextInputEvent, "TEXTINPUT");
+	LVICONST(TextEditingEvent, "TEXTEDITING");
+	LVICONST(KeyPressEvent, "KEYPRESS");
+	LVICONST(KeyReleaseEvent, "KEYRELEASE");
+	LVICONST(MouseDownEvent, "MOUSEDOWN");
+	LVICONST(MouseUpEvent, "MOUSEUP");
+	LVICONST(MouseMoveEvent, "MOUSEMOVE");
+	LVICONST(MouseWheelEvent, "MOUSEWHEEL");
+	LVICONST(TickEvent, "TICK");
+	LVICONST(BlurEvent, "BLUR");
+	LVICONST(CloseEvent, "CLOSE");
+	LVICONST(BeforeSimEvent, "BEFORESIM");
+	LVICONST(AfterSimEvent, "AFTERSIM");
 	LVICONST(BeforeSimDrawEvent, "BEFORESIMDRAW");
-	LVICONST(AfterSimDrawEvent , "AFTERSIMDRAW" );
+	LVICONST(AfterSimDrawEvent, "AFTERSIMDRAW");
 #undef LVICONST
 	lua_pushvalue(L, -1);
 	lua_setglobal(L, "event");

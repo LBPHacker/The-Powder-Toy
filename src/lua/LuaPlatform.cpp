@@ -1,7 +1,7 @@
-#include "LuaScriptInterface.h"
-#include "common/platform/Platform.h"
 #include "Config.h"
+#include "LuaScriptInterface.h"
 #include "PowderToySDL.h"
+#include "common/platform/Platform.h"
 
 static int platform(lua_State *L)
 {
@@ -25,9 +25,13 @@ static int exeName(lua_State *L)
 {
 	ByteString name = Platform::ExecutableName();
 	if (name.length())
+	{
 		tpt_lua_pushByteString(L, name);
+	}
 	else
+	{
 		luaL_error(L, "Error, could not get executable name");
+	}
 	return 1;
 }
 
@@ -61,14 +65,8 @@ void LuaPlatform::Open(lua_State *L)
 {
 	static const luaL_Reg reg[] = {
 #define LFUNC(v) { #v, v }
-		LFUNC(platform),
-		LFUNC(ident),
-		LFUNC(releaseType),
-		LFUNC(exeName),
-		LFUNC(restart),
-		LFUNC(openLink),
-		LFUNC(clipboardCopy),
-		LFUNC(clipboardPaste),
+		LFUNC(platform), LFUNC(ident),    LFUNC(releaseType),   LFUNC(exeName),
+		LFUNC(restart),  LFUNC(openLink), LFUNC(clipboardCopy), LFUNC(clipboardPaste),
 #undef LFUNC
 		{ NULL, NULL }
 	};

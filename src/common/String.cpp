@@ -1,17 +1,19 @@
-#include <sstream>
-#include <vector>
-#include <locale>
 #include <limits>
+#include <locale>
+#include <sstream>
 #include <stdexcept>
+#include <vector>
 
 #include "String.h"
 
-ByteString ConversionError::formatError(ByteString::value_type const *at, ByteString::value_type const *upto)
+ByteString ConversionError::formatError(const ByteString::value_type *at, const ByteString::value_type *upto)
 {
 	std::stringstream ss;
 	ss << "Could not convert sequence to UTF-8:";
-	for(int i = 0; i < 4 && at + i < upto; i++)
+	for (int i = 0; i < 4 && at + i < upto; i++)
+	{
 		ss << " " << std::hex << (unsigned int)std::make_unsigned<ByteString::value_type>::type(at[i]);
+	}
 	return ss.str();
 }
 
@@ -19,59 +21,71 @@ std::vector<ByteString> ByteString::PartitionBy(value_type ch, bool includeEmpty
 {
 	std::vector<ByteString> result;
 	size_t at = 0;
-	while(true)
+	while (true)
 	{
 		Split split = SplitBy(ch, at);
 		ByteString part = split.Before();
-		if(includeEmpty || part.size())
+		if (includeEmpty || part.size())
+		{
 			result.push_back(part);
+		}
 		at = split.PositionAfter();
-		if(!split)
+		if (!split)
+		{
 			break;
+		}
 	}
 	return result;
 }
 
-std::vector<ByteString> ByteString::PartitionBy(ByteString const &str, bool includeEmpty) const
+std::vector<ByteString> ByteString::PartitionBy(const ByteString &str, bool includeEmpty) const
 {
 	std::vector<ByteString> result;
 	size_t at = 0;
-	while(true)
+	while (true)
 	{
 		Split split = SplitBy(str, at);
 		ByteString part = split.Before();
-		if(includeEmpty || part.size())
+		if (includeEmpty || part.size())
+		{
 			result.push_back(part);
+		}
 		at = split.PositionAfter();
-		if(!split)
+		if (!split)
+		{
 			break;
+		}
 	}
 	return result;
 }
 
-std::vector<ByteString> ByteString::PartitionByAny(ByteString const &str, bool includeEmpty) const
+std::vector<ByteString> ByteString::PartitionByAny(const ByteString &str, bool includeEmpty) const
 {
 	std::vector<ByteString> result;
 	size_t at = 0;
-	while(true)
+	while (true)
 	{
 		Split split = SplitByAny(str, at);
 		ByteString part = split.Before();
-		if(includeEmpty || part.size())
+		if (includeEmpty || part.size())
+		{
 			result.push_back(part);
+		}
 		at = split.PositionAfter();
-		if(!split)
+		if (!split)
+		{
 			break;
+		}
 	}
 	return result;
 }
 
-ByteString &ByteString::Substitute(ByteString const &needle, ByteString const &replacement)
+ByteString &ByteString::Substitute(const ByteString &needle, const ByteString &replacement)
 {
 	size_t needleSize = needle.size();
 	size_t replacementSize = replacement.size();
 	size_t at = super::find(needle);
-	while(at != npos)
+	while (at != npos)
 	{
 		super::replace(at, needleSize, replacement);
 		at += replacementSize + !needleSize;
@@ -88,49 +102,64 @@ String ByteString::FromUtf8(bool ignoreError) const
 {
 	std::vector<String::value_type> destination;
 	destination.reserve(size());
-	std::make_unsigned<value_type>::type const *from = reinterpret_cast<std::make_unsigned<value_type>::type const *>(data());
-	for(size_t i = 0; i < size(); )
+	const std::make_unsigned<value_type>::type *from =
+		reinterpret_cast<const std::make_unsigned<value_type>::type *>(data());
+	for (size_t i = 0; i < size();)
 	{
-		if(from[i] < 0x80)
+		if (from[i] < 0x80)
 		{
 			destination.push_back(from[i]);
 			i += 1;
 			continue;
 		}
-		else if(from[i] >= 0xC2 && from[i] < 0xE0)
+		else if (from[i] >= 0xC2 && from[i] < 0xE0)
 		{
-			if(i + 1 < size() && from[i + 1] >= 0x80 && from[i + 1] < 0xC0)
+			if (i + 1 < size() && from[i + 1] >= 0x80 && from[i + 1] < 0xC0)
 			{
 				destination.push_back((from[i] & 0x1F) << 6 | (from[i + 1] & 0x3F));
 				i += 2;
 				continue;
 			}
 		}
-		else if(from[i] >= 0xE0 && from[i] < 0xF0)
+		else if (from[i] >= 0xE0 && from[i] < 0xF0)
 		{
-			if(i + 1 < size() && from[i + 1] >= (from[i] == 0xE0 ? 0xA0 : 0x80) && from[i + 1] < 0xC0)
-				if(i + 2 < size() && from[i + 2] >= 0x80 && from[i + 2] < 0xC0)
+			if (i + 1 < size() && from[i + 1] >= (from[i] == 0xE0 ? 0xA0 : 0x80) && from[i + 1] < 0xC0)
+			{
+				if (i + 2 < size() && from[i + 2] >= 0x80 && from[i + 2] < 0xC0)
 				{
 					destination.push_back((from[i] & 0x0F) << 12 | (from[i + 1] & 0x3F) << 6 | (from[i + 2] & 0x3F));
 					i += 3;
 					continue;
 				}
+			}
 		}
-		else if(from[i] >= 0xF0 && from[i] < 0xF5)
+		else if (from[i] >= 0xF0 && from[i] < 0xF5)
 		{
-			if(i + 1 < size() && from[i + 1] >= (from[i] == 0xF0 ? 0x90 : 0x80) && from[i + 1] < (from[i] == 0xF4 ? 0x90 : 0xC0))
-				if(i + 2 < size() && from[i + 2] >= 0x80 && from[i + 2] < 0xC0)
-					if(i + 3 < size() && from[i + 3] >= 0x80 && from[i + 3] < 0xC0)
+			if (i + 1 < size() && from[i + 1] >= (from[i] == 0xF0 ? 0x90 : 0x80) &&
+			    from[i + 1] < (from[i] == 0xF4 ? 0x90 : 0xC0))
+			{
+				if (i + 2 < size() && from[i + 2] >= 0x80 && from[i + 2] < 0xC0)
+				{
+					if (i + 3 < size() && from[i + 3] >= 0x80 && from[i + 3] < 0xC0)
 					{
-						destination.push_back((from[i] & 0x07) << 18 | (from[i + 1] & 0x3F) << 12 | (from[i + 2] & 0x3F) | (from[i + 3] & 0x3F));
+						destination.push_back(
+							(from[i] & 0x07) << 18 | (from[i + 1] & 0x3F) << 12 | (from[i + 2] & 0x3F) |
+							(from[i + 3] & 0x3F)
+						);
 						i += 4;
 						continue;
 					}
+				}
+			}
 		}
-		if(ignoreError)
+		if (ignoreError)
+		{
 			destination.push_back(from[i++]);
+		}
 		else
+		{
 			throw ConversionError(data() + i, data() + size());
+		}
 	}
 	return String(destination.data(), destination.size());
 }
@@ -139,59 +168,71 @@ std::vector<String> String::PartitionBy(value_type ch, bool includeEmpty) const
 {
 	std::vector<String> result;
 	size_t at = 0;
-	while(true)
+	while (true)
 	{
 		Split split = SplitBy(ch, at);
 		String part = split.Before();
-		if(includeEmpty || part.size())
+		if (includeEmpty || part.size())
+		{
 			result.push_back(part);
+		}
 		at = split.PositionAfter();
-		if(!split)
+		if (!split)
+		{
 			break;
+		}
 	}
 	return result;
 }
 
-std::vector<String> String::PartitionBy(String const &str, bool includeEmpty) const
+std::vector<String> String::PartitionBy(const String &str, bool includeEmpty) const
 {
 	std::vector<String> result;
 	size_t at = 0;
-	while(true)
+	while (true)
 	{
 		Split split = SplitBy(str, at);
 		String part = split.Before();
-		if(includeEmpty || part.size())
+		if (includeEmpty || part.size())
+		{
 			result.push_back(part);
+		}
 		at = split.PositionAfter();
-		if(!split)
+		if (!split)
+		{
 			break;
+		}
 	}
 	return result;
 }
 
-std::vector<String> String::PartitionByAny(String const &str, bool includeEmpty) const
+std::vector<String> String::PartitionByAny(const String &str, bool includeEmpty) const
 {
 	std::vector<String> result;
 	size_t at = 0;
-	while(true)
+	while (true)
 	{
 		Split split = SplitByAny(str, at);
 		String part = split.Before();
-		if(includeEmpty || part.size())
+		if (includeEmpty || part.size())
+		{
 			result.push_back(part);
+		}
 		at = split.PositionAfter();
-		if(!split)
+		if (!split)
+		{
 			break;
+		}
 	}
 	return result;
 }
 
-String &String::Substitute(String const &needle, String const &replacement)
+String &String::Substitute(const String &needle, const String &replacement)
 {
 	size_t needleSize = needle.size();
 	size_t replacementSize = replacement.size();
 	size_t at = super::find(needle);
-	while(at != npos)
+	while (at != npos)
 	{
 		super::replace(at, needleSize, replacement);
 		at += replacementSize + !needleSize;
@@ -204,25 +245,25 @@ ByteString String::ToUtf8() const
 {
 	std::vector<std::make_unsigned<ByteString::value_type>::type> destination;
 	destination.reserve(size() * 2);
-	value_type const *from = data();
-	for(size_t i = 0; i < size(); i++)
+	const value_type *from = data();
+	for (size_t i = 0; i < size(); i++)
 	{
-		if(from[i] >= 0 && from[i] < 0x80)
+		if (from[i] >= 0 && from[i] < 0x80)
 		{
 			destination.push_back(from[i]);
 		}
-		else if(from[i] < 0x800)
+		else if (from[i] < 0x800)
 		{
 			destination.push_back(0xC0 | (from[i] >> 6));
 			destination.push_back(0x80 | (from[i] & 0x3F));
 		}
-		else if(from[i] < 0x10000)
+		else if (from[i] < 0x10000)
 		{
 			destination.push_back(0xE0 | (from[i] >> 12));
 			destination.push_back(0x80 | ((from[i] >> 6) & 0x3F));
 			destination.push_back(0x80 | (from[i] & 0x3F));
 		}
-		else if(from[i] <= 0x10FFFF)
+		else if (from[i] <= 0x10FFFF)
 		{
 			destination.push_back(0xF0 | (from[i] >> 18));
 			destination.push_back(0x80 | ((from[i] >> 12) & 0x3F));
@@ -230,50 +271,52 @@ ByteString String::ToUtf8() const
 			destination.push_back(0x80 | (from[i] & 0x3F));
 		}
 		else
+		{
 			throw ConversionError(true);
+		}
 	}
-	return ByteString(reinterpret_cast<ByteString::value_type const *>(destination.data()), destination.size());
+	return ByteString(reinterpret_cast<const ByteString::value_type *>(destination.data()), destination.size());
 }
 
 /*
-	Due to unknown reasons, the STL basically doesn't support string-number
-	conversions for char32_t strings. Under the hood all stream objects use
-	the so-called locale facets to do number formatting and parsing. As the
-	name implies the facets can depend on the currently chosen locale, but
-	they are also specialized by the type of characters that are used in
-	the strings that are written/read.
+    Due to unknown reasons, the STL basically doesn't support string-number
+    conversions for char32_t strings. Under the hood all stream objects use
+    the so-called locale facets to do number formatting and parsing. As the
+    name implies the facets can depend on the currently chosen locale, but
+    they are also specialized by the type of characters that are used in
+    the strings that are written/read.
 
-	Of particular interest are the std::num_put<T> and std::num_get<T>
-	facets. In accordance with the standard the two class templates are
-	defined, and then specialized to char and wchar_t types. But the
-	generic class template does not implement all the necessary methods,
-	leaving you with undefined reference errors. Manually providing
-	implementations for such methods is a not a portable solution.
-	Therefore we provide our own number reading/writing interface, detached
-	from std::basic_stringstream.
+    Of particular interest are the std::num_put<T> and std::num_get<T>
+    facets. In accordance with the standard the two class templates are
+    defined, and then specialized to char and wchar_t types. But the
+    generic class template does not implement all the necessary methods,
+    leaving you with undefined reference errors. Manually providing
+    implementations for such methods is a not a portable solution.
+    Therefore we provide our own number reading/writing interface, detached
+    from std::basic_stringstream.
 
-	We would nevertheless like to avoid writing all the conversion code
-	ourselves and use STL as much as possible. As it turns out std::num_put
-	and std::num_get are too wired into std::ios_base and thus are unusable
-	in separation from an STL stream object.
+    We would nevertheless like to avoid writing all the conversion code
+    ourselves and use STL as much as possible. As it turns out std::num_put
+    and std::num_get are too wired into std::ios_base and thus are unusable
+    in separation from an STL stream object.
 
-	A hacky but simple solution is to create a static thread-local
-	std::wstringstream initialized to the C locale (setting the locale of a
-	temporarily created stream every time might be too expensive). Number
-	serialization then simply uses operator<< and then manually widens the
-	produced wchar_t's into char32_t's. Number parsing is more tricky and
-	narrows only a prefix of the parsed string: it selects only characters
-	that could be a part of a number as in "Stage 2" in
-	[facet.num.get.virtuals], narrows them and uses operator>>. The number
-	of characters consumed is used to take an offset into the original
-	string.
+    A hacky but simple solution is to create a static thread-local
+    std::wstringstream initialized to the C locale (setting the locale of a
+    temporarily created stream every time might be too expensive). Number
+    serialization then simply uses operator<< and then manually widens the
+    produced wchar_t's into char32_t's. Number parsing is more tricky and
+    narrows only a prefix of the parsed string: it selects only characters
+    that could be a part of a number as in "Stage 2" in
+    [facet.num.get.virtuals], narrows them and uses operator>>. The number
+    of characters consumed is used to take an offset into the original
+    string.
 
-	A std::stringstream is added in the same way for symmetry with
-	ByteStringStream and follows the same protocol except it doesn't
-	perform and narrowing or widening.
+    A std::stringstream is added in the same way for symmetry with
+    ByteStringStream and follows the same protocol except it doesn't
+    perform and narrowing or widening.
 
-	The nice thing above the *_wchar functions immediately below is that on
-	platforms where wchar_t has 32 bits these should be a no-op.
+    The nice thing above the *_wchar functions immediately below is that on
+    platforms where wchar_t has 32 bits these should be a no-op.
 */
 
 inline String::value_type widen_wchar(wchar_t ch)
@@ -291,7 +334,7 @@ inline wchar_t narrow_wchar(String::value_type ch)
 	return wchar_t(ch);
 }
 
-char const numberChars[] = "-.+0123456789ABCDEFXabcdefx";
+const char numberChars[] = "-.+0123456789ABCDEFXabcdefx";
 ByteString numberByteString(numberChars);
 String numberString(numberChars);
 
@@ -315,12 +358,15 @@ struct LocaleImpl
 		stream.clear();
 	}
 
-	inline void PrepareStream(ByteString const &str, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset)
+	inline void
+		PrepareStream(const ByteString &str, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset)
 	{
-		stream.flags((std::ios_base::dec & ~ reset) | set);
+		stream.flags((std::ios_base::dec & ~reset) | set);
 		std::basic_string<char> bstr;
-		while(pos < str.size() && numberByteString.Contains(str[pos]))
+		while (pos < str.size() && numberByteString.Contains(str[pos]))
+		{
 			bstr.push_back(narrow_wchar(str[pos++]));
+		}
 		stream.str(bstr);
 		stream.clear();
 	}
@@ -346,12 +392,15 @@ struct LocaleImpl
 		wstream.clear();
 	}
 
-	inline void PrepareWStream(String const &str, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset)
+	inline void
+		PrepareWStream(const String &str, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset)
 	{
-		wstream.flags((std::ios_base::dec & ~ reset) | set);
+		wstream.flags((std::ios_base::dec & ~reset) | set);
 		std::basic_string<wchar_t> wstr;
-		while(pos < str.size() && representable_wchar(str[pos]) && numberString.Contains(str[pos]))
+		while (pos < str.size() && representable_wchar(str[pos]) && numberString.Contains(str[pos]))
+		{
 			wstr.push_back(narrow_wchar(str[pos++]));
+		}
 		wstream.str(wstr);
 		wstream.clear();
 	}
@@ -361,8 +410,10 @@ struct LocaleImpl
 		std::basic_string<wchar_t> wstr = wstream.str();
 		std::vector<String::value_type> chars; // operator new?
 		chars.reserve(wstr.size());
-		for(wchar_t ch : wstream.str())
+		for (wchar_t ch : wstream.str())
+		{
 			chars.push_back(widen_wchar(ch));
+		}
 		b.AddChars(chars.data(), chars.size());
 		wstream.str(std::basic_string<wchar_t>());
 	}
@@ -384,7 +435,7 @@ ByteString ByteStringBuilder::Build() const
 	return ByteString(buffer.begin(), buffer.end());
 }
 
-void ByteStringBuilder::AddChars(ByteString::value_type const *data, size_t count)
+void ByteStringBuilder::AddChars(const ByteString::value_type *data, size_t count)
 {
 	buffer.reserve(buffer.size() + count);
 	buffer.insert(buffer.end(), data, data + count);
@@ -468,12 +519,12 @@ ByteStringBuilder &operator<<(ByteStringBuilder &b, ByteString::value_type data)
 	return b;
 }
 
-ByteStringBuilder &operator<<(ByteStringBuilder &b, ByteString::value_type const *data)
+ByteStringBuilder &operator<<(ByteStringBuilder &b, const ByteString::value_type *data)
 {
 	return b << ByteString(data);
 }
 
-ByteStringBuilder &operator<<(ByteStringBuilder &b, ByteString const &data)
+ByteStringBuilder &operator<<(ByteStringBuilder &b, const ByteString &data)
 {
 	b.AddChars(data.data(), data.size());
 	return b;
@@ -497,12 +548,14 @@ ByteStringBuilder &operator<<(ByteStringBuilder &b, double data)
 	return b;
 }
 
-ByteString::Split ByteString::SplitSigned(long long int &value, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset) const
+ByteString::Split ByteString::SplitSigned(
+	long long int &value, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset
+) const
 {
 	LocaleImpl *impl = getLocaleImpl();
 	impl->PrepareStream(*this, pos, set, reset);
 	impl->stream >> value;
-	if(impl->stream.fail())
+	if (impl->stream.fail())
 	{
 		impl->FlushStream();
 		return Split(*this, pos, npos, 0, false);
@@ -513,12 +566,14 @@ ByteString::Split ByteString::SplitSigned(long long int &value, size_t pos, std:
 	return split;
 }
 
-ByteString::Split ByteString::SplitUnsigned(unsigned long long int &value, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset) const
+ByteString::Split ByteString::SplitUnsigned(
+	unsigned long long int &value, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset
+) const
 {
 	LocaleImpl *impl = getLocaleImpl();
 	impl->PrepareStream(*this, pos, set, reset);
 	impl->stream >> value;
-	if(impl->stream.fail())
+	if (impl->stream.fail())
 	{
 		impl->FlushStream();
 		return Split(*this, pos, npos, 0, false);
@@ -529,12 +584,13 @@ ByteString::Split ByteString::SplitUnsigned(unsigned long long int &value, size_
 	return split;
 }
 
-ByteString::Split ByteString::SplitFloat(double &value, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset) const
+ByteString::Split
+	ByteString::SplitFloat(double &value, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset) const
 {
 	LocaleImpl *impl = getLocaleImpl();
 	impl->PrepareStream(*this, pos, set, reset);
 	impl->stream >> value;
-	if(impl->stream.fail())
+	if (impl->stream.fail())
 	{
 		impl->FlushStream();
 		return Split(*this, pos, npos, 0, false);
@@ -550,7 +606,7 @@ String StringBuilder::Build() const
 	return String(buffer.begin(), buffer.end());
 }
 
-void StringBuilder::AddChars(String::value_type const *data, size_t count)
+void StringBuilder::AddChars(const String::value_type *data, size_t count)
 {
 	buffer.reserve(buffer.size() + count);
 	buffer.insert(buffer.end(), data, data + count);
@@ -641,12 +697,12 @@ StringBuilder &operator<<(StringBuilder &b, String::value_type data)
 	return b;
 }
 
-StringBuilder &operator<<(StringBuilder &b, String::value_type const *data)
+StringBuilder &operator<<(StringBuilder &b, const String::value_type *data)
 {
 	return b << String(data);
 }
 
-StringBuilder &operator<<(StringBuilder &b, String const &data)
+StringBuilder &operator<<(StringBuilder &b, const String &data)
 {
 	b.AddChars(data.data(), data.size());
 	return b;
@@ -670,12 +726,14 @@ StringBuilder &operator<<(StringBuilder &b, double data)
 	return b;
 }
 
-String::Split String::SplitSigned(long long int &value, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset) const
+String::Split String::SplitSigned(
+	long long int &value, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset
+) const
 {
 	LocaleImpl *impl = getLocaleImpl();
 	impl->PrepareWStream(*this, pos, set, reset);
 	impl->wstream >> value;
-	if(impl->wstream.fail())
+	if (impl->wstream.fail())
 	{
 		impl->FlushWStream();
 		return Split(*this, pos, npos, 0, false);
@@ -686,12 +744,14 @@ String::Split String::SplitSigned(long long int &value, size_t pos, std::ios_bas
 	return split;
 }
 
-String::Split String::SplitUnsigned(unsigned long long int &value, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset) const
+String::Split String::SplitUnsigned(
+	unsigned long long int &value, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset
+) const
 {
 	LocaleImpl *impl = getLocaleImpl();
 	impl->PrepareWStream(*this, pos, set, reset);
 	impl->wstream >> value;
-	if(impl->wstream.fail())
+	if (impl->wstream.fail())
 	{
 		impl->FlushWStream();
 		return Split(*this, pos, npos, 0, false);
@@ -702,12 +762,13 @@ String::Split String::SplitUnsigned(unsigned long long int &value, size_t pos, s
 	return split;
 }
 
-String::Split String::SplitFloat(double &value, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset) const
+String::Split
+	String::SplitFloat(double &value, size_t pos, std::ios_base::fmtflags set, std::ios_base::fmtflags reset) const
 {
 	LocaleImpl *impl = getLocaleImpl();
 	impl->PrepareWStream(*this, pos, set, reset);
 	impl->wstream >> value;
-	if(impl->wstream.fail())
+	if (impl->wstream.fail())
 	{
 		impl->FlushWStream();
 		return Split(*this, pos, npos, 0, false);

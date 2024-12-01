@@ -18,7 +18,7 @@ void Element::Element_BRCK()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -31,7 +31,7 @@ void Element::Element_BRCK()
 	HeatConduct = 251;
 	Description = "Brick, breakable building material.";
 
-	Properties = TYPE_SOLID|PROP_HOT_GLOW;
+	Properties = TYPE_SOLID | PROP_HOT_GLOW;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

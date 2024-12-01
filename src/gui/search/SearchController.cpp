@@ -5,27 +5,27 @@
 #include "SearchView.h"
 
 #include "client/Client.h"
-#include "client/SaveInfo.h"
 #include "client/GameSave.h"
+#include "client/SaveInfo.h"
 #include "client/http/DeleteSaveRequest.h"
-#include "client/http/PublishSaveRequest.h"
-#include "client/http/UnpublishSaveRequest.h"
 #include "client/http/FavouriteSaveRequest.h"
+#include "client/http/PublishSaveRequest.h"
 #include "client/http/SearchSavesRequest.h"
 #include "client/http/SearchTagsRequest.h"
+#include "client/http/UnpublishSaveRequest.h"
 #include "common/platform/Platform.h"
 #include "graphics/Graphics.h"
 #include "graphics/VideoBuffer.h"
 #include "tasks/Task.h"
 #include "tasks/TaskWindow.h"
 
+#include "SimulationConfig.h"
 #include "gui/dialogues/ConfirmPrompt.h"
 #include "gui/preview/PreviewController.h"
 #include "gui/preview/PreviewView.h"
-#include "SimulationConfig.h"
 #include <algorithm>
 
-SearchController::SearchController(std::function<void ()> onDone_):
+SearchController::SearchController(std::function<void()> onDone_) :
 	activePreview(NULL),
 	nextQueryTime(0.0f),
 	nextQueryDone(true),
@@ -66,14 +66,16 @@ void SearchController::Update()
 	else if (!nextQueryDone && nextQueryTime < Platform::GetTime())
 	{
 		if (searchModel->UpdateSaveList(1, nextQuery))
+		{
 			nextQueryDone = true;
+		}
 	}
 	searchModel->Update();
-	if(activePreview && activePreview->HasExited)
+	if (activePreview && activePreview->HasExited)
 	{
 		delete activePreview;
 		activePreview = NULL;
-		if(searchModel->GetLoadedSave())
+		if (searchModel->GetLoadedSave())
 		{
 			Exit();
 		}
@@ -85,8 +87,10 @@ void SearchController::Exit()
 	InstantOpen(false);
 	searchView->CloseActiveWindow();
 	if (onDone)
+	{
 		onDone();
-	//HasExited = true;
+	}
+	// HasExited = true;
 }
 
 SearchController::~SearchController()
@@ -102,7 +106,7 @@ void SearchController::DoSearch(String query, bool now)
 	nextQuery = query;
 	if (!now)
 	{
-		nextQueryTime = Platform::GetTime()+600;
+		nextQueryTime = Platform::GetTime() + 600;
 		nextQueryDone = false;
 	}
 	else
@@ -125,37 +129,41 @@ void SearchController::Refresh()
 void SearchController::SetPage(int page)
 {
 	if (page != searchModel->GetPageNum() && page > 0 && page <= searchModel->GetPageCount())
+	{
 		searchModel->UpdateSaveList(page, searchModel->GetLastQuery());
+	}
 }
 
 void SearchController::SetPageRelative(int offset)
 {
 	int page = std::min(std::max(searchModel->GetPageNum() + offset, 1), searchModel->GetPageCount());
 	if (page != searchModel->GetPageNum())
+	{
 		searchModel->UpdateSaveList(page, searchModel->GetLastQuery());
+	}
 }
 
 void SearchController::ChangePeriod(int period)
 {
-	switch(period)
+	switch (period)
 	{
-		case 0:
-			searchModel->SetPeriod(http::allSaves);
-			break;
-		case 1:
-			searchModel->SetPeriod(http::todaySaves);
-			break;
-		case 2:
-			searchModel->SetPeriod(http::weekSaves);
-			break;
-		case 3:
-			searchModel->SetPeriod(http::monthSaves);
-			break;
-		case 4:
-			searchModel->SetPeriod(http::yearSaves);
-			break;
-		default:
-			searchModel->SetPeriod(http::allSaves);
+	case 0:
+		searchModel->SetPeriod(http::allSaves);
+		break;
+	case 1:
+		searchModel->SetPeriod(http::todaySaves);
+		break;
+	case 2:
+		searchModel->SetPeriod(http::weekSaves);
+		break;
+	case 3:
+		searchModel->SetPeriod(http::monthSaves);
+		break;
+	case 4:
+		searchModel->SetPeriod(http::yearSaves);
+		break;
+	default:
+		searchModel->SetPeriod(http::allSaves);
 	}
 
 	searchModel->UpdateSaveList(1, searchModel->GetLastQuery());
@@ -163,7 +171,7 @@ void SearchController::ChangePeriod(int period)
 
 void SearchController::ChangeSort()
 {
-	if(searchModel->GetSort() == http::sortByDate)
+	if (searchModel->GetSort() == http::sortByDate)
 	{
 		searchModel->SetSort(http::sortByVotes);
 	}
@@ -176,48 +184,60 @@ void SearchController::ChangeSort()
 
 void SearchController::ShowOwn(bool show)
 {
-	if(Client::Ref().GetAuthUser().UserID)
+	if (Client::Ref().GetAuthUser().UserID)
 	{
 		searchModel->SetShowFavourite(false);
 		searchModel->SetShowOwn(show);
 	}
 	else
+	{
 		searchModel->SetShowOwn(false);
+	}
 	searchModel->UpdateSaveList(1, searchModel->GetLastQuery());
 }
 
 void SearchController::ShowFavourite(bool show)
 {
-	if(Client::Ref().GetAuthUser().UserID)
+	if (Client::Ref().GetAuthUser().UserID)
 	{
 		searchModel->SetShowOwn(false);
 		searchModel->SetShowFavourite(show);
 	}
 	else
+	{
 		searchModel->SetShowFavourite(false);
+	}
 	searchModel->UpdateSaveList(1, searchModel->GetLastQuery());
 }
 
 void SearchController::Selected(int saveID, bool selected)
 {
-	if(!Client::Ref().GetAuthUser().UserID)
+	if (!Client::Ref().GetAuthUser().UserID)
+	{
 		return;
+	}
 
-	if(selected)
+	if (selected)
+	{
 		searchModel->SelectSave(saveID);
+	}
 	else
+	{
 		searchModel->DeselectSave(saveID);
+	}
 }
 
-void SearchController::SelectAllSaves() 
+void SearchController::SelectAllSaves()
 {
 	if (!Client::Ref().GetAuthUser().UserID)
+	{
 		return;
-	if (searchModel->GetShowOwn() || 
-		Client::Ref().GetAuthUser().UserElevation == User::ElevationMod || 
-		Client::Ref().GetAuthUser().UserElevation == User::ElevationAdmin)
+	}
+	if (searchModel->GetShowOwn() || Client::Ref().GetAuthUser().UserElevation == User::ElevationMod ||
+	    Client::Ref().GetAuthUser().UserElevation == User::ElevationAdmin)
+	{
 		searchModel->SelectAllSaves();
-
+	}
 }
 
 void SearchController::InstantOpen(bool instant)
@@ -240,9 +260,19 @@ void SearchController::OpenSaveDone()
 void SearchController::OpenSave(int saveID, int saveDate, std::unique_ptr<VideoBuffer> thumbnail)
 {
 	delete activePreview;
-	Graphics * g = searchView->GetGraphics();
-	g->BlendFilledRect(RectSized(Vec2{ XRES/3, WINDOWH-20 }, Vec2{ XRES/3, 20 }), 0x000000_rgb .WithAlpha(150)); //dim the "Page X of Y" a little to make the CopyTextButton more noticeable
-	activePreview = new PreviewController(saveID, saveDate, instantOpen ? savePreviewInstant : savePreviewNormal, [this] { OpenSaveDone(); }, std::move(thumbnail));
+	Graphics *g = searchView->GetGraphics();
+	g->BlendFilledRect(
+		RectSized(Vec2{ XRES / 3, WINDOWH - 20 }, Vec2{ XRES / 3, 20 }), 0x000000_rgb .WithAlpha(150)
+	); // dim the "Page X of Y" a little to make the CopyTextButton more noticeable
+	activePreview = new PreviewController(
+		saveID,
+		saveDate,
+		instantOpen ? savePreviewInstant : savePreviewNormal,
+		[this] {
+			OpenSaveDone();
+		},
+		std::move(thumbnail)
+	);
 	activePreview->GetView()->MakeActiveWindow();
 }
 
@@ -255,12 +285,14 @@ void SearchController::RemoveSelected()
 {
 	StringBuilder desc;
 	desc << "Are you sure you want to delete " << searchModel->GetSelected().size() << " save";
-	if(searchModel->GetSelected().size()>1)
+	if (searchModel->GetSelected().size() > 1)
+	{
 		desc << "s";
+	}
 	desc << "?";
 	new ConfirmPrompt("Delete saves", desc.Build(), { [this] {
-		removeSelectedC();
-	} });
+						  removeSelectedC();
+					  } });
 }
 
 void SearchController::removeSelectedC()
@@ -269,8 +301,14 @@ void SearchController::removeSelectedC()
 	{
 		SearchController *c;
 		std::vector<int> saves;
+
 	public:
-		RemoveSavesTask(std::vector<int> saves_, SearchController *c_) { saves = saves_; c = c_; }
+		RemoveSavesTask(std::vector<int> saves_, SearchController *c_)
+		{
+			saves = saves_;
+			c = c_;
+		}
+
 		bool doWork() override
 		{
 			for (size_t i = 0; i < saves.size(); i++)
@@ -285,7 +323,8 @@ void SearchController::removeSelectedC()
 				}
 				catch (const http::RequestError &ex)
 				{
-					notifyError(String::Build("Failed to delete [", saves[i], "]: ", ByteString(ex.what()).FromAscii()));
+					notifyError(String::Build("Failed to delete [", saves[i], "]: ", ByteString(ex.what()).FromAscii())
+					);
 					c->Refresh();
 					return false;
 				}
@@ -305,13 +344,16 @@ void SearchController::removeSelectedC()
 void SearchController::UnpublishSelected(bool publish)
 {
 	StringBuilder desc;
-	desc << "Are you sure you want to " << (publish ? String("publish ") : String("unpublish ")) << searchModel->GetSelected().size() << " save";
+	desc << "Are you sure you want to " << (publish ? String("publish ") : String("unpublish "))
+		 << searchModel->GetSelected().size() << " save";
 	if (searchModel->GetSelected().size() > 1)
+	{
 		desc << "s";
+	}
 	desc << "?";
 	new ConfirmPrompt(publish ? String("Publish Saves") : String("Unpublish Saves"), desc.Build(), { [this, publish] {
-		unpublishSelectedC(publish);
-	} });
+						  unpublishSelectedC(publish);
+					  } });
 }
 
 void SearchController::unpublishSelectedC(bool publish)
@@ -321,8 +363,14 @@ void SearchController::unpublishSelectedC(bool publish)
 		std::vector<int> saves;
 		SearchController *c;
 		bool publish;
+
 	public:
-		UnpublishSavesTask(std::vector<int> saves_, SearchController *c_, bool publish_) { saves = saves_; c = c_; publish = publish_; }
+		UnpublishSavesTask(std::vector<int> saves_, SearchController *c_, bool publish_)
+		{
+			saves = saves_;
+			c = c_;
+			publish = publish_;
+		}
 
 		void PublishSave(int saveID)
 		{
@@ -365,7 +413,9 @@ void SearchController::unpublishSelectedC(bool publish)
 					}
 					else
 					{
-						notifyError(String::Build("Failed to unpublish [", saves[i], "]: ", ByteString(ex.what()).FromAscii()));
+						notifyError(
+							String::Build("Failed to unpublish [", saves[i], "]: ", ByteString(ex.what()).FromAscii())
+						);
 					}
 					c->Refresh();
 					return false;
@@ -378,7 +428,10 @@ void SearchController::unpublishSelectedC(bool publish)
 	};
 
 	std::vector<int> selected = searchModel->GetSelected();
-	new TaskWindow(publish ? String("Publishing Saves") : String("Unpublishing Saves"), new UnpublishSavesTask(selected, this, publish));
+	new TaskWindow(
+		publish ? String("Publishing Saves") : String("Unpublishing Saves"),
+		new UnpublishSavesTask(selected, this, publish)
+	);
 }
 
 void SearchController::FavouriteSelected()
@@ -386,8 +439,13 @@ void SearchController::FavouriteSelected()
 	class FavouriteSavesTask : public Task
 	{
 		std::vector<int> saves;
+
 	public:
-		FavouriteSavesTask(std::vector<int> saves_) { saves = saves_; }
+		FavouriteSavesTask(std::vector<int> saves_)
+		{
+			saves = saves_;
+		}
+
 		bool doWork() override
 		{
 			for (size_t i = 0; i < saves.size(); i++)
@@ -402,7 +460,9 @@ void SearchController::FavouriteSelected()
 				}
 				catch (const http::RequestError &ex)
 				{
-					notifyError(String::Build("Failed to favourite [", saves[i], "]: ", ByteString(ex.what()).FromAscii()));
+					notifyError(
+						String::Build("Failed to favourite [", saves[i], "]: ", ByteString(ex.what()).FromAscii())
+					);
 					return false;
 				}
 				notifyProgress((i + 1) * 100 / saves.size());
@@ -414,8 +474,13 @@ void SearchController::FavouriteSelected()
 	class UnfavouriteSavesTask : public Task
 	{
 		std::vector<int> saves;
+
 	public:
-		UnfavouriteSavesTask(std::vector<int> saves_) { saves = saves_; }
+		UnfavouriteSavesTask(std::vector<int> saves_)
+		{
+			saves = saves_;
+		}
+
 		bool doWork() override
 		{
 			for (size_t i = 0; i < saves.size(); i++)
@@ -430,7 +495,9 @@ void SearchController::FavouriteSelected()
 				}
 				catch (const http::RequestError &ex)
 				{
-					notifyError(String::Build("Failed to unfavourite [", saves[i], "]: ", ByteString(ex.what()).FromAscii()));
+					notifyError(
+						String::Build("Failed to unfavourite [", saves[i], "]: ", ByteString(ex.what()).FromAscii())
+					);
 					return false;
 				}
 				notifyProgress((i + 1) * 100 / saves.size());
@@ -441,8 +508,12 @@ void SearchController::FavouriteSelected()
 
 	std::vector<int> selected = searchModel->GetSelected();
 	if (!searchModel->GetShowFavourite())
+	{
 		new TaskWindow("Favouring saves", new FavouriteSavesTask(selected));
+	}
 	else
+	{
 		new TaskWindow("Unfavouring saves", new UnfavouriteSavesTask(selected));
+	}
 	ClearSelection();
 }

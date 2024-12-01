@@ -16,7 +16,7 @@ void Element::Element_METL()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -30,7 +30,7 @@ void Element::Element_METL()
 	LatentHeat = 919;
 	Description = "The basic conductor. Meltable.";
 
-	Properties = TYPE_SOLID|PROP_CONDUCTS|PROP_LIFE_DEC|PROP_HOT_GLOW;
+	Properties = TYPE_SOLID | PROP_CONDUCTS | PROP_LIFE_DEC | PROP_HOT_GLOW;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

@@ -1,31 +1,32 @@
 #pragma once
-#include <memory>
-#include <set>
-#include <vector>
 #include "common/String.h"
 #include "gui/interface/Window.h"
 #include "simulation/MissingElements.h"
+#include <memory>
+#include <set>
+#include <vector>
 
 namespace http
 {
-	class AddCommentRequest;
-	class ReportSaveRequest;
+class AddCommentRequest;
+class ReportSaveRequest;
 }
 
 namespace ui
 {
-	class Button;
-	class CopyTextButton;
-	class Label;
-	class Textbox;
-	class ScrollPanel;
-	class AvatarButton;
+class Button;
+class CopyTextButton;
+class Label;
+class Textbox;
+class ScrollPanel;
+class AvatarButton;
 }
 
 class VideoBuffer;
 class PreviewModel;
 class PreviewController;
-class PreviewView: public ui::Window
+
+class PreviewView : public ui::Window
 {
 	PreviewController *c{};
 	MissingElements missingElements;
@@ -49,8 +50,8 @@ class PreviewView: public ui::Window
 	ui::Label *saveIDLabel2{};
 	ui::CopyTextButton *saveIDButton{};
 	ui::ScrollPanel *commentsPanel{};
-	std::vector<ui::Component*> commentComponents;
-	std::vector<ui::Component*> commentTextComponents;
+	std::vector<ui::Component *> commentComponents;
+	std::vector<ui::Component *> commentTextComponents;
 	int votesUp;
 	int votesDown;
 	bool userIsAuthor;
@@ -85,12 +86,12 @@ class PreviewView: public ui::Window
 	std::unique_ptr<http::ReportSaveRequest> reportSaveRequest;
 
 public:
-	void AttachController(PreviewController * controller);
+	void AttachController(PreviewController *controller);
 	PreviewView(std::unique_ptr<VideoBuffer> newSavePreviev);
-	void NotifySaveChanged(PreviewModel * sender);
-	void NotifyCommentsChanged(PreviewModel * sender);
-	void NotifyCommentsPageChanged(PreviewModel * sender);
-	void NotifyCommentBoxEnabledChanged(PreviewModel * sender);
+	void NotifySaveChanged(PreviewModel *sender);
+	void NotifyCommentsChanged(PreviewModel *sender);
+	void NotifyCommentsPageChanged(PreviewModel *sender);
+	void NotifyCommentBoxEnabledChanged(PreviewModel *sender);
 	void SaveLoadingError(String errorMessage);
 	void OnDraw() override;
 	void DoDraw() override;

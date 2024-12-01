@@ -1,31 +1,32 @@
 #pragma once
-#include <vector>
 #include <array>
 #include <map>
+#include <vector>
 
 #include "graphics/FontReader.h"
 #include "gui/interface/Window.h"
 
 namespace ui
 {
-	class Textbox;
-	class Label;
-	class Button;
+class Textbox;
+class Label;
+class Button;
 }
 
 constexpr int MAX_WIDTH = 64;
-class FontEditor: public ui::Window
+
+class FontEditor : public ui::Window
 {
 	void HandleExit();
 
 private:
 	ByteString dataFile;
 	std::map<String::value_type, unsigned char> fontWidths;
-	std::map<String::value_type, std::array<std::array<char, MAX_WIDTH>, FONT_H> > fontPixels;
+	std::map<String::value_type, std::array<std::array<char, MAX_WIDTH>, FONT_H>> fontPixels;
 
 	std::vector<unsigned char> fontData;
 	std::vector<unsigned int> fontPtrs;
-	std::vector<std::array<unsigned int, 2> > fontRanges;
+	std::vector<std::array<unsigned int, 2>> fontRanges;
 
 	ByteString beforeFontData;
 	ByteString afterFontData;
@@ -33,19 +34,26 @@ private:
 	ByteString afterFontRanges;
 
 	void ReadDataFile(ByteString dataFile);
-	void WriteDataFile(ByteString dataFile, std::vector<unsigned char> const &fontData, std::vector<unsigned int> const &fontPtrs, std::vector<std::array<unsigned int, 2> > const &fontRanges);
+	void WriteDataFile(
+		ByteString dataFile,
+		const std::vector<unsigned char> &fontData,
+		const std::vector<unsigned int> &fontPtrs,
+		const std::vector<std::array<unsigned int, 2>> &fontRanges
+	);
 	static void PackData(
-			std::map<String::value_type, unsigned char> const &fontWidths,
-			std::map<String::value_type, std::array<std::array<char, MAX_WIDTH>, FONT_H> > const &fontPixels,
-			std::vector<unsigned char> &fontData,
-			std::vector<unsigned int> &fontPtrs,
-			std::vector<std::array<unsigned int, 2> > &fontRanges);
+		const std::map<String::value_type, unsigned char> &fontWidths,
+		const std::map<String::value_type, std::array<std::array<char, MAX_WIDTH>, FONT_H>> &fontPixels,
+		std::vector<unsigned char> &fontData,
+		std::vector<unsigned int> &fontPtrs,
+		std::vector<std::array<unsigned int, 2>> &fontRanges
+	);
 	static void UnpackData(
-			std::map<String::value_type, unsigned char> &fontWidths,
-			std::map<String::value_type, std::array<std::array<char, MAX_WIDTH>, FONT_H> > &fontPixels,
-			std::vector<unsigned char> const &fontData,
-			std::vector<unsigned int> const &fontPtrs,
-			std::vector<std::array<unsigned int, 2> > const &fontRanges);
+		std::map<String::value_type, unsigned char> &fontWidths,
+		std::map<String::value_type, std::array<std::array<char, MAX_WIDTH>, FONT_H>> &fontPixels,
+		const std::vector<unsigned char> &fontData,
+		const std::vector<unsigned int> &fontPtrs,
+		const std::vector<std::array<unsigned int, 2>> &fontRanges
+	);
 
 	ui::Textbox *currentCharTextbox;
 	ui::Button *savedButton;

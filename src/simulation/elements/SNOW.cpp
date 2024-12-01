@@ -18,7 +18,7 @@ void Element::Element_SNOW()
 	Collision = -0.1f;
 	Gravity = 0.05f;
 	Diffusion = 0.01f;
-	HotAir = -0.00005f* CFDS;
+	HotAir = -0.00005f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;
@@ -34,7 +34,7 @@ void Element::Element_SNOW()
 	LatentHeat = 1095;
 	Description = "Light particles. Created when ICE breaks under pressure.";
 
-	Properties = TYPE_PART|PROP_NEUTPASS;
+	Properties = TYPE_PART | PROP_NEUTPASS;
 	CarriesTypeIn = 1U << FIELD_CTYPE;
 
 	LowPressure = IPL;
@@ -51,9 +51,9 @@ void Element::Element_SNOW()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	if (parts[i].ctype==PT_FRZW)//get colder if it is from FRZW
+	if (parts[i].ctype == PT_FRZW) // get colder if it is from FRZW
 	{
-		parts[i].temp = restrict_flt(parts[i].temp-1.0f, MIN_TEMP, MAX_TEMP);
+		parts[i].temp = restrict_flt(parts[i].temp - 1.0f, MIN_TEMP, MAX_TEMP);
 	}
 	for (auto rx = -1; rx <= 1; rx++)
 	{
@@ -61,13 +61,15 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
-					continue;
-				if ((TYP(r)==PT_SALT || TYP(r)==PT_SLTW) && sim->rng.chance(1, 333))
 				{
-					sim->part_change_type(i,x,y,PT_SLTW);
-					sim->part_change_type(ID(r),x+rx,y+ry,PT_SLTW);
+					continue;
+				}
+				if ((TYP(r) == PT_SALT || TYP(r) == PT_SLTW) && sim->rng.chance(1, 333))
+				{
+					sim->part_change_type(i, x, y, PT_SLTW);
+					sim->part_change_type(ID(r), x + rx, y + ry, PT_SLTW);
 				}
 			}
 		}

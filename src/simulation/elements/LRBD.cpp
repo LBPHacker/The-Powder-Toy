@@ -16,7 +16,7 @@ void Element::Element_LRBD()
 	Collision = 0.0f;
 	Gravity = 0.15f;
 	Diffusion = 0.00f;
-	HotAir = 0.000001f* CFDS;
+	HotAir = 0.000001f * CFDS;
 	Falldown = 2;
 
 	Flammable = 1000;
@@ -30,7 +30,7 @@ void Element::Element_LRBD()
 	HeatConduct = 170;
 	Description = "Liquid Rubidium.";
 
-	Properties = TYPE_LIQUID|PROP_CONDUCTS|PROP_LIFE_DEC;
+	Properties = TYPE_LIQUID | PROP_CONDUCTS | PROP_LIFE_DEC;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

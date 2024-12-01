@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "NTCT.h"
+#include "simulation/ElementCommon.h"
 
 void Element::Element_NTCT()
 {
@@ -17,7 +17,7 @@ void Element::Element_NTCT()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -30,7 +30,7 @@ void Element::Element_NTCT()
 	HeatConduct = 251;
 	Description = "Semi-conductor. Only conducts electricity when hot. (More than 100C)";
 
-	Properties = TYPE_SOLID|PROP_CONDUCTS|PROP_LIFE_DEC;
+	Properties = TYPE_SOLID | PROP_CONDUCTS | PROP_LIFE_DEC;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -46,7 +46,9 @@ void Element::Element_NTCT()
 
 int Element_NTCT_update(UPDATE_FUNC_ARGS)
 {
-	if (parts[i].temp>295.0f)
+	if (parts[i].temp > 295.0f)
+	{
 		parts[i].temp -= 2.5f;
+	}
 	return 0;
 }

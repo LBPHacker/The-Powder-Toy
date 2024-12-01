@@ -5,7 +5,7 @@
 
 namespace ui
 {
-	class Component;
+class Component;
 }
 
 class LuaScriptInterface;
@@ -21,19 +21,28 @@ public:
 class LuaComponent
 {
 protected:
-	ui::Component * component;
+	ui::Component *component;
 	lua_State *L;
-	LuaWindow * parent = nullptr;
+	LuaWindow *parent = nullptr;
 
 	int position(lua_State *L);
 	int size(lua_State *L);
 	int visible(lua_State *L);
+
 public:
-	LuaScriptInterface * ci;
+	LuaScriptInterface *ci;
 	int owner_ref;
 
-	ui::Component * GetComponent() { return component; }
-	void SetParentWindow(LuaWindow *parent) { this->parent = parent; }
+	ui::Component *GetComponent()
+	{
+		return component;
+	}
+
+	void SetParentWindow(LuaWindow *parent)
+	{
+		this->parent = parent;
+	}
+
 	LuaComponent(lua_State *L);
 	~LuaComponent();
 };

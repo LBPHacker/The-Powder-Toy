@@ -9,13 +9,14 @@ class PreviewController;
 class SearchView;
 class SearchModel;
 class VideoBuffer;
+
 class SearchController
 {
 private:
-	SearchModel * searchModel;
-	SearchView * searchView;
-	PreviewController * activePreview;
-	std::function<void ()> onDone;
+	SearchModel *searchModel;
+	SearchView *searchView;
+	PreviewController *activePreview;
+	std::function<void()> onDone;
 
 	double nextQueryTime;
 	String nextQuery;
@@ -26,11 +27,17 @@ private:
 	void unpublishSelectedC(bool publish);
 
 	void OpenSaveDone();
+
 public:
 	bool HasExited;
-	SearchController(std::function<void ()> onDone = nullptr);
+	SearchController(std::function<void()> onDone = nullptr);
 	~SearchController();
-	SearchView * GetView() { return searchView; }
+
+	SearchView *GetView()
+	{
+		return searchView;
+	}
+
 	void Exit();
 	void DoSearch(String query, bool now = false);
 	void DoSearch2(String query);

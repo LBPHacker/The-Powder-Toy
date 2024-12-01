@@ -19,7 +19,7 @@ void Element::Element_EXOT()
 	Collision = 0.0f;
 	Gravity = 0.15f;
 	Diffusion = 0.00f;
-	HotAir = 0.0003f	* CFDS;
+	HotAir = 0.0003f * CFDS;
 	Falldown = 2;
 
 	Flammable = 0;
@@ -33,7 +33,7 @@ void Element::Element_EXOT()
 	HeatConduct = 250;
 	Description = "Exotic matter. Explodes with excess exposure to electrons. Has many other odd reactions.";
 
-	Properties = TYPE_LIQUID|PROP_NEUTPASS;
+	Properties = TYPE_LIQUID | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -59,13 +59,15 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
+				{
 					continue;
+				}
 				auto rt = TYP(r);
 				if (rt == PT_WARP)
 				{
-					if (parts[ID(r)].tmp2>2000 && sim->rng.chance(1, 100))
+					if (parts[ID(r)].tmp2 > 2000 && sim->rng.chance(1, 100))
 					{
 						parts[i].tmp2 += 100;
 					}
@@ -73,13 +75,17 @@ static int update(UPDATE_FUNC_ARGS)
 				else if (rt == PT_EXOT)
 				{
 					if (parts[ID(r)].ctype == PT_PROT)
+					{
 						parts[i].ctype = PT_PROT;
+					}
 					if (parts[ID(r)].life == 1500 && sim->rng.chance(1, 1000))
+					{
 						parts[i].life = 1500;
+					}
 				}
 				else if (rt == PT_LAVA)
 				{
-					//turn molten TTAN or molten GOLD to molten VIBR
+					// turn molten TTAN or molten GOLD to molten VIBR
 					if (parts[ID(r)].ctype == PT_TTAN || parts[ID(r)].ctype == PT_GOLD)
 					{
 						if (sim->rng.chance(1, 10))
@@ -89,7 +95,7 @@ static int update(UPDATE_FUNC_ARGS)
 							return 1;
 						}
 					}
-					//molten VIBR will kill the leftover EXOT though, so the VIBR isn't killed later
+					// molten VIBR will kill the leftover EXOT though, so the VIBR isn't killed later
 					else if (parts[ID(r)].ctype == PT_VIBR)
 					{
 						if (sim->rng.chance(1, 1000))
@@ -100,25 +106,32 @@ static int update(UPDATE_FUNC_ARGS)
 					}
 				}
 				if (parts[i].tmp > 245 && parts[i].life > 1337)
-					if (rt!=PT_EXOT && rt!=PT_BREC && rt!=PT_DMND && rt!=PT_CLNE && rt!=PT_PRTI && rt!=PT_PRTO && rt!=PT_PCLN && rt!=PT_VOID && rt!=PT_NBHL && rt!=PT_WARP)
+				{
+					if (rt != PT_EXOT && rt != PT_BREC && rt != PT_DMND && rt != PT_CLNE && rt != PT_PRTI &&
+					    rt != PT_PRTO && rt != PT_PCLN && rt != PT_VOID && rt != PT_NBHL && rt != PT_WARP)
 					{
 						if (sim->create_part(i, x, y, rt) != -1)
 						{
 							return 1;
 						}
 					}
+				}
 			}
 		}
 	}
 
 	parts[i].tmp--;
 	parts[i].tmp2--;
-	//reset tmp every 250 frames, gives EXOT it's slow flashing effect
+	// reset tmp every 250 frames, gives EXOT it's slow flashing effect
 	if (parts[i].tmp < 1 || parts[i].tmp > 250)
+	{
 		parts[i].tmp = 250;
+	}
 
 	if (parts[i].tmp2 < 1)
+	{
 		parts[i].tmp2 = 1;
+	}
 	else if (parts[i].tmp2 > 6000)
 	{
 		parts[i].tmp2 = 10000;
@@ -128,10 +141,12 @@ static int update(UPDATE_FUNC_ARGS)
 			return 1;
 		}
 	}
-	else if(parts[i].life < 1001)
-		sim->pv[y/CELL][x/CELL] += (parts[i].tmp2*CFDS)/160000;
+	else if (parts[i].life < 1001)
+	{
+		sim->pv[y / CELL][x / CELL] += (parts[i].tmp2 * CFDS) / 160000;
+	}
 
-	if (sim->pv[y/CELL][x/CELL]>200 && parts[i].temp>9000 && parts[i].tmp2>200)
+	if (sim->pv[y / CELL][x / CELL] > 200 && parts[i].temp > 9000 && parts[i].tmp2 > 200)
 	{
 		parts[i].tmp2 = 6000;
 		sim->part_change_type(i, x, y, PT_WARP);
@@ -145,10 +160,12 @@ static int update(UPDATE_FUNC_ARGS)
 			auto ry = sim->rng.between(-2, 2);
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
+				{
 					continue;
-				if (TYP(r)==PT_EXOT && (parts[i].tmp2 > parts[ID(r)].tmp2) && parts[ID(r)].tmp2 >= 0) //diffusion
+				}
+				if (TYP(r) == PT_EXOT && (parts[i].tmp2 > parts[ID(r)].tmp2) && parts[ID(r)].tmp2 >= 0) // diffusion
 				{
 					auto tym = parts[i].tmp2 - parts[ID(r)].tmp2;
 					if (tym == 1)
@@ -159,8 +176,8 @@ static int update(UPDATE_FUNC_ARGS)
 					}
 					if (tym > 0)
 					{
-						parts[ID(r)].tmp2 += tym/2;
-						parts[i].tmp2 -= tym/2;
+						parts[ID(r)].tmp2 += tym / 2;
+						parts[i].tmp2 -= tym / 2;
 						break;
 					}
 				}
@@ -177,13 +194,15 @@ static int update(UPDATE_FUNC_ARGS)
 			}
 		}
 		else
+		{
 			parts[i].temp -= 1.0f;
+		}
 	}
 	else if (parts[i].temp < 273.15f)
 	{
 		parts[i].vx = 0;
 		parts[i].vy = 0;
-		sim->pv[y/CELL][x/CELL] -= 0.01f;
+		sim->pv[y / CELL][x / CELL] -= 0.01f;
 		parts[i].tmp--;
 	}
 	return 0;
@@ -199,9 +218,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		if (gfctx.rng.chance(cpart->tmp2 - 1, 1000))
 		{
 			float frequency = 0.04045f;
-			*colr = int(sin(frequency*c + 4) * 127 + 150);
-			*colg = int(sin(frequency*c + 6) * 127 + 150);
-			*colb = int(sin(frequency*c + 8) * 127 + 150);
+			*colr = int(sin(frequency * c + 4) * 127 + 150);
+			*colg = int(sin(frequency * c + 6) * 127 + 150);
+			*colb = int(sin(frequency * c + 8) * 127 + 150);
 
 			*firea = 100;
 			*firer = 0;
@@ -214,9 +233,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		else
 		{
 			float frequency = 0.00045f;
-			*colr = int(sin(frequency*q + 4) * 127 + (b/1.7));
-			*colg = int(sin(frequency*q + 6) * 127 + (b/1.7));
-			*colb = int(sin(frequency*q + 8) * 127 + (b/1.7));
+			*colr = int(sin(frequency * q + 4) * 127 + (b / 1.7));
+			*colg = int(sin(frequency * q + 6) * 127 + (b / 1.7));
+			*colb = int(sin(frequency * q + 8) * 127 + (b / 1.7));
 			*cola = cpart->tmp / 6;
 
 			*firea = *cola;
@@ -231,9 +250,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	else
 	{
 		float frequency = 0.01300f;
-		*colr = int(sin(frequency*q + 6.00) * 127 + ((b/2.9) + 80));
-		*colg = int(sin(frequency*q + 6.00) * 127 + ((b/2.9) + 80));
-		*colb = int(sin(frequency*q + 6.00) * 127 + ((b/2.9) + 80));
+		*colr = int(sin(frequency * q + 6.00) * 127 + ((b / 2.9) + 80));
+		*colg = int(sin(frequency * q + 6.00) * 127 + ((b / 2.9) + 80));
+		*colb = int(sin(frequency * q + 6.00) * 127 + ((b / 2.9) + 80));
 		*cola = cpart->tmp / 6;
 		*firea = *cola;
 		*firer = *colr;

@@ -19,7 +19,7 @@ void Element::Element_DMG()
 	Collision = 0.0f;
 	Gravity = 0.1f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;
@@ -33,7 +33,7 @@ void Element::Element_DMG()
 	HeatConduct = 29;
 	Description = "Generates damaging pressure and breaks any elements it hits.";
 
-	Properties = TYPE_PART|PROP_SPARKSETTLE;
+	Properties = TYPE_PART | PROP_SPARKSETTLE;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -59,22 +59,26 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
+				{
 					continue;
-				if (TYP(r)!=PT_DMG && TYP(r)!=PT_EMBR && TYP(r)!=PT_DMND && TYP(r)!=PT_CLNE && TYP(r)!=PT_PCLN && TYP(r)!=PT_BCLN)
+				}
+				if (TYP(r) != PT_DMG && TYP(r) != PT_EMBR && TYP(r) != PT_DMND && TYP(r) != PT_CLNE &&
+				    TYP(r) != PT_PCLN && TYP(r) != PT_BCLN)
 				{
 					sim->kill_part(i);
-					for (auto nxj=-rad; nxj<=rad; nxj++)
+					for (auto nxj = -rad; nxj <= rad; nxj++)
 					{
-						for (auto nxi=-rad; nxi<=rad; nxi++)
+						for (auto nxi = -rad; nxi <= rad; nxi++)
 						{
-							if (x+nxi>=0 && y+nxj>=0 && x+nxi<XRES && y+nxj<YRES && (nxi || nxj))
+							if (x + nxi >= 0 && y + nxj >= 0 && x + nxi < XRES && y + nxj < YRES && (nxi || nxj))
 							{
-								auto dist = int(sqrt(pow(nxi, 2.0f)+pow(nxj, 2.0f)));//;(pow((float)nxi,2))/(pow((float)rad,2))+(pow((float)nxj,2))/(pow((float)rad,2));
+								auto dist = int(sqrt(pow(nxi, 2.0f) + pow(nxj, 2.0f))
+								); //;(pow((float)nxi,2))/(pow((float)rad,2))+(pow((float)nxj,2))/(pow((float)rad,2));
 								if (!dist || (dist <= rad))
 								{
-									auto rr = pmap[y+nxj][x+nxi];
+									auto rr = pmap[y + nxj][x + nxi];
 									if (rr)
 									{
 										auto angle = atan2((float)nxj, nxi);
@@ -82,27 +86,42 @@ static int update(UPDATE_FUNC_ARGS)
 										auto fy = sin(angle) * 7.0f;
 										parts[ID(rr)].vx += fx;
 										parts[ID(rr)].vy += fy;
-										sim->vx[(y+nxj)/CELL][(x+nxi)/CELL] += fx;
-										sim->vy[(y+nxj)/CELL][(x+nxi)/CELL] += fy;
-										sim->pv[(y+nxj)/CELL][(x+nxi)/CELL] += 1.0f;
+										sim->vx[(y + nxj) / CELL][(x + nxi) / CELL] += fx;
+										sim->vy[(y + nxj) / CELL][(x + nxi) / CELL] += fy;
+										sim->pv[(y + nxj) / CELL][(x + nxi) / CELL] += 1.0f;
 										auto t = TYP(rr);
-										if (t && elements[t].HighPressureTransition>-1 && elements[t].HighPressureTransition<PT_NUM)
-											sim->part_change_type(ID(rr), x+nxi, y+nxj, elements[t].HighPressureTransition);
+										if (t && elements[t].HighPressureTransition > -1 &&
+										    elements[t].HighPressureTransition < PT_NUM)
+										{
+											sim->part_change_type(
+												ID(rr), x + nxi, y + nxj, elements[t].HighPressureTransition
+											);
+										}
 										else if (t == PT_BMTL)
-											sim->part_change_type(ID(rr), x+nxi, y+nxj, PT_BRMT);
+										{
+											sim->part_change_type(ID(rr), x + nxi, y + nxj, PT_BRMT);
+										}
 										else if (t == PT_GLAS)
-											sim->part_change_type(ID(rr), x+nxi, y+nxj, PT_BGLA);
+										{
+											sim->part_change_type(ID(rr), x + nxi, y + nxj, PT_BGLA);
+										}
 										else if (t == PT_COAL)
-											sim->part_change_type(ID(rr), x+nxi, y+nxj, PT_BCOL);
+										{
+											sim->part_change_type(ID(rr), x + nxi, y + nxj, PT_BCOL);
+										}
 										else if (t == PT_QRTZ)
-											sim->part_change_type(ID(rr), x+nxi, y+nxj, PT_PQRT);
+										{
+											sim->part_change_type(ID(rr), x + nxi, y + nxj, PT_PQRT);
+										}
 										else if (t == PT_TUNG)
 										{
-											sim->part_change_type(ID(rr), x+nxi, y+nxj, PT_BRMT);
+											sim->part_change_type(ID(rr), x + nxi, y + nxj, PT_BRMT);
 											parts[ID(rr)].ctype = PT_TUNG;
 										}
 										else if (t == PT_WOOD)
-											sim->part_change_type(ID(rr), x+nxi, y+nxj, PT_SAWD);
+										{
+											sim->part_change_type(ID(rr), x + nxi, y + nxj, PT_SAWD);
+										}
 									}
 								}
 							}

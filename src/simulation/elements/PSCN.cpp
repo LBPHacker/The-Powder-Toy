@@ -16,7 +16,7 @@ void Element::Element_PSCN()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -30,7 +30,7 @@ void Element::Element_PSCN()
 	HeatConduct = 251;
 	Description = "P-Type Silicon, Will transfer current to any conductor.";
 
-	Properties = TYPE_SOLID|PROP_CONDUCTS|PROP_LIFE_DEC;
+	Properties = TYPE_SOLID | PROP_CONDUCTS | PROP_LIFE_DEC;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

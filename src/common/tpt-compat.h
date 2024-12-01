@@ -23,9 +23,9 @@
 #include <cmath>
 
 #ifdef M_PI
-constexpr float  TPT_PI_FLT = float(M_PI);
+constexpr float TPT_PI_FLT = float(M_PI);
 constexpr double TPT_PI_DBL = double(M_PI);
 #else
-constexpr float  TPT_PI_FLT = 3.14159265f;
+constexpr float TPT_PI_FLT = 3.14159265f;
 constexpr double TPT_PI_DBL = 3.14159265358979323846;
 #endif

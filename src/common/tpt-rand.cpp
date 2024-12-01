@@ -17,7 +17,7 @@ uint64_t RNG::next()
 
 	s1 ^= s0;
 	s[0] = rotl(s0, 55) ^ s1 ^ (s1 << 14); // a, b
-	s[1] = rotl(s1, 36); // c
+	s[1] = rotl(s1, 36);                   // c
 
 	return result;
 }
@@ -29,7 +29,7 @@ unsigned int RNG::gen()
 
 unsigned int RNG::operator()()
 {
-	return next()&0xFFFFFFFF;
+	return next() & 0xFFFFFFFF;
 }
 
 int RNG::between(int lower, int upper)
@@ -41,13 +41,15 @@ int RNG::between(int lower, int upper)
 bool RNG::chance(int numerator, unsigned int denominator)
 {
 	if (numerator < 0)
+	{
 		return false;
+	}
 	return next() % denominator < static_cast<unsigned int>(numerator);
 }
 
 float RNG::uniform01()
 {
-	return static_cast<float>(next()&0xFFFFFFFF)/(float)0xFFFFFFFF;
+	return static_cast<float>(next() & 0xFFFFFFFF) / (float)0xFFFFFFFF;
 }
 
 RNG::RNG()

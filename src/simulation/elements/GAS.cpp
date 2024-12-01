@@ -16,7 +16,7 @@ void Element::Element_GAS()
 	Collision = -0.1f;
 	Gravity = 0.0f;
 	Diffusion = 0.75f;
-	HotAir = 0.001f	* CFDS;
+	HotAir = 0.001f * CFDS;
 	Falldown = 0;
 
 	Flammable = 600;

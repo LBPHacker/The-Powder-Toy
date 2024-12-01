@@ -1,40 +1,41 @@
 #pragma once
 
-#include "common/String.h"
 #include "Activity.h"
+#include "common/String.h"
 #include "tasks/TaskListener.h"
 
-#include <vector>
 #include <functional>
 #include <memory>
+#include <vector>
 
 class SaveFile;
 
 namespace ui
 {
-	class Label;
-	class ScrollPanel;
-	class ProgressBar;
+class Label;
+class ScrollPanel;
+class ProgressBar;
 }
 
 class LoadFilesTask;
-class FileBrowserActivity: public TaskListener, public WindowActivity
-{
-	using OnSelected = std::function<void (std::unique_ptr<SaveFile>)>;
 
-	LoadFilesTask * loadFiles;
+class FileBrowserActivity : public TaskListener, public WindowActivity
+{
+	using OnSelected = std::function<void(std::unique_ptr<SaveFile>)>;
+
+	LoadFilesTask *loadFiles;
 	OnSelected onSelected;
-	ui::ScrollPanel * itemList;
-	ui::Label * infoText;
+	ui::ScrollPanel *itemList;
+	ui::Label *infoText;
 	std::vector<std::unique_ptr<SaveFile>> files;
 	bool createButtons = false;
-	std::vector<ui::Component*> components;
-	std::vector<ui::Component*> componentsQueue;
+	std::vector<ui::Component *> components;
+	std::vector<ui::Component *> componentsQueue;
 	ByteString directory;
 	bool hasQueuedSearch;
 	ByteString queuedSearch;
 
-	ui::ProgressBar * progressBar;
+	ui::ProgressBar *progressBar;
 
 	int totalFiles;
 	int filesX, filesY, buttonPadding;
@@ -43,10 +44,11 @@ class FileBrowserActivity: public TaskListener, public WindowActivity
 
 	void populateList();
 	void cleanup();
+
 public:
 	FileBrowserActivity(ByteString directory, OnSelected onSelected = nullptr);
 	virtual ~FileBrowserActivity();
-	
+
 	void OnDraw() override;
 	void OnTick(float dt) override;
 	void OnTryExit(ExitMethod method) override;
@@ -57,8 +59,8 @@ public:
 	void RenameSave(int index);
 	void DoSearch(ByteString search);
 
-	void NotifyDone(Task * task) override;
-	void NotifyError(Task * task) override;
-	void NotifyProgress(Task * task) override;
-	void NotifyStatus(Task * task) override;
+	void NotifyDone(Task *task) override;
+	void NotifyError(Task *task) override;
+	void NotifyProgress(Task *task) override;
+	void NotifyStatus(Task *task) override;
 };

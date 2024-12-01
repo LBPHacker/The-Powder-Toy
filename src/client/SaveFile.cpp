@@ -2,13 +2,12 @@
 #include "GameSave.h"
 #include "common/platform/Platform.h"
 
-SaveFile::SaveFile(ByteString filename, bool newLazyLoad):
+SaveFile::SaveFile(ByteString filename, bool newLazyLoad) :
 	filename(filename),
 	displayName(filename.FromUtf8()),
 	loadingError(""),
 	lazyLoad(newLazyLoad)
 {
-
 }
 
 const GameSave *SaveFile::LazyGetGameSave() // non-owning
@@ -27,7 +26,7 @@ const GameSave *SaveFile::LazyGetGameSave() // non-owning
 				loadingError = "cannot access file";
 			}
 		}
-		catch(std::exception & e)
+		catch (std::exception &e)
 		{
 			loadingError = ByteString(e.what()).FromUtf8();
 		}

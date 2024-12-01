@@ -1,16 +1,16 @@
 #include "SearchModel.h"
-#include "SearchView.h"
 #include "Format.h"
-#include "client/SaveInfo.h"
-#include "client/GameSave.h"
+#include "SearchView.h"
 #include "client/Client.h"
+#include "client/GameSave.h"
+#include "client/SaveInfo.h"
 #include "client/http/SearchSavesRequest.h"
 #include "client/http/SearchTagsRequest.h"
 #include <algorithm>
-#include <thread>
 #include <cmath>
+#include <thread>
 
-SearchModel::SearchModel():
+SearchModel::SearchModel() :
 	currentPeriod(http::allSaves),
 	currentSort(http::sortByVotes),
 	currentPage(1),
@@ -31,7 +31,9 @@ bool SearchModel::GetShowTags()
 	return showTags;
 }
 
-void SearchModel::BeginSearchSaves(int start, int count, String query, http::Period period, http::Sort sort, http::Category category)
+void SearchModel::BeginSearchSaves(
+	int start, int count, String query, http::Period period, http::Sort sort, http::Category category
+)
 {
 	lastError = "";
 	resultCount = 0;
@@ -59,11 +61,13 @@ void SearchModel::BeginGetTags(int start, int count, String query)
 	lastError = "";
 	ByteStringBuilder urlStream;
 	urlStream << SERVER << "/Browse/Tags.json?Start=" << start << "&Count=" << count;
-	if(query.length())
+	if (query.length())
 	{
 		urlStream << "&Search_Query=";
-		if(query.length())
+		if (query.length())
+		{
 			urlStream << format::URLEncode(query.ToUtf8());
+		}
 	}
 	getTags = std::make_unique<http::SearchTagsRequest>(start, count, query.ToUtf8());
 	getTags->Start();
@@ -86,20 +90,25 @@ std::vector<std::pair<ByteString, int>> SearchModel::EndGetTags()
 
 bool SearchModel::UpdateSaveList(int pageNumber, String query)
 {
-	//Threading
+	// Threading
 	if (!searchSaves)
 	{
 		lastQuery = query;
 		lastError = "";
 		saveListLoaded = false;
 		saveList.clear();
-		//resultCount = 0;
+		// resultCount = 0;
 		currentPage = pageNumber;
 
-		if(pageNumber == 1 && !showOwn && !showFavourite && currentPeriod == http::allSaves && currentSort == http::sortByVotes && query == "")
+		if (pageNumber == 1 && !showOwn && !showFavourite && currentPeriod == http::allSaves &&
+		    currentSort == http::sortByVotes && query == "")
+		{
 			SetShowTags(true);
+		}
 		else
+		{
 			SetShowTags(false);
+		}
 
 		notifySaveListChanged();
 		notifyTagListChanged();
@@ -121,7 +130,7 @@ bool SearchModel::UpdateSaveList(int pageNumber, String query)
 		{
 			category = http::categoryMyOwn;
 		}
-		BeginSearchSaves((currentPage-1)*20, 20, lastQuery, currentPeriod, currentSort, category);
+		BeginSearchSaves((currentPage - 1) * 20, 20, lastQuery, currentPeriod, currentSort, category);
 		return true;
 	}
 	return false;
@@ -151,7 +160,7 @@ std::vector<SaveInfo *> SearchModel::GetSaveList() // non-owning
 	return nonOwningSaveList;
 }
 
-std::vector<std::pair<ByteString, int> > SearchModel::GetTagList()
+std::vector<std::pair<ByteString, int>> SearchModel::GetTagList()
 {
 	return tagList;
 }
@@ -174,7 +183,7 @@ void SearchModel::Update()
 	}
 }
 
-void SearchModel::AddObserver(SearchView * observer)
+void SearchModel::AddObserver(SearchView *observer)
 {
 	observers.push_back(observer);
 	observer->NotifySaveListChanged(this);
@@ -224,20 +233,22 @@ restart:
 	{
 		if (selected[i] == saveID)
 		{
-			selected.erase(selected.begin()+i);
+			selected.erase(selected.begin() + i);
 			changed = true;
-			goto restart; //Just ensure all cases are removed.
+			goto restart; // Just ensure all cases are removed.
 		}
 	}
-	if(changed)
+	if (changed)
+	{
 		notifySelectedChanged();
+	}
 }
 
 void SearchModel::notifySaveListChanged()
 {
 	for (size_t i = 0; i < observers.size(); i++)
 	{
-		SearchView* cObserver = observers[i];
+		SearchView *cObserver = observers[i];
 		cObserver->NotifySaveListChanged(this);
 	}
 }
@@ -246,7 +257,7 @@ void SearchModel::notifyTagListChanged()
 {
 	for (size_t i = 0; i < observers.size(); i++)
 	{
-		SearchView* cObserver = observers[i];
+		SearchView *cObserver = observers[i];
 		cObserver->NotifyTagListChanged(this);
 	}
 }
@@ -255,7 +266,7 @@ void SearchModel::notifyPageChanged()
 {
 	for (size_t i = 0; i < observers.size(); i++)
 	{
-		SearchView* cObserver = observers[i];
+		SearchView *cObserver = observers[i];
 		cObserver->NotifyPageChanged(this);
 	}
 }
@@ -264,7 +275,7 @@ void SearchModel::notifyPeriodChanged()
 {
 	for (size_t i = 0; i < observers.size(); i++)
 	{
-		SearchView* cObserver = observers[i];
+		SearchView *cObserver = observers[i];
 		cObserver->NotifyPeriodChanged(this);
 	}
 }
@@ -273,7 +284,7 @@ void SearchModel::notifySortChanged()
 {
 	for (size_t i = 0; i < observers.size(); i++)
 	{
-		SearchView* cObserver = observers[i];
+		SearchView *cObserver = observers[i];
 		cObserver->NotifySortChanged(this);
 	}
 }
@@ -282,7 +293,7 @@ void SearchModel::notifyShowOwnChanged()
 {
 	for (size_t i = 0; i < observers.size(); i++)
 	{
-		SearchView* cObserver = observers[i];
+		SearchView *cObserver = observers[i];
 		cObserver->NotifyShowOwnChanged(this);
 	}
 }
@@ -291,7 +302,7 @@ void SearchModel::notifyShowFavouriteChanged()
 {
 	for (size_t i = 0; i < observers.size(); i++)
 	{
-		SearchView* cObserver = observers[i];
+		SearchView *cObserver = observers[i];
 		cObserver->NotifyShowOwnChanged(this);
 	}
 }
@@ -300,15 +311,22 @@ void SearchModel::notifySelectedChanged()
 {
 	for (size_t i = 0; i < observers.size(); i++)
 	{
-		SearchView* cObserver = observers[i];
+		SearchView *cObserver = observers[i];
 		cObserver->NotifySelectedChanged(this);
 	}
 }
 
 int SearchModel::GetPageCount()
 {
-	if (!showOwn && !showFavourite && currentPeriod == http::allSaves && currentSort == http::sortByVotes && lastQuery == "")
-		return std::max(1, (int)(ceil(resultCount/20.0f))+1); //add one for front page (front page saves are repeated twice)
+	if (!showOwn && !showFavourite && currentPeriod == http::allSaves && currentSort == http::sortByVotes &&
+	    lastQuery == "")
+	{
+		return std::max(
+			1, (int)(ceil(resultCount / 20.0f)) + 1
+		); // add one for front page (front page saves are repeated twice)
+	}
 	else
-		return std::max(1, (int)(ceil(resultCount/20.0f)));
+	{
+		return std::max(1, (int)(ceil(resultCount / 20.0f)));
+	}
 }

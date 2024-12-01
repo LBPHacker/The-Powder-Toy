@@ -1,11 +1,13 @@
 #include "RenderController.h"
 
-#include "RenderView.h"
 #include "RenderModel.h"
+#include "RenderView.h"
 
 #include "Controller.h"
 
-RenderController::RenderController(Simulation *sim, Renderer * ren, RendererSettings *rendererSettings, std::function<void ()> onDone_):
+RenderController::RenderController(
+	Simulation *sim, Renderer *ren, RendererSettings *rendererSettings, std::function<void()> onDone_
+) :
 	HasExited(false)
 {
 	renderView = new RenderView();
@@ -60,7 +62,9 @@ void RenderController::Exit()
 {
 	renderView->CloseActiveWindow();
 	if (onDone)
+	{
 		onDone();
+	}
 	HasExited = true;
 }
 
@@ -70,4 +74,3 @@ RenderController::~RenderController()
 	renderView->CloseActiveWindow();
 	delete renderView;
 }
-

@@ -18,7 +18,7 @@ void Element::Element_RSST()
 	Collision = 0.0f;
 	Gravity = 0.15f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 2;
 
 	Flammable = 0;
@@ -49,17 +49,19 @@ void Element::Element_RSST()
 
 int update(UPDATE_FUNC_ARGS)
 {
-	for(int rx = -1; rx < 2; rx++)
+	for (int rx = -1; rx < 2; rx++)
 	{
-		for(int ry = -1; ry < 2; ry++)
+		for (int ry = -1; ry < 2; ry++)
 		{
-			auto r = pmap[y+ry][x+rx];
+			auto r = pmap[y + ry][x + rx];
 
 			if (!r)
+			{
 				continue;
+			}
 
 			// RSST + GUNP = FIRW
-			if(TYP(r) == PT_GUNP)
+			if (TYP(r) == PT_GUNP)
 			{
 				sim->create_part(i, x, y, PT_FIRW);
 				sim->kill_part(ID(r));
@@ -67,7 +69,7 @@ int update(UPDATE_FUNC_ARGS)
 			}
 
 			// RSST + BCOL = FSEP
-			if(TYP(r) == PT_BCOL)
+			if (TYP(r) == PT_BCOL)
 			{
 				sim->create_part(i, x, y, PT_FSEP);
 				parts[i].life = 50;
@@ -76,17 +78,21 @@ int update(UPDATE_FUNC_ARGS)
 			}
 
 			// Set RSST ctype from nearby clone
-			if((TYP(r) == PT_CLNE) || (TYP(r) == PT_PCLN))
+			if ((TYP(r) == PT_CLNE) || (TYP(r) == PT_PCLN))
 			{
-				if(parts[ID(r)].ctype != PT_RSST)
+				if (parts[ID(r)].ctype != PT_RSST)
+				{
 					parts[i].ctype = parts[ID(r)].ctype;
+				}
 			}
 
 			// Set RSST tmp from nearby breakable clone
-			if((TYP(r) == PT_BCLN) || (TYP(r) == PT_PBCN))
+			if ((TYP(r) == PT_BCLN) || (TYP(r) == PT_PBCN))
 			{
-				if(parts[ID(r)].ctype != PT_RSST)
+				if (parts[ID(r)].ctype != PT_RSST)
+				{
 					parts[i].tmp = parts[ID(r)].ctype;
+				}
 			}
 		}
 	}

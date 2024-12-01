@@ -31,10 +31,11 @@ constexpr char PATH_SEP_CHAR            = '@PATH_SEP_CHAR@';
 
 enum ForceWindowFrameOps
 {
-	forceWindowFrameOpsNone, // usual behaviour
+	forceWindowFrameOpsNone,     // usual behaviour
 	forceWindowFrameOpsEmbedded, // e.g. into a webpage; this sweeps a few emscripten limitations under the rug
 	forceWindowFrameOpsHandheld, // e.g. the system doesn't support windowed mode; includes odd setups like chromebooks
 };
+
 // clang-format off
 constexpr ForceWindowFrameOps FORCE_WINDOW_FRAME_OPS = @FORCE_WINDOW_FRAME_OPS@;
 // clang-format on
@@ -63,6 +64,7 @@ struct DisplayVersionWithBuild
 	Version<2> displayVersion;
 	size_t build;
 };
+
 // clang-format off
 constexpr DisplayVersionWithBuild APP_VERSION = { { @DISPLAY_VERSION_MAJOR@, @DISPLAY_VERSION_MINOR@ }, @BUILD_NUM@ };
 constexpr DisplayVersionWithBuild UPSTREAM_VERSION = { { @UPSTREAM_VERSION_MAJOR@, @UPSTREAM_VERSION_MINOR@ }, @UPSTREAM_BUILD_NUM@ };
@@ -70,11 +72,11 @@ constexpr DisplayVersionWithBuild UPSTREAM_VERSION = { { @UPSTREAM_VERSION_MAJOR
 
 constexpr auto DISPLAY_VERSION = APP_VERSION.displayVersion;
 
-constexpr char IDENT_RELTYPE    = SNAPSHOT ? 'S' : (BETA ? 'B' : 'R');
+constexpr char IDENT_RELTYPE = SNAPSHOT ? 'S' : (BETA ? 'B' : 'R');
 
 constexpr char LOCAL_SAVE_DIR[] = "Saves";
-constexpr char STAMPS_DIR[]     = "stamps";
-constexpr char BRUSH_DIR[]      = "Brushes";
+constexpr char STAMPS_DIR[] = "stamps";
+constexpr char BRUSH_DIR[] = "Brushes";
 
 constexpr int httpMaxConcurrentStreams = 50;
-constexpr int httpConnectTimeoutS      = 15;
+constexpr int httpConnectTimeoutS = 15;

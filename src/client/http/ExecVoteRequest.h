@@ -3,18 +3,18 @@
 
 namespace http
 {
-	class ExecVoteRequest : public APIRequest
+class ExecVoteRequest : public APIRequest
+{
+	int direction;
+
+public:
+	ExecVoteRequest(int saveID, int newDirection);
+
+	void Finish();
+
+	int Direction() const
 	{
-		int direction;
-
-	public:
-		ExecVoteRequest(int saveID, int newDirection);
-
-		void Finish();
-
-		int Direction() const
-		{
-			return direction;
-		}
-	};
+		return direction;
+	}
+};
 }

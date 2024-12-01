@@ -10,17 +10,17 @@ class GameController;
 
 namespace ui
 {
-	class ScrollPanel;
-	class Textbox;
+class ScrollPanel;
+class Textbox;
 }
 
-class ElementSearchActivity: public WindowActivity
+class ElementSearchActivity : public WindowActivity
 {
-	Tool * firstResult;
-	GameController * gameController;
-	std::vector<Tool*> tools;
-	ui::Textbox * searchField;
-	std::vector<ToolButton*> toolButtons;
+	Tool *firstResult;
+	GameController *gameController;
+	std::vector<Tool *> tools;
+	ui::Textbox *searchField;
+	std::vector<ToolButton *> toolButtons;
 	ui::ScrollPanel *scrollPanel = nullptr;
 	String toolTip;
 	int toolTipPresence;
@@ -32,9 +32,14 @@ class ElementSearchActivity: public WindowActivity
 
 public:
 	bool exit;
-	Tool * GetFirstResult() { return firstResult; }
-	ElementSearchActivity(GameController * gameController, std::vector<Tool*> tools);
-	void SetActiveTool(int selectionState, Tool * tool);
+
+	Tool *GetFirstResult()
+	{
+		return firstResult;
+	}
+
+	ElementSearchActivity(GameController *gameController, std::vector<Tool *> tools);
+	void SetActiveTool(int selectionState, Tool *tool);
 	virtual ~ElementSearchActivity();
 	void OnTick(float dt) override;
 	void OnKeyPress(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt) override;

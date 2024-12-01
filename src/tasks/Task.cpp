@@ -2,7 +2,7 @@
 
 #include "TaskListener.h"
 
-void Task::AddTaskListener(TaskListener * listener)
+void Task::AddTaskListener(TaskListener *listener)
 {
 	this->listener = listener;
 	notifyProgressMain();
@@ -12,7 +12,9 @@ void Task::AddTaskListener(TaskListener * listener)
 void Task::Start()
 {
 	before();
-	std::thread([this]() { doWork_wrapper(); }).detach();
+	std::thread([this]() {
+		doWork_wrapper();
+	}).detach();
 }
 
 int Task::GetProgress()
@@ -42,7 +44,7 @@ bool Task::GetSuccess()
 
 void Task::Poll()
 {
-	if(!done)
+	if (!done)
 	{
 		int newProgress;
 		bool newDone = false;
@@ -60,22 +62,25 @@ void Task::Poll()
 
 		success = newSuccess;
 
-		if(newProgress!=progress) {
+		if (newProgress != progress)
+		{
 			progress = newProgress;
 			notifyProgressMain();
 		}
 
-		if(newError!=error) {
+		if (newError != error)
+		{
 			error = newError;
 			notifyErrorMain();
 		}
 
-		if(newStatus!=status) {
+		if (newStatus != status)
+		{
 			status = newStatus;
 			notifyStatusMain();
 		}
 
-		if(newDone!=done)
+		if (newDone != done)
 		{
 			done = newDone;
 			after();
@@ -99,13 +104,12 @@ Task::~Task()
 
 void Task::before()
 {
-
 }
 
 bool Task::doWork()
 {
 	notifyStatus("Fake progress");
-	for(int i = 0; i < 100; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		notifyProgress(i);
 	}
@@ -114,7 +118,6 @@ bool Task::doWork()
 
 void Task::after()
 {
-
 }
 
 void Task::doWork_wrapper()
@@ -147,24 +150,32 @@ void Task::notifyError(String error)
 
 void Task::notifyProgressMain()
 {
-	if(listener)
+	if (listener)
+	{
 		listener->NotifyProgress(this);
+	}
 }
 
 void Task::notifyStatusMain()
 {
-	if(listener)
+	if (listener)
+	{
 		listener->NotifyStatus(this);
+	}
 }
 
 void Task::notifyDoneMain()
 {
-	if(listener)
+	if (listener)
+	{
 		listener->NotifyDone(this);
+	}
 }
 
 void Task::notifyErrorMain()
 {
-	if(listener)
+	if (listener)
+	{
 		listener->NotifyError(this);
+	}
 }

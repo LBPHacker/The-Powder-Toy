@@ -4,7 +4,7 @@
 
 const char LuaTextbox::className[] = "textbox";
 
-#define method(class, name) {#name, &class::name}
+#define method(class, name) { #name, &class ::name }
 Luna<LuaTextbox>::RegType LuaTextbox::methods[] = {
 	method(LuaTextbox, text),
 	method(LuaTextbox, readonly),
@@ -12,7 +12,7 @@ Luna<LuaTextbox>::RegType LuaTextbox::methods[] = {
 	method(LuaTextbox, position),
 	method(LuaTextbox, size),
 	method(LuaTextbox, visible),
-	{0, 0}
+	{ 0, 0 }
 };
 
 LuaTextbox::LuaTextbox(lua_State *L) :
@@ -28,14 +28,16 @@ LuaTextbox::LuaTextbox(lua_State *L) :
 
 	textbox = new ui::Textbox(ui::Point(posX, posY), ui::Point(sizeX, sizeY), text, placeholder);
 	textbox->Appearance.HorizontalAlign = ui::Appearance::AlignLeft;
-	textbox->SetActionCallback({ [this] { triggerOnTextChanged(); } });
+	textbox->SetActionCallback({ [this] {
+		triggerOnTextChanged();
+	} });
 	component = textbox;
 }
 
 int LuaTextbox::readonly(lua_State *L)
 {
 	int args = lua_gettop(L);
-	if(args)
+	if (args)
 	{
 		luaL_checktype(L, 1, LUA_TBOOLEAN);
 		textbox->ReadOnly = lua_toboolean(L, 1);
@@ -55,7 +57,7 @@ int LuaTextbox::onTextChanged(lua_State *L)
 
 void LuaTextbox::triggerOnTextChanged()
 {
-	if(onTextChangedFunction)
+	if (onTextChangedFunction)
 	{
 		lua_rawgeti(L, LUA_REGISTRYINDEX, onTextChangedFunction);
 		lua_rawgeti(L, LUA_REGISTRYINDEX, owner_ref);
@@ -69,7 +71,7 @@ void LuaTextbox::triggerOnTextChanged()
 int LuaTextbox::text(lua_State *L)
 {
 	int args = lua_gettop(L);
-	if(args)
+	if (args)
 	{
 		textbox->SetText(tpt_lua_checkString(L, 1));
 		return 0;

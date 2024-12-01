@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "graphics/VideoBuffer.h"
+#include "simulation/ElementCommon.h"
 
 static std::unique_ptr<VideoBuffer> iconGen(int wallID, Vec2<int> size);
 
@@ -19,7 +19,7 @@ void Element::Element_NONE()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;

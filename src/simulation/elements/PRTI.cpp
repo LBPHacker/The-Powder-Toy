@@ -1,8 +1,8 @@
-#include "simulation/ElementCommon.h"
-#include "simulation/orbitalparts.h"
+#include "PRTI.h"
 #include "PIPE.h"
 #include "SOAP.h"
-#include "PRTI.h"
+#include "simulation/ElementCommon.h"
+#include "simulation/orbitalparts.h"
 
 static int update(UPDATE_FUNC_ARGS);
 static int graphics(GRAPHICS_FUNC_ARGS);
@@ -23,7 +23,7 @@ void Element::Element_PRTI()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = -0.005f	* CFDS;
+	HotAir = -0.005f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -65,11 +65,15 @@ static int update(UPDATE_FUNC_ARGS)
 	auto &elements = sd.elements;
 	int fe = 0;
 
-	parts[i].tmp = (int)((parts[i].temp-73.15f)/100+1);
+	parts[i].tmp = (int)((parts[i].temp - 73.15f) / 100 + 1);
 	if (parts[i].tmp >= CHANNELS)
-		parts[i].tmp = CHANNELS-1;
+	{
+		parts[i].tmp = CHANNELS - 1;
+	}
 	else if (parts[i].tmp < 0)
+	{
 		parts[i].tmp = 0;
+	}
 
 	for (int count = 0; count < 8; count++)
 	{
@@ -77,31 +81,46 @@ static int update(UPDATE_FUNC_ARGS)
 		int ry = portal_ry[count];
 		if (rx || ry)
 		{
-			int r = pmap[y+ry][x+rx];
+			int r = pmap[y + ry][x + rx];
 			if (!r || TYP(r) == PT_STOR)
-				fe = 1;
-			if (!r || (!(elements[TYP(r)].Properties & (TYPE_PART | TYPE_LIQUID | TYPE_GAS | TYPE_ENERGY)) && TYP(r)!=PT_SPRK && TYP(r)!=PT_STOR))
 			{
-				r = sim->photons[y+ry][x+rx];
+				fe = 1;
+			}
+			if (!r ||
+			    (!(elements[TYP(r)].Properties & (TYPE_PART | TYPE_LIQUID | TYPE_GAS | TYPE_ENERGY)) &&
+			     TYP(r) != PT_SPRK && TYP(r) != PT_STOR))
+			{
+				r = sim->photons[y + ry][x + rx];
 				if (!r)
+				{
 					continue;
+				}
 			}
 
-			if (TYP(r)==PT_STKM || TYP(r)==PT_STKM2 || TYP(r)==PT_FIGH)
-				continue;// Handling these is a bit more complicated, and is done in STKM_interact()
+			if (TYP(r) == PT_STKM || TYP(r) == PT_STKM2 || TYP(r) == PT_FIGH)
+			{
+				continue; // Handling these is a bit more complicated, and is done in STKM_interact()
+			}
 
 			if (TYP(r) == PT_SOAP)
+			{
 				Element_SOAP_detach(sim, ID(r));
+			}
 
-			for (int nnx=0; nnx<80; nnx++)
+			for (int nnx = 0; nnx < 80; nnx++)
+			{
 				if (!sim->portalp[parts[i].tmp][count][nnx].type)
 				{
 					if (TYP(r) == PT_STOR)
 					{
-						if (sd.IsElement(parts[ID(r)].tmp) && (elements[parts[ID(r)].tmp].Properties & (TYPE_PART | TYPE_LIQUID | TYPE_GAS | TYPE_ENERGY)))
+						if (sd.IsElement(parts[ID(r)].tmp) &&
+						    (elements[parts[ID(r)].tmp].Properties & (TYPE_PART | TYPE_LIQUID | TYPE_GAS | TYPE_ENERGY)
+						    ))
 						{
 							// STOR uses same format as PIPE, so we can use this function to do the transfer
-							Element_PIPE_transfer_pipe_to_part(sim, parts+(ID(r)), &sim->portalp[parts[i].tmp][count][nnx], true);
+							Element_PIPE_transfer_pipe_to_part(
+								sim, parts + (ID(r)), &sim->portalp[parts[i].tmp][count][nnx], true
+							);
 							break;
 						}
 					}
@@ -109,40 +128,60 @@ static int update(UPDATE_FUNC_ARGS)
 					{
 						sim->portalp[parts[i].tmp][count][nnx] = parts[ID(r)];
 						if (TYP(r) == PT_SPRK)
-							sim->part_change_type(ID(r),x+rx,y+ry,parts[ID(r)].ctype);
+						{
+							sim->part_change_type(ID(r), x + rx, y + ry, parts[ID(r)].ctype);
+						}
 						else
+						{
 							sim->kill_part(ID(r));
+						}
 						fe = 1;
 						break;
 					}
 				}
+			}
 		}
 	}
 
-
-	if (fe) {
-		int orbd[4] = {0, 0, 0, 0};	//Orbital distances
-		int orbl[4] = {0, 0, 0, 0};	//Orbital locations
-		if (!sim->parts[i].life) parts[i].life = sim->rng.gen();
-		if (!sim->parts[i].ctype) parts[i].ctype = sim->rng.gen();
+	if (fe)
+	{
+		int orbd[4] = { 0, 0, 0, 0 }; // Orbital distances
+		int orbl[4] = { 0, 0, 0, 0 }; // Orbital locations
+		if (!sim->parts[i].life)
+		{
+			parts[i].life = sim->rng.gen();
+		}
+		if (!sim->parts[i].ctype)
+		{
+			parts[i].ctype = sim->rng.gen();
+		}
 		orbitalparts_get(parts[i].life, parts[i].ctype, orbd, orbl);
-		for (int r = 0; r < 4; r++) {
-			if (orbd[r]>1) {
+		for (int r = 0; r < 4; r++)
+		{
+			if (orbd[r] > 1)
+			{
 				orbd[r] -= 12;
-				if (orbd[r]<1) {
+				if (orbd[r] < 1)
+				{
 					orbd[r] = sim->rng.between(128, 255);
 					orbl[r] = sim->rng.between(0, 254);
-				} else {
-					orbl[r] += 2;
-					orbl[r] = orbl[r]%255;
 				}
-			} else {
+				else
+				{
+					orbl[r] += 2;
+					orbl[r] = orbl[r] % 255;
+				}
+			}
+			else
+			{
 				orbd[r] = sim->rng.between(128, 255);
 				orbl[r] = sim->rng.between(0, 254);
 			}
 		}
 		orbitalparts_set(&parts[i].life, &parts[i].ctype, orbd, orbl);
-	} else {
+	}
+	else
+	{
 		parts[i].life = 0;
 		parts[i].ctype = 0;
 	}

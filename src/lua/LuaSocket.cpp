@@ -16,9 +16,9 @@ int LuaSocket::Sleep(lua_State *L)
 void LuaSocket::Open(lua_State *L)
 {
 	static const luaL_Reg reg[] = {
-		{ "sleep", LuaSocket::Sleep },
-		{ "getTime", LuaSocket::GetTime },
-		{ NULL, NULL }
+		{   "sleep",   LuaSocket::Sleep },
+        { "getTime", LuaSocket::GetTime },
+        {      NULL,               NULL }
 	};
 	lua_newtable(L);
 	luaL_register(L, NULL, reg);

@@ -1,13 +1,13 @@
 #pragma once
-#include "common/String.h"
 #include "client/User.h"
-#include <vector>
+#include "common/String.h"
 #include <memory>
+#include <vector>
 
 namespace http
 {
-	class LoginRequest;
-	class LogoutRequest;
+class LoginRequest;
+class LogoutRequest;
 }
 
 enum LoginStatus
@@ -18,11 +18,12 @@ enum LoginStatus
 };
 
 class LoginView;
+
 class LoginModel
 {
 	std::unique_ptr<http::LoginRequest> loginRequest;
 	std::unique_ptr<http::LogoutRequest> logoutRequest;
-	std::vector<LoginView*> observers;
+	std::vector<LoginView *> observers;
 	String statusText;
 	LoginStatus loginStatus = loginIdle;
 	void notifyStatusChanged();
@@ -30,12 +31,14 @@ class LoginModel
 public:
 	void Login(ByteString username, ByteString password);
 	void Logout();
-	void AddObserver(LoginView * observer);
+	void AddObserver(LoginView *observer);
 	String GetStatusText();
+
 	LoginStatus GetStatus() const
 	{
 		return loginStatus;
 	}
+
 	void Tick();
 	User GetUser();
 	~LoginModel();

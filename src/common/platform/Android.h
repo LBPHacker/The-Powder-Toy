@@ -4,5 +4,5 @@
 
 namespace Platform
 {
-	std::optional<ByteString> CallActivityStringFunc(const char *funcName);
+std::optional<ByteString> CallActivityStringFunc(const char *funcName);
 }

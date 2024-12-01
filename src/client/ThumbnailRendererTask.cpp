@@ -2,9 +2,9 @@
 
 #include <cmath>
 
+#include "client/GameSave.h"
 #include "graphics/VideoBuffer.h"
 #include "simulation/SaveRenderer.h"
-#include "client/GameSave.h"
 
 int ThumbnailRendererTask::queueSize = 0;
 
@@ -13,7 +13,9 @@ int ThumbnailRendererTask::QueueSize()
 	return queueSize;
 }
 
-ThumbnailRendererTask::ThumbnailRendererTask(GameSave const &save, Vec2<int> size, RendererSettings::DecorationLevel newDecorationLevel, bool fire):
+ThumbnailRendererTask::ThumbnailRendererTask(
+	const GameSave &save, Vec2<int> size, RendererSettings::DecorationLevel newDecorationLevel, bool fire
+) :
 	save(std::make_unique<GameSave>(save)),
 	size(size),
 	decorationLevel(newDecorationLevel),
@@ -50,4 +52,3 @@ std::unique_ptr<VideoBuffer> ThumbnailRendererTask::Finish()
 	AbandonableTask::Finish();
 	return ptr;
 }
-

@@ -4,7 +4,7 @@
 
 const char LuaSlider::className[] = "slider";
 
-#define method(class, name) {#name, &class::name}
+#define method(class, name) { #name, &class ::name }
 Luna<LuaSlider>::RegType LuaSlider::methods[] = {
 	method(LuaSlider, onValueChanged),
 	method(LuaSlider, position),
@@ -12,7 +12,7 @@ Luna<LuaSlider>::RegType LuaSlider::methods[] = {
 	method(LuaSlider, visible),
 	method(LuaSlider, value),
 	method(LuaSlider, steps),
-	{0, 0}
+	{ 0, 0 }
 };
 
 LuaSlider::LuaSlider(lua_State *L) :
@@ -26,13 +26,15 @@ LuaSlider::LuaSlider(lua_State *L) :
 
 	slider = new ui::Slider(ui::Point(posX, posY), ui::Point(sizeX, sizeY), steps);
 	component = slider;
-	slider->SetActionCallback({ [this] { triggerOnValueChanged(); } });
+	slider->SetActionCallback({ [this] {
+		triggerOnValueChanged();
+	} });
 }
 
 int LuaSlider::steps(lua_State *L)
 {
 	int args = lua_gettop(L);
-	if(args)
+	if (args)
 	{
 		slider->SetSteps(lua_tointeger(L, 1));
 		return 0;
@@ -52,7 +54,7 @@ int LuaSlider::onValueChanged(lua_State *L)
 int LuaSlider::value(lua_State *L)
 {
 	int args = lua_gettop(L);
-	if(args)
+	if (args)
 	{
 		slider->SetValue(lua_tointeger(L, 1));
 		return 0;
@@ -66,7 +68,7 @@ int LuaSlider::value(lua_State *L)
 
 void LuaSlider::triggerOnValueChanged()
 {
-	if(onValueChangedFunction)
+	if (onValueChangedFunction)
 	{
 		lua_rawgeti(L, LUA_REGISTRYINDEX, onValueChangedFunction);
 		lua_rawgeti(L, LUA_REGISTRYINDEX, owner_ref);

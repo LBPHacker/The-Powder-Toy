@@ -1,24 +1,25 @@
 #include "Label.h"
+#include "ContextMenu.h"
 #include "Format.h"
 #include "Point.h"
 #include "PowderToySDL.h"
-#include "ContextMenu.h"
-#include "graphics/Graphics.h"
 #include "graphics/FontReader.h"
+#include "graphics/Graphics.h"
 #include <SDL.h>
 
 using namespace ui;
 
-Label::Label(Point position, Point size, String labelText):
+Label::Label(Point position, Point size, String labelText) :
 	Component(position, size),
 	textColour(255, 255, 255),
 	selectionIndexL(textWrapper.IndexBegin()),
 	selectionIndexH(textWrapper.IndexBegin()),
 	multiline(false),
 	selecting(false),
-	autoHeight(size.Y==-1?true:false)
+	autoHeight(size.Y == -1 ? true : false)
 {
-	if (labelText.size()) // Don't call virtual function in ctor unless absolutely necessary. Deriveds set labelText to "".
+	if (labelText.size(
+		)) // Don't call virtual function in ctor unless absolutely necessary. Deriveds set labelText to "".
 	{
 		SetText(labelText);
 	}
@@ -57,15 +58,9 @@ void Label::AutoHeight()
 
 void Label::updateTextWrapper()
 {
-	int lines = textWrapper.Update(
-		text,
-		multiline,
-		Size.X - Appearance.Margin.Left - Appearance.Margin.Right
-	);
+	int lines = textWrapper.Update(text, multiline, Size.X - Appearance.Margin.Left - Appearance.Margin.Right);
 	displayTextWrapper.Update(
-		displayText.size() ? displayText : text,
-		multiline,
-		Size.X - Appearance.Margin.Left - Appearance.Margin.Right
+		displayText.size() ? displayText : text, multiline, Size.X - Appearance.Margin.Left - Appearance.Margin.Right
 	);
 	if (autoHeight)
 	{
@@ -80,7 +75,7 @@ String Label::GetText()
 
 void Label::OnContextMenuAction(int item)
 {
-	switch(item)
+	switch (item)
 	{
 	case 0:
 		copySelection();
@@ -92,7 +87,7 @@ void Label::OnMouseDown(int x, int y, unsigned button)
 {
 	if (MouseDownInside)
 	{
-		if(button == SDL_BUTTON_RIGHT)
+		if (button == SDL_BUTTON_RIGHT)
 		{
 			if (menu)
 			{
@@ -116,7 +111,10 @@ void Label::copySelection()
 {
 	if (HasSelection())
 	{
-		ClipboardPush(format::CleanString(text.Between(selectionIndexL.raw_index, selectionIndexH.raw_index), false, true, false).ToUtf8());
+		ClipboardPush(
+			format::CleanString(text.Between(selectionIndexL.raw_index, selectionIndexH.raw_index), false, true, false)
+				.ToUtf8()
+		);
 	}
 	else
 	{
@@ -210,17 +208,29 @@ void Label::selectAll()
 
 void Label::updateSelection()
 {
-	if (selectionIndexL.raw_index <                  0) selectionIndexL = textWrapper.IndexBegin();
-	if (selectionIndexL.raw_index > (int)text.length()) selectionIndexL = textWrapper.IndexEnd();
-	if (selectionIndexH.raw_index <                  0) selectionIndexH = textWrapper.IndexBegin();
-	if (selectionIndexH.raw_index > (int)text.length()) selectionIndexH = textWrapper.IndexEnd();
+	if (selectionIndexL.raw_index < 0)
+	{
+		selectionIndexL = textWrapper.IndexBegin();
+	}
+	if (selectionIndexL.raw_index > (int)text.length())
+	{
+		selectionIndexL = textWrapper.IndexEnd();
+	}
+	if (selectionIndexH.raw_index < 0)
+	{
+		selectionIndexH = textWrapper.IndexBegin();
+	}
+	if (selectionIndexH.raw_index > (int)text.length())
+	{
+		selectionIndexH = textWrapper.IndexEnd();
+	}
 
 	displayTextWithSelection = displayTextWrapper.WrappedText();
 	if (HasSelection())
 	{
 		auto indexL = displayTextWrapper.Clear2Index(selectionIndexL.clear_index);
 		auto indexH = displayTextWrapper.Clear2Index(selectionIndexH.clear_index);
-		displayTextWithSelection.Insert(indexL.wrapped_index    , "\x01");
+		displayTextWithSelection.Insert(indexL.wrapped_index, "\x01");
 		displayTextWithSelection.Insert(indexH.wrapped_index + 1, "\x01");
 	}
 }
@@ -234,7 +244,7 @@ void Label::SetDisplayText(String newText)
 	TextPosition(displayTextWrapper.WrappedText());
 }
 
-void Label::Draw(const Point& screenPos)
+void Label::Draw(const Point &screenPos)
 {
 	if (!drawn)
 	{
@@ -247,7 +257,7 @@ void Label::Draw(const Point& screenPos)
 
 	auto indexL = displayTextWrapper.Clear2Index(selectionIndexL.clear_index);
 	auto indexH = displayTextWrapper.Clear2Index(selectionIndexH.clear_index);
-		
+
 	int selectionXL;
 	int selectionYL;
 	int selectionLineL = displayTextWrapper.Index2Point(indexL, selectionXL, selectionYL);
@@ -284,26 +294,16 @@ void Label::Draw(const Point& screenPos)
 			{
 				g->DrawFilledRect(
 					RectSized(
-						screenPos + tp + Vec2{ -1, selectionYL - 2 + i * FONT_H },
-						Vec2{ textSize.X + 1, FONT_H }
+						screenPos + tp + Vec2{ -1, selectionYL - 2 + i * FONT_H }, Vec2{ textSize.X + 1, FONT_H }
 					),
 					0xFFFFFF_rgb
 				);
 			}
 			g->DrawFilledRect(
-				RectSized(
-					screenPos + tp + Vec2{ -1, selectionYH - 2 },
-					Vec2{ selectionXH + 1, FONT_H }
-				),
-				0xFFFFFF_rgb
+				RectSized(screenPos + tp + Vec2{ -1, selectionYH - 2 }, Vec2{ selectionXH + 1, FONT_H }), 0xFFFFFF_rgb
 			);
 		}
 	}
-	g->BlendText(
-		screenPos + tp,
-		displayTextWithSelection,
-		textColour.NoAlpha().WithAlpha(255)
-	);
+	g->BlendText(screenPos + tp, displayTextWithSelection, textColour.NoAlpha().WithAlpha(255));
 	g->SwapClipRect(clip);
 }
-

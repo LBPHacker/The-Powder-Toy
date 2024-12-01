@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <limits>
 #include <type_traits>
@@ -15,7 +15,8 @@ struct PlaneBase
 {
 	Item *base;
 
-	PlaneBase(Item *newBase) : base(newBase)
+	PlaneBase(Item *newBase) :
+		base(newBase)
 	{
 	}
 
@@ -29,12 +30,12 @@ struct PlaneBase
 		return base;
 	}
 
-	Item &operator [](size_t index)
+	Item &operator[](size_t index)
 	{
 		return *(base + index);
 	}
 
-	const Item &operator [](size_t index) const
+	const Item &operator[](size_t index) const
 	{
 		return *(base + index);
 	}
@@ -51,7 +52,8 @@ template<size_t Extent>
 struct extentStorage
 {
 	constexpr extentStorage(size_t)
-	{}
+	{
+	}
 
 	constexpr size_t getExtent() const
 	{
@@ -59,7 +61,8 @@ struct extentStorage
 	}
 
 	constexpr void setExtent(size_t)
-	{}
+	{
+	}
 };
 
 template<>
@@ -67,9 +70,10 @@ struct extentStorage<DynamicExtent>
 {
 	size_t extent;
 
-	constexpr extentStorage(size_t extent):
+	constexpr extentStorage(size_t extent) :
 		extent(extent)
-	{}
+	{
+	}
 
 	constexpr size_t getExtent() const
 	{
@@ -83,13 +87,13 @@ struct extentStorage<DynamicExtent>
 };
 
 template<size_t Extent>
-struct xExtent: extentStorage<Extent>
+struct xExtent : extentStorage<Extent>
 {
 	using extentStorage<Extent>::extentStorage;
 };
 
 template<size_t Extent>
-struct yExtent: extentStorage<Extent>
+struct yExtent : extentStorage<Extent>
 {
 	using extentStorage<Extent>::extentStorage;
 };
@@ -115,11 +119,11 @@ struct baseStorage<T &&>
 // A class that contains some container T and lets you index into it as if it
 // were a 2D array of size Width x Height, in row-major order.
 template<typename T, size_t Width = DynamicExtent, size_t Height = DynamicExtent>
-class PlaneAdapter: xExtent<Width>, yExtent<Height>
+class PlaneAdapter : xExtent<Width>, yExtent<Height>
 {
 	using value_type = std::remove_reference_t<decltype(std::declval<T>()[0])>;
 	using iterator = decltype(std::begin(std::declval<T &>()));
-	using const_iterator = decltype(std::begin(std::declval<T const &>()));
+	using const_iterator = decltype(std::begin(std::declval<const T &>()));
 
 	size_t getWidth() const
 	{
@@ -136,7 +140,7 @@ class PlaneAdapter: xExtent<Width>, yExtent<Height>
 		return Base;
 	}
 
-	std::remove_reference_t<T> const &getBase() const
+	const std::remove_reference_t<T> &getBase() const
 	{
 		return Base;
 	}
@@ -144,25 +148,28 @@ class PlaneAdapter: xExtent<Width>, yExtent<Height>
 public:
 	typename baseStorage<T>::type Base;
 
-	PlaneAdapter():
+	PlaneAdapter() :
 		xExtent<Width>(0),
 		yExtent<Height>(0),
 		Base()
-	{}
+	{
+	}
 
 	template<typename... Args>
-	PlaneAdapter(Vec2<int> size, Args&&... args):
+	PlaneAdapter(Vec2<int> size, Args &&...args) :
 		xExtent<Width>(size.X),
 		yExtent<Height>(size.Y),
 		Base(getWidth() * getHeight(), std::forward<Args>(args)...)
-	{}
+	{
+	}
 
 	template<typename... Args>
-	PlaneAdapter(Vec2<int> size, std::in_place_t, Args&&... args):
+	PlaneAdapter(Vec2<int> size, std::in_place_t, Args &&...args) :
 		xExtent<Width>(size.X),
 		yExtent<Height>(size.Y),
 		Base(std::forward<Args>(args)...)
-	{}
+	{
+	}
 
 	Vec2<int> Size() const
 	{
@@ -190,7 +197,7 @@ public:
 		return std::data(getBase());
 	}
 
-	value_type const *data() const
+	const value_type *data() const
 	{
 		return std::data(getBase());
 	}
@@ -200,7 +207,7 @@ public:
 		return getBase()[p.X + p.Y * getWidth()];
 	}
 
-	value_type const &operator[](Vec2<int> p) const
+	const value_type &operator[](Vec2<int> p) const
 	{
 		return getBase()[p.X + p.Y * getWidth()];
 	}

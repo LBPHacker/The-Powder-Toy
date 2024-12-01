@@ -1,27 +1,29 @@
 #include "LoginView.h"
 #include "Config.h"
-#include "LoginModel.h"
 #include "LoginController.h"
+#include "LoginModel.h"
+#include "Misc.h"
+#include "client/Client.h"
 #include "graphics/Graphics.h"
+#include "gui/Style.h"
 #include "gui/interface/Button.h"
 #include "gui/interface/Label.h"
 #include "gui/interface/RichLabel.h"
 #include "gui/interface/Textbox.h"
-#include "gui/Style.h"
-#include "client/Client.h"
-#include "Misc.h"
 #include <SDL.h>
 
 constexpr auto defaultSize = ui::Point(200, 87);
 
-LoginView::LoginView():
+LoginView::LoginView() :
 	ui::Window(ui::Point(-1, -1), defaultSize),
-	loginButton(new ui::Button(ui::Point(200-100, 87-17), ui::Point(100, 17), "Sign in")),
-	cancelButton(new ui::Button(ui::Point(0, 87-17), ui::Point(101, 17), "Sign Out")),
-	titleLabel(new ui::Label(ui::Point(4, 5), ui::Point(200-16, 16), "Server login")),
-	infoLabel(new ui::RichLabel(ui::Point(6, 67), ui::Point(200-12, 16), "")),
-	usernameField(new ui::Textbox(ui::Point(8, 25), ui::Point(200-16, 17), Client::Ref().GetAuthUser().Username.FromUtf8(), "[username]")),
-	passwordField(new ui::Textbox(ui::Point(8, 46), ui::Point(200-16, 17), "", "[password]")),
+	loginButton(new ui::Button(ui::Point(200 - 100, 87 - 17), ui::Point(100, 17), "Sign in")),
+	cancelButton(new ui::Button(ui::Point(0, 87 - 17), ui::Point(101, 17), "Sign Out")),
+	titleLabel(new ui::Label(ui::Point(4, 5), ui::Point(200 - 16, 16), "Server login")),
+	infoLabel(new ui::RichLabel(ui::Point(6, 67), ui::Point(200 - 12, 16), "")),
+	usernameField(new ui::Textbox(
+		ui::Point(8, 25), ui::Point(200 - 16, 17), Client::Ref().GetAuthUser().Username.FromUtf8(), "[username]"
+	)),
+	passwordField(new ui::Textbox(ui::Point(8, 46), ui::Point(200 - 16, 17), "", "[password]")),
 	targetSize(defaultSize)
 {
 	FocusComponent(usernameField);
@@ -64,14 +66,20 @@ LoginView::LoginView():
 void LoginView::OnKeyPress(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt)
 {
 	if (repeat)
+	{
 		return;
-	switch(key)
+	}
+	switch (key)
 	{
 	case SDLK_TAB:
-		if(IsFocused(usernameField))
+		if (IsFocused(usernameField))
+		{
 			FocusComponent(passwordField);
+		}
 		else
+		{
 			FocusComponent(usernameField);
+		}
 		break;
 	}
 }
@@ -81,7 +89,7 @@ void LoginView::OnTryExit(ExitMethod method)
 	CloseActiveWindow();
 }
 
-void LoginView::NotifyStatusChanged(LoginModel * sender)
+void LoginView::NotifyStatusChanged(LoginModel *sender)
 {
 	auto statusText = sender->GetStatusText();
 	auto notWorking = sender->GetStatus() != loginWorking;
@@ -111,32 +119,36 @@ void LoginView::NotifyStatusChanged(LoginModel * sender)
 void LoginView::OnTick(float dt)
 {
 	c->Tick();
-	//if(targetSize != Size)
+	// if(targetSize != Size)
 	{
-		ui::Point difference = targetSize-Size;
-		if(difference.X!=0)
+		ui::Point difference = targetSize - Size;
+		if (difference.X != 0)
 		{
-			int xdiff = difference.X/5;
-			if(xdiff == 0)
-				xdiff = 1*isign(difference.X);
+			int xdiff = difference.X / 5;
+			if (xdiff == 0)
+			{
+				xdiff = 1 * isign(difference.X);
+			}
 			Size.X += xdiff;
 		}
-		if(difference.Y!=0)
+		if (difference.Y != 0)
 		{
-			int ydiff = difference.Y/5;
-			if(ydiff == 0)
-				ydiff = 1*isign(difference.Y);
+			int ydiff = difference.Y / 5;
+			if (ydiff == 0)
+			{
+				ydiff = 1 * isign(difference.Y);
+			}
 			Size.Y += ydiff;
 		}
 
-		loginButton->Position.Y = Size.Y-17;
-		cancelButton->Position.Y = Size.Y-17;
+		loginButton->Position.Y = Size.Y - 17;
+		cancelButton->Position.Y = Size.Y - 17;
 	}
 }
 
 void LoginView::OnDraw()
 {
-	Graphics * g = GetGraphics();
+	Graphics *g = GetGraphics();
 	g->DrawFilledRect(RectSized(Position - Vec2{ 1, 1 }, Size + Vec2{ 2, 2 }), 0x000000_rgb);
 	g->DrawRect(RectSized(Position, Size), 0xFFFFFF_rgb);
 }

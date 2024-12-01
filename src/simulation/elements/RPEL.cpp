@@ -18,7 +18,7 @@ void Element::Element_RPEL()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f  * CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -52,20 +52,24 @@ static int update(UPDATE_FUNC_ARGS)
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
 	int r, rx, ry, ri;
-	for(ri = 0; ri <= 10; ri++)
+	for (ri = 0; ri <= 10; ri++)
 	{
 		rx = sim->rng.between(-10, 10);
 		ry = sim->rng.between(-10, 10);
-		if (x+rx >= 0 && x+rx < XRES && y+ry >= 0 && y+ry < YRES && (rx || ry))
+		if (x + rx >= 0 && x + rx < XRES && y + ry >= 0 && y + ry < YRES && (rx || ry))
 		{
-			r = pmap[y+ry][x+rx];
+			r = pmap[y + ry][x + rx];
 			if (!r)
-				r = sim->photons[y+ry][x+rx];
+			{
+				r = sim->photons[y + ry][x + rx];
+			}
 
-			if (r && !(elements[TYP(r)].Properties & TYPE_SOLID)) {
-				if (!parts[i].ctype || parts[i].ctype == parts[ID(r)].type) {
-					parts[ID(r)].vx += isign(rx)*((parts[i].temp-273.15)/10.0f);
-					parts[ID(r)].vy += isign(ry)*((parts[i].temp-273.15)/10.0f);
+			if (r && !(elements[TYP(r)].Properties & TYPE_SOLID))
+			{
+				if (!parts[i].ctype || parts[i].ctype == parts[ID(r)].type)
+				{
+					parts[ID(r)].vx += isign(rx) * ((parts[i].temp - 273.15) / 10.0f);
+					parts[ID(r)].vy += isign(ry) * ((parts[i].temp - 273.15) / 10.0f);
 				}
 			}
 		}

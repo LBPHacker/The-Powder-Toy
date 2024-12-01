@@ -4,12 +4,16 @@
 
 void SimTool::CallPerform(Simulation *sim, ui::Point position, ui::Point brushOffset)
 {
-	Particle * cpart = NULL;
+	Particle *cpart = NULL;
 	int r;
 	if ((r = sim->pmap[position.Y][position.X]))
+	{
 		cpart = &(sim->parts[ID(r)]);
+	}
 	else if ((r = sim->photons[position.Y][position.X]))
+	{
 		cpart = &(sim->parts[ID(r)]);
+	}
 	if (Perform)
 	{
 		// TODO: maybe do something with the result
@@ -29,13 +33,15 @@ static void defaultPerformDraw(SimTool *tool, Simulation *sim, const Brush &brus
 	}
 }
 
-static void defaultPerformDrawLine(SimTool *tool, Simulation *sim, const Brush &brush, ui::Point position1, ui::Point position2, bool dragging)
+static void defaultPerformDrawLine(
+	SimTool *tool, Simulation *sim, const Brush &brush, ui::Point position1, ui::Point position2, bool dragging
+)
 {
 	auto x1 = position1.X;
 	auto y1 = position1.Y;
 	auto x2 = position2.X;
 	auto y2 = position2.Y;
-	bool reverseXY = abs(y2-y1) > abs(x2-x1);
+	bool reverseXY = abs(y2 - y1) > abs(x2 - x1);
 	int x, y, dx, dy, sy, rx = brush.GetRadius().X, ry = brush.GetRadius().Y;
 	float e = 0.0f, de;
 	if (reverseXY)
@@ -58,32 +64,41 @@ static void defaultPerformDrawLine(SimTool *tool, Simulation *sim, const Brush &
 	}
 	dx = x2 - x1;
 	dy = abs(y2 - y1);
-	de = dx ? dy/(float)dx : 0.0f;
+	de = dx ? dy / (float)dx : 0.0f;
 	y = y1;
-	sy = (y1<y2) ? 1 : -1;
-	for (x=x1; x<=x2; x++)
+	sy = (y1 < y2) ? 1 : -1;
+	for (x = x1; x <= x2; x++)
 	{
 		if (reverseXY)
+		{
 			defaultPerformDraw(tool, sim, brush, { y, x });
+		}
 		else
+		{
 			defaultPerformDraw(tool, sim, brush, { x, y });
+		}
 		e += de;
 		if (e >= 0.5f)
 		{
 			y += sy;
-			if (!(rx+ry) && ((y1<y2) ? (y<=y2) : (y>=y2)))
+			if (!(rx + ry) && ((y1 < y2) ? (y <= y2) : (y >= y2)))
 			{
 				if (reverseXY)
+				{
 					defaultPerformDraw(tool, sim, brush, { y, x });
+				}
 				else
+				{
 					defaultPerformDraw(tool, sim, brush, { x, y });
+				}
 			}
 			e -= 1.0f;
 		}
 	}
 }
 
-static void defaultPerformDrawRect(SimTool *tool, Simulation *sim, const Brush &brush, ui::Point position1, ui::Point position2)
+static void
+	defaultPerformDrawRect(SimTool *tool, Simulation *sim, const Brush &brush, ui::Point position1, ui::Point position2)
 {
 	int brushX = ((position1.X + position2.X) / 2);
 	int brushY = ((position1.Y + position2.Y) / 2);
@@ -107,7 +122,7 @@ SimTool::SimTool()
 	PerformSelect = nullptr;
 }
 
-void SimTool::Click(Simulation * sim, const Brush &brush, ui::Point position)
+void SimTool::Click(Simulation *sim, const Brush &brush, ui::Point position)
 {
 	if (PerformClick)
 	{
@@ -147,7 +162,7 @@ void SimTool::DrawRect(Simulation *sim, const Brush &brush, ui::Point position1,
 	}
 }
 
-void SimTool::DrawFill(Simulation * sim, const Brush &brush, ui::Point position)
+void SimTool::DrawFill(Simulation *sim, const Brush &brush, ui::Point position)
 {
 	if (PerformDrawFill)
 	{

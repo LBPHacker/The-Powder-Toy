@@ -18,7 +18,7 @@
 // * Each field in Snapshot has a mirror set of fields in SnapshotDelta. Fields of static size
 //   have mirror fields whose type is HunkVector, templated by the item type of the
 //   corresponding field; these fields are handled in a uniform manner. Fields of dynamic size are
-//   handled in a non-uniform, case-by-case manner. 
+//   handled in a non-uniform, case-by-case manner.
 // * A HunkVector is generated from two streams of identical size and is a collection
 //   of Hunks, a Hunk is an offset combined with a collection of Diffs, and a Diff is a pair of values,
 //   one originating from one stream and the other from the other. Thus, Hunks represent contiguous
@@ -75,7 +75,7 @@ constexpr size_t playerstUint32Count = sizeof(playerst) / sizeof(uint32_t);
 static_assert(sizeof(playerst) % sizeof(uint32_t) == 0, "fix me");
 
 // * Needed by FillHunkVector for handling Snapshot::stickmen.
-bool operator ==(const playerst &lhs, const playerst &rhs)
+bool operator==(const playerst &lhs, const playerst &rhs)
 {
 	auto match = true;
 	for (auto i = 0U; i < 16U; ++i)
@@ -86,19 +86,13 @@ bool operator ==(const playerst &lhs, const playerst &rhs)
 	{
 		match = match && lhs.accs[i] == rhs.accs[i];
 	}
-	return match                              &&
-	       lhs.comm        == rhs.comm        &&
-	       lhs.pcomm       == rhs.pcomm       &&
-	       lhs.elem        == rhs.elem        &&
-	       lhs.spwn        == rhs.spwn        &&
-	       lhs.frames      == rhs.frames      &&
-	       lhs.rocketBoots == rhs.rocketBoots &&
-	       lhs.fan         == rhs.fan         &&
-	       lhs.spawnID     == rhs.spawnID;
+	return match && lhs.comm == rhs.comm && lhs.pcomm == rhs.pcomm && lhs.elem == rhs.elem && lhs.spwn == rhs.spwn &&
+		lhs.frames == rhs.frames && lhs.rocketBoots == rhs.rocketBoots && lhs.fan == rhs.fan &&
+		lhs.spawnID == rhs.spawnID;
 }
 
 // * Needed by FillSingleDiff for handling Snapshot::signs.
-bool operator ==(const std::vector<sign> &lhs, const std::vector<sign> &rhs)
+bool operator==(const std::vector<sign> &lhs, const std::vector<sign> &rhs)
 {
 	if (lhs.size() != rhs.size())
 	{
@@ -106,10 +100,7 @@ bool operator ==(const std::vector<sign> &lhs, const std::vector<sign> &rhs)
 	}
 	for (auto i = 0U; i < lhs.size(); ++i)
 	{
-		if (!(lhs[i].x    == rhs[i].x    &&
-		      lhs[i].y    == rhs[i].y    &&
-		      lhs[i].ju   == rhs[i].ju   &&
-		      lhs[i].text == rhs[i].text))
+		if (!(lhs[i].x == rhs[i].x && lhs[i].y == rhs[i].y && lhs[i].ju == rhs[i].ju && lhs[i].text == rhs[i].text))
 		{
 			return false;
 		}
@@ -154,7 +145,9 @@ void FillHunkVectorPtr(const Item *oldItems, const Item *newItems, SnapshotDelta
 }
 
 template<class Item>
-void FillHunkVector(const std::vector<Item> &oldItems, const std::vector<Item> &newItems, SnapshotDelta::HunkVector<Item> &out)
+void FillHunkVector(
+	const std::vector<Item> &oldItems, const std::vector<Item> &newItems, SnapshotDelta::HunkVector<Item> &out
+)
 {
 	FillHunkVectorPtr<Item>(oldItems.data(), newItems.data(), out, std::min(oldItems.size(), newItems.size()));
 }
@@ -203,30 +196,45 @@ std::unique_ptr<SnapshotDelta> SnapshotDelta::FromSnapshots(const Snapshot &oldS
 {
 	auto ptr = std::make_unique<SnapshotDelta>();
 	auto &delta = *ptr;
-	FillHunkVector(oldSnap.AirPressure    , newSnap.AirPressure    , delta.AirPressure    );
-	FillHunkVector(oldSnap.AirVelocityX   , newSnap.AirVelocityX   , delta.AirVelocityX   );
-	FillHunkVector(oldSnap.AirVelocityY   , newSnap.AirVelocityY   , delta.AirVelocityY   );
-	FillHunkVector(oldSnap.AmbientHeat    , newSnap.AmbientHeat    , delta.AmbientHeat    );
-	FillHunkVector(oldSnap.GravMass       , newSnap.GravMass       , delta.GravMass       );
-	FillHunkVector(oldSnap.GravForceX     , newSnap.GravForceX     , delta.GravForceX     );
-	FillHunkVector(oldSnap.GravForceY     , newSnap.GravForceY     , delta.GravForceY     );
-	FillHunkVector(oldSnap.BlockMap       , newSnap.BlockMap       , delta.BlockMap       );
-	FillHunkVector(oldSnap.ElecMap        , newSnap.ElecMap        , delta.ElecMap        );
-	FillHunkVector(oldSnap.BlockAir       , newSnap.BlockAir       , delta.BlockAir       );
-	FillHunkVector(oldSnap.BlockAirH      , newSnap.BlockAirH      , delta.BlockAirH      );
-	FillHunkVector(oldSnap.FanVelocityX   , newSnap.FanVelocityX   , delta.FanVelocityX   );
-	FillHunkVector(oldSnap.FanVelocityY   , newSnap.FanVelocityY   , delta.FanVelocityY   );
-	FillHunkVector(oldSnap.WirelessData   , newSnap.WirelessData   , delta.WirelessData   );
-	FillSingleDiff(oldSnap.signs          , newSnap.signs          , delta.signs          );
-	FillSingleDiff(oldSnap.Authors        , newSnap.Authors        , delta.Authors        );
-	FillSingleDiff(oldSnap.FrameCount     , newSnap.FrameCount     , delta.FrameCount     );
-	FillSingleDiff(oldSnap.RngState       , newSnap.RngState       , delta.RngState       );
-	FillHunkVectorPtr(reinterpret_cast<const uint32_t *>(oldSnap.PortalParticles.data()), reinterpret_cast<const uint32_t *>(newSnap.PortalParticles.data()), delta.PortalParticles, newSnap.PortalParticles.size() * ParticleUint32Count);
-	FillHunkVectorPtr(reinterpret_cast<const uint32_t *>(oldSnap.stickmen.data())       , reinterpret_cast<const uint32_t *>(newSnap.stickmen.data()       ), delta.stickmen       , newSnap.stickmen       .size() * playerstUint32Count);
+	FillHunkVector(oldSnap.AirPressure, newSnap.AirPressure, delta.AirPressure);
+	FillHunkVector(oldSnap.AirVelocityX, newSnap.AirVelocityX, delta.AirVelocityX);
+	FillHunkVector(oldSnap.AirVelocityY, newSnap.AirVelocityY, delta.AirVelocityY);
+	FillHunkVector(oldSnap.AmbientHeat, newSnap.AmbientHeat, delta.AmbientHeat);
+	FillHunkVector(oldSnap.GravMass, newSnap.GravMass, delta.GravMass);
+	FillHunkVector(oldSnap.GravForceX, newSnap.GravForceX, delta.GravForceX);
+	FillHunkVector(oldSnap.GravForceY, newSnap.GravForceY, delta.GravForceY);
+	FillHunkVector(oldSnap.BlockMap, newSnap.BlockMap, delta.BlockMap);
+	FillHunkVector(oldSnap.ElecMap, newSnap.ElecMap, delta.ElecMap);
+	FillHunkVector(oldSnap.BlockAir, newSnap.BlockAir, delta.BlockAir);
+	FillHunkVector(oldSnap.BlockAirH, newSnap.BlockAirH, delta.BlockAirH);
+	FillHunkVector(oldSnap.FanVelocityX, newSnap.FanVelocityX, delta.FanVelocityX);
+	FillHunkVector(oldSnap.FanVelocityY, newSnap.FanVelocityY, delta.FanVelocityY);
+	FillHunkVector(oldSnap.WirelessData, newSnap.WirelessData, delta.WirelessData);
+	FillSingleDiff(oldSnap.signs, newSnap.signs, delta.signs);
+	FillSingleDiff(oldSnap.Authors, newSnap.Authors, delta.Authors);
+	FillSingleDiff(oldSnap.FrameCount, newSnap.FrameCount, delta.FrameCount);
+	FillSingleDiff(oldSnap.RngState, newSnap.RngState, delta.RngState);
+	FillHunkVectorPtr(
+		reinterpret_cast<const uint32_t *>(oldSnap.PortalParticles.data()),
+		reinterpret_cast<const uint32_t *>(newSnap.PortalParticles.data()),
+		delta.PortalParticles,
+		newSnap.PortalParticles.size() * ParticleUint32Count
+	);
+	FillHunkVectorPtr(
+		reinterpret_cast<const uint32_t *>(oldSnap.stickmen.data()),
+		reinterpret_cast<const uint32_t *>(newSnap.stickmen.data()),
+		delta.stickmen,
+		newSnap.stickmen.size() * playerstUint32Count
+	);
 
 	// * Slightly more interesting; this will only diff the common parts, the rest is copied separately.
 	auto commonSize = std::min(oldSnap.Particles.size(), newSnap.Particles.size());
-	FillHunkVectorPtr(reinterpret_cast<const uint32_t *>(oldSnap.Particles.data()), reinterpret_cast<const uint32_t *>(newSnap.Particles.data()), delta.commonParticles, commonSize * ParticleUint32Count);
+	FillHunkVectorPtr(
+		reinterpret_cast<const uint32_t *>(oldSnap.Particles.data()),
+		reinterpret_cast<const uint32_t *>(newSnap.Particles.data()),
+		delta.commonParticles,
+		commonSize * ParticleUint32Count
+	);
 	delta.extraPartsOld.resize(oldSnap.Particles.size() - commonSize);
 	std::copy(oldSnap.Particles.begin() + commonSize, oldSnap.Particles.end(), delta.extraPartsOld.begin());
 	delta.extraPartsNew.resize(newSnap.Particles.size() - commonSize);
@@ -239,26 +247,26 @@ std::unique_ptr<Snapshot> SnapshotDelta::Forward(const Snapshot &oldSnap)
 {
 	auto ptr = std::make_unique<Snapshot>(oldSnap);
 	auto &newSnap = *ptr;
-	ApplyHunkVector<false>(AirPressure    , newSnap.AirPressure    );
-	ApplyHunkVector<false>(AirVelocityX   , newSnap.AirVelocityX   );
-	ApplyHunkVector<false>(AirVelocityY   , newSnap.AirVelocityY   );
-	ApplyHunkVector<false>(AmbientHeat    , newSnap.AmbientHeat    );
-	ApplyHunkVector<false>(GravMass       , newSnap.GravMass       );
-	ApplyHunkVector<false>(GravForceX     , newSnap.GravForceX     );
-	ApplyHunkVector<false>(GravForceY     , newSnap.GravForceY     );
-	ApplyHunkVector<false>(BlockMap       , newSnap.BlockMap       );
-	ApplyHunkVector<false>(ElecMap        , newSnap.ElecMap        );
-	ApplyHunkVector<false>(BlockAir       , newSnap.BlockAir       );
-	ApplyHunkVector<false>(BlockAirH      , newSnap.BlockAirH      );
-	ApplyHunkVector<false>(FanVelocityX   , newSnap.FanVelocityX   );
-	ApplyHunkVector<false>(FanVelocityY   , newSnap.FanVelocityY   );
-	ApplyHunkVector<false>(WirelessData   , newSnap.WirelessData   );
-	ApplySingleDiff<false>(signs          , newSnap.signs          );
-	ApplySingleDiff<false>(Authors        , newSnap.Authors        );
-	ApplySingleDiff<false>(FrameCount     , newSnap.FrameCount     );
-	ApplySingleDiff<false>(RngState       , newSnap.RngState       );
+	ApplyHunkVector<false>(AirPressure, newSnap.AirPressure);
+	ApplyHunkVector<false>(AirVelocityX, newSnap.AirVelocityX);
+	ApplyHunkVector<false>(AirVelocityY, newSnap.AirVelocityY);
+	ApplyHunkVector<false>(AmbientHeat, newSnap.AmbientHeat);
+	ApplyHunkVector<false>(GravMass, newSnap.GravMass);
+	ApplyHunkVector<false>(GravForceX, newSnap.GravForceX);
+	ApplyHunkVector<false>(GravForceY, newSnap.GravForceY);
+	ApplyHunkVector<false>(BlockMap, newSnap.BlockMap);
+	ApplyHunkVector<false>(ElecMap, newSnap.ElecMap);
+	ApplyHunkVector<false>(BlockAir, newSnap.BlockAir);
+	ApplyHunkVector<false>(BlockAirH, newSnap.BlockAirH);
+	ApplyHunkVector<false>(FanVelocityX, newSnap.FanVelocityX);
+	ApplyHunkVector<false>(FanVelocityY, newSnap.FanVelocityY);
+	ApplyHunkVector<false>(WirelessData, newSnap.WirelessData);
+	ApplySingleDiff<false>(signs, newSnap.signs);
+	ApplySingleDiff<false>(Authors, newSnap.Authors);
+	ApplySingleDiff<false>(FrameCount, newSnap.FrameCount);
+	ApplySingleDiff<false>(RngState, newSnap.RngState);
 	ApplyHunkVectorPtr<false>(PortalParticles, reinterpret_cast<uint32_t *>(newSnap.PortalParticles.data()));
-	ApplyHunkVectorPtr<false>(stickmen       , reinterpret_cast<uint32_t *>(newSnap.stickmen.data()       ));
+	ApplyHunkVectorPtr<false>(stickmen, reinterpret_cast<uint32_t *>(newSnap.stickmen.data()));
 
 	// * Slightly more interesting; apply the common hunk vector, copy the extra portion separaterly.
 	ApplyHunkVectorPtr<false>(commonParticles, reinterpret_cast<uint32_t *>(newSnap.Particles.data()));
@@ -273,26 +281,26 @@ std::unique_ptr<Snapshot> SnapshotDelta::Restore(const Snapshot &newSnap)
 {
 	auto ptr = std::make_unique<Snapshot>(newSnap);
 	auto &oldSnap = *ptr;
-	ApplyHunkVector<true>(AirPressure    , oldSnap.AirPressure    );
-	ApplyHunkVector<true>(AirVelocityX   , oldSnap.AirVelocityX   );
-	ApplyHunkVector<true>(AirVelocityY   , oldSnap.AirVelocityY   );
-	ApplyHunkVector<true>(AmbientHeat    , oldSnap.AmbientHeat    );
-	ApplyHunkVector<true>(GravMass       , oldSnap.GravMass       );
-	ApplyHunkVector<true>(GravForceX     , oldSnap.GravForceX     );
-	ApplyHunkVector<true>(GravForceY     , oldSnap.GravForceY     );
-	ApplyHunkVector<true>(BlockMap       , oldSnap.BlockMap       );
-	ApplyHunkVector<true>(ElecMap        , oldSnap.ElecMap        );
-	ApplyHunkVector<true>(BlockAir       , oldSnap.BlockAir       );
-	ApplyHunkVector<true>(BlockAirH      , oldSnap.BlockAirH      );
-	ApplyHunkVector<true>(FanVelocityX   , oldSnap.FanVelocityX   );
-	ApplyHunkVector<true>(FanVelocityY   , oldSnap.FanVelocityY   );
-	ApplyHunkVector<true>(WirelessData   , oldSnap.WirelessData   );
-	ApplySingleDiff<true>(signs          , oldSnap.signs          );
-	ApplySingleDiff<true>(Authors        , oldSnap.Authors        );
-	ApplySingleDiff<true>(FrameCount     , oldSnap.FrameCount     );
-	ApplySingleDiff<true>(RngState       , oldSnap.RngState       );
+	ApplyHunkVector<true>(AirPressure, oldSnap.AirPressure);
+	ApplyHunkVector<true>(AirVelocityX, oldSnap.AirVelocityX);
+	ApplyHunkVector<true>(AirVelocityY, oldSnap.AirVelocityY);
+	ApplyHunkVector<true>(AmbientHeat, oldSnap.AmbientHeat);
+	ApplyHunkVector<true>(GravMass, oldSnap.GravMass);
+	ApplyHunkVector<true>(GravForceX, oldSnap.GravForceX);
+	ApplyHunkVector<true>(GravForceY, oldSnap.GravForceY);
+	ApplyHunkVector<true>(BlockMap, oldSnap.BlockMap);
+	ApplyHunkVector<true>(ElecMap, oldSnap.ElecMap);
+	ApplyHunkVector<true>(BlockAir, oldSnap.BlockAir);
+	ApplyHunkVector<true>(BlockAirH, oldSnap.BlockAirH);
+	ApplyHunkVector<true>(FanVelocityX, oldSnap.FanVelocityX);
+	ApplyHunkVector<true>(FanVelocityY, oldSnap.FanVelocityY);
+	ApplyHunkVector<true>(WirelessData, oldSnap.WirelessData);
+	ApplySingleDiff<true>(signs, oldSnap.signs);
+	ApplySingleDiff<true>(Authors, oldSnap.Authors);
+	ApplySingleDiff<true>(FrameCount, oldSnap.FrameCount);
+	ApplySingleDiff<true>(RngState, oldSnap.RngState);
 	ApplyHunkVectorPtr<true>(PortalParticles, reinterpret_cast<uint32_t *>(oldSnap.PortalParticles.data()));
-	ApplyHunkVectorPtr<true>(stickmen       , reinterpret_cast<uint32_t *>(oldSnap.stickmen.data()       ));
+	ApplyHunkVectorPtr<true>(stickmen, reinterpret_cast<uint32_t *>(oldSnap.stickmen.data()));
 
 	// * Slightly more interesting; apply the common hunk vector, copy the extra portion separaterly.
 	ApplyHunkVectorPtr<true>(commonParticles, reinterpret_cast<uint32_t *>(oldSnap.Particles.data()));

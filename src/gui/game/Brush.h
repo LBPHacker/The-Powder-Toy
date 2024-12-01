@@ -1,10 +1,11 @@
 #pragma once
-#include "gui/interface/Point.h"
 #include "common/Plane.h"
+#include "gui/interface/Point.h"
 #include <memory>
 #include <vector>
 
 class Graphics;
+
 class Brush
 {
 private:
@@ -17,7 +18,7 @@ private:
 
 	struct iterator
 	{
-		Brush const &parent;
+		const Brush &parent;
 		int x, y;
 
 		iterator &operator++()
@@ -30,7 +31,8 @@ private:
 					--y;
 					x = -radius.X;
 				}
-			} while (y >= -radius.Y && !parent.bitmap[radius + Vec2<int>{ x, y }]);
+			}
+			while (y >= -radius.Y && !parent.bitmap[radius + Vec2<int>{ x, y }]);
 			return *this;
 		}
 
@@ -74,12 +76,12 @@ public:
 	iterator begin() const
 	{
 		// bottom to top is the preferred order for Simulation::CreateParts
-		return ++iterator{*this, radius.X, radius.Y + 1};
+		return ++iterator{ *this, radius.X, radius.Y + 1 };
 	}
 
 	iterator end() const
 	{
-		return iterator{*this, -radius.X, -radius.Y - 1};
+		return iterator{ *this, -radius.X, -radius.Y - 1 };
 	}
 
 	void RenderRect(Graphics *g, ui::Point position1, ui::Point position2) const;

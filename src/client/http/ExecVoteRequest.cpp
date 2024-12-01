@@ -1,23 +1,23 @@
 #include "ExecVoteRequest.h"
-#include "client/Client.h"
 #include "Config.h"
+#include "client/Client.h"
 
 namespace http
 {
-	ExecVoteRequest::ExecVoteRequest(int saveID, int newDirection) :
-		APIRequest(ByteString::Build(SERVER, "/Vote.api"), authRequire, false),
-		direction(newDirection)
-	{
-		AddPostData(FormData{
-			{ "ID", ByteString::Build(saveID) },
-			{ "Action", direction ? (direction == 1 ? "Up" : "Down") : "Reset" },
-			{ "Key", Client::Ref().GetAuthUser().SessionKey },
-		});
-	}
+ExecVoteRequest::ExecVoteRequest(int saveID, int newDirection) :
+	APIRequest(ByteString::Build(SERVER, "/Vote.api"), authRequire, false),
+	direction(newDirection)
+{
+	AddPostData(FormData{
+		{     "ID",							  ByteString::Build(saveID) },
+		{ "Action", direction ? (direction == 1 ? "Up" : "Down") : "Reset" },
+		{    "Key",				 Client::Ref().GetAuthUser().SessionKey },
+	});
+}
 
-	void ExecVoteRequest::Finish()
-	{
-		auto [ status, data ] = Request::Finish();
-		ParseResponse(data, status, responseOk);
-	}
+void ExecVoteRequest::Finish()
+{
+	auto [status, data] = Request::Finish();
+	ParseResponse(data, status, responseOk);
+}
 }

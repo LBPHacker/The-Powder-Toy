@@ -1,12 +1,11 @@
+#include "Graphics.h"
+#include "RasterDrawMethodsImpl.h"
+#include "SimulationConfig.h"
 #include <cstdlib>
 #include <cstring>
-#include "Graphics.h"
-#include "SimulationConfig.h"
-#include "RasterDrawMethodsImpl.h"
 
 void Graphics::Finalise()
 {
-
 }
 
 template struct RasterDrawMethods<Graphics>;

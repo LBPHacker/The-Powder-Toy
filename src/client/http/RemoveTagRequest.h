@@ -4,11 +4,11 @@
 
 namespace http
 {
-	class RemoveTagRequest : public APIRequest
-	{
-	public:
-		RemoveTagRequest(int saveID, ByteString tag);
+class RemoveTagRequest : public APIRequest
+{
+public:
+	RemoveTagRequest(int saveID, ByteString tag);
 
-		std::list<ByteString> Finish();
-	};
+	std::list<ByteString> Finish();
+};
 }

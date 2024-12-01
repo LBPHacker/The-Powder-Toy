@@ -19,7 +19,7 @@ void Element::Element_LIFE()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -33,7 +33,7 @@ void Element::Element_LIFE()
 	HeatConduct = 40;
 	Description = "Game Of Life! B3/S23";
 
-	Properties = TYPE_SOLID|PROP_LIFE;
+	Properties = TYPE_SOLID | PROP_LIFE;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -81,9 +81,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		else
 		{
 			auto mul = (cpart->tmp2 - 1) / float(states - 2);
-			*colr = int(colour1.Red   * mul + colour2.Red   * (1.f - mul));
+			*colr = int(colour1.Red * mul + colour2.Red * (1.f - mul));
 			*colg = int(colour1.Green * mul + colour2.Green * (1.f - mul));
-			*colb = int(colour1.Blue  * mul + colour2.Blue  * (1.f - mul));
+			*colb = int(colour1.Blue * mul + colour2.Blue * (1.f - mul));
 		}
 	}
 	*pixel_mode |= NO_DECO;
@@ -95,7 +95,9 @@ static void create(ELEMENT_CREATE_FUNC_ARGS)
 	auto &sd = SimulationData::CRef();
 	auto &builtinGol = sd.builtinGol;
 	if (v == -1)
+	{
 		v = 0;
+	}
 	// * 0x200000: No need to look for colours, they'll be set later anyway.
 	bool skipLookup = v & 0x200000;
 	v &= 0x1FFFFF;

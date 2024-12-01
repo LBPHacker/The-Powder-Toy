@@ -1,10 +1,10 @@
 #include "AccessProperty.h"
-#include "simulation/ElementClasses.h"
-#include "simulation/GOLString.h"
-#include "simulation/SimulationData.h"
 #include "Config.h"
 #include "Format.h"
 #include "gui/game/GameController.h"
+#include "simulation/ElementClasses.h"
+#include "simulation/GOLString.h"
+#include "simulation/SimulationData.h"
 #include <iostream>
 
 AccessProperty AccessProperty::Parse(int prop, String value)
@@ -20,20 +20,20 @@ AccessProperty AccessProperty::Parse(int prop, String value)
 	value = value.ToUpper();
 	try
 	{
-		switch(properties[prop].Type)
+		switch (properties[prop].Type)
 		{
 		case StructProperty::Integer:
 		case StructProperty::ParticleType:
 		{
 			int v;
-			if(value.length() > 2 && value.BeginsWith("0X"))
+			if (value.length() > 2 && value.BeginsWith("0X"))
 			{
-				//0xC0FFEE
+				// 0xC0FFEE
 				v = value.Substr(2).ToNumber<unsigned int>(Format::Hex());
 			}
-			else if(value.length() > 1 && value.BeginsWith("#"))
+			else if (value.length() > 1 && value.BeginsWith("#"))
 			{
-				//#C0FFEE
+				// #C0FFEE
 				v = value.Substr(1).ToNumber<unsigned int>(Format::Hex());
 			}
 			else
@@ -52,6 +52,7 @@ AccessProperty AccessProperty::Parse(int prop, String value)
 							class InvalidGOLString : public std::exception
 							{
 							};
+
 							throw InvalidGOLString();
 						}
 					}
@@ -106,14 +107,14 @@ AccessProperty AccessProperty::Parse(int prop, String value)
 		case StructProperty::UInteger:
 		{
 			unsigned int v;
-			if(value.length() > 2 && value.BeginsWith("0X"))
+			if (value.length() > 2 && value.BeginsWith("0X"))
 			{
-				//0xC0FFEE
+				// 0xC0FFEE
 				v = value.Substr(2).ToNumber<unsigned int>(Format::Hex());
 			}
-			else if(value.length() > 1 && value.BeginsWith("#"))
+			else if (value.length() > 1 && value.BeginsWith("#"))
 			{
-				//#C0FFEE
+				// #C0FFEE
 				v = value.Substr(1).ToNumber<unsigned int>(Format::Hex());
 			}
 			else
@@ -130,17 +131,22 @@ AccessProperty AccessProperty::Parse(int prop, String value)
 		case StructProperty::Float:
 		{
 			if (properties[prop].Name == "temp")
-				changeProperty.propertyValue = format::StringToTemperature(value, GameController::Ref().GetTemperatureScale());
+			{
+				changeProperty.propertyValue =
+					format::StringToTemperature(value, GameController::Ref().GetTemperatureScale());
+			}
 			else
+			{
 				changeProperty.propertyValue = value.ToNumber<float>();
+			}
 		}
-			break;
+		break;
 		default:
 			throw ParseError("invalid property value");
 		}
 		changeProperty.propertyIndex = prop;
 	}
-	catch (const std::exception& ex)
+	catch (const std::exception &ex)
 	{
 		throw ParseError("invalid property value");
 	}

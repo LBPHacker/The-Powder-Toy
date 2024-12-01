@@ -19,7 +19,7 @@ void Element::Element_SPAWN2()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -57,11 +57,15 @@ static void changeType(ELEMENT_CHANGETYPE_FUNC_ARGS)
 	if (to == PT_SPAWN2)
 	{
 		if (sim->player2.spawnID == -1)
+		{
 			sim->player2.spawnID = i;
+		}
 	}
 	else
 	{
 		if (sim->player2.spawnID == i)
+		{
 			sim->player2.spawnID = -1;
+		}
 	}
 }

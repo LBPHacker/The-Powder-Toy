@@ -4,11 +4,11 @@
 
 namespace http
 {
-	class GetUserInfoRequest : public APIRequest
-	{
-	public:
-		GetUserInfoRequest(ByteString username);
+class GetUserInfoRequest : public APIRequest
+{
+public:
+	GetUserInfoRequest(ByteString username);
 
-		UserInfo Finish();
-	};
+	UserInfo Finish();
+};
 }

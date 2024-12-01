@@ -18,7 +18,7 @@ void Element::Element_TESC()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -31,7 +31,7 @@ void Element::Element_TESC()
 	HeatConduct = 251;
 	Description = "Tesla coil! Creates lightning when sparked.";
 
-	Properties = TYPE_SOLID|PROP_CONDUCTS|PROP_LIFE_DEC|PROP_HOT_GLOW;
+	Properties = TYPE_SOLID | PROP_CONDUCTS | PROP_LIFE_DEC | PROP_HOT_GLOW;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -51,6 +51,8 @@ static void create(ELEMENT_CREATE_FUNC_ARGS)
 	{
 		sim->parts[i].tmp = v;
 		if (sim->parts[i].tmp > 300)
+		{
 			sim->parts[i].tmp = 300;
+		}
 	}
 }

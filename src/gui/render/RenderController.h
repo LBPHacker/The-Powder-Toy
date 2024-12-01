@@ -1,22 +1,31 @@
 #pragma once
-#include <functional>
 #include <cstdint>
+#include <functional>
 
 class RenderView;
 class RenderModel;
 class Renderer;
 struct RendererSettings;
 class Simulation;
+
 class RenderController
 {
-	RenderView * renderView;
-	RenderModel * renderModel;
-	std::function<void ()> onDone;
+	RenderView *renderView;
+	RenderModel *renderModel;
+	std::function<void()> onDone;
+
 public:
 	bool HasExited;
-	RenderController(Simulation *sim, Renderer * ren, RendererSettings *rendererSettings, std::function<void ()> onDone = nullptr);
+	RenderController(
+		Simulation *sim, Renderer *ren, RendererSettings *rendererSettings, std::function<void()> onDone = nullptr
+	);
 	void Exit();
-	RenderView * GetView() { return renderView; }
+
+	RenderView *GetView()
+	{
+		return renderView;
+	}
+
 	virtual ~RenderController();
 	void SetRenderMode(uint32_t newRenderMode);
 	uint32_t GetRenderMode();

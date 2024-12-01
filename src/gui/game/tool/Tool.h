@@ -4,8 +4,8 @@
 #include "graphics/Pixel.h"
 #include "graphics/VideoBuffer.h"
 #include "gui/interface/Point.h"
-#include "simulation/StructProperty.h"
 #include "simulation/MenuSection.h"
+#include "simulation/StructProperty.h"
 #include <memory>
 #include <optional>
 
@@ -33,9 +33,15 @@ public:
 
 	Tool() = default;
 
-	Tool(int id, String name, String description,
-		RGB<uint8_t> colour, ByteString identifier, std::unique_ptr<VideoBuffer> (*textureGen)(int, Vec2<int>) = NULL, bool blocky = false
-	):
+	Tool(
+		int id,
+		String name,
+		String description,
+		RGB<uint8_t> colour,
+		ByteString identifier,
+		std::unique_ptr<VideoBuffer> (*textureGen)(int, Vec2<int>) = NULL,
+		bool blocky = false
+	) :
 		textureGen(textureGen),
 		ToolID(id),
 		Name(name),
@@ -43,20 +49,25 @@ public:
 		Identifier(identifier),
 		Colour(colour),
 		Blocky(blocky)
-	{}
+	{
+	}
 
-	Tool(int id, ByteString identifier) : ToolID(id), Identifier(identifier)
-	{}
+	Tool(int id, ByteString identifier) :
+		ToolID(id),
+		Identifier(identifier)
+	{
+	}
 
 	virtual ~Tool()
-	{}
+	{
+	}
 
 	std::unique_ptr<VideoBuffer> GetTexture(Vec2<int>);
-	virtual void Click(Simulation * sim, Brush const &brush, ui::Point position);
-	virtual void Draw(Simulation * sim, Brush const &brush, ui::Point position);
-	virtual void DrawLine(Simulation * sim, Brush const &brush, ui::Point position1, ui::Point position2, bool dragging);
-	virtual void DrawRect(Simulation * sim, Brush const &brush, ui::Point position1, ui::Point position2);
-	virtual void DrawFill(Simulation * sim, Brush const &brush, ui::Point position);
+	virtual void Click(Simulation *sim, const Brush &brush, ui::Point position);
+	virtual void Draw(Simulation *sim, const Brush &brush, ui::Point position);
+	virtual void DrawLine(Simulation *sim, const Brush &brush, ui::Point position1, ui::Point position2, bool dragging);
+	virtual void DrawRect(Simulation *sim, const Brush &brush, ui::Point position1, ui::Point position2);
+	virtual void DrawFill(Simulation *sim, const Brush &brush, ui::Point position);
 
 	virtual void Drag(Simulation *sim, const Brush &brush, ui::Point position1, ui::Point position2)
 	{

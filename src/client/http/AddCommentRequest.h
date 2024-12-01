@@ -3,11 +3,11 @@
 
 namespace http
 {
-	class AddCommentRequest : public APIRequest
-	{
-	public:
-		AddCommentRequest(int saveID, String comment);
+class AddCommentRequest : public APIRequest
+{
+public:
+	AddCommentRequest(int saveID, String comment);
 
-		void Finish();
-	};
+	void Finish();
+};
 }

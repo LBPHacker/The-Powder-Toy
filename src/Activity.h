@@ -4,13 +4,24 @@
 class Activity
 {
 public:
-	virtual void Exit() {}
-	virtual void Show() {}
-	virtual void Hide() {}
-	virtual ~Activity() {}
+	virtual void Exit()
+	{
+	}
+
+	virtual void Show()
+	{
+	}
+
+	virtual void Hide()
+	{
+	}
+
+	virtual ~Activity()
+	{
+	}
 };
 
-class WindowActivity: public ui::Window, public Activity
+class WindowActivity : public ui::Window, public Activity
 {
 public:
 	WindowActivity(ui::Point position, ui::Point size) :
@@ -18,18 +29,24 @@ public:
 	{
 		Show();
 	}
+
 	void Exit() override
 	{
 		Hide();
 		SelfDestruct();
 	}
+
 	void Show() override
 	{
 		MakeActiveWindow();
 	}
+
 	void Hide() override
 	{
 		CloseActiveWindow();
 	}
-	virtual ~WindowActivity() {}
+
+	virtual ~WindowActivity()
+	{
+	}
 };

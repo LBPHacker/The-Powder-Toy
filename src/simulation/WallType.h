@@ -1,8 +1,8 @@
 #pragma once
-#include <memory>
 #include "common/String.h"
 #include "common/Vec2.h"
 #include "graphics/Pixel.h"
+#include <memory>
 class VideoBuffer;
 
 struct wall_type

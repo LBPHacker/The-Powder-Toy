@@ -19,7 +19,7 @@ void Element::Element_ANAR()
 	Gravity = -0.1f;
 	NewtonianGravity = -1.f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;
@@ -54,15 +54,17 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
-					continue;
-				if (TYP(r)==PT_CFLM && sim->rng.chance(1, 4))
 				{
-					sim->part_change_type(i,x,y,PT_CFLM);
+					continue;
+				}
+				if (TYP(r) == PT_CFLM && sim->rng.chance(1, 4))
+				{
+					sim->part_change_type(i, x, y, PT_CFLM);
 					parts[i].life = sim->rng.between(50, 199);
 					parts[ID(r)].temp = parts[i].temp = 0;
-					sim->pv[y/CELL][x/CELL] -= 0.5;
+					sim->pv[y / CELL][x / CELL] -= 0.5;
 				}
 			}
 		}

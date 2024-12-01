@@ -60,7 +60,9 @@ static int ffree(lua_State *L)
 	return 0;
 }
 
-static int luaPerformWrapper(SimTool *tool, Simulation *sim, Particle *cpart, int x, int y, int brushX, int brushY, float strength)
+static int luaPerformWrapper(
+	SimTool *tool, Simulation *sim, Particle *cpart, int x, int y, int brushX, int brushY, float strength
+)
 {
 	int ok = 0;
 	auto *lsi = GetLSI();
@@ -177,7 +179,9 @@ static void luaDrawWrapper(SimTool *tool, Simulation *sim, const Brush &brush, u
 	}
 }
 
-static void luaDrawLineWrapper(SimTool *tool, Simulation *sim, const Brush &brush, ui::Point position1, ui::Point position2, bool dragging)
+static void luaDrawLineWrapper(
+	SimTool *tool, Simulation *sim, const Brush &brush, ui::Point position1, ui::Point position2, bool dragging
+)
 {
 	auto *lsi = GetLSI();
 	auto L = lsi->L;
@@ -203,7 +207,8 @@ static void luaDrawLineWrapper(SimTool *tool, Simulation *sim, const Brush &brus
 	}
 }
 
-static void luaDrawRectWrapper(SimTool *tool, Simulation *sim, const Brush &brush, ui::Point position1, ui::Point position2)
+static void
+	luaDrawRectWrapper(SimTool *tool, Simulation *sim, const Brush &brush, ui::Point position1, ui::Point position2)
 {
 	auto *lsi = GetLSI();
 	auto L = lsi->L;
@@ -271,7 +276,7 @@ static void luaSelectWrapper(SimTool *tool, int toolSelection)
 	}
 }
 
-template <typename T>
+template<typename T>
 struct DependentFalse : std::false_type
 {
 };
@@ -287,11 +292,8 @@ static int property(lua_State *L)
 	}
 	ByteString propertyName = tpt_lua_checkByteString(L, 2);
 	auto handleCallback = [lsi, L, index, tool, &propertyName](
-		auto customToolMember,
-		auto simToolMember,
-		auto wrapper,
-		const char *luaPropertyName
-	) {
+							  auto customToolMember, auto simToolMember, auto wrapper, const char *luaPropertyName
+						  ) {
 		if (propertyName == luaPropertyName)
 		{
 			if (lua_gettop(L) > 2)
@@ -316,30 +318,47 @@ static int property(lua_State *L)
 		}
 		return false;
 	};
-	if (handleCallback(&CustomTool::perform , &SimTool::Perform        , luaPerformWrapper , "Perform" ) ||
-	    handleCallback(&CustomTool::click   , &SimTool::PerformClick   , luaClickWrapper   , "Click"   ) ||
-	    handleCallback(&CustomTool::drag    , &SimTool::PerformDrag    , luaDragWrapper    , "Drag"    ) ||
-	    handleCallback(&CustomTool::draw    , &SimTool::PerformDraw    , luaDrawWrapper    , "Draw"    ) ||
+	if (handleCallback(&CustomTool::perform, &SimTool::Perform, luaPerformWrapper, "Perform") ||
+	    handleCallback(&CustomTool::click, &SimTool::PerformClick, luaClickWrapper, "Click") ||
+	    handleCallback(&CustomTool::drag, &SimTool::PerformDrag, luaDragWrapper, "Drag") ||
+	    handleCallback(&CustomTool::draw, &SimTool::PerformDraw, luaDrawWrapper, "Draw") ||
 	    handleCallback(&CustomTool::drawLine, &SimTool::PerformDrawLine, luaDrawLineWrapper, "DrawLine") ||
 	    handleCallback(&CustomTool::drawRect, &SimTool::PerformDrawRect, luaDrawRectWrapper, "DrawRect") ||
 	    handleCallback(&CustomTool::drawFill, &SimTool::PerformDrawFill, luaDrawFillWrapper, "DrawFill") ||
-	    handleCallback(&CustomTool::select  , &SimTool::PerformSelect  , luaSelectWrapper  , "Select"  ))
+	    handleCallback(&CustomTool::select, &SimTool::PerformSelect, luaSelectWrapper, "Select"))
 	{
 		return 0;
 	}
 	int returnValueCount = 0;
-	auto handleProperty = [L, lsi, tool, &propertyName, &returnValueCount](auto simToolMember, const char *luaPropertyName, bool buildMenusIfChanged) {
+	auto handleProperty = [L, lsi, tool, &propertyName, &returnValueCount](
+							  auto simToolMember, const char *luaPropertyName, bool buildMenusIfChanged
+						  ) {
 		if (propertyName == luaPropertyName)
 		{
 			auto &thing = tool->*simToolMember;
 			using PropertyType = std::remove_reference_t<decltype(thing)>;
 			if (lua_gettop(L) > 2)
 			{
-				if      constexpr (std::is_same_v<PropertyType, String      >) thing = tpt_lua_checkString(L, 3);
-				else if constexpr (std::is_same_v<PropertyType, bool        >) thing = lua_toboolean(L, 3);
-				else if constexpr (std::is_same_v<PropertyType, int         >) thing = luaL_checkinteger(L, 3);
-				else if constexpr (std::is_same_v<PropertyType, RGB<uint8_t>>) thing = RGB<uint8_t>::Unpack(luaL_checkinteger(L, 3));
-				else static_assert(DependentFalse<PropertyType>::value);
+				if constexpr (std::is_same_v<PropertyType, String>)
+				{
+					thing = tpt_lua_checkString(L, 3);
+				}
+				else if constexpr (std::is_same_v<PropertyType, bool>)
+				{
+					thing = lua_toboolean(L, 3);
+				}
+				else if constexpr (std::is_same_v<PropertyType, int>)
+				{
+					thing = luaL_checkinteger(L, 3);
+				}
+				else if constexpr (std::is_same_v<PropertyType, RGB<uint8_t>>)
+				{
+					thing = RGB<uint8_t>::Unpack(luaL_checkinteger(L, 3));
+				}
+				else
+				{
+					static_assert(DependentFalse<PropertyType>::value);
+				}
 				if (buildMenusIfChanged)
 				{
 					lsi->gameModel->BuildMenus();
@@ -347,23 +366,36 @@ static int property(lua_State *L)
 			}
 			else
 			{
-				if      constexpr (std::is_same_v<PropertyType, String      >) tpt_lua_pushString(L, thing);
-				else if constexpr (std::is_same_v<PropertyType, bool        >) lua_pushboolean(L, thing);
-				else if constexpr (std::is_same_v<PropertyType, int         >) lua_pushinteger(L, thing);
-				else if constexpr (std::is_same_v<PropertyType, RGB<uint8_t>>) lua_pushinteger(L, thing.Pack());
-				else static_assert(DependentFalse<PropertyType>::value);
+				if constexpr (std::is_same_v<PropertyType, String>)
+				{
+					tpt_lua_pushString(L, thing);
+				}
+				else if constexpr (std::is_same_v<PropertyType, bool>)
+				{
+					lua_pushboolean(L, thing);
+				}
+				else if constexpr (std::is_same_v<PropertyType, int>)
+				{
+					lua_pushinteger(L, thing);
+				}
+				else if constexpr (std::is_same_v<PropertyType, RGB<uint8_t>>)
+				{
+					lua_pushinteger(L, thing.Pack());
+				}
+				else
+				{
+					static_assert(DependentFalse<PropertyType>::value);
+				}
 				returnValueCount = 1;
 			}
 			return true;
 		}
 		return false;
 	};
-	if (handleProperty(&SimTool::Name       , "Name"       ,  true) ||
-	    handleProperty(&SimTool::Description, "Description",  true) ||
-	    handleProperty(&SimTool::Colour     , "Colour"     ,  true) ||
-	    handleProperty(&SimTool::Colour     , "Color"      ,  true) ||
-	    handleProperty(&SimTool::MenuSection, "MenuSection",  true) ||
-	    handleProperty(&SimTool::MenuVisible, "MenuVisible",  true))
+	if (handleProperty(&SimTool::Name, "Name", true) || handleProperty(&SimTool::Description, "Description", true) ||
+	    handleProperty(&SimTool::Colour, "Colour", true) || handleProperty(&SimTool::Colour, "Color", true) ||
+	    handleProperty(&SimTool::MenuSection, "MenuSection", true) ||
+	    handleProperty(&SimTool::MenuVisible, "MenuVisible", true))
 	{
 		return returnValueCount;
 	}
@@ -393,7 +425,7 @@ void LuaTools::Open(lua_State *L)
 		LFUNC(exists),
 #undef LFUNC
 		{ "free", ffree },
-		{ NULL, NULL }
+		{   NULL,  NULL }
 	};
 	lua_newtable(L);
 	luaL_register(L, NULL, reg);

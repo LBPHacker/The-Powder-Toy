@@ -2,11 +2,14 @@
 #include "ConsoleView.h"
 #include "prefs/GlobalPrefs.h"
 
-ConsoleModel::ConsoleModel() {
+ConsoleModel::ConsoleModel()
+{
 	std::vector<String> previousHistory = GlobalPrefs::Ref().Get("Console.History", std::vector<String>{});
-	for(std::vector<String>::reverse_iterator iter = previousHistory.rbegin(), end = previousHistory.rend(); iter != end; ++iter)
+	for (std::vector<String>::reverse_iterator iter = previousHistory.rbegin(), end = previousHistory.rend();
+	     iter != end;
+	     ++iter)
 	{
-		if(previousCommands.size()<25)
+		if (previousCommands.size() < 25)
 		{
 			previousCommands.push_front(ConsoleCommand(*iter, 0, ""));
 			currentCommandIndex = previousCommands.size();
@@ -14,7 +17,7 @@ ConsoleModel::ConsoleModel() {
 	}
 }
 
-void ConsoleModel::AddObserver(ConsoleView * observer)
+void ConsoleModel::AddObserver(ConsoleView *observer)
 {
 	observers.push_back(observer);
 	observer->NotifyPreviousCommandsChanged(this);
@@ -43,8 +46,10 @@ ConsoleCommand ConsoleModel::GetCurrentCommand()
 void ConsoleModel::AddLastCommand(ConsoleCommand command)
 {
 	previousCommands.push_back(command);
-	if(previousCommands.size()>25)
+	if (previousCommands.size() > 25)
+	{
 		previousCommands.pop_front();
+	}
 	currentCommandIndex = previousCommands.size();
 	GlobalPrefs::Ref().Set("Console.History", std::vector<String>(previousCommands.begin(), previousCommands.end()));
 	notifyPreviousCommandsChanged();

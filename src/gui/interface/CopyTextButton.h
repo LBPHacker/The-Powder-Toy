@@ -3,10 +3,12 @@
 
 namespace ui
 {
-	class Label;
+class Label;
+
 class CopyTextButton : public Button
 {
 	ui::Label *copyTextLabel;
+
 public:
 	CopyTextButton(Point position, Point size, String buttonText, Label *copyTextLabel_);
 

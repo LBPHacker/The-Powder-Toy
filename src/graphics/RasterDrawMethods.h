@@ -33,13 +33,13 @@ struct RasterDrawMethods
 
 	void BlendFilledEllipse(Vec2<int> center, Vec2<int> size, RGBA<uint8_t>);
 
-	void BlendImage(pixel const *, uint8_t alpha, Rect<int>);
-	void BlendImage(pixel const *, uint8_t alpha, Rect<int>, size_t rowStride);
-	void XorImage(unsigned char const *, Rect<int>);
-	void XorImage(unsigned char const *, Rect<int>, size_t rowStride);
+	void BlendImage(const pixel *, uint8_t alpha, Rect<int>);
+	void BlendImage(const pixel *, uint8_t alpha, Rect<int>, size_t rowStride);
+	void XorImage(const unsigned char *, Rect<int>);
+	void XorImage(const unsigned char *, Rect<int>, size_t rowStride);
 
-	void BlendRGBAImage(pixel_rgba const *, Rect<int>);
-	void BlendRGBAImage(pixel_rgba const *, Rect<int>, size_t rowStride);
+	void BlendRGBAImage(const pixel_rgba *, Rect<int>);
+	void BlendRGBAImage(const pixel_rgba *, Rect<int>, size_t rowStride);
 
 	// Returns width of character
 	int BlendChar(Vec2<int>, String::value_type, RGBA<uint8_t>);
@@ -47,17 +47,17 @@ struct RasterDrawMethods
 
 	// Returns the offset between the first character and the
 	// would-be-next character
-	Vec2<int> BlendText(Vec2<int>, String const &, RGBA<uint8_t>);
+	Vec2<int> BlendText(Vec2<int>, const String &, RGBA<uint8_t>);
 
-	Vec2<int> BlendTextOutline(Vec2<int>, String const &, RGBA<uint8_t>);
+	Vec2<int> BlendTextOutline(Vec2<int>, const String &, RGBA<uint8_t>);
 
 	static int CharWidth(String::value_type);
 	// Considers the first line to be FONT_H-2 tall with successive lines adding
 	// FONT_H each
-	static Vec2<int> TextSize(String const &);
+	static Vec2<int> TextSize(const String &);
 	// Return iterator to the end of an initial portion of text that fits in
 	// the given width
-	static String::const_iterator TextFit(String const &, int width);
+	static String::const_iterator TextFit(const String &, int width);
 
 	void Clear();
 };

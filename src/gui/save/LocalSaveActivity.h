@@ -1,36 +1,35 @@
 #pragma once
 
+#include "Activity.h"
+#include "Format.h"
+#include "client/SaveFile.h"
+#include "common/Plane.h"
+#include "graphics/Pixel.h"
 #include <functional>
 #include <memory>
 #include <vector>
-#include "Activity.h"
-#include "client/SaveFile.h"
-#include "common/Plane.h"
-#include "Format.h"
-#include "graphics/Pixel.h"
 
 #include "save_local.png.h"
 
 namespace ui
 {
-	class Textbox;
+class Textbox;
 }
 
 class VideoBuffer;
 
 class ThumbnailRendererTask;
 
-class LocalSaveActivity: public WindowActivity
+class LocalSaveActivity : public WindowActivity
 {
-	using OnSaved = std::function<void (std::unique_ptr<SaveFile>)>;
-	std::unique_ptr<PlaneAdapter<std::vector<pixel_rgba>>> saveToDiskImage = format::PixelsFromPNG(
-		std::vector<char>(save_local_png, save_local_png + save_local_png_size)
-	);
+	using OnSaved = std::function<void(std::unique_ptr<SaveFile>)>;
+	std::unique_ptr<PlaneAdapter<std::vector<pixel_rgba>>> saveToDiskImage =
+		format::PixelsFromPNG(std::vector<char>(save_local_png, save_local_png + save_local_png_size));
 
 	std::unique_ptr<SaveFile> save;
 	ThumbnailRendererTask *thumbnailRenderer;
 	std::unique_ptr<VideoBuffer> thumbnail;
-	ui::Textbox * filenameField;
+	ui::Textbox *filenameField;
 	OnSaved onSaved;
 
 public:

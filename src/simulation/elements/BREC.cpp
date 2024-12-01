@@ -18,7 +18,7 @@ void Element::Element_BREC()
 	Collision = -0.1f;
 	Gravity = 0.18f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;
@@ -29,9 +29,10 @@ void Element::Element_BREC()
 	Weight = 90;
 
 	HeatConduct = 211;
-	Description = "Broken electronics. Formed from EMP blasts, and when constantly sparked while under pressure, turns to EXOT.";
+	Description =
+		"Broken electronics. Formed from EMP blasts, and when constantly sparked while under pressure, turns to EXOT.";
 
-	Properties = TYPE_PART|PROP_CONDUCTS|PROP_LIFE_DEC|PROP_HOT_GLOW;
+	Properties = TYPE_PART | PROP_CONDUCTS | PROP_LIFE_DEC | PROP_HOT_GLOW;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -49,16 +50,15 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	if (parts[i].life)
 	{
-		if (sim->pv[y/CELL][x/CELL]>10.0f)
+		if (sim->pv[y / CELL][x / CELL] > 10.0f)
 		{
-			if (parts[i].temp>9000 && sim->pv[y/CELL][x/CELL]>30.0f && sim->rng.chance(1, 200))
+			if (parts[i].temp > 9000 && sim->pv[y / CELL][x / CELL] > 30.0f && sim->rng.chance(1, 200))
 			{
-				sim->part_change_type(i, x ,y ,PT_EXOT);
+				sim->part_change_type(i, x, y, PT_EXOT);
 				parts[i].life = 1000;
 			}
-			parts[i].temp += (sim->pv[y/CELL][x/CELL])/8;
+			parts[i].temp += (sim->pv[y / CELL][x / CELL]) / 8;
 		}
-
 	}
 	return 0;
 }

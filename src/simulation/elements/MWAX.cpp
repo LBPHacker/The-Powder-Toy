@@ -16,7 +16,7 @@ void Element::Element_MWAX()
 	Collision = 0.0f;
 	Gravity = 0.15f;
 	Diffusion = 0.00f;
-	HotAir = 0.000001f* CFDS;
+	HotAir = 0.000001f * CFDS;
 	Falldown = 2;
 
 	Flammable = 5;

@@ -1,8 +1,8 @@
 #pragma once
-#include "common/String.h"
 #include "ServerNotification.h"
-#include <vector>
+#include "common/String.h"
 #include <optional>
+#include <vector>
 
 struct UpdateInfo
 {
@@ -12,6 +12,7 @@ struct UpdateInfo
 		channelBeta,
 		channelSnapshot,
 	};
+
 	Channel channel;
 	ByteString file;
 	String changeLog;

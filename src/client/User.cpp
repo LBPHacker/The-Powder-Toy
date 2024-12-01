@@ -1,10 +1,10 @@
 #include "User.h"
 
 static const std::vector<std::pair<User::Elevation, ByteString>> elevationStrings = {
-	{ User::ElevationAdmin  , "Admin"   },
-	{ User::ElevationMod    , "Mod"     },
+	{   User::ElevationAdmin,   "Admin" },
+	{     User::ElevationMod,     "Mod" },
 	{ User::ElevationHalfMod, "HalfMod" },
-	{ User::ElevationNone   , "None"    },
+	{    User::ElevationNone,    "None" },
 };
 
 User::Elevation User::ElevationFromString(ByteString str)

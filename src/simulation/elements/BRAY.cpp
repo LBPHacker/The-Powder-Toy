@@ -18,7 +18,7 @@ void Element::Element_BRAY()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -31,7 +31,7 @@ void Element::Element_BRAY()
 	HeatConduct = 251;
 	Description = "Ray Point. Rays create points when they collide.";
 
-	Properties = TYPE_SOLID|PROP_LIFE_DEC|PROP_LIFE_KILL;
+	Properties = TYPE_SOLID | PROP_LIFE_DEC | PROP_LIFE_KILL;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -50,50 +50,67 @@ void Element::Element_BRAY()
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
 	int x, trans = 255;
-	if(cpart->tmp==0)
+	if (cpart->tmp == 0)
 	{
 		trans = cpart->life * 7;
-		if (trans>255) trans = 255;
-		if (cpart->ctype&0x3FFFFFFF) {
+		if (trans > 255)
+		{
+			trans = 255;
+		}
+		if (cpart->ctype & 0x3FFFFFFF)
+		{
 			*colg = 0;
 			*colb = 0;
 			*colr = 0;
-			for (x=0; x<12; x++) {
-				*colr += (cpart->ctype >> (x+18)) & 1;
-				*colb += (cpart->ctype >>  x)	 & 1;
+			for (x = 0; x < 12; x++)
+			{
+				*colr += (cpart->ctype >> (x + 18)) & 1;
+				*colb += (cpart->ctype >> x) & 1;
 			}
-			for (x=0; x<12; x++)
-				*colg += (cpart->ctype >> (x+9))  & 1;
-			x = 624/(*colr+*colg+*colb+1);
+			for (x = 0; x < 12; x++)
+			{
+				*colg += (cpart->ctype >> (x + 9)) & 1;
+			}
+			x = 624 / (*colr + *colg + *colb + 1);
 			*colr *= x;
 			*colg *= x;
 			*colb *= x;
 		}
 	}
-	else if(cpart->tmp==1)
+	else if (cpart->tmp == 1)
 	{
-		trans = cpart->life/4;
-		if (trans>255) trans = 255;
-		if (cpart->ctype&0x3FFFFFFF) {
+		trans = cpart->life / 4;
+		if (trans > 255)
+		{
+			trans = 255;
+		}
+		if (cpart->ctype & 0x3FFFFFFF)
+		{
 			*colg = 0;
 			*colb = 0;
 			*colr = 0;
-			for (x=0; x<12; x++) {
-				*colr += (cpart->ctype >> (x+18)) & 1;
-				*colb += (cpart->ctype >>  x)	 & 1;
+			for (x = 0; x < 12; x++)
+			{
+				*colr += (cpart->ctype >> (x + 18)) & 1;
+				*colb += (cpart->ctype >> x) & 1;
 			}
-			for (x=0; x<12; x++)
-				*colg += (cpart->ctype >> (x+9))  & 1;
-			x = 624/(*colr+*colg+*colb+1);
+			for (x = 0; x < 12; x++)
+			{
+				*colg += (cpart->ctype >> (x + 9)) & 1;
+			}
+			x = 624 / (*colr + *colg + *colb + 1);
 			*colr *= x;
 			*colg *= x;
 			*colb *= x;
 		}
 	}
-	else if(cpart->tmp==2)
+	else if (cpart->tmp == 2)
 	{
-		trans = cpart->life*100;
-		if (trans>255) trans = 255;
+		trans = cpart->life * 100;
+		if (trans > 255)
+		{
+			trans = 255;
+		}
 		*colr = 255;
 		*colg = 150;
 		*colb = 50;

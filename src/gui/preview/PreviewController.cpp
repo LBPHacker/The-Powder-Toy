@@ -1,14 +1,15 @@
 #include "PreviewController.h"
+#include "Config.h"
 #include "Controller.h"
 #include "PreviewModel.h"
 #include "PreviewView.h"
 #include "client/Client.h"
-#include "client/SaveInfo.h"
 #include "client/GameSave.h"
-#include "client/http/GetSaveRequest.h"
-#include "client/http/GetSaveDataRequest.h"
-#include "client/http/GetCommentsRequest.h"
+#include "client/SaveInfo.h"
 #include "client/http/FavouriteSaveRequest.h"
+#include "client/http/GetCommentsRequest.h"
+#include "client/http/GetSaveDataRequest.h"
+#include "client/http/GetSaveRequest.h"
 #include "common/platform/Platform.h"
 #include "graphics/Graphics.h"
 #include "graphics/VideoBuffer.h"
@@ -16,9 +17,14 @@
 #include "gui/dialogues/InformationMessage.h"
 #include "gui/login/LoginController.h"
 #include "gui/login/LoginView.h"
-#include "Config.h"
 
-PreviewController::PreviewController(int saveID, int saveDate, SavePreviewType savePreviewType, std::function<void ()> onDone_, std::unique_ptr<VideoBuffer> thumbnail):
+PreviewController::PreviewController(
+	int saveID,
+	int saveDate,
+	SavePreviewType savePreviewType,
+	std::function<void()> onDone_,
+	std::unique_ptr<VideoBuffer> thumbnail
+) :
 	saveId(saveID),
 	loginWindow(NULL),
 	HasExited(false)
@@ -32,7 +38,7 @@ PreviewController::PreviewController(int saveID, int saveDate, SavePreviewType s
 
 	previewModel->UpdateSave(saveID, saveDate);
 
-	if(Client::Ref().GetAuthUser().UserID)
+	if (Client::Ref().GetAuthUser().UserID)
 	{
 		previewModel->SetCommentBoxEnabled(true);
 	}
@@ -63,7 +69,7 @@ void PreviewController::ShowLogin()
 	loginWindow->GetView()->MakeActiveWindow();
 }
 
-void PreviewController::NotifyAuthUserChanged(Client * sender)
+void PreviewController::NotifyAuthUserChanged(Client *sender)
 {
 	previewModel->SetCommentBoxEnabled(sender->GetAuthUser().UserID);
 }
@@ -109,9 +115,10 @@ void PreviewController::OpenInBrowser()
 
 bool PreviewController::NextCommentPage()
 {
-	if(previewModel->GetCommentsPageNum() < previewModel->GetCommentsPageCount() && previewModel->GetCommentsLoaded() && !previewModel->GetDoOpen())
+	if (previewModel->GetCommentsPageNum() < previewModel->GetCommentsPageCount() &&
+	    previewModel->GetCommentsLoaded() && !previewModel->GetDoOpen())
 	{
-		previewModel->UpdateComments(previewModel->GetCommentsPageNum()+1);
+		previewModel->UpdateComments(previewModel->GetCommentsPageNum() + 1);
 		return true;
 	}
 	return false;
@@ -119,9 +126,9 @@ bool PreviewController::NextCommentPage()
 
 bool PreviewController::PrevCommentPage()
 {
-	if(previewModel->GetCommentsPageNum() > 1 && previewModel->GetCommentsLoaded() && !previewModel->GetDoOpen())
+	if (previewModel->GetCommentsPageNum() > 1 && previewModel->GetCommentsLoaded() && !previewModel->GetDoOpen())
 	{
-		previewModel->UpdateComments(previewModel->GetCommentsPageNum()-1);
+		previewModel->UpdateComments(previewModel->GetCommentsPageNum() - 1);
 		return true;
 	}
 	return false;
@@ -143,7 +150,9 @@ void PreviewController::Exit()
 	previewView->CloseActiveWindow();
 	HasExited = true;
 	if (onDone)
+	{
 		onDone();
+	}
 }
 
 PreviewController::~PreviewController()

@@ -1,18 +1,18 @@
 #pragma once
+#include "common/ExplicitSingleton.h"
+#include "common/String.h"
+#include "graphics/RendererSettings.h"
 #include <memory>
 #include <mutex>
 #include <utility>
 #include <vector>
-#include "common/ExplicitSingleton.h"
-#include "graphics/RendererSettings.h"
-#include "common/String.h"
 
 class GameSave;
 class VideoBuffer;
 class Simulation;
 class Renderer;
 
-class SaveRenderer: public ExplicitSingleton<SaveRenderer>
+class SaveRenderer : public ExplicitSingleton<SaveRenderer>
 {
 	std::unique_ptr<Simulation> sim;
 	std::unique_ptr<Renderer> ren;

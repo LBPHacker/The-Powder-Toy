@@ -5,7 +5,7 @@
 
 namespace Platform
 {
-	void MaybeTriggerSyncFs();
+void MaybeTriggerSyncFs();
 }
 
 static void MainLoopBody()

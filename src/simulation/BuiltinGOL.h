@@ -1,7 +1,7 @@
 #pragma once
 
-#include "graphics/Pixel.h"
 #include "common/String.h"
+#include "graphics/Pixel.h"
 
 struct BuiltinGOL
 {

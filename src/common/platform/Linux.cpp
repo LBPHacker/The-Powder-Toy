@@ -1,9 +1,9 @@
+#include "Config.h"
 #include "Platform.h"
 #include "icon_cps.png.h"
 #include "icon_exe.png.h"
-#include "save.xml.h"
 #include "powder.desktop.h"
-#include "Config.h"
+#include "save.xml.h"
 #include <cstring>
 #include <ctime>
 #ifdef __FreeBSD__
@@ -63,8 +63,16 @@ bool Install()
 		ByteString escaped;
 		for (auto ch : str)
 		{
-			auto from = " " "\n" "\t" "\r" "\\";
-			auto to   = "s"  "n"  "t"  "r" "\\";
+			auto from = " "
+						"\n"
+						"\t"
+						"\r"
+						"\\";
+			auto to = "s"
+					  "n"
+					  "t"
+					  "r"
+					  "\\";
 			if (auto off = strchr(from, ch))
 			{
 				escaped.append(1, '\\');
@@ -95,7 +103,8 @@ bool Install()
 		ByteString desktopData(powder_desktop, powder_desktop + powder_desktop_size);
 		auto exe = Platform::ExecutableName();
 		auto path = exe.SplitFromEndBy('/').Before();
-		desktopData = desktopData.Substitute("Exec=" + ByteString(APPEXE), "Exec=" + desktopEscapeString(desktopEscapeExec(exe)));
+		desktopData =
+			desktopData.Substitute("Exec=" + ByteString(APPEXE), "Exec=" + desktopEscapeString(desktopEscapeExec(exe)));
 		desktopData += ByteString::Build("Path=", desktopEscapeString(path), "\n");
 		ByteString file = ByteString::Build(APPVENDOR, "-", APPID, ".desktop");
 		ok = ok && Platform::WriteFile(std::vector<char>(desktopData.begin(), desktopData.end()), file);
@@ -115,14 +124,24 @@ bool Install()
 	{
 		ByteString file = ByteString(APPVENDOR) + "-cps.png";
 		ok = ok && Platform::WriteFile(std::vector<char>(icon_cps_png, icon_cps_png + icon_cps_png_size), file);
-		ok = ok && !system(ByteString::Build("xdg-icon-resource install --noupdate --context mimetypes --size 64 ", file, " application-vnd.powdertoy.save").c_str());
+		ok = ok &&
+			!system(ByteString::Build(
+						"xdg-icon-resource install --noupdate --context mimetypes --size 64 ",
+						file,
+						" application-vnd.powdertoy.save"
+			)
+		                .c_str());
 		Platform::RemoveFile(file);
 	}
 	if (ok)
 	{
 		ByteString file = ByteString(APPVENDOR) + "-exe.png";
 		ok = ok && Platform::WriteFile(std::vector<char>(icon_exe_png, icon_exe_png + icon_exe_png_size), file);
-		ok = ok && !system(ByteString::Build("xdg-icon-resource install --noupdate --size 64 ", file, " ", APPVENDOR, "-", APPEXE).c_str());
+		ok = ok &&
+			!system(
+				 ByteString::Build("xdg-icon-resource install --noupdate --size 64 ", file, " ", APPVENDOR, "-", APPEXE)
+					 .c_str()
+			);
 		Platform::RemoveFile(file);
 	}
 	if (ok)

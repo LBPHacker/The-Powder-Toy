@@ -1,6 +1,6 @@
 #pragma once
-#include "graphics/Pixel.h"
 #include "common/String.h"
+#include "graphics/Pixel.h"
 
 struct CustomGOLData
 {
@@ -8,7 +8,7 @@ struct CustomGOLData
 	RGB<uint8_t> colour1, colour2;
 	String nameString;
 
-	inline bool operator <(const CustomGOLData &other) const
+	inline bool operator<(const CustomGOLData &other) const
 	{
 		return rule < other.rule;
 	}

@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "RFRG.h"
+#include "simulation/ElementCommon.h"
 
 void Element::Element_RFRG()
 {
@@ -30,7 +30,7 @@ void Element::Element_RFRG()
 	HeatConduct = 3;
 	Description = "Refrigerant. Heats up and liquefies under pressure.";
 
-	Properties = TYPE_GAS|PROP_DEADLY;
+	Properties = TYPE_GAS | PROP_DEADLY;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -46,7 +46,7 @@ void Element::Element_RFRG()
 
 int Element_RFRG_update(UPDATE_FUNC_ARGS)
 {
-	float new_pressure = sim->pv[y/CELL][x/CELL];
+	float new_pressure = sim->pv[y / CELL][x / CELL];
 	float *old_pressure = (float *)&parts[i].tmp;
 	if (std::isnan(*old_pressure))
 	{

@@ -1,6 +1,6 @@
 #pragma once
-#include "common/String.h"
 #include "Component.h"
+#include "common/String.h"
 #include <functional>
 
 namespace ui
@@ -10,11 +10,13 @@ class Button : public Component
 {
 	struct ButtonAction
 	{
-		std::function<void ()> action, altAction, mouseEnter;
+		std::function<void()> action, altAction, mouseEnter;
 	};
-	
+
 public:
-	Button(Point position = Point(0, 0), Point size = Point(0, 0), String buttonText = String(), String toolTip = String());
+	Button(
+		Point position = Point(0, 0), Point size = Point(0, 0), String buttonText = String(), String toolTip = String()
+	);
 	virtual ~Button() = default;
 
 	void OnMouseClick(int x, int y, unsigned int button) override;
@@ -25,22 +27,40 @@ public:
 	void OnMouseHover(int x, int y) override;
 	void OnMouseLeave(int x, int y) override;
 
-	void Draw(const Point& screenPos) override;
+	void Draw(const Point &screenPos) override;
 
 	void TextPosition(String) override;
-	inline bool GetState() { return state; }
-	void DoAction(); //action of button what ever it may be
-	void DoAltAction(); //action of button what ever it may be
+
+	inline bool GetState()
+	{
+		return state;
+	}
+
+	void DoAction();    // action of button what ever it may be
+	void DoAltAction(); // action of button what ever it may be
 	void SetTogglable(bool isTogglable);
 	bool GetTogglable();
 	bool GetToggleState();
 	void SetToggleState(bool state);
-	inline void SetActionCallback(ButtonAction const &action) { actionCallback = action; }
+
+	inline void SetActionCallback(const ButtonAction &action)
+	{
+		actionCallback = action;
+	}
+
 	// inline ButtonAction const &GetActionCallback() const { return actionCallback; }
 	void SetText(String buttonText);
 	void SetIcon(Icon icon);
-	inline String GetText() { return ButtonText; }
-	void SetToolTip(String newToolTip) { toolTip = newToolTip; }
+
+	inline String GetText()
+	{
+		return ButtonText;
+	}
+
+	void SetToolTip(String newToolTip)
+	{
+		toolTip = newToolTip;
+	}
 
 protected:
 	String ButtonText;

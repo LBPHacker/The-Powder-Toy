@@ -4,11 +4,11 @@
 
 namespace http
 {
-	class AddTagRequest : public APIRequest
-	{
-	public:
-		AddTagRequest(int saveID, ByteString tag);
+class AddTagRequest : public APIRequest
+{
+public:
+	AddTagRequest(int saveID, ByteString tag);
 
-		std::list<ByteString> Finish();
-	};
+	std::list<ByteString> Finish();
+};
 }

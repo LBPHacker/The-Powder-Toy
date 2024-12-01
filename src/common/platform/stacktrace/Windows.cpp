@@ -1,13 +1,13 @@
-#include "common/platform/Platform.h"
 #include "common/Defer.h"
+#include "common/platform/Platform.h"
 #include <windows.h>
 #pragma pack(push, 8)
 #include <dbghelp.h>
 #pragma pack(pop)
-#include <psapi.h>
 #include <array>
-#include <mutex>
 #include <cstdint>
+#include <mutex>
+#include <psapi.h>
 
 namespace Platform
 {
@@ -16,6 +16,7 @@ struct SymbolInfo
 	String name;
 	uintptr_t displacement;
 };
+
 static std::optional<SymbolInfo> GetSymbolInfo(HANDLE process, uintptr_t offset)
 {
 	DWORD64 displacement;
@@ -35,6 +36,7 @@ struct ModuleInfo
 	String name;
 	uintptr_t displacement;
 };
+
 static std::optional<ModuleInfo> GetModuleInfo(HANDLE process, uintptr_t offset)
 {
 	IMAGEHLP_MODULEW64 module{};
@@ -66,39 +68,39 @@ std::optional<std::vector<String>> StackTrace()
 	STACKFRAME64 frame{};
 	DWORD machine;
 #if defined(_M_IX86)
-	machine                 = IMAGE_FILE_MACHINE_I386;
-	frame.AddrPC.Offset     = context.Eip;
-	frame.AddrPC.Mode       = AddrModeFlat;
-	frame.AddrFrame.Offset  = context.Ebp;
-	frame.AddrFrame.Mode    = AddrModeFlat;
-	frame.AddrStack.Offset  = context.Esp;
-	frame.AddrStack.Mode    = AddrModeFlat;
+	machine = IMAGE_FILE_MACHINE_I386;
+	frame.AddrPC.Offset = context.Eip;
+	frame.AddrPC.Mode = AddrModeFlat;
+	frame.AddrFrame.Offset = context.Ebp;
+	frame.AddrFrame.Mode = AddrModeFlat;
+	frame.AddrStack.Offset = context.Esp;
+	frame.AddrStack.Mode = AddrModeFlat;
 #elif defined(_M_X64)
-	machine                 = IMAGE_FILE_MACHINE_AMD64;
-	frame.AddrPC.Offset     = context.Rip;
-	frame.AddrPC.Mode       = AddrModeFlat;
-	frame.AddrFrame.Offset  = context.Rsp;
-	frame.AddrFrame.Mode    = AddrModeFlat;
-	frame.AddrStack.Offset  = context.Rsp;
-	frame.AddrStack.Mode    = AddrModeFlat;
+	machine = IMAGE_FILE_MACHINE_AMD64;
+	frame.AddrPC.Offset = context.Rip;
+	frame.AddrPC.Mode = AddrModeFlat;
+	frame.AddrFrame.Offset = context.Rsp;
+	frame.AddrFrame.Mode = AddrModeFlat;
+	frame.AddrStack.Offset = context.Rsp;
+	frame.AddrStack.Mode = AddrModeFlat;
 #elif defined(_M_IA64)
-	machine                 = IMAGE_FILE_MACHINE_IA64;
-	frame.AddrPC.Offset     = context.StIIP;
-	frame.AddrPC.Mode       = AddrModeFlat;
-	frame.AddrFrame.Offset  = context.IntSp;
-	frame.AddrFrame.Mode    = AddrModeFlat;
+	machine = IMAGE_FILE_MACHINE_IA64;
+	frame.AddrPC.Offset = context.StIIP;
+	frame.AddrPC.Mode = AddrModeFlat;
+	frame.AddrFrame.Offset = context.IntSp;
+	frame.AddrFrame.Mode = AddrModeFlat;
 	frame.AddrBStore.Offset = context.RsBSP;
-	frame.AddrBStore.Mode   = AddrModeFlat;
-	frame.AddrStack.Offset  = context.IntSp;
-	frame.AddrStack.Mode    = AddrModeFlat;
+	frame.AddrBStore.Mode = AddrModeFlat;
+	frame.AddrStack.Offset = context.IntSp;
+	frame.AddrStack.Mode = AddrModeFlat;
 #elif defined(_M_ARM64)
-	machine                 = IMAGE_FILE_MACHINE_ARM64;
-	frame.AddrPC.Offset     = context.Pc;
-	frame.AddrPC.Mode       = AddrModeFlat;
-	frame.AddrFrame.Offset  = context.Fp;
-	frame.AddrFrame.Mode    = AddrModeFlat;
-	frame.AddrStack.Offset  = context.Sp;
-	frame.AddrStack.Mode    = AddrModeFlat;
+	machine = IMAGE_FILE_MACHINE_ARM64;
+	frame.AddrPC.Offset = context.Pc;
+	frame.AddrPC.Mode = AddrModeFlat;
+	frame.AddrFrame.Offset = context.Fp;
+	frame.AddrFrame.Mode = AddrModeFlat;
+	frame.AddrStack.Offset = context.Sp;
+	frame.AddrStack.Mode = AddrModeFlat;
 #else
 	return std::nullopt;
 #endif
@@ -106,7 +108,9 @@ std::optional<std::vector<String>> StackTrace()
 	std::vector<String> res;
 	for (auto i = 0; i < 100; ++i)
 	{
-		if (!StackWalk64(machine, process, thread, &frame, &context, NULL, SymFunctionTableAccess64, SymGetModuleBase64, NULL))
+		if (!StackWalk64(
+				machine, process, thread, &frame, &context, NULL, SymFunctionTableAccess64, SymGetModuleBase64, NULL
+			))
 		{
 			break;
 		}

@@ -1,14 +1,14 @@
 #include "gui/interface/Component.h"
 
 #include "graphics/Graphics.h"
+#include "gui/interface/ContextMenu.h"
+#include "gui/interface/Panel.h"
 #include "gui/interface/Point.h"
 #include "gui/interface/Window.h"
-#include "gui/interface/Panel.h"
-#include "gui/interface/ContextMenu.h"
 
 using namespace ui;
 
-Component::Component(Point position, Point size):
+Component::Component(Point position, Point size) :
 	parentstate_(0),
 	_parent(NULL),
 	drawn(false),
@@ -22,7 +22,6 @@ Component::Component(Point position, Point size):
 	Visible(true),
 	DoesTextInput(false)
 {
-
 }
 
 void Component::Refresh()
@@ -32,75 +31,76 @@ void Component::Refresh()
 
 void Component::TextPosition(String displayText)
 {
-
 	textPosition = ui::Point(0, 0);
 
 	textSize = Graphics::TextSize(displayText);
 	int textWidth = textSize.X, textHeight = textSize.Y;
-	textHeight-=3;
-	textWidth-=1;
-	if(Appearance.icon)
+	textHeight -= 3;
+	textWidth -= 1;
+	if (Appearance.icon)
 	{
 		textWidth += 13;
 	}
 
-	int textAreaWidth = Size.X-(Appearance.Margin.Right+Appearance.Margin.Left);
-	int textAreaHeight = Size.Y-(Appearance.Margin.Top+Appearance.Margin.Bottom);
+	int textAreaWidth = Size.X - (Appearance.Margin.Right + Appearance.Margin.Left);
+	int textAreaHeight = Size.Y - (Appearance.Margin.Top + Appearance.Margin.Bottom);
 
-	switch(Appearance.VerticalAlign)
+	switch (Appearance.VerticalAlign)
 	{
-		case ui::Appearance::AlignTop:
-			textPosition.Y = Appearance.Margin.Top+2;
-			break;
-		case ui::Appearance::AlignMiddle:
-			textPosition.Y = Appearance.Margin.Top+((textAreaHeight-textHeight)/2);
-			break;
-		case ui::Appearance::AlignBottom:
-			textPosition.Y = Size.Y-(textHeight+Appearance.Margin.Bottom);
-			break;
+	case ui::Appearance::AlignTop:
+		textPosition.Y = Appearance.Margin.Top + 2;
+		break;
+	case ui::Appearance::AlignMiddle:
+		textPosition.Y = Appearance.Margin.Top + ((textAreaHeight - textHeight) / 2);
+		break;
+	case ui::Appearance::AlignBottom:
+		textPosition.Y = Size.Y - (textHeight + Appearance.Margin.Bottom);
+		break;
 	}
 
-	switch(Appearance.HorizontalAlign)
+	switch (Appearance.HorizontalAlign)
 	{
-		case ui::Appearance::AlignLeft:
-			textPosition.X = Appearance.Margin.Left;
-			break;
-		case ui::Appearance::AlignCentre:
-			textPosition.X = Appearance.Margin.Left+((textAreaWidth-textWidth)/2);
-			break;
-		case ui::Appearance::AlignRight:
-			textPosition.X = Size.X-(textWidth+Appearance.Margin.Right);
-			break;
+	case ui::Appearance::AlignLeft:
+		textPosition.X = Appearance.Margin.Left;
+		break;
+	case ui::Appearance::AlignCentre:
+		textPosition.X = Appearance.Margin.Left + ((textAreaWidth - textWidth) / 2);
+		break;
+	case ui::Appearance::AlignRight:
+		textPosition.X = Size.X - (textWidth + Appearance.Margin.Right);
+		break;
 	}
-	if(Appearance.icon)
+	if (Appearance.icon)
 	{
-		iconPosition = textPosition-ui::Point(0, 1);
+		iconPosition = textPosition - ui::Point(0, 1);
 		textPosition.X += 15;
 	}
 }
 
 bool Component::IsFocused() const
 {
-	if(parentstate_)
+	if (parentstate_)
+	{
 		return parentstate_->IsFocused(this);
+	}
 	return false;
 }
 
-void Component::SetParentWindow(Window* window)
+void Component::SetParentWindow(Window *window)
 {
 	parentstate_ = window;
 }
 
-void Component::SetParent(Panel* new_parent)
+void Component::SetParent(Panel *new_parent)
 {
-	if(new_parent == NULL)
+	if (new_parent == NULL)
 	{
-		if(_parent != NULL)
+		if (_parent != NULL)
 		{
 			// remove from current parent and send component to parent state
-			for(int i = 0; i < _parent->GetChildCount(); ++i)
+			for (int i = 0; i < _parent->GetChildCount(); ++i)
 			{
-				if(_parent->GetChild(i) == this)
+				if (_parent->GetChild(i) == this)
 				{
 					// remove ourself from parent component
 					_parent->RemoveChild(i, false);
@@ -108,7 +108,7 @@ void Component::SetParent(Panel* new_parent)
 					// add ourself to the parent state
 					GetParentWindow()->AddComponent(this);
 
-					//done in this loop.
+					// done in this loop.
 					break;
 				}
 			}
@@ -117,8 +117,10 @@ void Component::SetParent(Panel* new_parent)
 	else
 	{
 		// remove from parent state (if in parent state) and place in new parent
-		if(GetParentWindow())
+		if (GetParentWindow())
+		{
 			GetParentWindow()->RemoveComponent(this);
+		}
 		new_parent->children.push_back(this);
 	}
 	this->_parent = new_parent;
@@ -126,11 +128,15 @@ void Component::SetParent(Panel* new_parent)
 
 Point Component::GetContainerPos()
 {
-	Point newPos(0,0);
-	if(GetParentWindow())
+	Point newPos(0, 0);
+	if (GetParentWindow())
+	{
 		newPos += GetParentWindow()->Position;
-	if(GetParent())
+	}
+	if (GetParent())
+	{
 		newPos += GetParent()->Position + GetParent()->ViewportPosition;
+	}
 	return newPos;
 }
 
@@ -139,7 +145,7 @@ Point Component::GetScreenPos()
 	return GetContainerPos() + Position;
 }
 
-Graphics * Component::GetGraphics()
+Graphics *Component::GetGraphics()
 {
 	return parentstate_->GetGraphics();
 }
@@ -149,10 +155,9 @@ Graphics * Component::GetGraphics()
 
 void Component::OnContextMenuAction(int item)
 {
-
 }
 
-void Component::Draw(const Point& screenPos)
+void Component::Draw(const Point &screenPos)
 {
 	drawn = true;
 }
@@ -215,12 +220,10 @@ void Component::OnMouseWheelInside(int localx, int localy, int d)
 
 void Component::OnFocus()
 {
-
 }
 
 void Component::OnDefocus()
 {
-
 }
 
 Component::~Component()

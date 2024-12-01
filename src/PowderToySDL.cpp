@@ -1,11 +1,11 @@
 #include "PowderToySDL.h"
+#include "Config.h"
 #include "SimulationConfig.h"
 #include "WindowIcon.h"
-#include "Config.h"
-#include "gui/interface/Engine.h"
-#include "graphics/Graphics.h"
-#include "common/platform/Platform.h"
 #include "common/clipboard/Clipboard.h"
+#include "common/platform/Platform.h"
+#include "graphics/Graphics.h"
+#include "gui/interface/Engine.h"
 #include <iostream>
 
 int desktopWidth = 1280;
@@ -92,17 +92,23 @@ static void CalculateMousePosition(int *x, int *y)
 	SDL_GetWindowPosition(sdl_window, &windowX, &windowY);
 
 	if (x)
+	{
 		*x = (globalMx - windowX) / currentFrameOps.scale;
+	}
 	if (y)
+	{
 		*y = (globalMy - windowY) / currentFrameOps.scale;
+	}
 }
 
 void blit(pixel *vid)
 {
-	SDL_UpdateTexture(sdl_texture, NULL, vid, WINDOWW * sizeof (Uint32));
+	SDL_UpdateTexture(sdl_texture, NULL, vid, WINDOWW * sizeof(Uint32));
 	// need to clear the renderer if there are black edges (fullscreen, or resizable window)
 	if (currentFrameOps.fullscreen || currentFrameOps.resizable)
+	{
 		SDL_RenderClear(sdl_renderer);
+	}
 	SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
 	SDL_RenderPresent(sdl_renderer);
 }
@@ -170,17 +176,15 @@ void SDLSetScreen()
 	auto currentFrameOpsNorm = currentFrameOps.Normalize();
 	auto newFrameOpsNorm = newFrameOps.Normalize();
 	auto recreate = !sdl_window ||
-	                // Recreate the window when toggling fullscreen, due to occasional issues
-	                newFrameOpsNorm.fullscreen       != currentFrameOpsNorm.fullscreen       ||
-	                // Also recreate it when enabling resizable windows, to fix bugs on windows,
-	                //  see https://github.com/jacob1/The-Powder-Toy/issues/24
-	                newFrameOpsNorm.resizable        != currentFrameOpsNorm.resizable        ||
-	                newFrameOpsNorm.changeResolution != currentFrameOpsNorm.changeResolution ||
-	                newFrameOpsNorm.blurryScaling    != currentFrameOpsNorm.blurryScaling    ||
-	                newVsyncHint != vsyncHint;
+		// Recreate the window when toggling fullscreen, due to occasional issues
+		newFrameOpsNorm.fullscreen != currentFrameOpsNorm.fullscreen ||
+		// Also recreate it when enabling resizable windows, to fix bugs on windows,
+	    //  see https://github.com/jacob1/The-Powder-Toy/issues/24
+		newFrameOpsNorm.resizable != currentFrameOpsNorm.resizable ||
+		newFrameOpsNorm.changeResolution != currentFrameOpsNorm.changeResolution ||
+		newFrameOpsNorm.blurryScaling != currentFrameOpsNorm.blurryScaling || newVsyncHint != vsyncHint;
 
-	if (!(recreate ||
-	      newFrameOpsNorm.scale               != currentFrameOpsNorm.scale               ||
+	if (!(recreate || newFrameOpsNorm.scale != currentFrameOpsNorm.scale ||
 	      newFrameOpsNorm.forceIntegerScaling != currentFrameOpsNorm.forceIntegerScaling))
 	{
 		return;
@@ -251,7 +255,8 @@ void SDLSetScreen()
 			Platform::Exit(-1);
 		}
 		SDL_RenderSetLogicalSize(sdl_renderer, WINDOWW, WINDOWH);
-		sdl_texture = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, WINDOWW, WINDOWH);
+		sdl_texture =
+			SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, WINDOWW, WINDOWH);
 		if (!sdl_texture)
 		{
 			fprintf(stderr, "SDL_CreateTexture failed: %s\n", SDL_GetError());
@@ -291,17 +296,36 @@ static void EventProcess(const SDL_Event &event)
 		{
 			break;
 		}
-		if (ALLOW_QUIT && !event.key.repeat && event.key.keysym.sym == 'q' && (event.key.keysym.mod&KMOD_CTRL) && !(event.key.keysym.mod&KMOD_ALT))
+		if (ALLOW_QUIT && !event.key.repeat && event.key.keysym.sym == 'q' && (event.key.keysym.mod & KMOD_CTRL) &&
+		    !(event.key.keysym.mod & KMOD_ALT))
+		{
 			engine.ConfirmExit();
+		}
 		else
-			engine.onKeyPress(event.key.keysym.sym, event.key.keysym.scancode, event.key.repeat, event.key.keysym.mod&KMOD_SHIFT, event.key.keysym.mod&KMOD_CTRL, event.key.keysym.mod&KMOD_ALT);
+		{
+			engine.onKeyPress(
+				event.key.keysym.sym,
+				event.key.keysym.scancode,
+				event.key.repeat,
+				event.key.keysym.mod & KMOD_SHIFT,
+				event.key.keysym.mod & KMOD_CTRL,
+				event.key.keysym.mod & KMOD_ALT
+			);
+		}
 		break;
 	case SDL_KEYUP:
 		if (SDL_GetModState() & KMOD_GUI)
 		{
 			break;
 		}
-		engine.onKeyRelease(event.key.keysym.sym, event.key.keysym.scancode, event.key.repeat, event.key.keysym.mod&KMOD_SHIFT, event.key.keysym.mod&KMOD_CTRL, event.key.keysym.mod&KMOD_ALT);
+		engine.onKeyRelease(
+			event.key.keysym.sym,
+			event.key.keysym.scancode,
+			event.key.repeat,
+			event.key.keysym.mod & KMOD_SHIFT,
+			event.key.keysym.mod & KMOD_CTRL,
+			event.key.keysym.mod & KMOD_ALT
+		);
 		break;
 	case SDL_TEXTINPUT:
 		if (SDL_GetModState() & KMOD_GUI)
@@ -380,7 +404,7 @@ static void EventProcess(const SDL_Event &event)
 		case SDL_WINDOWEVENT_SHOWN:
 			if (!calculatedInitialMouse)
 			{
-				//initial mouse coords, sdl won't tell us this if mouse hasn't moved
+				// initial mouse coords, sdl won't tell us this if mouse hasn't moved
 				CalculateMousePosition(&mousex, &mousey);
 				engine.initialMouse(mousex, mousey);
 				engine.onMouseMove(mousex, mousey);

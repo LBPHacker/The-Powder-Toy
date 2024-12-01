@@ -1,19 +1,20 @@
 #include "OptionsModel.h"
 #include "OptionsView.h"
-#include "simulation/Simulation.h"
-#include "simulation/Air.h"
-#include "simulation/gravity/Gravity.h"
-#include "prefs/GlobalPrefs.h"
 #include "common/clipboard/Clipboard.h"
-#include "gui/interface/Engine.h"
 #include "gui/game/GameModel.h"
+#include "gui/interface/Engine.h"
+#include "prefs/GlobalPrefs.h"
+#include "simulation/Air.h"
+#include "simulation/Simulation.h"
+#include "simulation/gravity/Gravity.h"
 
-OptionsModel::OptionsModel(GameModel * gModel_) {
+OptionsModel::OptionsModel(GameModel *gModel_)
+{
 	gModel = gModel_;
 	sim = gModel->GetSimulation();
 }
 
-void OptionsModel::AddObserver(OptionsView* view)
+void OptionsModel::AddObserver(OptionsView *view)
 {
 	observers.push_back(view);
 	view->NotifySettingsChanged(this);
@@ -21,23 +22,23 @@ void OptionsModel::AddObserver(OptionsView* view)
 
 bool OptionsModel::GetHeatSimulation()
 {
-	return sim->legacy_enable?false:true;
+	return sim->legacy_enable ? false : true;
 }
 
 void OptionsModel::SetHeatSimulation(bool state)
 {
-	sim->legacy_enable = state?0:1;
+	sim->legacy_enable = state ? 0 : 1;
 	notifySettingsChanged();
 }
 
 bool OptionsModel::GetAmbientHeatSimulation()
 {
-	return sim->aheat_enable?true:false;
+	return sim->aheat_enable ? true : false;
 }
 
 void OptionsModel::SetAmbientHeatSimulation(bool state)
 {
-	sim->aheat_enable = state?1:0;
+	sim->aheat_enable = state ? 1 : 0;
 	notifySettingsChanged();
 }
 
@@ -54,12 +55,12 @@ void OptionsModel::SetNewtonianGravity(bool state)
 
 bool OptionsModel::GetWaterEqualisation()
 {
-	return sim->water_equal_test?true:false;
+	return sim->water_equal_test ? true : false;
 }
 
 void OptionsModel::SetWaterEqualisation(bool state)
 {
-	sim->water_equal_test = state?1:0;
+	sim->water_equal_test = state ? 1 : 0;
 	notifySettingsChanged();
 }
 
@@ -67,6 +68,7 @@ int OptionsModel::GetAirMode()
 {
 	return sim->air->airMode;
 }
+
 void OptionsModel::SetAirMode(int airMode)
 {
 	sim->air->airMode = airMode;
@@ -77,6 +79,7 @@ int OptionsModel::GetEdgeMode()
 {
 	return gModel->GetSimulation()->edgeMode;
 }
+
 void OptionsModel::SetEdgeMode(int edgeMode)
 {
 	GlobalPrefs::Ref().Set("Simulation.EdgeMode", edgeMode);
@@ -88,6 +91,7 @@ int OptionsModel::GetTemperatureScale()
 {
 	return gModel->GetTemperatureScale();
 }
+
 void OptionsModel::SetTemperatureScale(int temperatureScale)
 {
 	GlobalPrefs::Ref().Set("Renderer.TemperatureScale", temperatureScale);
@@ -111,6 +115,7 @@ float OptionsModel::GetAmbientAirTemperature()
 {
 	return gModel->GetSimulation()->air->ambientAirTemp;
 }
+
 void OptionsModel::SetAmbientAirTemperature(float ambientAirTemp)
 {
 	GlobalPrefs::Ref().Set("Simulation.AmbientAirTemp", ambientAirTemp);
@@ -122,6 +127,7 @@ int OptionsModel::GetGravityMode()
 {
 	return sim->gravityMode;
 }
+
 void OptionsModel::SetGravityMode(int gravityMode)
 {
 	sim->gravityMode = gravityMode;
@@ -202,6 +208,7 @@ bool OptionsModel::GetFullscreen()
 {
 	return ui::Engine::Ref().GetFullscreen();
 }
+
 void OptionsModel::SetFullscreen(bool fullscreen)
 {
 	ui::Engine::Ref().SetFullscreen(fullscreen);
@@ -249,6 +256,7 @@ bool OptionsModel::GetFastQuit()
 {
 	return ui::Engine::Ref().GetFastQuit();
 }
+
 void OptionsModel::SetFastQuit(bool fastquit)
 {
 	ui::Engine::Ref().SetFastQuit(fastquit);
@@ -260,6 +268,7 @@ int OptionsModel::GetDecoSpace()
 {
 	return gModel->GetDecoSpace();
 }
+
 void OptionsModel::SetDecoSpace(int decoSpace)
 {
 	GlobalPrefs::Ref().Set("Simulation.DecoSpace", decoSpace);
@@ -335,6 +344,6 @@ void OptionsModel::notifySettingsChanged()
 	}
 }
 
-OptionsModel::~OptionsModel() {
+OptionsModel::~OptionsModel()
+{
 }
-

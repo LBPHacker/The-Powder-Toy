@@ -4,6 +4,7 @@
 class Simulation;
 class GameView;
 class GameController;
+
 class SurfaceNormals : public DebugInfo
 {
 	const Simulation *sim;

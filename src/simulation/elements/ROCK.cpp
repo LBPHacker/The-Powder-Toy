@@ -47,7 +47,6 @@ void Element::Element_ROCK()
 	Create = &create;
 }
 
-
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
 	int z = (cpart->tmp2 - 7) * 6; // Randomized color noise based on tmp2
@@ -59,7 +58,7 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	{
 		*pixel_mode |= FIRE_ADD;
 
-		*firea = int(((cpart->temp)-810.15)/45);
+		*firea = int(((cpart->temp) - 810.15) / 45);
 		*firer = *colr;
 		*fireg = *colg;
 		*fireb = *colb;

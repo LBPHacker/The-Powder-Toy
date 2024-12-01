@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "STKM.h"
+#include "simulation/ElementCommon.h"
 
 static int update(UPDATE_FUNC_ARGS);
 static void create(ELEMENT_CREATE_FUNC_ARGS);
@@ -23,7 +23,7 @@ void Element::Element_STKM2()
 	Gravity = 0.0f;
 	NewtonianGravity = 0.0f;
 	Diffusion = 0.0f;
-	HotAir = 0.00f	* CFDS;
+	HotAir = 0.00f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -68,7 +68,9 @@ static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
 	int spawnID = sim->create_part(-3, x, y, PT_SPAWN2);
 	if (spawnID >= 0)
+	{
 		sim->player2.spawnID = spawnID;
+	}
 }
 
 static bool createAllowed(ELEMENT_CREATE_ALLOWED_FUNC_ARGS)
@@ -84,5 +86,7 @@ static void changeType(ELEMENT_CHANGETYPE_FUNC_ARGS)
 		sim->player2.spwn = 1;
 	}
 	else
+	{
 		sim->player2.spwn = 0;
+	}
 }

@@ -16,7 +16,7 @@ void Element::Element_NITR()
 	Collision = 0.0f;
 	Gravity = 0.2f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 2;
 
 	Flammable = 1000;

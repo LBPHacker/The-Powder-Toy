@@ -1,12 +1,11 @@
-#include "LuaScriptInterface.h"
-#include "client/http/Request.h"
-#include "client/Client.h"
-#include "json/json.h"
-#include "LuaScriptInterface.h"
-#include "Format.h"
 #include "Config.h"
-#include <memory>
+#include "Format.h"
+#include "LuaScriptInterface.h"
+#include "client/Client.h"
+#include "client/http/Request.h"
+#include "json/json.h"
 #include <iostream>
+#include <memory>
 
 class RequestHandle
 {
@@ -46,7 +45,15 @@ private:
 	}
 
 public:
-	static int Make(lua_State *L, const ByteString &uri, bool isPost, const ByteString &verb, RequestType type, const http::PostData &postData, const std::vector<http::Header> &headers)
+	static int Make(
+		lua_State *L,
+		const ByteString &uri,
+		bool isPost,
+		const ByteString &verb,
+		RequestType type,
+		const http::PostData &postData,
+		const std::vector<http::Header> &headers
+	)
 	{
 		auto authUser = Client::Ref().GetAuthUser();
 		if (type == getAuthToken && !authUser.UserID)
@@ -60,7 +67,7 @@ public:
 		{
 			return 0;
 		}
-		new(rh) RequestHandle();
+		new (rh) RequestHandle();
 		rh->type = type;
 		rh->request = std::make_unique<http::Request>(uri);
 		if (verb.size())
@@ -213,7 +220,7 @@ static int HTTPRequest_finish(lua_State *L)
 	if (!rh->Dead())
 	{
 		std::vector<http::Header> headers;
-		auto [ status, data ] = rh->Finish(headers);
+		auto [status, data] = rh->Finish(headers);
 		tpt_lua_pushByteString(L, data);
 		lua_pushinteger(L, status);
 		lua_newtable(L);
@@ -352,7 +359,17 @@ static int request(lua_State *L, bool isPost)
 
 static int getAuthToken(lua_State *L)
 {
-	return RequestHandle::Make(L, ByteString::Build(SERVER, "/ExternalAuth.api?Action=Get&Audience=", format::URLEncode(tpt_lua_checkByteString(L, 1))), false, {}, RequestHandle::getAuthToken, {}, {});
+	return RequestHandle::Make(
+		L,
+		ByteString::Build(
+			SERVER, "/ExternalAuth.api?Action=Get&Audience=", format::URLEncode(tpt_lua_checkByteString(L, 1))
+		),
+		false,
+		{},
+		RequestHandle::getAuthToken,
+		{},
+		{}
+	);
 }
 
 static int get(lua_State *L)
@@ -369,7 +386,7 @@ void LuaHttp::Open(lua_State *L)
 {
 	{
 		static const luaL_Reg reg[] = {
-#define LFUNC(v) { #v, HTTPRequest_ ## v }
+#define LFUNC(v) { #v, HTTPRequest_##v }
 			LFUNC(status),
 			LFUNC(progress),
 			LFUNC(cancel),

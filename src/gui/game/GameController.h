@@ -1,23 +1,23 @@
 #pragma once
-#include "lua/CommandInterfacePtr.h"
+#include "Misc.h"
 #include "client/ClientListener.h"
 #include "client/StartupInfo.h"
 #include "common/ExplicitSingleton.h"
-#include "gui/interface/Point.h"
-#include "gui/interface/Colour.h"
 #include "gui/SavePreviewType.h"
-#include "simulation/Sign.h"
+#include "gui/interface/Colour.h"
+#include "gui/interface/Point.h"
+#include "lua/CommandInterfacePtr.h"
 #include "simulation/Particle.h"
-#include "Misc.h"
-#include <vector>
-#include <utility>
+#include "simulation/Sign.h"
 #include <memory>
+#include <utility>
+#include <vector>
 
-constexpr auto DEBUG_PARTS      = 0x0001;
+constexpr auto DEBUG_PARTS = 0x0001;
 constexpr auto DEBUG_ELEMENTPOP = 0x0002;
-constexpr auto DEBUG_LINES      = 0x0004;
-constexpr auto DEBUG_PARTICLE   = 0x0008;
-constexpr auto DEBUG_SURFNORM   = 0x0010;
+constexpr auto DEBUG_LINES = 0x0004;
+constexpr auto DEBUG_PARTICLE = 0x0008;
+constexpr auto DEBUG_SURFNORM = 0x0010;
 
 class DebugInfo;
 class SaveFile;
@@ -38,6 +38,7 @@ class GameSave;
 class LoginController;
 class TagsController;
 class ConsoleController;
+
 class GameController : public ClientListener, public ExplicitSingleton<GameController>
 {
 	CommandInterfacePtr commandInterface;
@@ -46,21 +47,22 @@ private:
 	bool firstTick;
 	int foundSignID;
 
-	PreviewController * activePreview;
-	GameView * gameView;
-	GameModel * gameModel;
-	SearchController * search;
-	RenderController * renderOptions;
-	LoginController * loginWindow;
-	ConsoleController * console;
-	TagsController * tagsWindow;
-	LocalBrowserController * localBrowser;
-	OptionsController * options;
+	PreviewController *activePreview;
+	GameView *gameView;
+	GameModel *gameModel;
+	SearchController *search;
+	RenderController *renderOptions;
+	LoginController *loginWindow;
+	ConsoleController *console;
+	TagsController *tagsWindow;
+	LocalBrowserController *localBrowser;
+	OptionsController *options;
 	std::vector<std::unique_ptr<DebugInfo>> debugInfo;
 	std::unique_ptr<Snapshot> beforeRestore;
 	unsigned int debugFlags;
-	
+
 	void OpenSaveDone();
+
 public:
 	enum MouseupReason
 	{
@@ -72,7 +74,7 @@ public:
 	bool HasDone;
 	GameController();
 	~GameController();
-	GameView * GetView();
+	GameView *GetView();
 	int GetSignAt(int x, int y);
 	String GetSignText(int signID);
 	std::pair<int, sign::Type> GetSignSplit(int signID);
@@ -129,16 +131,25 @@ public:
 	int GetTemperatureScale();
 	int GetEdgeMode();
 	void SetEdgeMode(int edgeMode);
-	void SetDebugFlags(unsigned int flags) { debugFlags = flags; }
-	unsigned int GetDebugFlags() const { return debugFlags; }
+
+	void SetDebugFlags(unsigned int flags)
+	{
+		debugFlags = flags;
+	}
+
+	unsigned int GetDebugFlags() const
+	{
+		return debugFlags;
+	}
+
 	void SetActiveMenu(int menuID);
-	std::vector<Menu*> GetMenuList();
+	std::vector<Menu *> GetMenuList();
 	int GetNumMenus(bool onlyEnabled);
 	void RebuildFavoritesMenu();
-	Tool * GetActiveTool(int selection);
-	void SetActiveTool(int toolSelection, Tool * tool);
+	Tool *GetActiveTool(int selection);
+	void SetActiveTool(int toolSelection, Tool *tool);
 	void SetActiveTool(int toolSelection, ByteString identifier);
-	void SetLastTool(Tool * tool);
+	void SetLastTool(Tool *tool);
 	Tool *GetLastTool();
 	int GetReplaceModeFlags();
 	void SetReplaceModeFlags(int flags);
@@ -175,7 +186,7 @@ public:
 	ui::Point PointTranslate(ui::Point point);
 	ui::Point NormaliseBlockCoord(ui::Point point);
 	String ElementResolve(int type, int ctype);
-	String BasicParticleInfo(Particle const &sample_part);
+	String BasicParticleInfo(const Particle &sample_part);
 	bool IsValidElement(int type);
 	String WallName(int type);
 	ByteString TakeScreenshot(int captureUI, int fileType);
@@ -193,11 +204,11 @@ public:
 	bool LoadClipboard();
 	void LoadStamp(std::unique_ptr<GameSave> stamp);
 
-	void RemoveNotification(Notification * notification);
+	void RemoveNotification(Notification *notification);
 
-	void NotifyUpdateAvailable(Client * sender) override;
-	void NotifyAuthUserChanged(Client * sender) override;
-	void NotifyNewNotification(Client * sender, ServerNotification notification) override;
+	void NotifyUpdateAvailable(Client *sender) override;
+	void NotifyAuthUserChanged(Client *sender) override;
+	void NotifyNewNotification(Client *sender, ServerNotification notification) override;
 	void RunUpdater(UpdateInfo info);
 	bool GetMouseClickRequired();
 

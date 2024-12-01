@@ -1,11 +1,11 @@
-#include "Platform.h"
-#include "resource.h"
-#include "common/tpt-rand.h"
 #include "Config.h"
-#include <memory>
+#include "Platform.h"
+#include "common/tpt-rand.h"
+#include "resource.h"
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <sys/stat.h>
 
 namespace Platform
@@ -18,10 +18,12 @@ std::string sharedCwd;
 // search - list of search terms. extensions - list of extensions to also match
 std::vector<ByteString> DirectorySearch(ByteString directory, ByteString search, std::vector<ByteString> extensions)
 {
-	//Get full file listing
-	//Normalise directory string, ensure / or \ is present
+	// Get full file listing
+	// Normalise directory string, ensure / or \ is present
 	if (!directory.size() || (directory.back() != '/' && directory.back() != '\\'))
+	{
 		directory.append(1, PATH_SEP_CHAR);
+	}
 	auto directoryList = DirectoryList(directory);
 
 	search = search.ToLower();
@@ -42,23 +44,39 @@ std::vector<ByteString> DirectorySearch(ByteString directory, ByteString search,
 		}
 		bool searchMatch = !search.size();
 		if (search.size() && tempfilename.Contains(search))
+		{
 			searchMatch = true;
+		}
 
 		if (searchMatch && extensionMatch)
+		{
 			searchResults.push_back(filename);
+		}
 	}
 
-	//Filter results
+	// Filter results
 	return searchResults;
 }
 
 bool ReadFile(std::vector<char> &fileData, ByteString filename)
 {
 	std::ifstream f(filename, std::ios::binary);
-	if (f) f.seekg(0, std::ios::end);
-	if (f) fileData.resize(f.tellg());
-	if (f) f.seekg(0);
-	if (f && fileData.size()) f.read(fileData.data(), fileData.size());
+	if (f)
+	{
+		f.seekg(0, std::ios::end);
+	}
+	if (f)
+	{
+		fileData.resize(f.tellg());
+	}
+	if (f)
+	{
+		f.seekg(0);
+	}
+	if (f && fileData.size())
+	{
+		f.read(fileData.data(), fileData.size());
+	}
 	if (!f)
 	{
 		std::cerr << "ReadFile: " << filename << ": " << strerror(errno) << std::endl;
@@ -75,7 +93,8 @@ bool WriteFile(const std::vector<char> &fileData, ByteString filename)
 	{
 		while (true)
 		{
-			writeFileName = ByteString::Build(filename, ".temp.", Format::Width(5), Format::Fill('0'), interfaceRng() % 100000);
+			writeFileName =
+				ByteString::Build(filename, ".temp.", Format::Width(5), Format::Fill('0'), interfaceRng() % 100000);
 			if (!FileExists(writeFileName))
 			{
 				break;
@@ -85,7 +104,10 @@ bool WriteFile(const std::vector<char> &fileData, ByteString filename)
 	bool ok = false;
 	{
 		std::ofstream f(writeFileName, std::ios::binary);
-		if (f) f.write(fileData.data(), fileData.size());
+		if (f)
+		{
+			f.write(fileData.data(), fileData.size());
+		}
 		ok = bool(f);
 	}
 	if (!ok)

@@ -1,25 +1,25 @@
 #pragma once
-#include "Particle.h"
-#include "Stickman.h"
-#include "WallType.h"
-#include "Sign.h"
-#include "ElementDefs.h"
-#include "BuiltinGOL.h"
-#include "MenuSection.h"
 #include "AccessProperty.h"
+#include "BuiltinGOL.h"
 #include "CoordStack.h"
-#include "common/tpt-rand.h"
-#include "gravity/Gravity.h"
-#include "graphics/RendererFrame.h"
 #include "Element.h"
+#include "ElementDefs.h"
+#include "MenuSection.h"
+#include "Particle.h"
+#include "Sign.h"
 #include "SimulationConfig.h"
 #include "SimulationSettings.h"
-#include <cstring>
-#include <cstddef>
-#include <vector>
+#include "Stickman.h"
+#include "WallType.h"
+#include "common/tpt-rand.h"
+#include "graphics/RendererFrame.h"
+#include "gravity/Gravity.h"
 #include <array>
+#include <cstddef>
+#include <cstring>
 #include <memory>
 #include <optional>
+#include <vector>
 
 constexpr int CHANNELS = int(MAX_TEMP - 73) / 100 + 2;
 
@@ -45,7 +45,7 @@ struct RenderableSimulation
 
 	playerst player;
 	playerst player2;
-	playerst fighters[MAX_FIGHTERS]; //Defined in Stickman.h
+	playerst fighters[MAX_FIGHTERS]; // Defined in Stickman.h
 
 	float vx[YCELLS][XCELLS];
 	float vy[YCELLS][XCELLS];
@@ -115,7 +115,7 @@ public:
 	// initialized in clear_sim
 	int pfree;
 	bool elementRecount;
-	unsigned char fighcount; //Contains the number of fighters
+	unsigned char fighcount; // Contains the number of fighters
 	uint64_t frameCount;
 	bool ensureDeterminism;
 
@@ -125,7 +125,7 @@ public:
 	int sandcolour_interface;
 
 	void Load(const GameSave *save, bool includePressure, Vec2<int> blockP); // block coordinates
-	std::unique_ptr<GameSave> Save(bool includePressure, Rect<int> partR); // particle coordinates
+	std::unique_ptr<GameSave> Save(bool includePressure, Rect<int> partR);   // particle coordinates
 	void SaveSimOptions(GameSave &gameSave);
 	SimulationSample GetSample(int x, int y);
 
@@ -160,8 +160,8 @@ public:
 	int FloodINST(int x, int y);
 	void detach(int i);
 	bool part_change_type(int i, int x, int y, int t);
-	//int InCurrentBrush(int i, int j, int rx, int ry);
-	//int get_brush_flags();
+	// int InCurrentBrush(int i, int j, int rx, int ry);
+	// int get_brush_flags();
 	int create_part(int p, int x, int y, int t, int v = -1);
 	void delete_part(int x, int y);
 	void get_sign_pos(int i, int *x0, int *y0, int *w, int *h);
@@ -180,38 +180,53 @@ public:
 	void SetEdgeMode(int newEdgeMode);
 	void SetDecoSpace(int newDecoSpace);
 
-	//Drawing Deco
+	// Drawing Deco
 	void ApplyDecoration(int x, int y, int colR, int colG, int colB, int colA, int mode);
-	void ApplyDecorationPoint(int x, int y, int colR, int colG, int colB, int colA, int mode, Brush const &cBrush);
-	void ApplyDecorationLine(int x1, int y1, int x2, int y2, int colR, int colG, int colB, int colA, int mode, Brush const &cBrush);
+	void ApplyDecorationPoint(int x, int y, int colR, int colG, int colB, int colA, int mode, const Brush &cBrush);
+	void ApplyDecorationLine(
+		int x1, int y1, int x2, int y2, int colR, int colG, int colB, int colA, int mode, const Brush &cBrush
+	);
 	void ApplyDecorationBox(int x1, int y1, int x2, int y2, int colR, int colG, int colB, int colA, int mode);
 	bool ColorCompare(const RendererFrame &frame, int x, int y, int replaceR, int replaceG, int replaceB);
-	void ApplyDecorationFill(const RendererFrame &frame, int x, int y, int colR, int colG, int colB, int colA, int replaceR, int replaceG, int replaceB);
+	void ApplyDecorationFill(
+		const RendererFrame &frame,
+		int x,
+		int y,
+		int colR,
+		int colG,
+		int colB,
+		int colA,
+		int replaceR,
+		int replaceG,
+		int replaceB
+	);
 
-	//Drawing Walls
-	int CreateWalls(int x, int y, int rx, int ry, int wall, Brush const *cBrush = nullptr);
-	void CreateWallLine(int x1, int y1, int x2, int y2, int rx, int ry, int wall, Brush const *cBrush = nullptr);
+	// Drawing Walls
+	int CreateWalls(int x, int y, int rx, int ry, int wall, const Brush *cBrush = nullptr);
+	void CreateWallLine(int x1, int y1, int x2, int y2, int rx, int ry, int wall, const Brush *cBrush = nullptr);
 	void CreateWallBox(int x1, int y1, int x2, int y2, int wall);
 	int FloodWalls(int x, int y, int wall, int bm);
 
-	//Drawing Particles
-	int CreateParts(int positionX, int positionY, int c, Brush const &cBrush, int flags = -1);
+	// Drawing Particles
+	int CreateParts(int positionX, int positionY, int c, const Brush &cBrush, int flags = -1);
 	int CreateParts(int x, int y, int rx, int ry, int c, int flags = -1);
 	int CreatePartFlags(int x, int y, int c, int flags);
-	void CreateLine(int x1, int y1, int x2, int y2, int c, Brush const &cBrush, int flags = -1);
+	void CreateLine(int x1, int y1, int x2, int y2, int c, const Brush &cBrush, int flags = -1);
 	void CreateLine(int x1, int y1, int x2, int y2, int c);
 	void CreateBox(int x1, int y1, int x2, int y2, int c, int flags = -1);
 	int FloodParts(int x, int y, int c, int cm, int flags = -1);
 
-	void GetGravityField(int x, int y, float particleGrav, float newtonGrav, float & pGravX, float & pGravY);
+	void GetGravityField(int x, int y, float particleGrav, float newtonGrav, float &pGravX, float &pGravY);
 
 	int get_wavelength_bin(int *wm);
+
 	struct GetNormalResult
 	{
 		bool success;
 		float nx, ny;
 		int lx, ly, rx, ry;
 	};
+
 	GetNormalResult get_normal(int pt, int x, int y, float dx, float dy) const;
 	template<bool PhotoelectricEffect, class Sim>
 	static GetNormalResult get_normal_interp(Sim &sim, int pt, float x0, float y0, float dx, float dy);
@@ -225,5 +240,5 @@ public:
 	void UpdateGravityMask();
 
 private:
-	CoordStack& getCoordStackSingleton();
+	CoordStack &getCoordStackSingleton();
 };

@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "BIZR.h"
+#include "simulation/ElementCommon.h"
 
 void Element::Element_BIZRG()
 {
@@ -17,7 +17,7 @@ void Element::Element_BIZRG()
 	Collision = -0.1f;
 	Gravity = 0.0f;
 	Diffusion = 2.75f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;

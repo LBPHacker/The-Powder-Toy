@@ -1,13 +1,13 @@
 #pragma once
-#include "common/String.h"
 #include "Activity.h"
 #include "client/UserInfo.h"
+#include "common/String.h"
 #include <memory>
 
 namespace http
 {
-	class SaveUserInfoRequest;
-	class GetUserInfoRequest;
+class SaveUserInfoRequest;
+class GetUserInfoRequest;
 }
 
 namespace ui
@@ -15,7 +15,9 @@ namespace ui
 class Label;
 class ScrollPanel;
 }
-class ProfileActivity: public WindowActivity {
+
+class ProfileActivity : public WindowActivity
+{
 	ui::ScrollPanel *scrollPanel;
 	ui::Label *location;
 	ui::Label *bio;

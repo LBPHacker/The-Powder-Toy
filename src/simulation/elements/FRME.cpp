@@ -18,7 +18,7 @@ void Element::Element_FRME()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -47,7 +47,7 @@ void Element::Element_FRME()
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
-	if(cpart->tmp)
+	if (cpart->tmp)
 	{
 		*colr += 30;
 		*colg += 30;

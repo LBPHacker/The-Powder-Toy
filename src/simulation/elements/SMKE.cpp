@@ -18,7 +18,7 @@ void Element::Element_SMKE()
 	Collision = 0.0f;
 	Gravity = -0.1f;
 	Diffusion = 0.00f;
-	HotAir = 0.001f	* CFDS;
+	HotAir = 0.001f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;
@@ -32,7 +32,7 @@ void Element::Element_SMKE()
 	HeatConduct = 88;
 	Description = "Smoke, created by fire.";
 
-	Properties = TYPE_GAS|PROP_LIFE_DEC|PROP_LIFE_KILL_DEC;
+	Properties = TYPE_GAS | PROP_LIFE_DEC | PROP_LIFE_KILL_DEC;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -57,8 +57,8 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	*fireg = 55;
 	*fireb = 55;
 
-	*pixel_mode = PMODE_NONE; //Clear default, don't draw pixel
+	*pixel_mode = PMODE_NONE; // Clear default, don't draw pixel
 	*pixel_mode |= FIRE_BLEND;
-	//Returning 1 means static, cache as we please
+	// Returning 1 means static, cache as we please
 	return 1;
 }

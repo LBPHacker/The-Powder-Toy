@@ -1,8 +1,8 @@
 #include "Platform.h"
+#include <atomic>
 #include <ctime>
 #include <emscripten.h>
 #include <emscripten/threading.h>
-#include <atomic>
 #include <iostream>
 
 static std::atomic<bool> shouldSyncFs = false;
@@ -17,16 +17,12 @@ namespace Platform
 {
 void OpenURI(ByteString uri)
 {
-	EM_ASM({
-		open(UTF8ToString($0));
-	}, uri.c_str());
+	EM_ASM({ open(UTF8ToString($0)); }, uri.c_str());
 }
 
 void DoRestart()
 {
-	EM_ASM({
-		location.reload();
-	});
+	EM_ASM({ location.reload(); });
 }
 
 long unsigned int GetTime()
@@ -66,20 +62,23 @@ ByteString DefaultDdir()
 
 int InvokeMain(int argc, char *argv[])
 {
-	EM_ASM({
-		FS.syncfs(true, () => {
-			Module.ccall('MainJs', 'number', [ 'number', 'number' ], [ $0, $1 ]);
-		});
-	}, argc, argv);
+	EM_ASM(
+		{ FS.syncfs(true, () = > { Module.ccall('MainJs', 'number', [ 'number', 'number' ], [ $0, $1 ]); }); },
+		argc,
+		argv
+	);
 	return 0;
 }
 
 void MarkPresentable()
 {
 	EM_ASM({
-		try {
+		try
+		{
 			window.mark_presentable();
-		} catch (e) {
+		}
+		catch (e)
+		{
 		}
 	});
 }
@@ -91,12 +90,17 @@ void MaybeTriggerSyncFs()
 		std::cerr << "invoking FS.syncfs" << std::endl;
 		syncFsInFlight = true;
 		EM_ASM({
-			FS.syncfs(false, err => {
-				if (err) {
-					console.error(err);
-				}
-				Module.ccall('Platform_SyncFsDone', null, [], []);
-			});
+			FS.syncfs(
+				false,
+				err = >
+					{
+						if (err)
+						{
+							console.error(err);
+						}
+						Module.ccall('Platform_SyncFsDone', null, [], []);
+					}
+			);
 		});
 	}
 }
@@ -133,44 +137,51 @@ EMSCRIPTEN_KEEPALIVE extern "C" void Platform_ShouldSyncFs()
 
 namespace Platform
 {
-	void SetupCrt()
-	{
-		EM_ASM({
+void SetupCrt()
+{
+	EM_ASM(
+		{
 			// If we don't castrate assert here, we get a crash from within the emscripten port of
-			// SDL2 having to do with registering a callback that reports to the main thread, ever
-			// since this "fix" https://github.com/emscripten-core/emscripten/pull/19691/files
-			// TODO: Review later.
-			assert = () => {};
+		    // SDL2 having to do with registering a callback that reports to the main thread, ever
+		    // since this "fix" https://github.com/emscripten-core/emscripten/pull/19691/files
+		    // TODO: Review later.
+			assert = () = > {};
 
 			let ddir = UTF8ToString($0);
 			let prefix = ddir + '/';
-			let shouldSyncFs = Module.cwrap(
-				'Platform_ShouldSyncFs',
-				null,
-				[]
-			);
-			FS.trackingDelegate['onMovePath'] = function(oldpath, newpath) {
-				if (oldpath.startsWith(prefix) || newpath.startsWith(prefix)) {
+			let shouldSyncFs = Module.cwrap('Platform_ShouldSyncFs', null, []);
+			FS.trackingDelegate['onMovePath'] = function(oldpath, newpath)
+			{
+				if (oldpath.startsWith(prefix) || newpath.startsWith(prefix))
+				{
 					shouldSyncFs();
 				}
 			};
-			FS.trackingDelegate['onDeletePath'] = function(path) {
-				if (path.startsWith(prefix)) {
+			FS.trackingDelegate['onDeletePath'] = function(path)
+			{
+				if (path.startsWith(prefix))
+				{
 					shouldSyncFs();
 				}
 			};
-			FS.trackingDelegate['onWriteToFile'] = function(path, bytesWritten) {
-				if (path.startsWith(prefix)) {
+			FS.trackingDelegate['onWriteToFile'] = function(path, bytesWritten)
+			{
+				if (path.startsWith(prefix))
+				{
 					shouldSyncFs();
 				}
 			};
-			FS.trackingDelegate['onMakeDirectory'] = function(path, mode) {
-				if (path.startsWith(prefix)) {
+			FS.trackingDelegate['onMakeDirectory'] = function(path, mode)
+			{
+				if (path.startsWith(prefix))
+				{
 					shouldSyncFs();
 				}
 			};
 			FS.mkdir(ddir);
 			FS.mount(IDBFS, {}, ddir);
-		}, DefaultDdir().c_str());
-	}
+		},
+		DefaultDdir().c_str()
+	);
+}
 }

@@ -1,15 +1,16 @@
 #pragma once
-#include <vector>
 #include <cstdint>
+#include <vector>
 
 class RenderView;
 class Renderer;
 struct RendererSettings;
 class Simulation;
+
 class RenderModel
 {
-	std::vector<RenderView*> observers;
-	Renderer * renderer = nullptr;
+	std::vector<RenderView *> observers;
+	Renderer *renderer = nullptr;
 	RendererSettings *rendererSettings = nullptr;
 	Simulation *sim = nullptr;
 	void notifyRendererChanged();
@@ -17,12 +18,13 @@ class RenderModel
 	void notifyRenderChanged();
 	void notifyDisplayChanged();
 	void notifyColourChanged();
+
 public:
-	Renderer * GetRenderer();
+	Renderer *GetRenderer();
 	RendererSettings *GetRendererSettings();
 	Simulation *GetSimulation();
-	void AddObserver(RenderView * observer);
-	void SetRenderer(Renderer * ren, RendererSettings *newRendererSettings);
+	void AddObserver(RenderView *observer);
+	void SetRenderer(Renderer *ren, RendererSettings *newRendererSettings);
 	void SetSimulation(Simulation *newSim);
 	void SetRenderMode(uint32_t newRenderMode);
 	uint32_t GetRenderMode();

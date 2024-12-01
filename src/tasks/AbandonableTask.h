@@ -5,7 +5,7 @@
 class AbandonableTask : public Task
 {
 	std::condition_variable done_cv;
-	
+
 public:
 	void Finish();
 	void Abandon();

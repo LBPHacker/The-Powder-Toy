@@ -1,6 +1,7 @@
 #include "simulation/ToolCommon.h"
 
-static int perform(SimTool *tool, Simulation * sim, Particle * cpart, int x, int y, int brushX, int brushYy, float strength);
+static int
+	perform(SimTool *tool, Simulation *sim, Particle *cpart, int x, int y, int brushX, int brushYy, float strength);
 
 void SimTool::Tool_NGRV()
 {
@@ -11,7 +12,8 @@ void SimTool::Tool_NGRV()
 	Perform = &perform;
 }
 
-static int perform(SimTool *tool, Simulation * sim, Particle * cpart, int x, int y, int brushX, int brushYy, float strength)
+static int
+	perform(SimTool *tool, Simulation *sim, Particle *cpart, int x, int y, int brushX, int brushYy, float strength)
 {
 	sim->gravIn.mass[Vec2{ x, y } / CELL] = strength * -5.0f;
 	return 1;

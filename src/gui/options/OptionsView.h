@@ -1,19 +1,20 @@
 #pragma once
 #include "common/String.h"
-#include "gui/interface/Window.h"
 #include "gui/interface/ScrollPanel.h"
+#include "gui/interface/Window.h"
 
 namespace ui
 {
-	class Checkbox;
-	class DropDown;
-	class Textbox;
-	class Button;
+class Checkbox;
+class DropDown;
+class Textbox;
+class Button;
 }
 
 class OptionsModel;
 class OptionsController;
-class OptionsView: public ui::Window
+
+class OptionsView : public ui::Window
 {
 	OptionsController *c{};
 	ui::Checkbox *heatSimulation{};
@@ -47,10 +48,11 @@ class OptionsView: public ui::Window
 	void UpdateAmbientAirTempPreview(float airTemp, bool isValid);
 	void AmbientAirTempToTextBox(float airTemp);
 	void UpdateAirTemp(String temp, bool isDefocus);
+
 public:
 	OptionsView();
-	void NotifySettingsChanged(OptionsModel * sender);
-	void AttachController(OptionsController * c_);
+	void NotifySettingsChanged(OptionsModel *sender);
+	void AttachController(OptionsController *c_);
 	void OnDraw() override;
 	void OnTryExit(ExitMethod method) override;
 };

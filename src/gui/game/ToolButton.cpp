@@ -1,10 +1,10 @@
 #include "ToolButton.h"
+#include "Favorite.h"
 #include "graphics/Graphics.h"
 #include "graphics/VideoBuffer.h"
-#include "Favorite.h"
 #include <SDL.h>
 
-ToolButton::ToolButton(ui::Point position, ui::Point size, String text, ByteString toolIdentifier, String toolTip):
+ToolButton::ToolButton(ui::Point position, ui::Point size, String text, ByteString toolIdentifier, String toolTip) :
 	ui::Button(position, size, text, toolTip),
 	toolIdentifier(toolIdentifier)
 {
@@ -12,7 +12,7 @@ ToolButton::ToolButton(ui::Point position, ui::Point size, String text, ByteStri
 	Appearance.BorderActive = ui::Colour(255, 0, 0);
 	Appearance.BorderFavorite = ui::Colour(255, 255, 0);
 
-	//don't use "..." on elements that have long names
+	// don't use "..." on elements that have long names
 	buttonDisplayText = ButtonText.Substr(0, 7);
 	Component::TextPosition(buttonDisplayText);
 }
@@ -27,15 +27,21 @@ void ToolButton::OnMouseDown(int x, int y, unsigned int button)
 
 void ToolButton::OnMouseClick(int x, int y, unsigned int button)
 {
-	if(isButtonDown)
+	if (isButtonDown)
 	{
 		isButtonDown = false;
-		if(button == SDL_BUTTON_LEFT)
+		if (button == SDL_BUTTON_LEFT)
+		{
 			SetSelectionState(0);
-		if(button == SDL_BUTTON_RIGHT)
+		}
+		if (button == SDL_BUTTON_RIGHT)
+		{
 			SetSelectionState(1);
-		if(button == SDL_BUTTON_MIDDLE)
+		}
+		if (button == SDL_BUTTON_MIDDLE)
+		{
 			SetSelectionState(2);
+		}
 		DoAction();
 	}
 }
@@ -46,14 +52,17 @@ void ToolButton::OnMouseUp(int x, int y, unsigned int button)
 	isButtonDown = false;
 }
 
-void ToolButton::Draw(const ui::Point& screenPos)
+void ToolButton::Draw(const ui::Point &screenPos)
 {
-	Graphics * g = GetGraphics();
+	Graphics *g = GetGraphics();
 	auto rect = ClipRect;
 	if (ClipRect.size.X && ClipRect.size.Y)
+	{
 		g->SwapClipRect(rect); // old cliprect is now in rect
+	}
 
-	int totalColour = Appearance.BackgroundInactive.Blue + (3*Appearance.BackgroundInactive.Green) + (2*Appearance.BackgroundInactive.Red);
+	int totalColour = Appearance.BackgroundInactive.Blue + (3 * Appearance.BackgroundInactive.Green) +
+		(2 * Appearance.BackgroundInactive.Red);
 
 	if (Appearance.GetTexture())
 	{
@@ -78,7 +87,7 @@ void ToolButton::Draw(const ui::Point& screenPos)
 		g->BlendText(screenPos, 0xE068, Appearance.BorderFavorite);
 	}
 
-	if (totalColour<544)
+	if (totalColour < 544)
 	{
 		g->BlendText(screenPos + textPosition, buttonDisplayText, 0xFFFFFF_rgb .WithAlpha(255));
 	}
@@ -88,13 +97,15 @@ void ToolButton::Draw(const ui::Point& screenPos)
 	}
 
 	if (ClipRect.size.X && ClipRect.size.Y)
+	{
 		g->SwapClipRect(rect); // apply old clip rect
+	}
 }
 
 void ToolButton::SetSelectionState(int state)
 {
 	currentSelection = state;
-	switch(state)
+	switch (state)
 	{
 	case 0:
 		Appearance.BorderInactive = ui::Colour(255, 0, 0);

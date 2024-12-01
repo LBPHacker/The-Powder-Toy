@@ -33,7 +33,7 @@ void Element::Element_GRVT()
 	HeatConduct = 61;
 	Description = "Gravitons. Create Newtonian Gravity.";
 
-	Properties = TYPE_ENERGY|PROP_LIFE_DEC|PROP_LIFE_KILL_DEC;
+	Properties = TYPE_ENERGY | PROP_LIFE_DEC | PROP_LIFE_KILL_DEC;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -53,19 +53,22 @@ void Element::Element_GRVT()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	//at higher tmps they just go completely insane
+	// at higher tmps they just go completely insane
 	if (parts[i].tmp >= 100)
+	{
 		parts[i].tmp = 100;
+	}
 	if (parts[i].tmp <= -100)
+	{
 		parts[i].tmp = -100;
+	}
 
 	int under = pmap[y][x];
 	int utype = TYP(under);
 
-	//Randomly kill GRVT inside RSSS
-	if((utype == PT_RSSS) && sim->rng.chance(1, 5))
+	// Randomly kill GRVT inside RSSS
+	if ((utype == PT_RSSS) && sim->rng.chance(1, 5))
 	{
-
 		sim->kill_part(i);
 		return 1;
 	}
@@ -88,6 +91,6 @@ static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
 	float a = sim->rng.between(0, 359) * 3.14159f / 180.0f;
 	sim->parts[i].life = 250 + sim->rng.between(0, 199);
-	sim->parts[i].vx = 2.0f*cosf(a);
-	sim->parts[i].vy = 2.0f*sinf(a);
+	sim->parts[i].vx = 2.0f * cosf(a);
+	sim->parts[i].vy = 2.0f * sinf(a);
 }

@@ -8,7 +8,7 @@
 
 using namespace ui;
 
-ProgressBar::ProgressBar(Point position, Point size, int startProgress, String startStatus):
+ProgressBar::ProgressBar(Point position, Point size, int startProgress, String startStatus) :
 	Component(position, size),
 	progress(0),
 	intermediatePos(0.0f),
@@ -21,8 +21,10 @@ ProgressBar::ProgressBar(Point position, Point size, int startProgress, String s
 void ProgressBar::SetProgress(int progress)
 {
 	this->progress = progress;
-	if(this->progress > 100)
+	if (this->progress > 100)
+	{
 		this->progress = 100;
+	}
 }
 
 int ProgressBar::GetProgress()
@@ -52,10 +54,11 @@ void ProgressBar::Draw(const Point &screenPos)
 		{
 			g->DrawFilledRect(inner, bgColour.NoAlpha());
 		}
-		g->BlendText(screenPos + Vec2{
-			(Size.X - (Graphics::TextSize(progressStatus).X - 1)) / 2,
-			(Size.Y - 8) / 2
-		}, progressStatus, textColour);
+		g->BlendText(
+			screenPos + Vec2{ (Size.X - (Graphics::TextSize(progressStatus).X - 1)) / 2, (Size.Y - 8) / 2 },
+			progressStatus,
+			textColour
+		);
 		g->SwapClipRect(clip);
 	};
 	drawContent(0, inner.size.X, 0x000000_rgb .WithAlpha(0), 0xFFFFFF_rgb .WithAlpha(255));
@@ -75,7 +78,9 @@ void ProgressBar::Draw(const Point &screenPos)
 
 void ProgressBar::Tick(float dt)
 {
-	intermediatePos += 1.0f*dt;
-	if(intermediatePos>100.0f)
+	intermediatePos += 1.0f * dt;
+	if (intermediatePos > 100.0f)
+	{
 		intermediatePos = 0.0f;
+	}
 }

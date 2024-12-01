@@ -6,14 +6,22 @@
 class SaveFile;
 class LocalBrowserView;
 class LocalBrowserModel;
-class LocalBrowserController {
-	LocalBrowserView * browserView;
-	LocalBrowserModel * browserModel;
-	std::function<void ()> onDone;
+
+class LocalBrowserController
+{
+	LocalBrowserView *browserView;
+	LocalBrowserModel *browserModel;
+	std::function<void()> onDone;
+
 public:
 	bool HasDone;
-	LocalBrowserController(std::function<void ()> onDone = nullptr);
-	LocalBrowserView * GetView() {return browserView;}
+	LocalBrowserController(std::function<void()> onDone = nullptr);
+
+	LocalBrowserView *GetView()
+	{
+		return browserView;
+	}
+
 	std::unique_ptr<SaveFile> TakeSave();
 	void RemoveSelected();
 	void removeSelectedC();

@@ -7,16 +7,30 @@ void Client::LoadAuthUser()
 {
 	ByteString newUsername, newSessionKey;
 	if (EM_ASM_INT({
-		return (document.querySelector("#PowderSessionInfo [name='Username']") &&
-		        document.querySelector("#PowderSessionInfo [name='SessionKey']")) ? 1 : 0;
-	}))
+			return (document.querySelector("#PowderSessionInfo [name='Username']") &&
+		            document.querySelector("#PowderSessionInfo [name='SessionKey']")) ?
+				1 :
+				0;
+		}))
 	{
-		newUsername = ByteString(std::unique_ptr<char, decltype(&free)>((char *)EM_ASM_PTR({
-			return stringToNewUTF8(document.querySelector("#PowderSessionInfo [name='Username']").value);
-		}), free).get());
-		newSessionKey = ByteString(std::unique_ptr<char, decltype(&free)>((char *)EM_ASM_PTR({
-			return stringToNewUTF8(document.querySelector("#PowderSessionInfo [name='SessionKey']").value);
-		}), free).get());
+		newUsername = ByteString(
+			std::unique_ptr<char, decltype(&free)>(
+				(char *)EM_ASM_PTR({
+					return stringToNewUTF8(document.querySelector("#PowderSessionInfo [name='Username']").value);
+				}),
+				free
+			)
+				.get()
+		);
+		newSessionKey = ByteString(
+			std::unique_ptr<char, decltype(&free)>(
+				(char *)EM_ASM_PTR({
+					return stringToNewUTF8(document.querySelector("#PowderSessionInfo [name='SessionKey']").value);
+				}),
+				free
+			)
+				.get()
+		);
 	}
 	else
 	{

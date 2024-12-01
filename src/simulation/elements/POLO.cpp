@@ -19,7 +19,7 @@ void Element::Element_POLO()
 	Collision = 0.0f;
 	Gravity = 0.4f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;
@@ -34,7 +34,7 @@ void Element::Element_POLO()
 	HeatConduct = 251;
 	Description = "Polonium, highly radioactive. Decays into NEUT and heats up.";
 
-	Properties = TYPE_PART|PROP_NEUTPASS|PROP_RADIOACTIVE|PROP_LIFE_DEC|PROP_DEADLY;
+	Properties = TYPE_PART | PROP_NEUTPASS | PROP_RADIOACTIVE | PROP_LIFE_DEC | PROP_DEADLY;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -89,8 +89,8 @@ static int update(UPDATE_FUNC_ARGS)
 	}
 	if (parts[i].tmp2 >= 10)
 	{
-		sim->part_change_type(i,x,y,PT_PLUT);
-		parts[i].temp = (parts[i].temp+600.0f)/2.0f;
+		sim->part_change_type(i, x, y, PT_PLUT);
+		parts[i].temp = (parts[i].temp + 600.0f) / 2.0f;
 		return 1;
 	}
 	if (TYP(r) == PT_PROT)
@@ -114,7 +114,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		*colb = 0x70;
 	}
 	else
+	{
 		*pixel_mode |= PMODE_GLOW;
+	}
 
 	return 0;
 }

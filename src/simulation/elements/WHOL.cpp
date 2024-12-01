@@ -16,7 +16,7 @@ void Element::Element_WHOL()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.010f	* CFDS;
+	HotAir = 0.010f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;

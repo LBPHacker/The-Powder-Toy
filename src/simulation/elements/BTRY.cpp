@@ -18,7 +18,7 @@ void Element::Element_BTRY()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -53,20 +53,24 @@ static int update(UPDATE_FUNC_ARGS)
 	{
 		for (auto ry = -2; ry <= 2; ry++)
 		{
-			if ((rx || ry) && abs(rx)+abs(ry)<4)
+			if ((rx || ry) && abs(rx) + abs(ry) < 4)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
-					continue;
-				auto rt = TYP(r);
-				auto pavg = sim->parts_avg(i,ID(r),PT_INSL);
-				if (pavg!=PT_INSL && pavg!=PT_RSSS)
 				{
-					if ((elements[rt].Properties&PROP_CONDUCTS) && !(rt==PT_WATR||rt==PT_SLTW||rt==PT_NTCT||rt==PT_PTCT||rt==PT_INWR) && parts[ID(r)].life==0)
+					continue;
+				}
+				auto rt = TYP(r);
+				auto pavg = sim->parts_avg(i, ID(r), PT_INSL);
+				if (pavg != PT_INSL && pavg != PT_RSSS)
+				{
+					if ((elements[rt].Properties & PROP_CONDUCTS) &&
+					    !(rt == PT_WATR || rt == PT_SLTW || rt == PT_NTCT || rt == PT_PTCT || rt == PT_INWR) &&
+					    parts[ID(r)].life == 0)
 					{
 						parts[ID(r)].life = 4;
 						parts[ID(r)].ctype = rt;
-						sim->part_change_type(ID(r),x+rx,y+ry,PT_SPRK);
+						sim->part_change_type(ID(r), x + rx, y + ry, PT_SPRK);
 					}
 				}
 			}

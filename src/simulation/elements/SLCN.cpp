@@ -20,7 +20,7 @@ void Element::Element_SLCN()
 	Collision = -0.1f;
 	Gravity = 0.27f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 1;
 
 	Flammable = 0;
@@ -50,10 +50,8 @@ void Element::Element_SLCN()
 }
 
 static const RGB<uint8_t> SLCN_COLOUR[16] = {
-	0x5A6679_rgb, 0x6878A1_rgb, 0xABBFDD_rgb, 0x838490_rgb,
-	0xBCCDDF_rgb, 0x82A0D2_rgb, 0x5B6680_rgb, 0x232C3B_rgb,
-	0x485067_rgb, 0x8B9AB6_rgb, 0xADB1C1_rgb, 0xC3C6D1_rgb,
-	0x8594AD_rgb, 0x262F47_rgb, 0xA9AEBC_rgb, 0xC2E1F7_rgb,
+	0x5A6679_rgb, 0x6878A1_rgb, 0xABBFDD_rgb, 0x838490_rgb, 0xBCCDDF_rgb, 0x82A0D2_rgb, 0x5B6680_rgb, 0x232C3B_rgb,
+	0x485067_rgb, 0x8B9AB6_rgb, 0xADB1C1_rgb, 0xC3C6D1_rgb, 0x8594AD_rgb, 0x262F47_rgb, 0xA9AEBC_rgb, 0xC2E1F7_rgb,
 };
 
 static void initSparkles(Simulation *sim, Particle &part)
@@ -75,7 +73,8 @@ static int update(UPDATE_FUNC_ARGS)
 	if (phase & 0x1000)
 	{
 		// discard current, current <- next, next <- random, wrap phase
-		parts[i].tmp = (parts[i].tmp & 0xFFF00000) | (phase & 0xFFF) | (sim->rng.between(0, 15) << 16) | ((parts[i].tmp >> 4) & 0xF000);
+		parts[i].tmp = (parts[i].tmp & 0xFFF00000) | (phase & 0xFFF) | (sim->rng.between(0, 15) << 16) |
+			((parts[i].tmp >> 4) & 0xF000);
 	}
 	else
 	{
@@ -113,9 +112,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	{
 		RGB<uint8_t> next_colour = SLCN_COLOUR[(cpart->tmp >> 16) & 15];
 		curr_colour = RGB<uint8_t>(
-			(curr_colour.Red   + next_colour.Red) / 2,
+			(curr_colour.Red + next_colour.Red) / 2,
 			(curr_colour.Green + next_colour.Green) / 2,
-			(curr_colour.Blue  + next_colour.Blue) / 2
+			(curr_colour.Blue + next_colour.Blue) / 2
 		);
 	}
 	*colr = curr_colour.Red;

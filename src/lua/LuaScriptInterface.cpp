@@ -1,4 +1,6 @@
 #include "LuaScriptInterface.h"
+#include "LuaBit.h"
+#include "LuaComponent.h"
 #include "client/http/Request.h"
 #include "common/platform/Platform.h"
 #include "common/tpt-rand.h"
@@ -8,8 +10,6 @@
 #include "gui/game/GameView.h"
 #include "gui/interface/Engine.h"
 #include "gui/interface/Window.h"
-#include "LuaBit.h"
-#include "LuaComponent.h"
 #include "prefs/GlobalPrefs.h"
 #include "simulation/Simulation.h"
 #include "simulation/SimulationData.h"
@@ -70,7 +70,7 @@ static int mathRandomseed(lua_State *L)
 	return 0;
 }
 
-static void hook(lua_State *L, lua_Debug * ar)
+static void hook(lua_State *L, lua_Debug *ar)
 {
 	auto *lsi = GetLSI();
 	if (ar->event == LUA_HOOKCOUNT && int(Platform::GetTime() - lsi->luaExecutionStart) > lsi->luaHookTimeout)
@@ -176,7 +176,8 @@ LuaScriptInterface::LuaScriptInterface(GameController *newGameController, GameMo
 		ref.Assign(L, -1);
 		lua_pop(L, 1);
 	}
-	if (luaL_loadbuffer(L, (const char *)compat_lua, compat_lua_size, "@[built-in compat.lua]") || tpt_lua_pcall(L, 0, 0, 0, eventTraitNone))
+	if (luaL_loadbuffer(L, (const char *)compat_lua, compat_lua_size, "@[built-in compat.lua]") ||
+	    tpt_lua_pcall(L, 0, 0, 0, eventTraitNone))
 	{
 		throw std::runtime_error(ByteString("failed to load built-in compat: ") + tpt_lua_toByteString(L, -1));
 	}
@@ -204,10 +205,14 @@ void CommandInterface::Init()
 	auto *L = lsi->L;
 	if (Platform::FileExists("autorun.lua"))
 	{
-		if(luaL_loadfile(L, "autorun.lua") || tpt_lua_pcall(L, 0, 0, 0, eventTraitNone))
+		if (luaL_loadfile(L, "autorun.lua") || tpt_lua_pcall(L, 0, 0, 0, eventTraitNone))
+		{
 			Log(CommandInterface::LogError, LuaGetError());
+		}
 		else
+		{
 			Log(CommandInterface::LogWarning, "Loaded autorun.lua");
+		}
 	}
 }
 
@@ -221,35 +226,35 @@ void LuaGetProperty(lua_State *L, StructProperty property, intptr_t propertyAddr
 {
 	switch (property.Type)
 	{
-		case StructProperty::TransitionType:
-		case StructProperty::ParticleType:
-		case StructProperty::Integer:
-			lua_pushnumber(L, *((int*)propertyAddress));
-			break;
-		case StructProperty::UInteger:
-			lua_pushnumber(L, *((unsigned int*)propertyAddress));
-			break;
-		case StructProperty::Float:
-			lua_pushnumber(L, *((float*)propertyAddress));
-			break;
-		case StructProperty::UChar:
-			lua_pushnumber(L, *((unsigned char*)propertyAddress));
-			break;
-		case StructProperty::BString:
-		{
-			tpt_lua_pushByteString(L, *((ByteString*)propertyAddress));
-			break;
-		}
-		case StructProperty::String:
-		{
-			tpt_lua_pushString(L, *((String*)propertyAddress));
-			break;
-		}
-		case StructProperty::Colour:
-			lua_pushinteger(L, *((unsigned int*)propertyAddress));
-			break;
-		case StructProperty::Removed:
-			lua_pushnil(L);
+	case StructProperty::TransitionType:
+	case StructProperty::ParticleType:
+	case StructProperty::Integer:
+		lua_pushnumber(L, *((int *)propertyAddress));
+		break;
+	case StructProperty::UInteger:
+		lua_pushnumber(L, *((unsigned int *)propertyAddress));
+		break;
+	case StructProperty::Float:
+		lua_pushnumber(L, *((float *)propertyAddress));
+		break;
+	case StructProperty::UChar:
+		lua_pushnumber(L, *((unsigned char *)propertyAddress));
+		break;
+	case StructProperty::BString:
+	{
+		tpt_lua_pushByteString(L, *((ByteString *)propertyAddress));
+		break;
+	}
+	case StructProperty::String:
+	{
+		tpt_lua_pushString(L, *((String *)propertyAddress));
+		break;
+	}
+	case StructProperty::Colour:
+		lua_pushinteger(L, *((unsigned int *)propertyAddress));
+		break;
+	case StructProperty::Removed:
+		lua_pushnil(L);
 	}
 }
 
@@ -266,41 +271,48 @@ void LuaSetProperty(lua_State *L, StructProperty property, intptr_t propertyAddr
 {
 	switch (property.Type)
 	{
-		case StructProperty::TransitionType:
-		case StructProperty::ParticleType:
-		case StructProperty::Integer:
-			*((int*)propertyAddress) = int32_truncate(luaL_checknumber(L, stackPos));
-			break;
-		case StructProperty::UInteger:
-			*((unsigned int*)propertyAddress) = int32_truncate(luaL_checknumber(L, stackPos));
-			break;
-		case StructProperty::Float:
-			*((float*)propertyAddress) = luaL_checknumber(L, stackPos);
-			break;
-		case StructProperty::UChar:
-			*((unsigned char*)propertyAddress) = int32_truncate(luaL_checknumber(L, stackPos));
-			break;
-		case StructProperty::BString:
-			*((ByteString*)propertyAddress) = tpt_lua_checkByteString(L, stackPos);
-			break;
-		case StructProperty::String:
-			*((String*)propertyAddress) = tpt_lua_checkString(L, stackPos);
-			break;
-		case StructProperty::Colour:
-			*((unsigned int*)propertyAddress) = int32_truncate(luaL_checknumber(L, stackPos));
-			break;
-		case StructProperty::Removed:
-			break;
+	case StructProperty::TransitionType:
+	case StructProperty::ParticleType:
+	case StructProperty::Integer:
+		*((int *)propertyAddress) = int32_truncate(luaL_checknumber(L, stackPos));
+		break;
+	case StructProperty::UInteger:
+		*((unsigned int *)propertyAddress) = int32_truncate(luaL_checknumber(L, stackPos));
+		break;
+	case StructProperty::Float:
+		*((float *)propertyAddress) = luaL_checknumber(L, stackPos);
+		break;
+	case StructProperty::UChar:
+		*((unsigned char *)propertyAddress) = int32_truncate(luaL_checknumber(L, stackPos));
+		break;
+	case StructProperty::BString:
+		*((ByteString *)propertyAddress) = tpt_lua_checkByteString(L, stackPos);
+		break;
+	case StructProperty::String:
+		*((String *)propertyAddress) = tpt_lua_checkString(L, stackPos);
+		break;
+	case StructProperty::Colour:
+		*((unsigned int *)propertyAddress) = int32_truncate(luaL_checknumber(L, stackPos));
+		break;
+	case StructProperty::Removed:
+		break;
 	}
 }
 
-void LuaSetParticleProperty(lua_State *L, int particleID, StructProperty property, intptr_t propertyAddress, int stackPos)
+void LuaSetParticleProperty(
+	lua_State *L, int particleID, StructProperty property, intptr_t propertyAddress, int stackPos
+)
 {
 	auto *lsi = GetLSI();
 	auto *sim = lsi->sim;
 	if (property.Name == "type")
 	{
-		sim->part_change_type(particleID, int(sim->parts[particleID].x+0.5f), int(sim->parts[particleID].y+0.5f), luaL_checkinteger(L, 3));
+		sim->part_change_type(
+			particleID,
+			int(sim->parts[particleID].x + 0.5f),
+			int(sim->parts[particleID].y + 0.5f),
+			luaL_checkinteger(L, 3)
+		);
 	}
 	else if (property.Name == "x" || property.Name == "y")
 	{
@@ -393,9 +405,18 @@ bool CommandInterface::HandleEvent(const GameControllerEvent &event)
 	{
 		lua_rawgeti(L, -1, i);
 		int numArgs = pushGameControllerEvent(L, event);
-		int callret = tpt_lua_pcall(L, numArgs, 1, 0, std::visit([](auto &event) {
-			return event.traits;
-		}, event));
+		int callret = tpt_lua_pcall(
+			L,
+			numArgs,
+			1,
+			0,
+			std::visit(
+				[](auto &event) {
+					return event.traits;
+				},
+				event
+			)
+		);
 		if (callret)
 		{
 			if (LuaGetError() == "Error: Script not responding")
@@ -415,7 +436,9 @@ bool CommandInterface::HandleEvent(const GameControllerEvent &event)
 		else
 		{
 			if (!lua_isnoneornil(L, -1))
+			{
 				cont = lua_toboolean(L, -1);
+			}
 			lua_pop(L, 1);
 		}
 		len = lua_objlen(L, -1);
@@ -425,7 +448,8 @@ bool CommandInterface::HandleEvent(const GameControllerEvent &event)
 }
 
 template<size_t Index>
-std::enable_if_t<Index != std::variant_size_v<GameControllerEvent>, bool> HaveSimGraphicsEventHandlersHelper(lua_State *L, std::vector<LuaSmartRef> &gameControllerEventHandlers)
+std::enable_if_t<Index != std::variant_size_v<GameControllerEvent>, bool>
+	HaveSimGraphicsEventHandlersHelper(lua_State *L, std::vector<LuaSmartRef> &gameControllerEventHandlers)
 {
 	if (std::variant_alternative_t<Index, GameControllerEvent>::traits & eventTraitSimGraphics)
 	{
@@ -441,7 +465,8 @@ std::enable_if_t<Index != std::variant_size_v<GameControllerEvent>, bool> HaveSi
 }
 
 template<size_t Index>
-std::enable_if_t<Index == std::variant_size_v<GameControllerEvent>, bool> HaveSimGraphicsEventHandlersHelper(lua_State *L, std::vector<LuaSmartRef> &gameControllerEventHandlers)
+std::enable_if_t<Index == std::variant_size_v<GameControllerEvent>, bool>
+	HaveSimGraphicsEventHandlersHelper(lua_State *L, std::vector<LuaSmartRef> &gameControllerEventHandlers)
 {
 	return false;
 }
@@ -484,7 +509,9 @@ int CommandInterface::Command(String command)
 		int level = lua_gettop(L), ret = -1;
 		lsi->currentCommand = true;
 		if (lsi->lastCode.length())
+		{
 			lsi->lastCode += "\n";
+		}
 		lsi->lastCode += command;
 		ByteString tmp = ("return " + lsi->lastCode).ToUtf8();
 		luaL_loadbuffer(L, tmp.data(), tmp.size(), "@console");
@@ -498,10 +525,14 @@ int CommandInterface::Command(String command)
 		{
 			lastError = LuaGetError();
 			String err = lastError;
-			if (err.Contains("near '<eof>'")) //the idea stolen from lua-5.1.5/lua.c
+			if (err.Contains("near '<eof>'")) // the idea stolen from lua-5.1.5/lua.c
+			{
 				lastError = "...";
+			}
 			else
+			{
 				lsi->lastCode = "";
+			}
 		}
 		else
 		{
@@ -532,11 +563,14 @@ int CommandInterface::Command(String command)
 				if (text.length())
 				{
 					if (lastError.length())
+					{
 						lastError += "; " + text;
+					}
 					else
+					{
 						lastError = text;
+					}
 				}
-
 			}
 		}
 		lsi->currentCommand = false;
@@ -548,36 +582,50 @@ static String highlight(String command)
 {
 	StringBuilder result;
 	int pos = 0;
-	String::value_type const*raw = command.c_str();
+	const String::value_type *raw = command.c_str();
 	String::value_type c;
 	while ((c = raw[pos]))
 	{
-		if((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_')
+		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_')
 		{
 			int len = 0;
 			String::value_type w;
-			String::value_type const* wstart = raw+pos;
-			while((w = wstart[len]) && ((w >= 'A' && w <= 'Z') || (w >= 'a' && w <= 'z') || (w >= '0' && w <= '9') || w == '_'))
+			const String::value_type *wstart = raw + pos;
+			while ((w = wstart[len]) &&
+			       ((w >= 'A' && w <= 'Z') || (w >= 'a' && w <= 'z') || (w >= '0' && w <= '9') || w == '_'))
+			{
 				len++;
+			}
 #define CMP(X) (String(wstart, len) == X)
-			if(CMP("and") || CMP("break") || CMP("do") || CMP("else") || CMP("elseif") || CMP("end") || CMP("for") || CMP("function") || CMP("if") || CMP("in") || CMP("local") || CMP("not") || CMP("or") || CMP("repeat") || CMP("return") || CMP("then") || CMP("until") || CMP("while"))
+			if (CMP("and") || CMP("break") || CMP("do") || CMP("else") || CMP("elseif") || CMP("end") || CMP("for") ||
+			    CMP("function") || CMP("if") || CMP("in") || CMP("local") || CMP("not") || CMP("or") || CMP("repeat") ||
+			    CMP("return") || CMP("then") || CMP("until") || CMP("while"))
+			{
 				result << "\x0F\xB5\x89\x01" << String(wstart, len) << "\bw";
-			else if(CMP("false") || CMP("nil") || CMP("true"))
+			}
+			else if (CMP("false") || CMP("nil") || CMP("true"))
+			{
 				result << "\x0F\xCB\x4B\x16" << String(wstart, len) << "\bw";
+			}
 			else
+			{
 				result << "\x0F\x2A\xA1\x98" << String(wstart, len) << "\bw";
+			}
 #undef CMP
 			pos += len;
 		}
-		else if((c >= '0' && c <= '9') || (c == '.' && raw[pos + 1] >= '0' && raw[pos + 1] <= '9'))
+		else if ((c >= '0' && c <= '9') || (c == '.' && raw[pos + 1] >= '0' && raw[pos + 1] <= '9'))
 		{
-			if(c == '0' && raw[pos + 1] == 'x')
+			if (c == '0' && raw[pos + 1] == 'x')
 			{
 				int len = 2;
 				String::value_type w;
-				String::value_type const* wstart = raw+pos;
-				while((w = wstart[len]) && ((w >= '0' && w <= '9') || (w >= 'A' && w <= 'F') || (w >= 'a' && w <= 'f')))
+				const String::value_type *wstart = raw + pos;
+				while ((w = wstart[len]) && ((w >= '0' && w <= '9') || (w >= 'A' && w <= 'F') || (w >= 'a' && w <= 'f'))
+				)
+				{
 					len++;
+				}
 				result << "\x0F\xD3\x36\x82" << String(wstart, len) << "\bw";
 				pos += len;
 			}
@@ -585,55 +633,65 @@ static String highlight(String command)
 			{
 				int len = 0;
 				String::value_type w;
-				String::value_type const* wstart = raw+pos;
+				const String::value_type *wstart = raw + pos;
 				bool seendot = false;
-				while((w = wstart[len]) && ((w >= '0' && w <= '9') || w == '.'))
+				while ((w = wstart[len]) && ((w >= '0' && w <= '9') || w == '.'))
 				{
-					if(w == '.')
+					if (w == '.')
 					{
-						if(seendot)
+						if (seendot)
+						{
 							break;
+						}
 						else
+						{
 							seendot = true;
+						}
 					}
 					len++;
 				}
-				if(w == 'e')
+				if (w == 'e')
 				{
 					len++;
 					w = wstart[len];
-					if(w == '+' || w == '-')
+					if (w == '+' || w == '-')
+					{
 						len++;
-					while((w = wstart[len]) && (w >= '0' && w <= '9'))
+					}
+					while ((w = wstart[len]) && (w >= '0' && w <= '9'))
+					{
 						len++;
+					}
 				}
 				result << "\x0F\xD3\x36\x82" << String(wstart, len) << "\bw";
 				pos += len;
 			}
 		}
-		else if(c == '\'' || c == '"' || (c == '[' && (raw[pos + 1] == '[' || raw[pos + 1] == '=')))
+		else if (c == '\'' || c == '"' || (c == '[' && (raw[pos + 1] == '[' || raw[pos + 1] == '=')))
 		{
-			if(c == '[')
+			if (c == '[')
 			{
-				int len = 1, eqs=0;
+				int len = 1, eqs = 0;
 				String::value_type w;
-				String::value_type const* wstart = raw + pos;
-				while((w = wstart[len]) && (w == '='))
+				const String::value_type *wstart = raw + pos;
+				while ((w = wstart[len]) && (w == '='))
 				{
 					eqs++;
 					len++;
 				}
-				while((w = wstart[len]))
+				while ((w = wstart[len]))
 				{
-					if(w == ']')
+					if (w == ']')
 					{
 						int nlen = 1;
-						String::value_type const* cstart = wstart + len;
-						while((w = cstart[nlen]) && (w == '='))
-							nlen++;
-						if(w == ']' && nlen == eqs+1)
+						const String::value_type *cstart = wstart + len;
+						while ((w = cstart[nlen]) && (w == '='))
 						{
-							len += nlen+1;
+							nlen++;
+						}
+						if (w == ']' && nlen == eqs + 1)
+						{
+							len += nlen + 1;
 							break;
 						}
 					}
@@ -646,42 +704,48 @@ static String highlight(String command)
 			{
 				int len = 1;
 				String::value_type w;
-				String::value_type const* wstart = raw+pos;
-				while((w = wstart[len]) && (w != c))
+				const String::value_type *wstart = raw + pos;
+				while ((w = wstart[len]) && (w != c))
 				{
-					if(w == '\\' && wstart[len + 1])
+					if (w == '\\' && wstart[len + 1])
+					{
 						len++;
+					}
 					len++;
 				}
-				if(w == c)
+				if (w == c)
+				{
 					len++;
+				}
 				result << "\x0F\xDC\x32\x2F" << String(wstart, len) << "\bw";
 				pos += len;
 			}
 		}
-		else if(c == '-' && raw[pos + 1] == '-')
+		else if (c == '-' && raw[pos + 1] == '-')
 		{
-			if(raw[pos + 2] == '[')
+			if (raw[pos + 2] == '[')
 			{
 				int len = 3, eqs = 0;
 				String::value_type w;
-				String::value_type const* wstart = raw + pos;
-				while((w = wstart[len]) && (w == '='))
+				const String::value_type *wstart = raw + pos;
+				while ((w = wstart[len]) && (w == '='))
 				{
 					eqs++;
 					len++;
 				}
-				while((w = wstart[len]))
+				while ((w = wstart[len]))
 				{
-					if(w == ']')
+					if (w == ']')
 					{
 						int nlen = 1;
-						String::value_type const* cstart = wstart + len;
-						while((w = cstart[nlen]) && (w == '='))
-							nlen++;
-						if(w == ']' && nlen == eqs + 1)
+						const String::value_type *cstart = wstart + len;
+						while ((w = cstart[nlen]) && (w == '='))
 						{
-							len += nlen+1;
+							nlen++;
+						}
+						if (w == ']' && nlen == eqs + 1)
+						{
+							len += nlen + 1;
 							break;
 						}
 					}
@@ -694,19 +758,21 @@ static String highlight(String command)
 			{
 				int len = 2;
 				String::value_type w;
-				String::value_type const* wstart = raw + pos;
-				while((w = wstart[len]) && (w != '\n'))
+				const String::value_type *wstart = raw + pos;
+				while ((w = wstart[len]) && (w != '\n'))
+				{
 					len++;
+				}
 				result << "\x0F\x85\x99\x01" << String(wstart, len) << "\bw";
 				pos += len;
 			}
 		}
-		else if(c == '{' || c == '}')
+		else if (c == '{' || c == '}')
 		{
 			result << "\x0F\xCB\x4B\x16" << c << "\bw";
 			pos++;
 		}
-		else if(c == '.' && raw[pos + 1] == '.' && raw[pos + 2] == '.')
+		else if (c == '.' && raw[pos + 1] == '.' && raw[pos + 2] == '.')
 		{
 			result << "\x0F\x2A\xA1\x98...\bw";
 			pos += 3;
@@ -722,17 +788,19 @@ static String highlight(String command)
 
 String CommandInterface::FormatCommand(String command)
 {
-	if(command.size() && command[0] == '!')
+	if (command.size() && command[0] == '!')
 	{
 		return "!" + PlainFormatCommand(command.Substr(1));
 	}
 	else
+	{
 		return highlight(command);
+	}
 }
 
 LuaScriptInterface::~LuaScriptInterface()
 {
-	for (auto &[ component, ref ] : grabbedComponents)
+	for (auto &[component, ref] : grabbedComponents)
 	{
 		window->RemoveComponent(component->GetComponent());
 		ref.Clear();
@@ -818,6 +886,7 @@ int tpt_lua_pcall(lua_State *L, int numArgs, int numResults, int errorFunc, Even
 {
 	auto *lsi = GetLSI();
 	lsi->luaExecutionStart = Platform::GetTime();
+
 	struct AtReturn
 	{
 		EventTraits oldEventTraits;
@@ -835,6 +904,7 @@ int tpt_lua_pcall(lua_State *L, int numArgs, int numResults, int errorFunc, Even
 			lsi->eventTraits = oldEventTraits;
 		}
 	} atReturn(newEventTraits);
+
 	return lua_pcall(L, numArgs, numResults, errorFunc);
 }
 
@@ -843,8 +913,7 @@ CommandInterfacePtr CommandInterface::Create(GameController *newGameController, 
 	return CommandInterfacePtr(new LuaScriptInterface(newGameController, newGameModel));
 }
 
-void CommandInterfaceDeleter::operator ()(CommandInterface *ptr) const
+void CommandInterfaceDeleter::operator()(CommandInterface *ptr) const
 {
 	delete static_cast<LuaScriptInterface *>(ptr);
 }
-

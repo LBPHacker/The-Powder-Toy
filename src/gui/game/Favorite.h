@@ -1,11 +1,12 @@
 #pragma once
-#include "common/String.h"
 #include "common/ExplicitSingleton.h"
+#include "common/String.h"
 #include <vector>
 
 class Favorite : public ExplicitSingleton<Favorite>
 {
 	std::vector<ByteString> favoritesList;
+
 public:
 	Favorite();
 

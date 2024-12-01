@@ -3,11 +3,11 @@
 
 namespace http
 {
-	class LogoutRequest : public APIRequest
-	{
-	public:
-		LogoutRequest();
+class LogoutRequest : public APIRequest
+{
+public:
+	LogoutRequest();
 
-		void Finish();
-	};
+	void Finish();
+};
 }

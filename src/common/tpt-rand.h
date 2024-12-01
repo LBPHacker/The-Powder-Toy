@@ -1,7 +1,7 @@
 #pragma once
 #include "ExplicitSingleton.h"
-#include <stdint.h>
 #include <array>
+#include <stdint.h>
 
 class RNG
 {
@@ -11,6 +11,7 @@ public:
 private:
 	State s;
 	uint64_t next();
+
 public:
 	unsigned int operator()();
 	unsigned int gen();

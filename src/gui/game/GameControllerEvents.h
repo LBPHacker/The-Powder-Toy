@@ -1,12 +1,12 @@
 #pragma once
 #include "common/String.h"
-#include <variant>
 #include <cstdint>
+#include <variant>
 
 enum EventTraits : uint32_t
 {
-	eventTraitNone        = UINT32_C(0x00000000),
-	eventTraitSimRng      = UINT32_C(0x00000001),
+	eventTraitNone = UINT32_C(0x00000000),
+	eventTraitSimRng = UINT32_C(0x00000001),
 	eventTraitSimGraphics = UINT32_C(0x00000002),
 };
 
@@ -127,5 +127,4 @@ using GameControllerEvent = std::variant<
 	BeforeSimEvent,
 	AfterSimEvent,
 	BeforeSimDrawEvent,
-	AfterSimDrawEvent
->;
+	AfterSimDrawEvent>;

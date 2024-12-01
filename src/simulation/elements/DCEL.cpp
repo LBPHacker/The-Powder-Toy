@@ -19,7 +19,7 @@ void Element::Element_DCEL()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -51,8 +51,8 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	float multiplier = 1.0f/1.1f;
-	if (parts[i].life!=0)
+	float multiplier = 1.0f / 1.1f;
+	if (parts[i].life != 0)
 	{
 		multiplier = 1.0f - ((parts[i].life > 100 ? 100 : (parts[i].life < 0 ? 0 : parts[i].life)) / 100.0f);
 	}
@@ -63,11 +63,15 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if ((rx || ry) && !(rx && ry))
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
-					r = sim->photons[y+ry][x+rx];
+				{
+					r = sim->photons[y + ry][x + rx];
+				}
 				if (!r)
+				{
 					continue;
+				}
 				if (elements[TYP(r)].Properties & (TYPE_PART | TYPE_LIQUID | TYPE_GAS | TYPE_ENERGY))
 				{
 					parts[ID(r)].vx *= multiplier;
@@ -82,7 +86,9 @@ static int update(UPDATE_FUNC_ARGS)
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
-	if(cpart->tmp)
+	if (cpart->tmp)
+	{
 		*pixel_mode |= PMODE_GLOW;
+	}
 	return 0;
 }

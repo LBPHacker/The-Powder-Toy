@@ -26,7 +26,7 @@ struct alignas(alignof(uint32_t) > alignof(T) ? alignof(uint32_t) : alignof(T)) 
 
 	constexpr RGB() = default;
 
-	constexpr RGB(T r, T g, T b):
+	constexpr RGB(T r, T g, T b) :
 		Blue(b),
 		Green(g),
 		Red(r)
@@ -42,17 +42,19 @@ struct alignas(alignof(uint32_t) > alignof(T) ? alignof(uint32_t) : alignof(T)) 
 	constexpr RGB<T> Blend(RGBA<T> other) const
 	{
 		if (other.Alpha == 0xFF)
+		{
 			return other.NoAlpha();
+		}
 		// Dividing by 0xFF means the two branches return the same value in the
 		// case that other.Alpha == 0xFF, and the division happens via
 		// multiplication and bitshift anyway, so it vectorizes better than code
 		// that branches in a meaningful way.
 		return RGB<T>(
 			// the intermediate is guaranteed to fit in 16 bits, and a 16 bit
-			// multiplication vectorizes better than a longer one.
-			uint16_t(other.Alpha * other.Red   + (0xFF - other.Alpha) * Red  ) / 0xFF,
+		    // multiplication vectorizes better than a longer one.
+			uint16_t(other.Alpha * other.Red + (0xFF - other.Alpha) * Red) / 0xFF,
 			uint16_t(other.Alpha * other.Green + (0xFF - other.Alpha) * Green) / 0xFF,
-			uint16_t(other.Alpha * other.Blue  + (0xFF - other.Alpha) * Blue ) / 0xFF
+			uint16_t(other.Alpha * other.Blue + (0xFF - other.Alpha) * Blue) / 0xFF
 		);
 	}
 
@@ -113,7 +115,7 @@ struct alignas(alignof(uint32_t) > alignof(T) ? alignof(uint32_t) : alignof(T)) 
 	}
 };
 
-constexpr inline RGB<uint8_t> operator ""_rgb(unsigned long long value)
+constexpr inline RGB<uint8_t> operator""_rgb(unsigned long long value)
 {
 	return RGB<uint8_t>::Unpack(value);
 }
@@ -125,7 +127,7 @@ struct alignas(alignof(uint32_t) > alignof(T) ? alignof(uint32_t) : alignof(T)) 
 
 	constexpr RGBA() = default;
 
-	constexpr RGBA(T r, T g, T b, T a):
+	constexpr RGBA(T r, T g, T b, T a) :
 		Blue(b),
 		Green(g),
 		Red(r),
@@ -134,7 +136,7 @@ struct alignas(alignof(uint32_t) > alignof(T) ? alignof(uint32_t) : alignof(T)) 
 	}
 
 	template<typename S = T, typename = std::enable_if_t<std::is_same_v<S, uint8_t>>>
-	RGBA(T r, T g, T b):
+	RGBA(T r, T g, T b) :
 		Blue(b),
 		Green(g),
 		Red(r),

@@ -14,17 +14,19 @@ int LuaComponentCallback::CheckAndAssignArg1(lua_State *L)
 	return 0;
 }
 
-LuaComponent::LuaComponent(lua_State *L) : component(nullptr), owner_ref(LUA_REFNIL)
+LuaComponent::LuaComponent(lua_State *L) :
+	component(nullptr),
+	owner_ref(LUA_REFNIL)
 {
 	this->L = L; // I don't get how this doesn't cause crashes later on
-	
+
 	ci = static_cast<LuaScriptInterface *>(&CommandInterface::Ref());
 }
 
 int LuaComponent::position(lua_State *L)
 {
 	int args = lua_gettop(L);
-	if(args)
+	if (args)
 	{
 		luaL_checktype(L, 1, LUA_TNUMBER);
 		luaL_checktype(L, 2, LUA_TNUMBER);
@@ -42,7 +44,7 @@ int LuaComponent::position(lua_State *L)
 int LuaComponent::size(lua_State *L)
 {
 	int args = lua_gettop(L);
-	if(args)
+	if (args)
 	{
 		luaL_checktype(L, 1, LUA_TNUMBER);
 		luaL_checktype(L, 2, LUA_TNUMBER);
@@ -61,7 +63,7 @@ int LuaComponent::size(lua_State *L)
 int LuaComponent::visible(lua_State *L)
 {
 	int args = lua_gettop(L);
-	if(args)
+	if (args)
 	{
 		luaL_checktype(L, 1, LUA_TBOOLEAN);
 		component->Visible = lua_toboolean(L, 1);
@@ -77,12 +79,16 @@ int LuaComponent::visible(lua_State *L)
 LuaComponent::~LuaComponent()
 {
 	if (parent)
+	{
 		parent->ClearRef(this);
+	}
 
 	if (component)
 	{
 		if (component->GetParentWindow())
+		{
 			component->GetParentWindow()->RemoveComponent(component);
+		}
 		delete component;
 	}
 }

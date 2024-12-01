@@ -1,43 +1,71 @@
 #pragma once
-#include "common/Plane.h"
-#include "common/String.h"
-#include "common/tpt-rand.h"
-#include "common/Version.h"
-#include "simulation/Sign.h"
-#include "simulation/Particle.h"
-#include "simulation/MissingElements.h"
-#include "simulation/gravity/GravityData.h"
 #include "Misc.h"
 #include "SimulationConfig.h"
-#include <vector>
+#include "common/Plane.h"
+#include "common/String.h"
+#include "common/Version.h"
+#include "common/tpt-rand.h"
+#include "simulation/MissingElements.h"
+#include "simulation/Particle.h"
+#include "simulation/Sign.h"
+#include "simulation/gravity/GravityData.h"
 #include <array>
 #include <json/json.h>
+#include <vector>
 
 struct sign;
 struct Particle;
 
-struct ParseException: public std::exception {
-	enum ParseResult { OK = 0, Corrupt, WrongVersion, InvalidDimensions, InternalError, MissingElement };
+struct ParseException : public std::exception
+{
+	enum ParseResult
+	{
+		OK = 0,
+		Corrupt,
+		WrongVersion,
+		InvalidDimensions,
+		InternalError,
+		MissingElement
+	};
+
 	ByteString message;
 	ParseResult result;
+
 public:
-	ParseException(ParseResult result, String message): message(message.ToUtf8()), result(result) {}
-	const char * what() const throw() override
+	ParseException(ParseResult result, String message) :
+		message(message.ToUtf8()),
+		result(result)
+	{
+	}
+
+	const char *what() const throw() override
 	{
 		return message.c_str();
 	}
-	~ParseException() throw() {}
+
+	~ParseException() throw()
+	{
+	}
 };
 
-struct BuildException: public std::exception {
+struct BuildException : public std::exception
+{
 	ByteString message;
+
 public:
-	BuildException(String message): message(message.ToUtf8()) {}
-	const char * what() const throw() override
+	BuildException(String message) :
+		message(message.ToUtf8())
+	{
+	}
+
+	const char *what() const throw() override
 	{
 		return message.c_str();
 	}
-	~BuildException() throw() {}
+
+	~BuildException() throw()
+	{
+	}
 };
 
 class StkmData
@@ -52,8 +80,7 @@ public:
 
 	bool hasData() const
 	{
-		return rocketBoots1 || rocketBoots2 || fan1 || fan2
-		        || rocketBootsFigh.size() || fanFigh.size();
+		return rocketBoots1 || rocketBoots2 || fan1 || fan2 || rocketBootsFigh.size() || fanFigh.size();
 	}
 };
 
@@ -74,12 +101,13 @@ public:
 	bool hasAmbientHeat = false;
 	bool hasBlockAirMaps = false;
 	bool hasGravityMaps = false;
-	bool ensureDeterminism = false; // only taken seriously by serializeOPS; readOPS may set this even if the save does not have everything required for determinism
-	bool hasRngState = false; // only written by readOPS, never read
+	bool ensureDeterminism = false; // only taken seriously by serializeOPS; readOPS may set this even if the save does
+	                                // not have everything required for determinism
+	bool hasRngState = false;       // only written by readOPS, never read
 	RNG::State rngState;
 	uint64_t frameCount = 0;
 
-	//Simulation data
+	// Simulation data
 	int particlesCount = 0;
 	std::vector<Particle> particles;
 	PlaneAdapter<std::vector<unsigned char>> blockMap;
@@ -96,7 +124,7 @@ public:
 	PlaneAdapter<std::vector<float>> gravForceX;
 	PlaneAdapter<std::vector<float>> gravForceY;
 
-	//Simulation Options
+	// Simulation Options
 	bool waterEEnabled = false;
 	bool legacyEnable = false;
 	bool gravityEnable = false;
@@ -112,11 +140,11 @@ public:
 
 	MissingElements missingElements;
 
-	//Signs
+	// Signs
 	std::vector<sign> signs;
 	StkmData stkm;
 
-	//Element palette
+	// Element palette
 	typedef std::pair<ByteString, int> PaletteItem;
 	std::vector<PaletteItem> palette;
 
@@ -136,6 +164,6 @@ public:
 
 	static bool PressureInTmp3(int type);
 
-	GameSave& operator << (Particle &v);
-	GameSave& operator << (sign &v);
+	GameSave &operator<<(Particle &v);
+	GameSave &operator<<(sign &v);
 };

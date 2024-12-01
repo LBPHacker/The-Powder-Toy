@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "VIRS.h"
+#include "simulation/ElementCommon.h"
 
 static int graphics(GRAPHICS_FUNC_ARGS);
 
@@ -19,7 +19,7 @@ void Element::Element_VRSS()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -33,7 +33,7 @@ void Element::Element_VRSS()
 	HeatConduct = 251;
 	Description = "Solid Virus. Turns everything it touches into virus.";
 
-	Properties = TYPE_SOLID|PROP_DEADLY;
+	Properties = TYPE_SOLID | PROP_DEADLY;
 	CarriesTypeIn = 1U << FIELD_TMP2;
 
 	LowPressure = IPL;

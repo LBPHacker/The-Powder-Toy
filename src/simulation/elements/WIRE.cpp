@@ -19,7 +19,7 @@ void Element::Element_WIRE()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f  * CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -49,7 +49,7 @@ void Element::Element_WIRE()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	int count=0;
+	int count = 0;
 	/*
 	  0:  wire
 	  1:  spark head
@@ -57,15 +57,15 @@ static int update(UPDATE_FUNC_ARGS)
 
 	  tmp is previous state, ctype is current state
 	*/
-	//parts[i].tmp=parts[i].ctype;
-	parts[i].ctype=0;
-	if (parts[i].tmp==1)
+	// parts[i].tmp=parts[i].ctype;
+	parts[i].ctype = 0;
+	if (parts[i].tmp == 1)
 	{
-		parts[i].ctype=2;
+		parts[i].ctype = 2;
 	}
-	else if (parts[i].tmp==2)
+	else if (parts[i].tmp == 2)
 	{
-		parts[i].ctype=0;
+		parts[i].ctype = 0;
 	}
 	for (auto rx = -1; rx <= 1; rx++)
 	{
@@ -73,36 +73,44 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
-					continue;
-				if (TYP(r)==PT_SPRK && parts[ID(r)].life==3 && parts[ID(r)].ctype==PT_PSCN)
 				{
-					parts[i].ctype=1;
+					continue;
+				}
+				if (TYP(r) == PT_SPRK && parts[ID(r)].life == 3 && parts[ID(r)].ctype == PT_PSCN)
+				{
+					parts[i].ctype = 1;
 					return 0;
 				}
-				else if (TYP(r)==PT_NSCN && parts[i].tmp==1)
-					sim->create_part(-1, x+rx, y+ry, PT_SPRK);
-				else if (TYP(r)==PT_WIRE && parts[ID(r)].tmp==1 && !parts[i].tmp)
+				else if (TYP(r) == PT_NSCN && parts[i].tmp == 1)
+				{
+					sim->create_part(-1, x + rx, y + ry, PT_SPRK);
+				}
+				else if (TYP(r) == PT_WIRE && parts[ID(r)].tmp == 1 && !parts[i].tmp)
+				{
 					count++;
+				}
 			}
 		}
 	}
-	if (count==1 || count==2)
-		parts[i].ctype=1;
+	if (count == 1 || count == 2)
+	{
+		parts[i].ctype = 1;
+	}
 	return 0;
 }
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
-	if (cpart->ctype==0)
+	if (cpart->ctype == 0)
 	{
 		*colr = 255;
 		*colg = 204;
 		*colb = 0;
 		return 0;
 	}
-	if (cpart->ctype==1)
+	if (cpart->ctype == 1)
 	{
 		*colr = 50;
 		*colg = 100;
@@ -110,7 +118,7 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		//*pixel_mode |= PMODE_GLOW;
 		return 0;
 	}
-	if (cpart->ctype==2)
+	if (cpart->ctype == 2)
 	{
 		*colr = 255;
 		*colg = 100;

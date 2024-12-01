@@ -19,15 +19,25 @@ void Brush::InitOutline()
 			if (bitmap[{ i, j }])
 			{
 				if (i == 0 || j == 0 || i == bounds.X - 1 || j == bounds.Y - 1)
+				{
 					value = true;
+				}
 				else if (!bitmap[{ i + 1, j }])
+				{
 					value = true;
+				}
 				else if (!bitmap[{ i - 1, j }])
+				{
 					value = true;
+				}
 				else if (!bitmap[{ i, j + 1 }])
+				{
 					value = true;
+				}
 				else if (!bitmap[{ i, j - 1 }])
+				{
 					value = true;
+				}
 			}
 			outline[{ i, j }] = value ? 0xFF : 0;
 		}
@@ -37,13 +47,21 @@ void Brush::InitOutline()
 void Brush::SetRadius(ui::Point newRadius)
 {
 	if (newRadius.X < 0)
+	{
 		newRadius.X = 0;
+	}
 	if (newRadius.Y < 0)
+	{
 		newRadius.Y = 0;
+	}
 	if (newRadius.X > 200)
+	{
 		newRadius.X = 200;
+	}
 	if (newRadius.Y > 200)
+	{
 		newRadius.Y = 200;
+	}
 	radius = newRadius;
 	InitOutline();
 }
@@ -51,34 +69,46 @@ void Brush::SetRadius(ui::Point newRadius)
 void Brush::AdjustSize(int delta, bool logarithmic, bool keepX, bool keepY)
 {
 	if (keepX && keepY)
+	{
 		return;
+	}
 
 	ui::Point newSize(0, 0);
 	ui::Point oldSize = GetRadius();
 	if (logarithmic)
+	{
 		newSize = oldSize + ui::Point(delta * std::max(oldSize.X / 5, 1), delta * std::max(oldSize.Y / 5, 1));
+	}
 	else
+	{
 		newSize = oldSize + ui::Point(delta, delta);
+	}
 
 	if (keepY)
+	{
 		SetRadius(ui::Point(newSize.X, oldSize.Y));
+	}
 	else if (keepX)
+	{
 		SetRadius(ui::Point(oldSize.X, newSize.Y));
+	}
 	else
+	{
 		SetRadius(newSize);
+	}
 }
 
 void Brush::RenderRect(Graphics *g, ui::Point position1, ui::Point position2) const
 {
 	int width, height;
-	width = position2.X-position1.X;
-	height = position2.Y-position1.Y;
-	if (height<0)
+	width = position2.X - position1.X;
+	height = position2.Y - position1.Y;
+	if (height < 0)
 	{
 		position1.Y += height;
 		height *= -1;
 	}
-	if (width<0)
+	if (width < 0)
 	{
 		position1.X += width;
 		width *= -1;

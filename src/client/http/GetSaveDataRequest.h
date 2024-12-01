@@ -3,11 +3,11 @@
 
 namespace http
 {
-	class GetSaveDataRequest : public Request
-	{
-	public:
-		GetSaveDataRequest(int saveID, int saveDate);
+class GetSaveDataRequest : public Request
+{
+public:
+	GetSaveDataRequest(int saveID, int saveDate);
 
-		std::vector<char> Finish();
-	};
+	std::vector<char> Finish();
+};
 }

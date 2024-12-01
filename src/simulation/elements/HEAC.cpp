@@ -1,5 +1,5 @@
-#include "simulation/ElementCommon.h"
 #include "simulation/Air.h"
+#include "simulation/ElementCommon.h"
 
 static int update(UPDATE_FUNC_ARGS);
 
@@ -19,7 +19,7 @@ void Element::Element_HEAC()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -47,16 +47,16 @@ void Element::Element_HEAC()
 	Update = &update;
 }
 
-static const auto isInsulator = [](Simulation* a, int b) -> bool {
+static const auto isInsulator = [](Simulation *a, int b) -> bool {
 	auto &sd = SimulationData::CRef();
 	return b && (sd.elements[TYP(b)].HeatConduct == 0 || (TYP(b) == PT_HSWC && a->parts[ID(b)].life != 10));
 };
 
 // If this is used elsewhere (GOLD), it should be moved into Simulation.h
 template<class BinaryPredicate>
-bool CheckLine(Simulation* sim, int x1, int y1, int x2, int y2, BinaryPredicate func)
+bool CheckLine(Simulation *sim, int x1, int y1, int x2, int y2, BinaryPredicate func)
 {
-	bool reverseXY = abs(y2-y1) > abs(x2-x1);
+	bool reverseXY = abs(y2 - y1) > abs(x2 - x1);
 	int x, y, dx, dy, sy;
 	float e, de;
 	if (reverseXY)
@@ -81,34 +81,50 @@ bool CheckLine(Simulation* sim, int x1, int y1, int x2, int y2, BinaryPredicate 
 	dy = abs(y2 - y1);
 	e = 0.0f;
 	if (dx)
-		de = dy/(float)dx;
+	{
+		de = dy / (float)dx;
+	}
 	else
+	{
 		de = 0.0f;
+	}
 	y = y1;
-	sy = (y1<y2) ? 1 : -1;
-	for (x=x1; x<=x2; x++)
+	sy = (y1 < y2) ? 1 : -1;
+	for (x = x1; x <= x2; x++)
 	{
 		if (reverseXY)
 		{
-			if (func(sim, sim->pmap[x][y])) return true;
+			if (func(sim, sim->pmap[x][y]))
+			{
+				return true;
+			}
 		}
 		else
 		{
-			if (func(sim, sim->pmap[y][x])) return true;
+			if (func(sim, sim->pmap[y][x]))
+			{
+				return true;
+			}
 		}
 		e += de;
 		if (e >= 0.5f)
 		{
 			y += sy;
-			if ((y1<y2) ? (y<=y2) : (y>=y2))
+			if ((y1 < y2) ? (y <= y2) : (y >= y2))
 			{
 				if (reverseXY)
 				{
-					if (func(sim, sim->pmap[x][y])) return true;
+					if (func(sim, sim->pmap[x][y]))
+					{
+						return true;
+					}
 				}
 				else
 				{
-					if (func(sim, sim->pmap[y][x])) return true;
+					if (func(sim, sim->pmap[y][x]))
+					{
+						return true;
+					}
 				}
 			}
 			e -= 1.0f;
@@ -130,15 +146,16 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			rry = ry * rad;
 			rrx = rx * rad;
-			if (x+rrx >= 0 && x+rrx < XRES && y+rry >= 0 && y+rry < YRES && !CheckLine(sim, x, y, x+rrx, y+rry, isInsulator))
+			if (x + rrx >= 0 && x + rrx < XRES && y + rry >= 0 && y + rry < YRES &&
+			    !CheckLine(sim, x, y, x + rrx, y + rry, isInsulator))
 			{
-				r = pmap[y+rry][x+rrx];
+				r = pmap[y + rry][x + rrx];
 				if (r && elements[TYP(r)].HeatConduct > 0 && (TYP(r) != PT_HSWC || parts[ID(r)].life == 10))
 				{
 					count++;
 					tempAgg += parts[ID(r)].temp;
 				}
-				r = sim->photons[y+rry][x+rrx];
+				r = sim->photons[y + rry][x + rrx];
 				if (r && elements[TYP(r)].HeatConduct > 0 && (TYP(r) != PT_HSWC || parts[ID(r)].life == 10))
 				{
 					count++;
@@ -150,7 +167,7 @@ static int update(UPDATE_FUNC_ARGS)
 
 	if (count > 0)
 	{
-		parts[i].temp = tempAgg/count;
+		parts[i].temp = tempAgg / count;
 
 		for (int rx = -1; rx <= 1; rx++)
 		{
@@ -158,14 +175,15 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				rry = ry * rad;
 				rrx = rx * rad;
-				if (x+rrx >= 0 && x+rrx < XRES && y+rry >= 0 && y+rry < YRES && !CheckLine(sim, x, y, x+rrx, y+rry, isInsulator))
+				if (x + rrx >= 0 && x + rrx < XRES && y + rry >= 0 && y + rry < YRES &&
+				    !CheckLine(sim, x, y, x + rrx, y + rry, isInsulator))
 				{
-					r = pmap[y+rry][x+rrx];
+					r = pmap[y + rry][x + rrx];
 					if (r && elements[TYP(r)].HeatConduct > 0 && (TYP(r) != PT_HSWC || parts[ID(r)].life == 10))
 					{
 						parts[ID(r)].temp = parts[i].temp;
 					}
-					r = sim->photons[y+rry][x+rrx];
+					r = sim->photons[y + rry][x + rrx];
 					if (r && elements[TYP(r)].HeatConduct > 0 && (TYP(r) != PT_HSWC || parts[ID(r)].life == 10))
 					{
 						parts[ID(r)].temp = parts[i].temp;

@@ -18,7 +18,7 @@ void Element::Element_CLNE()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -51,40 +51,51 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	if (parts[i].ctype<=0 || parts[i].ctype>=PT_NUM || !elements[parts[i].ctype].Enabled)
+	if (parts[i].ctype <= 0 || parts[i].ctype >= PT_NUM || !elements[parts[i].ctype].Enabled)
 	{
 		for (auto rx = -1; rx <= 1; rx++)
 		{
 			for (auto ry = -1; ry <= 1; ry++)
 			{
-				auto r = sim->photons[y+ry][x+rx];
+				auto r = sim->photons[y + ry][x + rx];
 				if (!r)
-					r = pmap[y+ry][x+rx];
+				{
+					r = pmap[y + ry][x + rx];
+				}
 				if (!r)
+				{
 					continue;
+				}
 				auto rt = TYP(r);
-				if (rt!=PT_CLNE && rt!=PT_PCLN &&
-				    rt!=PT_BCLN && rt!=PT_STKM &&
-				    rt!=PT_PBCN && rt!=PT_STKM2 &&
-				    rt<PT_NUM)
+				if (rt != PT_CLNE && rt != PT_PCLN && rt != PT_BCLN && rt != PT_STKM && rt != PT_PBCN &&
+				    rt != PT_STKM2 && rt < PT_NUM)
 				{
 					parts[i].ctype = rt;
-					if (rt==PT_LIFE || rt==PT_LAVA)
+					if (rt == PT_LIFE || rt == PT_LAVA)
+					{
 						parts[i].tmp = parts[ID(r)].ctype;
+					}
 				}
 			}
 		}
 	}
 	else
 	{
-		if (parts[i].ctype==PT_LIFE) sim->create_part(-1, x + sim->rng.between(-1, 1), y + sim->rng.between(-1, 1), PT_LIFE, parts[i].tmp);
-		else if (parts[i].ctype!=PT_LIGH || sim->rng.chance(1, 30))
+		if (parts[i].ctype == PT_LIFE)
 		{
-			int np = sim->create_part(-1, x + sim->rng.between(-1, 1), y + sim->rng.between(-1, 1), TYP(parts[i].ctype));
-			if (np>=0)
+			sim->create_part(-1, x + sim->rng.between(-1, 1), y + sim->rng.between(-1, 1), PT_LIFE, parts[i].tmp);
+		}
+		else if (parts[i].ctype != PT_LIGH || sim->rng.chance(1, 30))
+		{
+			int np =
+				sim->create_part(-1, x + sim->rng.between(-1, 1), y + sim->rng.between(-1, 1), TYP(parts[i].ctype));
+			if (np >= 0)
 			{
-				if (parts[i].ctype==PT_LAVA && parts[i].tmp>0 && parts[i].tmp<PT_NUM && elements[parts[i].tmp].HighTemperatureTransition==PT_LAVA)
+				if (parts[i].ctype == PT_LAVA && parts[i].tmp > 0 && parts[i].tmp < PT_NUM &&
+				    elements[parts[i].tmp].HighTemperatureTransition == PT_LAVA)
+				{
 					parts[np].ctype = parts[i].tmp;
+				}
 			}
 		}
 	}

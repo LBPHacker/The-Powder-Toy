@@ -2,7 +2,7 @@
 
 namespace LuaSocket
 {
-	void OpenTCP(lua_State *L)
-	{
-	}
+void OpenTCP(lua_State *L)
+{
+}
 }

@@ -3,11 +3,11 @@
 
 namespace http
 {
-	class ReportSaveRequest : public APIRequest
-	{
-	public:
-		ReportSaveRequest(int saveID, String message);
+class ReportSaveRequest : public APIRequest
+{
+public:
+	ReportSaveRequest(int saveID, String message);
 
-		void Finish();
-	};
+	void Finish();
+};
 }

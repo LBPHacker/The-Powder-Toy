@@ -1,86 +1,86 @@
 #pragma once
-#include "SimulationConfig.h"
+#include "BuiltinGOL.h"
+#include "CustomGOLData.h"
+#include "Element.h"
 #include "ElementDefs.h"
+#include "MenuSection.h"
+#include "Particle.h"
+#include "SimulationConfig.h"
+#include "WallType.h"
 #include "common/ExplicitSingleton.h"
 #include "common/String.h"
-#include "MenuSection.h"
-#include "BuiltinGOL.h"
-#include "Element.h"
-#include "Particle.h"
-#include "WallType.h"
 #include "graphics/gcache_item.h"
-#include "CustomGOLData.h"
-#include <cstdint>
-#include <vector>
 #include <array>
+#include <cstdint>
 #include <shared_mutex>
+#include <vector>
 
-constexpr int O_WL_WALLELEC     = 122;
-constexpr int O_WL_EWALL        = 123;
-constexpr int O_WL_DETECT       = 124;
-constexpr int O_WL_STREAM       = 125;
-constexpr int O_WL_SIGN         = 126;
-constexpr int O_WL_FAN          = 127;
-constexpr int O_WL_FANHELPER    = 255;
-constexpr int O_WL_ALLOWLIQUID  = 128;
-constexpr int O_WL_DESTROYALL   = 129;
-constexpr int O_WL_ERASE        = 130;
-constexpr int O_WL_WALL         = 131;
-constexpr int O_WL_ALLOWAIR     = 132;
-constexpr int O_WL_ALLOWSOLID   = 133;
+constexpr int O_WL_WALLELEC = 122;
+constexpr int O_WL_EWALL = 123;
+constexpr int O_WL_DETECT = 124;
+constexpr int O_WL_STREAM = 125;
+constexpr int O_WL_SIGN = 126;
+constexpr int O_WL_FAN = 127;
+constexpr int O_WL_FANHELPER = 255;
+constexpr int O_WL_ALLOWLIQUID = 128;
+constexpr int O_WL_DESTROYALL = 129;
+constexpr int O_WL_ERASE = 130;
+constexpr int O_WL_WALL = 131;
+constexpr int O_WL_ALLOWAIR = 132;
+constexpr int O_WL_ALLOWSOLID = 133;
 constexpr int O_WL_ALLOWALLELEC = 134;
-constexpr int O_WL_EHOLE        = 135;
-constexpr int O_WL_ALLOWGAS     = 140;
-constexpr int O_WL_GRAV         = 142;
-constexpr int O_WL_ALLOWENERGY  = 145;
+constexpr int O_WL_EHOLE = 135;
+constexpr int O_WL_ALLOWGAS = 140;
+constexpr int O_WL_GRAV = 142;
+constexpr int O_WL_ALLOWENERGY = 145;
 
-constexpr int WL_ERASE        =  0;
-constexpr int WL_WALLELEC     =  1;
-constexpr int WL_EWALL        =  2;
-constexpr int WL_DETECT       =  3;
-constexpr int WL_STREAM       =  4;
-constexpr int WL_FAN          =  5;
-constexpr int WL_ALLOWLIQUID  =  6;
-constexpr int WL_DESTROYALL   =  7;
-constexpr int WL_WALL         =  8;
-constexpr int WL_ALLOWAIR     =  9;
-constexpr int WL_ALLOWPOWDER  = 10;
+constexpr int WL_ERASE = 0;
+constexpr int WL_WALLELEC = 1;
+constexpr int WL_EWALL = 2;
+constexpr int WL_DETECT = 3;
+constexpr int WL_STREAM = 4;
+constexpr int WL_FAN = 5;
+constexpr int WL_ALLOWLIQUID = 6;
+constexpr int WL_DESTROYALL = 7;
+constexpr int WL_WALL = 8;
+constexpr int WL_ALLOWAIR = 9;
+constexpr int WL_ALLOWPOWDER = 10;
 constexpr int WL_ALLOWALLELEC = 11;
-constexpr int WL_EHOLE        = 12;
-constexpr int WL_ALLOWGAS     = 13;
-constexpr int WL_GRAV         = 14;
-constexpr int WL_ALLOWENERGY  = 15;
-constexpr int WL_BLOCKAIR     = 16;
-constexpr int WL_ERASEALL     = 17;
-constexpr int WL_STASIS       = 18;
-constexpr int WL_FLOODHELPER  =255;
+constexpr int WL_EHOLE = 12;
+constexpr int WL_ALLOWGAS = 13;
+constexpr int WL_GRAV = 14;
+constexpr int WL_ALLOWENERGY = 15;
+constexpr int WL_BLOCKAIR = 16;
+constexpr int WL_ERASEALL = 17;
+constexpr int WL_STASIS = 18;
+constexpr int WL_FLOODHELPER = 255;
 
 constexpr int UI_WALLCOUNT = 19;
 
 constexpr int OLD_SPC_AIR = 236;
-constexpr int SPC_AIR     = 256;
+constexpr int SPC_AIR = 256;
 
-constexpr int DECO_DRAW     = 0;
-constexpr int DECO_CLEAR    = 1;
-constexpr int DECO_ADD      = 2;
+constexpr int DECO_DRAW = 0;
+constexpr int DECO_CLEAR = 1;
+constexpr int DECO_ADD = 2;
 constexpr int DECO_SUBTRACT = 3;
 constexpr int DECO_MULTIPLY = 4;
-constexpr int DECO_DIVIDE   = 5;
-constexpr int DECO_SMUDGE   = 6;
+constexpr int DECO_DIVIDE = 5;
+constexpr int DECO_SMUDGE = 6;
 
-//Old IDs for GOL types
-constexpr int GT_GOL  =  78;
-constexpr int GT_HLIF =  79;
-constexpr int GT_ASIM =  80;
-constexpr int GT_2x2  =  81;
-constexpr int GT_DANI =  82;
-constexpr int GT_AMOE =  83;
-constexpr int GT_MOVE =  84;
-constexpr int GT_PGOL =  85;
-constexpr int GT_DMOE =  86;
-constexpr int GT_34   =  87;
-constexpr int GT_LLIF =  88;
-constexpr int GT_STAN =  89;
+// Old IDs for GOL types
+constexpr int GT_GOL = 78;
+constexpr int GT_HLIF = 79;
+constexpr int GT_ASIM = 80;
+constexpr int GT_2x2 = 81;
+constexpr int GT_DANI = 82;
+constexpr int GT_AMOE = 83;
+constexpr int GT_MOVE = 84;
+constexpr int GT_PGOL = 85;
+constexpr int GT_DMOE = 86;
+constexpr int GT_34 = 87;
+constexpr int GT_LLIF = 88;
+constexpr int GT_STAN = 89;
 constexpr int GT_SEED = 134;
 constexpr int GT_MAZE = 135;
 constexpr int GT_COAG = 136;
@@ -94,17 +94,17 @@ constexpr int GT_STAR = 144;
 constexpr int GT_FROG = 145;
 constexpr int GT_BRAN = 146;
 
-//New IDs for GOL types
-constexpr int NGT_GOL  =  0;
-constexpr int NGT_HLIF =  1;
-constexpr int NGT_ASIM =  2;
-constexpr int NGT_2x2  =  3;
-constexpr int NGT_DANI =  4;
-constexpr int NGT_AMOE =  5;
-constexpr int NGT_MOVE =  6;
-constexpr int NGT_PGOL =  7;
-constexpr int NGT_DMOE =  8;
-constexpr int NGT_34   =  9;
+// New IDs for GOL types
+constexpr int NGT_GOL = 0;
+constexpr int NGT_HLIF = 1;
+constexpr int NGT_ASIM = 2;
+constexpr int NGT_2x2 = 3;
+constexpr int NGT_DANI = 4;
+constexpr int NGT_AMOE = 5;
+constexpr int NGT_MOVE = 6;
+constexpr int NGT_PGOL = 7;
+constexpr int NGT_DMOE = 8;
+constexpr int NGT_34 = 9;
 constexpr int NGT_LLIF = 10;
 constexpr int NGT_STAN = 11;
 constexpr int NGT_SEED = 12;
@@ -120,8 +120,8 @@ constexpr int NGT_STAR = 21;
 constexpr int NGT_FROG = 22;
 constexpr int NGT_BRAN = 23;
 
-//replace mode / specific delete flags
-constexpr auto REPLACE_MODE    = UINT32_C(0x00000001);
+// replace mode / specific delete flags
+constexpr auto REPLACE_MODE = UINT32_C(0x00000001);
 constexpr auto SPECIFIC_DELETE = UINT32_C(0x00000002);
 
 class SimulationData : public ExplicitSingleton<SimulationData>
@@ -152,11 +152,16 @@ public:
 	void init_can_move();
 
 	const CustomGOLData *GetCustomGOLByRule(int rule) const;
-	const std::vector<CustomGOLData> &GetCustomGol() const { return customGol; }
+
+	const std::vector<CustomGOLData> &GetCustomGol() const
+	{
+		return customGol;
+	}
+
 	void SetCustomGOL(std::vector<CustomGOLData> newCustomGol);
 
 	String ElementResolve(int type, int ctype) const;
-	String BasicParticleInfo(Particle const &sample_part) const;
+	String BasicParticleInfo(const Particle &sample_part) const;
 	int GetParticleType(ByteString type) const;
 
 	bool IsElement(int type) const
@@ -168,5 +173,4 @@ public:
 	{
 		return (type >= 0 && type < PT_NUM && elements[type].Enabled);
 	}
-
 };

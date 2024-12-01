@@ -18,7 +18,7 @@ void Element::Element_SHLD1()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -31,7 +31,7 @@ void Element::Element_SHLD1()
 	HeatConduct = 0;
 	Description = "Shield, spark it to grow.";
 
-	Properties = TYPE_SOLID|PROP_LIFE_DEC;
+	Properties = TYPE_SOLID | PROP_LIFE_DEC;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -53,31 +53,33 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[y+ry][x+rx];
+				auto r = pmap[y + ry][x + rx];
 				if (!r)
+				{
 					continue;
-				else if (TYP(r)==PT_SPRK&&parts[i].life==0)
+				}
+				else if (TYP(r) == PT_SPRK && parts[i].life == 0)
 				{
 					if (sim->rng.chance(11, 40))
 					{
-						sim->part_change_type(i,x,y,PT_SHLD2);
+						sim->part_change_type(i, x, y, PT_SHLD2);
 						parts[i].life = 7;
 					}
 					for (auto nnx = -1; nnx <= 1; nnx++)
 					{
 						for (auto nny = -1; nny <= 1; nny++)
 						{
-							if (!pmap[y+ry+nny][x+rx+nnx])
+							if (!pmap[y + ry + nny][x + rx + nnx])
 							{
-								sim->create_part(-1,x+rx+nnx,y+ry+nny,PT_SHLD1);
-								//parts[ID(pmap[y+ny+nny][x+nx+nnx])].life=7;
+								sim->create_part(-1, x + rx + nnx, y + ry + nny, PT_SHLD1);
+								// parts[ID(pmap[y+ny+nny][x+nx+nnx])].life=7;
 							}
 						}
 					}
 				}
 				else if (TYP(r) == PT_SHLD3 && sim->rng.chance(2, 5))
 				{
-					sim->part_change_type(i,x,y,PT_SHLD2);
+					sim->part_change_type(i, x, y, PT_SHLD2);
 					parts[i].life = 7;
 				}
 			}

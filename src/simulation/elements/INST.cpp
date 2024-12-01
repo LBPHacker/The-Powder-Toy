@@ -16,7 +16,7 @@ void Element::Element_INST()
 	Collision = 0.0f;
 	Gravity = 0.0f;
 	Diffusion = 0.00f;
-	HotAir = 0.000f	* CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -29,7 +29,7 @@ void Element::Element_INST()
 	HeatConduct = 251;
 	Description = "Instantly conducts, PSCN to charge, NSCN to take.";
 
-	Properties = TYPE_SOLID|PROP_LIFE_DEC;
+	Properties = TYPE_SOLID | PROP_LIFE_DEC;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

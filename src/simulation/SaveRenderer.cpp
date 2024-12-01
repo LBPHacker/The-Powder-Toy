@@ -2,8 +2,8 @@
 
 #include "client/GameSave.h"
 
-#include "graphics/VideoBuffer.h"
 #include "graphics/Renderer.h"
+#include "graphics/VideoBuffer.h"
 
 #include "Simulation.h"
 #include "SimulationData.h"
@@ -19,7 +19,8 @@ SaveRenderer::~SaveRenderer() = default;
 
 std::unique_ptr<VideoBuffer> SaveRenderer::Render(const GameSave *save, bool fire, RendererSettings rendererSettings)
 {
-	// this function usually runs on a thread different from where element info in SimulationData may be written, so we acquire a read-only lock on it
+	// this function usually runs on a thread different from where element info in SimulationData may be written, so we
+	// acquire a read-only lock on it
 	auto &sd = SimulationData::CRef();
 	std::shared_lock lk(sd.elementGraphicsMx);
 	std::lock_guard<std::mutex> gx(renderMutex);

@@ -13,12 +13,12 @@ struct WindowFrameOps
 	WindowFrameOps Normalize() const
 	{
 		return {
-			fullscreen ? 1     : scale              ,
-			fullscreen ? false : resizable          ,
-			fullscreen                              ,
-			fullscreen ? changeResolution    : false,
+			fullscreen ? 1 : scale,
+			fullscreen ? false : resizable,
+			fullscreen,
+			fullscreen ? changeResolution : false,
 			fullscreen ? forceIntegerScaling : false,
-			blurryScaling                           ,
+			blurryScaling,
 		};
 	}
 };

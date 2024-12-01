@@ -5,16 +5,23 @@
 class SaveInfo;
 class TagsView;
 class TagsModel;
+
 class TagsController
 {
-	std::function<void ()> onDone;
-	TagsView * tagsView;
-	TagsModel * tagsModel;
+	std::function<void()> onDone;
+	TagsView *tagsView;
+	TagsModel *tagsModel;
+
 public:
 	bool HasDone;
-	TagsController(std::function<void ()> onDone, SaveInfo * save);
-	TagsView * GetView() {return tagsView;}
-	SaveInfo * GetSave();
+	TagsController(std::function<void()> onDone, SaveInfo *save);
+
+	TagsView *GetView()
+	{
+		return tagsView;
+	}
+
+	SaveInfo *GetSave();
 	void RemoveTag(ByteString tag);
 	void AddTag(ByteString tag);
 	void Exit();
