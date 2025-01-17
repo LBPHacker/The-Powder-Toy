@@ -80,6 +80,7 @@ endif
 if tpt_libs_static != 'none'
 	if tpt_libs_variant not in [
 		'x86_64-linux-gnu-static',
+		'aarch64-linux-gnu-static',
 		'x86_64-windows-mingw-static',
 		'x86_64-windows-msvc-static',
 		'x86_64-windows-msvc-dynamic',
