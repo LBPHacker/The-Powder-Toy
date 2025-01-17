@@ -26,6 +26,8 @@ if [[ -z         ${APP_VENDOR-} ]]; then >&2 echo         "APP_VENDOR not set"; 
 case $BSH_HOST_ARCH-$BSH_HOST_PLATFORM-$BSH_HOST_LIBC-$BSH_STATIC_DYNAMIC in
 x86_64-linux-gnu-static) ;;
 x86_64-linux-gnu-dynamic) ;;
+aarch64-linux-gnu-static) ;;
+aarch64-linux-gnu-dynamic) ;;
 x86_64-windows-mingw-static) ;;
 x86_64-windows-mingw-dynamic) ;;
 x86_64-windows-msvc-static) ;;
