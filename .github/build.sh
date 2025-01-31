@@ -130,6 +130,14 @@ if [[ -z ${BSH_NO_PACKAGES-} ]]; then
 	esac
 fi
 
+version_file=VERSION.txt
+write_display_version_major="$( cat "$version_file" | cut -d '-' -f 1 | cut -d '.' -f 1)"
+write_display_version_minor="$( cat "$version_file" | cut -d '-' -f 1 | cut -d '.' -f 2)"
+write_build_num="$(             cat "$version_file" | cut -d '-' -f 1 | cut -d '.' -f 3)"
+write_upstream_version_major="$(cat "$version_file" | cut -d '-' -f 3 | cut -d '.' -f 1)"
+write_upstream_version_minor="$(cat "$version_file" | cut -d '-' -f 3 | cut -d '.' -f 2)"
+write_upstream_build_num="$(    cat "$version_file" | cut -d '-' -f 3 | cut -d '.' -f 3)"
+
 function inplace_sed() {
 	local subst=$1
 	local path=$2
@@ -302,16 +310,16 @@ if [[ $stable_or_beta == yes ]]; then
 	display_version_minor=$(echo $xyz | cut -d '.' -f 2)
 	build_num=$(echo $xyz | cut -d '.' -f 3)
 	if [[ $MOD_ID != 0 ]]; then
-		meson_configure+=$'\t'-Ddisplay_version_major=$display_version_major
-		meson_configure+=$'\t'-Ddisplay_version_minor=$display_version_minor
-		meson_configure+=$'\t'-Dbuild_num=$build_num
+		write_display_version_major=$display_version_major
+		write_display_version_minor=$display_version_minor
+		write_build_num=$build_num
 	fi
 fi
 if [[ $RELEASE_TYPE == snapshot ]]; then
 	build_num=$(echo $RELEASE_NAME | cut -d '-' -f 2) # $RELEASE_NAME is snapshot-X
 	meson_configure+=$'\t'-Dsnapshot=true
 	if [[ $MOD_ID != 0 ]]; then
-		meson_configure+=$'\t'-Dbuild_num=$build_num
+		write_build_num=$build_num
 	fi
 fi
 if [[ $RELEASE_TYPE == snapshot ]] && [[ $MOD_ID != 0 ]]; then
@@ -419,30 +427,31 @@ meson_configure+=$'\t'-Dc_args=[$c_args]
 meson_configure+=$'\t'-Dcpp_args=[$c_args]
 meson_configure+=$'\t'-Dc_link_args=[$c_link_args]
 meson_configure+=$'\t'-Dcpp_link_args=[$c_link_args]
-$meson_configure build
-cd build
 
 function verify_version_component() {
-	local key=$1
-	local expected=$2
-	local actual=$(jq -r '.[] | select(.name == "'$key'") | .value' < meson-info/intro-buildoptions.json)
-	if [[ $actual != $expected ]]; then
+	declare -n expected_ptr="$1"
+	declare -n actual_ptr="write_$1"
+	if [[ "$actual_ptr" != "$expected_ptr" ]]; then
 		>&2 echo "meson option $key expected to be $expected, is instead $actual"
 		exit 1
 	fi
 }
+echo "${write_display_version_major}.${write_display_version_minor}.${write_build_num}-upstream-${write_upstream_version_major}.${write_upstream_version_minor}.${write_upstream_build_num}" > "$version_file"
 if [[ $stable_or_beta == yes ]] && [[ $MOD_ID == 0 ]]; then
-	verify_version_component display_version_major $display_version_major
-	verify_version_component display_version_minor $display_version_minor
-	verify_version_component build_num $build_num
-	verify_version_component upstream_version_major $display_version_major
-	verify_version_component upstream_version_minor $display_version_minor
-	verify_version_component upstream_build_num $build_num
+	verify_version_component display_version_major
+	verify_version_component display_version_minor
+	verify_version_component build_num
+	verify_version_component upstream_version_major
+	verify_version_component upstream_version_minor
+	verify_version_component upstream_build_num
 fi
 if [[ $RELEASE_TYPE == snapshot ]] && [[ $MOD_ID == 0 ]]; then
-	verify_version_component build_num $build_num
-	verify_version_component upstream_build_num $build_num
+	verify_version_component build_num
+	verify_version_component upstream_build_num
 fi
+
+$meson_configure build
+cd build
 
 strip=strip
 objcopy=objcopy
