@@ -80,8 +80,8 @@ constexpr auto TRON_WAIT     = UINT32_C(0x00000004); //it was just created, so W
 constexpr auto TRON_NODIE    = UINT32_C(0x00000008);
 constexpr auto TRON_DEATH    = UINT32_C(0x00000010); //Crashed, now dying
 constexpr auto TRON_NORANDOM = UINT32_C(0x00010000);
-int tron_rx[4] = {-1, 0, 1, 0};
-int tron_ry[4] = { 0,-1, 0, 1};
+constexpr int tron_rx[4] = {-1, 0, 1, 0};
+constexpr int tron_ry[4] = { 0,-1, 0, 1};
 unsigned int tron_colours[32];
 
 static void init_graphics()
