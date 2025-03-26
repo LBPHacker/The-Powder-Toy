@@ -28,7 +28,6 @@ void Element::Element_DRIC()
 
 	DefaultProperties.temp = 172.65f;
 	HeatConduct = 2;
-	Description = "Dry Ice, formed when CO2 is cooled.";
 
 	Properties = TYPE_SOLID;
 

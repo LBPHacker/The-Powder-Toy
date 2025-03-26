@@ -1,6 +1,6 @@
 #include "LuaScriptInterface.h"
-#include "gui/game/GameModel.h"
 #include "common/DependentFalse.h"
+#include "Powder/Activity/Game.hpp"
 #include "simulation/SimTool.h"
 #include "simulation/Simulation.h"
 #include <type_traits>
@@ -26,17 +26,16 @@ static int allocate(lua_State *L)
 		return luaL_error(L, "You cannot create tools in the 'DEFAULT' group.");
 	}
 	auto identifier = group + "_TOOL_" + name;
-	if (lsi->gameModel->GetToolFromIdentifier(identifier))
+	if (lsi->game.GetToolFromIdentifier(identifier))
 	{
 		return luaL_error(L, "Tool identifier already in use.");
 	}
 	{
 		SimTool tool;
 		tool.Identifier = identifier;
-		lsi->gameModel->AllocTool(std::make_unique<SimTool>(tool));
+		lsi->game.AllocTool(std::make_unique<SimTool>(tool));
 	}
-	lsi->gameModel->BuildMenus();
-	auto index = *lsi->gameModel->GetToolIndex(lsi->gameModel->GetToolFromIdentifier(identifier));
+	auto index = *lsi->game.GetIndexFromTool(lsi->game.GetToolFromIdentifier(identifier));
 	lsi->customTools.resize(std::max(int(lsi->customTools.size()), index + 1));
 	lsi->customTools[index].valid = true;
 	lua_pushinteger(L, index);
@@ -54,7 +53,7 @@ static int ffree(lua_State *L)
 	auto *lsi = GetLSI();
 	lsi->AssertMutableToolsEvent();
 	int index = luaL_checkinteger(L, 1);
-	auto *tool = lsi->gameModel->GetToolByIndex(index);
+	auto *tool = lsi->game.GetToolFromIndex(index);
 	if (!tool)
 	{
 		return luaL_error(L, "Invalid tool");
@@ -64,8 +63,7 @@ static int ffree(lua_State *L)
 		return luaL_error(L, "Can only free custom tools");
 	}
 	lsi->customTools[index] = {};
-	lsi->gameModel->FreeTool(tool);
-	lsi->gameModel->BuildMenus();
+	lsi->game.FreeTool(tool);
 	return 0;
 }
 
@@ -74,7 +72,7 @@ static int luaPerformWrapper(SimTool *tool, Simulation *sim, Particle *cpart, in
 	int ok = 0;
 	auto *lsi = GetLSI();
 	auto L = lsi->L;
-	auto index = *lsi->gameModel->GetToolIndex(tool);
+	auto index = *lsi->game.GetIndexFromTool(tool);
 	auto &customTools = lsi->customTools;
 	if (customTools[index].perform)
 	{
@@ -113,12 +111,12 @@ static void luaClickWrapper(SimTool *tool, Simulation *sim, const Brush &brush, 
 {
 	auto *lsi = GetLSI();
 	auto L = lsi->L;
-	auto index = *lsi->gameModel->GetToolIndex(tool);
+	auto index = *lsi->game.GetIndexFromTool(tool);
 	auto &customTools = lsi->customTools;
 	if (customTools[index].click)
 	{
 		lua_rawgeti(L, LUA_REGISTRYINDEX, customTools[index].click);
-		lua_pushinteger(L, lsi->gameModel->GetBrushIndex(brush));
+		lua_pushinteger(L, *lsi->game.GetIndexFromBrush(&brush));
 		lua_pushinteger(L, position.X);
 		lua_pushinteger(L, position.Y);
 		lua_pushnumber(L, tool->Strength);
@@ -134,12 +132,12 @@ static void luaDragWrapper(SimTool *tool, Simulation *sim, const Brush &brush, u
 {
 	auto *lsi = GetLSI();
 	auto L = lsi->L;
-	auto index = *lsi->gameModel->GetToolIndex(tool);
+	auto index = *lsi->game.GetIndexFromTool(tool);
 	auto &customTools = lsi->customTools;
 	if (customTools[index].drag)
 	{
 		lua_rawgeti(L, LUA_REGISTRYINDEX, customTools[index].drag);
-		lua_pushinteger(L, lsi->gameModel->GetBrushIndex(brush));
+		lua_pushinteger(L, *lsi->game.GetIndexFromBrush(&brush));
 		lua_pushinteger(L, position1.X);
 		lua_pushinteger(L, position1.Y);
 		lua_pushinteger(L, position2.X);
@@ -157,12 +155,12 @@ static void luaDrawWrapper(SimTool *tool, Simulation *sim, const Brush &brush, u
 {
 	auto *lsi = GetLSI();
 	auto L = lsi->L;
-	auto index = *lsi->gameModel->GetToolIndex(tool);
+	auto index = *lsi->game.GetIndexFromTool(tool);
 	auto &customTools = lsi->customTools;
 	if (customTools[index].draw)
 	{
 		lua_rawgeti(L, LUA_REGISTRYINDEX, customTools[index].draw);
-		lua_pushinteger(L, lsi->gameModel->GetBrushIndex(brush));
+		lua_pushinteger(L, *lsi->game.GetIndexFromBrush(&brush));
 		lua_pushinteger(L, position.X);
 		lua_pushinteger(L, position.Y);
 		lua_pushnumber(L, tool->Strength);
@@ -178,12 +176,12 @@ static void luaDrawLineWrapper(SimTool *tool, Simulation *sim, const Brush &brus
 {
 	auto *lsi = GetLSI();
 	auto L = lsi->L;
-	auto index = *lsi->gameModel->GetToolIndex(tool);
+	auto index = *lsi->game.GetIndexFromTool(tool);
 	auto &customTools = lsi->customTools;
 	if (customTools[index].drawLine)
 	{
 		lua_rawgeti(L, LUA_REGISTRYINDEX, customTools[index].drawLine);
-		lua_pushinteger(L, lsi->gameModel->GetBrushIndex(brush));
+		lua_pushinteger(L, *lsi->game.GetIndexFromBrush(&brush));
 		lua_pushinteger(L, position1.X);
 		lua_pushinteger(L, position1.Y);
 		lua_pushinteger(L, position2.X);
@@ -202,12 +200,12 @@ static void luaDrawRectWrapper(SimTool *tool, Simulation *sim, const Brush &brus
 {
 	auto *lsi = GetLSI();
 	auto L = lsi->L;
-	auto index = *lsi->gameModel->GetToolIndex(tool);
+	auto index = *lsi->game.GetIndexFromTool(tool);
 	auto &customTools = lsi->customTools;
 	if (customTools[index].drawRect)
 	{
 		lua_rawgeti(L, LUA_REGISTRYINDEX, customTools[index].drawRect);
-		lua_pushinteger(L, lsi->gameModel->GetBrushIndex(brush));
+		lua_pushinteger(L, *lsi->game.GetIndexFromBrush(&brush));
 		lua_pushinteger(L, position1.X);
 		lua_pushinteger(L, position1.Y);
 		lua_pushinteger(L, position2.X);
@@ -225,12 +223,12 @@ static void luaDrawFillWrapper(SimTool *tool, Simulation *sim, const Brush &brus
 {
 	auto *lsi = GetLSI();
 	auto L = lsi->L;
-	auto index = *lsi->gameModel->GetToolIndex(tool);
+	auto index = *lsi->game.GetIndexFromTool(tool);
 	auto &customTools = lsi->customTools;
 	if (customTools[index].drawFill)
 	{
 		lua_rawgeti(L, LUA_REGISTRYINDEX, customTools[index].drawFill);
-		lua_pushinteger(L, lsi->gameModel->GetBrushIndex(brush));
+		lua_pushinteger(L, *lsi->game.GetIndexFromBrush(&brush));
 		lua_pushinteger(L, position.X);
 		lua_pushinteger(L, position.Y);
 		lua_pushnumber(L, tool->Strength);
@@ -246,7 +244,7 @@ static void luaSelectWrapper(SimTool *tool, int toolSelection)
 {
 	auto *lsi = GetLSI();
 	auto L = lsi->L;
-	auto index = *lsi->gameModel->GetToolIndex(tool);
+	auto index = *lsi->game.GetIndexFromTool(tool);
 	auto &customTools = lsi->customTools;
 	if (customTools[index].select)
 	{
@@ -265,7 +263,7 @@ static int property(lua_State *L)
 	auto *lsi = GetLSI();
 	lsi->AssertMutableToolsEvent();
 	int index = luaL_checkinteger(L, 1);
-	auto *tool = lsi->gameModel->GetToolByIndex(index);
+	auto *tool = lsi->game.GetToolFromIndex(index);
 	if (!tool)
 	{
 		return luaL_error(L, "Invalid tool");
@@ -313,7 +311,7 @@ static int property(lua_State *L)
 		return 0;
 	}
 	int returnValueCount = 0;
-	auto handleProperty = [L, lsi, tool, &propertyName, &returnValueCount](auto simToolMember, const char *luaPropertyName, bool buildMenusIfChanged) {
+	auto handleProperty = [L, tool, &propertyName, &returnValueCount](auto simToolMember, const char *luaPropertyName) {
 		if (propertyName == luaPropertyName)
 		{
 			auto &thing = tool->*simToolMember;
@@ -325,10 +323,6 @@ static int property(lua_State *L)
 				else if constexpr (std::is_same_v<PropertyType, int         >) thing = luaL_checkinteger(L, 3);
 				else if constexpr (std::is_same_v<PropertyType, RGB         >) thing = RGB::Unpack(luaL_checkinteger(L, 3));
 				else static_assert(DependentFalse<PropertyType>::value);
-				if (buildMenusIfChanged)
-				{
-					lsi->gameModel->BuildMenus();
-				}
 			}
 			else
 			{
@@ -343,13 +337,13 @@ static int property(lua_State *L)
 		}
 		return false;
 	};
-	if (handleProperty(&SimTool::Name       , "Name"       ,  true) ||
-	    handleProperty(&SimTool::Description, "Description",  true) ||
-	    handleProperty(&SimTool::Colour     , "Colour"     ,  true) ||
-	    handleProperty(&SimTool::Colour     , "Color"      ,  true) ||
-	    handleProperty(&SimTool::MenuSection, "MenuSection",  true) ||
-	    handleProperty(&SimTool::MenuVisible, "MenuVisible",  true) ||
-	    handleProperty(&SimTool::MenuSort,    "MenuSort",     true))
+	if (handleProperty(&SimTool::Name       , "Name"       ) ||
+	    // handleProperty(&SimTool::Description, "Description") || // TODO-REDO_UI: set the translation instead
+	    handleProperty(&SimTool::Colour     , "Colour"     ) ||
+	    handleProperty(&SimTool::Colour     , "Color"      ) ||
+	    handleProperty(&SimTool::MenuSection, "MenuSection") ||
+	    handleProperty(&SimTool::MenuVisible, "MenuVisible") ||
+	    handleProperty(&SimTool::MenuSort   , "MenuSort"   ))
 	{
 		return returnValueCount;
 	}
@@ -366,7 +360,7 @@ static int exists(lua_State *L)
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
 	int index = luaL_checkinteger(L, 1);
-	lua_pushboolean(L, bool(lsi->gameModel->GetToolByIndex(index)));
+	lua_pushboolean(L, bool(lsi->game.GetToolFromIndex(index)));
 	return 1;
 }
 
@@ -375,7 +369,7 @@ static int isCustom(lua_State *L)
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
 	int index = luaL_checkinteger(L, 1);
-	auto *tool = lsi->gameModel->GetToolByIndex(index);
+	auto *tool = lsi->game.GetToolFromIndex(index);
 	if (!tool)
 	{
 		return luaL_error(L, "Invalid tool");
@@ -386,7 +380,6 @@ static int isCustom(lua_State *L)
 
 void LuaTools::Open(lua_State *L)
 {
-	auto *lsi = GetLSI();
 	static const luaL_Reg reg[] = {
 #define LFUNC(v) { #v, v }
 		LFUNC(allocate),
@@ -402,15 +395,15 @@ void LuaTools::Open(lua_State *L)
 	lua_newtable(L);
 	lua_setfield(L, -2, "index");
 	lua_setglobal(L, "tools");
-	auto &toolList = lsi->gameModel->GetTools();
-	for (int i = 0; i < int(toolList.size()); ++i)
-	{
-		if (!toolList[i])
-		{
-			continue;
-		}
-		SetToolIndex(L, toolList[i]->Identifier, i);
-	}
+	// auto &toolList = lsi->gameModel->GetTools(); // TODO-REDO_UI-POSTCLEANUP: put this back in if initializing commandinterface after tools is impossible for some reason
+	// for (int i = 0; i < int(toolList.size()); ++i)
+	// {
+	// 	if (!toolList[i])
+	// 	{
+	// 		continue;
+	// 	}
+	// 	SetToolIndex(L, toolList[i]->Identifier, i);
+	// }
 }
 
 void LuaTools::SetToolIndex(lua_State *L, ByteString identifier, std::optional<int> index)

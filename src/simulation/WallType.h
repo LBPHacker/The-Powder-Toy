@@ -13,5 +13,4 @@ struct wall_type
 	std::unique_ptr<VideoBuffer> (*textureGen)(int, Vec2<int>);
 	String name;
 	ByteString identifier;
-	String descs;
 };

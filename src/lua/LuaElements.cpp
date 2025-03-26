@@ -1,5 +1,5 @@
 #include "LuaScriptInterface.h"
-#include "gui/game/GameModel.h"
+#include "Powder/Activity/Game.hpp"
 #include "simulation/ElementClasses.h"
 #include "simulation/ElementCommon.h"
 #include "simulation/SimulationData.h"
@@ -319,13 +319,24 @@ static int allocate(lua_State *L)
 	auto group = tpt_lua_toByteString(L, 1).ToUpper();
 	auto id = tpt_lua_toByteString(L, 2).ToUpper();
 
-	if (id.Contains("_"))
+	auto validNameChar = [](char ch) {
+		return (ch >= '0' && ch <= '9') ||
+		       (ch >= 'A' && ch <= 'Z') ||
+		        ch == '-';
+	};
+	for (auto ch : id)
 	{
-		return luaL_error(L, "The element name may not contain '_'.");
+		if (!validNameChar(ch))
+		{
+			return luaL_error(L, "The element name may only contain '-', 'A'..'Z', and '0'..'9'.");
+		}
 	}
-	if (group.Contains("_"))
+	for (auto ch : group)
 	{
-		return luaL_error(L, "The group name may not contain '_'.");
+		if (!validNameChar(ch))
+		{
+			return luaL_error(L, "The group name may only contain '-', 'A'..'Z', and '0'..'9'.");
+		}
 	}
 	if (group == "DEFAULT")
 	{
@@ -389,8 +400,7 @@ static int allocate(lua_State *L)
 			lsi->customCanMove[elem][newID] = 0;
 			lsi->customCanMove[newID][elem] = 0;
 		}
-		lsi->gameModel->AllocElementTool(newID);
-		lsi->gameModel->BuildMenus();
+		lsi->game.AllocElementTool(newID);
 		lsi->InitCustomCanMove();
 	}
 
@@ -516,8 +526,7 @@ static int element(lua_State *L)
 
 			sd.graphicscache[id].isready = 0;
 		}
-		lsi->gameModel->UpdateElementTool(id);
-		lsi->gameModel->BuildMenus();
+		lsi->game.UpdateElementTool(id);
 		lsi->InitCustomCanMove();
 
 		return 0;
@@ -545,6 +554,7 @@ static int element(lua_State *L)
 
 static int property(lua_State *L)
 {
+	// TODO-REDO_UI: Description property: set the translation instead
 	auto &builtinElements = GetElements();
 	auto *lsi = GetLSI();
 	auto &customElements = lsi->customElements;
@@ -582,8 +592,7 @@ static int property(lua_State *L)
 				manageElementIdentifier(L, id, false);
 				LuaSetProperty(L, *prop, propertyAddress, 3);
 				manageElementIdentifier(L, id, true);
-				lsi->gameModel->UpdateElementTool(id);
-				lsi->gameModel->BuildMenus();
+				lsi->game.UpdateElementTool(id);
 				lsi->InitCustomCanMove();
 				sd.graphicscache[id].isready = 0;
 			}
@@ -740,8 +749,7 @@ static int ffree(lua_State *L)
 		sd.elements[id].Enabled = false;
 	}
 	lsi->customElements[id] = {};
-	lsi->gameModel->FreeTool(lsi->gameModel->GetToolFromIdentifier(identifier));
-	lsi->gameModel->BuildMenus();
+	lsi->game.FreeTool(lsi->game.GetToolFromIdentifier(identifier));
 
 	lua_getglobal(L, "elements");
 	tpt_lua_pushByteString(L, identifier);
@@ -788,11 +796,11 @@ static int loadDefault(lua_State *L)
 			// TODO: somehow unify element and corresponding element tool management in a way that makes it hard to mess up
 			if (oldEnabled && elements[id].Enabled)
 			{
-				lsi->gameModel->UpdateElementTool(id);
+				lsi->game.UpdateElementTool(id);
 			}
 			else if (oldEnabled && !elements[id].Enabled)
 			{
-				lsi->gameModel->FreeTool(lsi->gameModel->GetToolFromIdentifier(identifier));
+				lsi->game.FreeTool(lsi->game.GetToolFromIdentifier(identifier));
 			}
 			manageElementIdentifier(L, id, true);
 
@@ -819,7 +827,6 @@ static int loadDefault(lua_State *L)
 		}
 	}
 
-	lsi->gameModel->BuildMenus();
 	for (auto moving = 0; moving < PT_NUM; ++moving)
 	{
 		for (auto into = 0; into < PT_NUM; ++into)

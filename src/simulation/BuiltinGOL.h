@@ -11,5 +11,4 @@ struct BuiltinGOL
 	RGB colour = RGB(0, 0, 0);
 	RGB colour2 = RGB(0, 0, 0);
 	int goltype;
-	String description;
 };

@@ -31,7 +31,6 @@ void Element::Element_PCLN()
 	Weight = 100;
 
 	HeatConduct = 251;
-	Description = "Powered clone. When activated, duplicates any particles it touches.";
 
 	Properties = TYPE_SOLID | PROP_PHOTPASS | PROP_NOCTYPEDRAW;
 	CarriesTypeIn = 1U << FIELD_CTYPE;

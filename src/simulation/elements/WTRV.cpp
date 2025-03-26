@@ -30,7 +30,6 @@ void Element::Element_WTRV()
 
 	DefaultProperties.temp = R_TEMP + 100.0f + 273.15f;
 	HeatConduct = 48;
-	Description = "Steam. Produced from hot water.";
 
 	Properties = TYPE_GAS;
 	CarriesTypeIn = 1U << FIELD_CTYPE;

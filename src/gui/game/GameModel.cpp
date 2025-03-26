@@ -1099,9 +1099,9 @@ void GameModel::SetColourSelectorColour(ui::Colour colour_)
 {
 	colour = colour_;
 
-	std::vector<Tool*> tools = GetMenuList()[SC_DECO]->GetToolList();
-	for (auto tool : tools)
-		static_cast<DecorationTool *>(tool)->Colour = colour;
+	// std::vector<Tool*> tools = GetMenuList()[SC_DECO]->GetToolList();
+	// for (auto tool : tools)
+	// 	static_cast<DecorationTool *>(tool)->Colour = colour;
 
 	notifyColourSelectorColourChanged();
 }
@@ -1837,7 +1837,7 @@ std::optional<int> GameModel::GetToolIndex(Tool *tool)
 
 void GameModel::AllocCustomGolTool(const CustomGOLData &gd)
 {
-	auto tool = std::make_unique<ElementTool>(PMAP(gd.rule, PT_LIFE), gd.nameString, "Custom GOL type: " + SerialiseGOLRule(gd.rule), gd.colour1, "DEFAULT_PT_LIFECUST_" + gd.nameString.ToAscii(), nullptr);
+	auto tool = std::make_unique<ElementTool>(PMAP(gd.rule, PT_LIFE), gd.nameString, gd.colour1, "DEFAULT_PT_LIFECUST_" + gd.nameString.ToAscii(), nullptr);
 	tool->MenuSection = SC_LIFE;
 	AllocTool(std::move(tool));
 }
@@ -1849,7 +1849,7 @@ void GameModel::UpdateElementTool(int element)
 	auto &elem = elements[element];
 	auto *tool = GetToolFromIdentifier(elem.Identifier);
 	tool->Name = elem.Name;
-	tool->Description = elem.Description;
+	// tool->Description = elem.Description;
 	tool->Colour = elem.Colour;
 	tool->textureGen = elem.IconGenerator;
 	tool->MenuSection = elem.MenuSection;
@@ -1899,13 +1899,13 @@ void GameModel::InitTools()
 	}
 	for (int i = 0; i < NGOL; ++i)
 	{
-		auto tool = std::make_unique<ElementTool>(PMAP(i, PT_LIFE), builtinGol[i].name, builtinGol[i].description, builtinGol[i].colour, "DEFAULT_PT_LIFE_" + builtinGol[i].name.ToAscii());
+		auto tool = std::make_unique<ElementTool>(PMAP(i, PT_LIFE), builtinGol[i].name, builtinGol[i].colour, "DEFAULT_PT_LIFE_" + builtinGol[i].name.ToAscii());
 		tool->MenuSection = SC_LIFE;
 		AllocTool(std::move(tool));
 	}
 	for (int i = 0; i < UI_WALLCOUNT; ++i)
 	{
-		auto tool = std::make_unique<WallTool>(i, sd.wtypes[i].descs, sd.wtypes[i].colour, sd.wtypes[i].identifier, sd.wtypes[i].textureGen);
+		auto tool = std::make_unique<WallTool>(i, sd.wtypes[i].colour, sd.wtypes[i].identifier, sd.wtypes[i].textureGen);
 		tool->MenuSection = SC_WALL;
 		AllocTool(std::move(tool));
 	}
@@ -1913,17 +1913,17 @@ void GameModel::InitTools()
 	{
 		AllocTool(std::make_unique<SimTool>(tool));
 	}
-	AllocTool(std::make_unique<DecorationTool>(view, DECO_ADD     , "ADD" , "Colour blending: Add."                         , 0x000000_rgb, "DEFAULT_DECOR_ADD" ));
-	AllocTool(std::make_unique<DecorationTool>(view, DECO_SUBTRACT, "SUB" , "Colour blending: Subtract."                    , 0x000000_rgb, "DEFAULT_DECOR_SUB" ));
-	AllocTool(std::make_unique<DecorationTool>(view, DECO_MULTIPLY, "MUL" , "Colour blending: Multiply."                    , 0x000000_rgb, "DEFAULT_DECOR_MUL" ));
-	AllocTool(std::make_unique<DecorationTool>(view, DECO_DIVIDE  , "DIV" , "Colour blending: Divide."                      , 0x000000_rgb, "DEFAULT_DECOR_DIV" ));
-	AllocTool(std::make_unique<DecorationTool>(view, DECO_SMUDGE  , "SMDG", "Smudge tool, blends surrounding deco together.", 0x000000_rgb, "DEFAULT_DECOR_SMDG"));
-	AllocTool(std::make_unique<DecorationTool>(view, DECO_CLEAR   , "CLR" , "Erase any set decoration."                     , 0x000000_rgb, "DEFAULT_DECOR_CLR" ));
-	AllocTool(std::make_unique<DecorationTool>(view, DECO_DRAW    , "SET" , "Draw decoration (No blending)."                , 0x000000_rgb, "DEFAULT_DECOR_SET" ));
-	AllocTool(std::make_unique<PropertyTool>(*this));
-	AllocTool(std::make_unique<SignTool>(*this));
-	AllocTool(std::make_unique<SampleTool>(*this));
-	AllocTool(std::make_unique<GOLTool>(*this));
+	// AllocTool(std::make_unique<DecorationTool>(view, DECO_ADD     , "ADD" , "Colour blending: Add."                         , 0x000000_rgb, "DEFAULT_DECOR_ADD" ));
+	// AllocTool(std::make_unique<DecorationTool>(view, DECO_SUBTRACT, "SUB" , "Colour blending: Subtract."                    , 0x000000_rgb, "DEFAULT_DECOR_SUB" ));
+	// AllocTool(std::make_unique<DecorationTool>(view, DECO_MULTIPLY, "MUL" , "Colour blending: Multiply."                    , 0x000000_rgb, "DEFAULT_DECOR_MUL" ));
+	// AllocTool(std::make_unique<DecorationTool>(view, DECO_DIVIDE  , "DIV" , "Colour blending: Divide."                      , 0x000000_rgb, "DEFAULT_DECOR_DIV" ));
+	// AllocTool(std::make_unique<DecorationTool>(view, DECO_SMUDGE  , "SMDG", "Smudge tool, blends surrounding deco together.", 0x000000_rgb, "DEFAULT_DECOR_SMDG"));
+	// AllocTool(std::make_unique<DecorationTool>(view, DECO_CLEAR   , "CLR" , "Erase any set decoration."                     , 0x000000_rgb, "DEFAULT_DECOR_CLR" ));
+	// AllocTool(std::make_unique<DecorationTool>(view, DECO_DRAW    , "SET" , "Draw decoration (No blending)."                , 0x000000_rgb, "DEFAULT_DECOR_SET" ));
+	// AllocTool(std::make_unique<PropertyTool>(*this));
+	// AllocTool(std::make_unique<SignTool>(*this));
+	// AllocTool(std::make_unique<SampleTool>(*this));
+	// AllocTool(std::make_unique<GOLTool>(*this));
 	LoadCustomGol();
 
 	SanitizeToolsets();
@@ -1936,10 +1936,10 @@ void GameModel::BuildMenus()
 	auto &sd = SimulationData::Ref();
 
 	menuList.clear();
-	for (auto &section : sd.msections)
-	{
-		menuList.push_back(std::make_unique<Menu>(section.icon, section.name, section.doshow));
-	}
+	// for (auto &section : sd.msections)
+	// {
+	// 	menuList.push_back(std::make_unique<Menu>(section.icon, section.name, section.doshow));
+	// }
 
 	for (auto &tool : tools)
 	{

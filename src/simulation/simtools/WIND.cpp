@@ -10,7 +10,6 @@ void SimTool::Tool_WIND()
 	Identifier = "DEFAULT_TOOL_WIND";
 	Name = "WIND";
 	Colour = 0x404040_rgb;
-	Description = "Creates air movement.";
 	PerformDrawLine = &performDrawLine;
 	PerformDrag = &performDrag;
 }

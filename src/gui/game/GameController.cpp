@@ -106,7 +106,7 @@ GameController::GameController():
 		gameView->SetSimFpsLimit(DefaultFpsLimit);
 	}
 
-	commandInterface = CommandInterface::Create(this, gameModel);
+	// commandInterface = CommandInterface::Create(this, gameModel); // TODO-REDO_UI
 
 	Client::Ref().AddListener(this);
 
@@ -164,7 +164,7 @@ GameController::~GameController()
 		delete *iter;
 	}
 	gameView->PauseRendererThread();
-	commandInterface->RemoveComponents();
+	// commandInterface->RemoveComponents(); // TODO-REDO_UI
 	gameView->CloseActiveWindow();
 	delete gameView;
 	commandInterface.reset();
@@ -888,7 +888,7 @@ void GameController::LoadRenderPreset(int presetNum)
 {
 	auto &settings = gameModel->GetRendererSettings();
 	RenderPreset preset = Renderer::renderModePresets[presetNum];
-	gameModel->SetInfoTip(preset.Name);
+	// gameModel->SetInfoTip(preset.Name);
 	settings.renderMode = preset.renderMode;
 	settings.displayMode = preset.displayMode;
 	settings.colorMode = preset.colorMode;

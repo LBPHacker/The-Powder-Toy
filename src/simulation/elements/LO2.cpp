@@ -28,7 +28,6 @@ void Element::Element_LO2()
 
 	DefaultProperties.temp = 80.0f;
 	HeatConduct = 70;
-	Description = "Liquid Oxygen. Very cold. Reacts with fire.";
 
 	Properties = TYPE_LIQUID;
 

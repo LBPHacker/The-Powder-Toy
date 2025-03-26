@@ -8,7 +8,6 @@ void SimTool::Tool_AIR()
 	Identifier = "DEFAULT_TOOL_AIR";
 	Name = "AIR";
 	Colour = 0xFFFFFF_rgb;
-	Description = "Air, creates airflow and pressure.";
 	Perform = &perform;
 }
 

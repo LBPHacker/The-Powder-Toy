@@ -31,7 +31,6 @@ void Element::Element_LIFE()
 
 	DefaultProperties.temp = 9000.0f;
 	HeatConduct = 40;
-	Description = "Game Of Life! B3/S23";
 
 	Properties = TYPE_SOLID|PROP_LIFE;
 

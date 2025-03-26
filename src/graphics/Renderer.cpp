@@ -12,6 +12,8 @@
 #include "simulation/gravity/Gravity.h"
 #include "simulation/orbitalparts.h"
 #include "simulation/elements/SOAP.h"
+#include "simulation/SignDraw.h"
+#include "Lang/Translation.hpp"
 #include <algorithm>
 #include <cmath>
 #include <numbers>
@@ -211,30 +213,11 @@ std::unique_ptr<VideoBuffer> Renderer::WallIcon(int wallID, Vec2<int> size)
 
 void Renderer::DrawSigns()
 {
-	int x, y, w, h;
-	std::vector<sign> signs = sim->signs;
-	for (auto &currentSign : signs)
+	for (auto &currentSign : sim->signs)
 	{
 		if (currentSign.text.length())
 		{
-			String text = currentSign.getDisplayText(sim, x, y, w, h);
-			DrawFilledRect(RectSized(Vec2{ x + 1, y + 1 }, Vec2{ w, h - 1 }), 0x000000_rgb);
-			DrawRect(RectSized(Vec2{ x, y }, Vec2{ w+1, h }), 0xC0C0C0_rgb);
-			BlendText({ x+3, y+4 }, text, 0xFFFFFF_rgb .WithAlpha(255));
-
-			if (currentSign.ju != sign::None)
-			{
-				int x = currentSign.x;
-				int y = currentSign.y;
-				int dx = 1 - currentSign.ju;
-				int dy = (currentSign.y > 18) ? -1 : 1;
-				for (int j = 0; j < 4; j++)
-				{
-					DrawPixel({ x, y }, 0xC0C0C0_rgb);
-					x += dx;
-					y += dy;
-				}
-			}
+			currentSign.Draw(*sim, *this);
 		}
 	}
 }
@@ -1354,73 +1337,73 @@ RGB HeatToColour(float temp, float hdispLimitMin, float hdispLimitMax)
 
 const std::vector<RenderPreset> Renderer::renderModePresets = {
 	{
-		"Alternative Velocity Display",
+		"DEFAULT_RENDERERPRESET_ALTVEL"_St,
 		RENDER_EFFE | RENDER_BASC,
 		DISPLAY_AIRC,
 		0,
 	},
 	{
-		"Velocity Display",
+		"DEFAULT_RENDERERPRESET_VEL"_St,
 		RENDER_EFFE | RENDER_BASC,
 		DISPLAY_AIRV,
 		0,
 	},
 	{
-		"Pressure Display",
+		"DEFAULT_RENDERERPRESET_PRES"_St,
 		RENDER_EFFE | RENDER_BASC,
 		DISPLAY_AIRP,
 		0,
 	},
 	{
-		"Persistent Display",
+		"DEFAULT_RENDERERPRESET_PERS"_St,
 		RENDER_EFFE | RENDER_BASC,
 		DISPLAY_PERS,
 		0,
 	},
 	{
-		"Fire Display",
+		"DEFAULT_RENDERERPRESET_FIRE"_St,
 		RENDER_FIRE | RENDER_SPRK | RENDER_EFFE | RENDER_BASC,
 		0,
 		0,
 	},
 	{
-		"Blob Display",
+		"DEFAULT_RENDERERPRESET_BLOB"_St,
 		RENDER_FIRE | RENDER_SPRK | RENDER_EFFE | RENDER_BLOB,
 		0,
 		0,
 	},
 	{
-		"Heat Display",
+		"DEFAULT_RENDERERPRESET_HEAT"_St,
 		RENDER_BASC,
 		DISPLAY_AIRH,
 		COLOUR_HEAT,
 	},
 	{
-		"Fancy Display",
+		"DEFAULT_RENDERERPRESET_FANCY"_St,
 		RENDER_FIRE | RENDER_SPRK | RENDER_GLOW | RENDER_BLUR | RENDER_EFFE | RENDER_BASC,
 		DISPLAY_WARP,
 		0,
 	},
 	{
-		"Nothing Display",
+		"DEFAULT_RENDERERPRESET_NOTHING"_St,
 		RENDER_BASC,
 		0,
 		0,
 	},
 	{
-		"Heat Gradient Display",
+		"DEFAULT_RENDERERPRESET_HEATGRAD"_St,
 		RENDER_BASC,
 		0,
 		COLOUR_GRAD,
 	},
 	{
-		"Life Gradient Display",
+		"DEFAULT_RENDERERPRESET_LIFEGRAD"_St,
 		RENDER_BASC,
 		0,
 		COLOUR_LIFE,
 	},
 	{
-		"Dynamic Heat Display",
+		"DEFAULT_RENDERERPRESET_DYNHEAT"_St,
 		RENDER_BASC,
 		DISPLAY_AIRH,
 		COLOUR_HEAT,
@@ -1428,13 +1411,13 @@ const std::vector<RenderPreset> Renderer::renderModePresets = {
 		HdispLimitAuto{},
 	},
 	{
-		"Vorticity Display",
+		"DEFAULT_RENDERERPRESET_VORT"_St,
 		RENDER_EFFE | RENDER_BASC,
 		DISPLAY_AIRW,
 		0,
 	},
 	{
-		"Destructibility Display",
+		"DEFAULT_RENDERERPRESET_DEST"_St,
 		RENDER_BASC,
 		0,
 		COLOUR_DEST,

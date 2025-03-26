@@ -30,7 +30,6 @@ void Element::Element_SWCH()
 	Weight = 100;
 
 	HeatConduct = 251;
-	Description = "Switch. Only conducts when switched on. (PSCN switches on, NSCN switches off)";
 
 	Properties = TYPE_SOLID;
 

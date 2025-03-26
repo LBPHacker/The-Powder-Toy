@@ -29,7 +29,6 @@ void Element::Element_BTRY()
 	Weight = 100;
 
 	HeatConduct = 251;
-	Description = "Battery. Generates infinite electricity.";
 
 	Properties = TYPE_SOLID;
 

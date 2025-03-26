@@ -30,7 +30,6 @@ void Element::Element_TTAN()
 	Weight = 100;
 
 	HeatConduct = 251;
-	Description = "Titanium. Higher melting temperature than most other metals, blocks all air pressure.";
 
 	Properties = TYPE_SOLID|PROP_CONDUCTS|PROP_HOT_GLOW|PROP_LIFE_DEC;
 

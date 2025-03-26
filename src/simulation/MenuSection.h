@@ -1,10 +1,15 @@
 #pragma once
 #include "common/String.h"
 
+namespace Powder::Lang
+{
+	struct Translation;
+}
+
 struct menu_section
 {
 	String::value_type icon;
-	String name;
+	Powder::Lang::Translation &name;
 	int itemcount;
 	int doshow;
 };

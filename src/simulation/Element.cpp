@@ -31,7 +31,6 @@ Element::Element():
 
 	HeatConduct(128),
 	HeatCapacity(1.0f),
-	Description("No description"),
 
 	Properties(TYPE_SOLID),
 	CarriesTypeIn(0),
@@ -90,7 +89,6 @@ std::vector<StructProperty> const &Element::GetProperties()
 				{ "Temperature",               StructProperty::Float,    offsetof(Element, DefaultProperties.temp   ) },
 				{ "HeatConduct",               StructProperty::UChar,    offsetof(Element, HeatConduct              ) },
 				{ "HeatCapacity",              StructProperty::Float,    offsetof(Element, HeatCapacity             ) },
-				{ "Description",               StructProperty::String,   offsetof(Element, Description              ) },
 				{ "State",                     StructProperty::Removed,  0                                            },
 				{ "Properties",                StructProperty::Integer,  offsetof(Element, Properties               ) },
 				{ "LowPressure",               StructProperty::Float,    offsetof(Element, LowPressure              ) },

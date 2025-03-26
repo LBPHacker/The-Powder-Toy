@@ -4,9 +4,9 @@
 class WallTool: public Tool
 {
 public:
-	WallTool(int id, String description,
+	WallTool(int id,
 		RGB colour, ByteString identifier, std::unique_ptr<VideoBuffer> (*textureGen)(int, Vec2<int>) = nullptr):
-		Tool(id, "", description, colour, identifier, textureGen, true)
+		Tool(id, "", colour, identifier, textureGen, true)
 	{
 	}
 

@@ -31,7 +31,6 @@ void Element::Element_GEL()
 
 	DefaultProperties.temp = R_TEMP - 2.0f + 273.15f;
 	HeatConduct = 29;
-	Description = "A liquid with variable viscosity and heat conductivity. Absorbs water.";
 
 	Properties = TYPE_LIQUID|PROP_LIFE_DEC|PROP_NEUTPENETRATE;
 

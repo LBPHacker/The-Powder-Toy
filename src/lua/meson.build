@@ -1,28 +1,28 @@
 luaconsole_files = files(
-	'LuaButton.cpp',
+#	'LuaButton.cpp', # TODO-REDO_UI
 	'LuaBz2.cpp',
-	'LuaCheckbox.cpp',
+#	'LuaCheckbox.cpp', # TODO-REDO_UI
 	'LuaCompat.cpp',
-	'LuaComponent.cpp',
+#	'LuaComponent.cpp', # TODO-REDO_UI
 	'LuaElements.cpp',
 	'LuaEvent.cpp',
 	'LuaFileSystem.cpp',
 	'LuaGraphics.cpp',
 	'LuaHttp.cpp',
 	'LuaInterface.cpp',
-	'LuaLabel.cpp',
+#	'LuaLabel.cpp', # TODO-REDO_UI
 	'LuaMisc.cpp',
 	'LuaPlatform.cpp',
-	'LuaProgressBar.cpp',
+#	'LuaProgressBar.cpp', # TODO-REDO_UI
 	'LuaRenderer.cpp',
 	'LuaScriptInterface.cpp',
 	'LuaSimulation.cpp',
-	'LuaSlider.cpp',
+#	'LuaSlider.cpp', # TODO-REDO_UI
 	'LuaSocket.cpp',
 	'LuaSmartRef.cpp',
-	'LuaTextbox.cpp',
+#	'LuaTextbox.cpp', # TODO-REDO_UI
 	'LuaTools.cpp',
-	'LuaWindow.cpp',
+#	'LuaWindow.cpp', # TODO-REDO_UI
 )
 if lua_variant != 'luajit'
 	luaconsole_files += files(

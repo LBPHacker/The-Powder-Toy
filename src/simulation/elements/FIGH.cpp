@@ -35,7 +35,6 @@ void Element::Element_FIGH()
 
 	DefaultProperties.temp = R_TEMP + 14.6f + 273.15f;
 	HeatConduct = 0;
-	Description = "Fighter. Tries to kill stickmen. You must first give it an element to kill him with.";
 
 	Properties = PROP_NOCTYPEDRAW;
 	CarriesTypeIn = 1U << FIELD_CTYPE;

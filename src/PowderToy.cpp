@@ -23,6 +23,7 @@
 #include "gui/dialogues/ErrorMessage.h"
 #include "gui/interface/Engine.h"
 #include "gui/interface/TextWrapper.h"
+#include "Lang/Language.hpp"
 #include "Config.h"
 #include "SimulationConfig.h"
 #include <optional>
@@ -233,6 +234,7 @@ struct ExplicitSingletons
 {
 	// These need to be listed in the order they are populated in main.
 	std::unique_ptr<GlobalPrefs> globalPrefs;
+	std::unique_ptr<Powder::Lang::Language> language;
 	http::RequestManagerPtr requestManager;
 	std::unique_ptr<Client> client;
 	std::unique_ptr<SaveRenderer> saveRenderer;
@@ -243,7 +245,7 @@ struct ExplicitSingletons
 };
 static std::unique_ptr<ExplicitSingletons> explicitSingletons;
 
-int main(int argc, char *argv[])
+int main_unused(int argc, char *argv[])
 {
 	Platform::SetupCrt();
 	return Platform::InvokeMain(argc, argv);
@@ -349,6 +351,8 @@ int Main(int argc, char *argv[])
 	explicitSingletons->globalPrefs = std::make_unique<GlobalPrefs>();
 
 	auto &prefs = GlobalPrefs::Ref();
+
+	explicitSingletons->language = std::make_unique<Powder::Lang::Language>();
 
 	WindowFrameOps windowFrameOps{
 		prefs.Get("Scale", 1),

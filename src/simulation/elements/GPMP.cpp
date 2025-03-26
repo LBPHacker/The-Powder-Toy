@@ -30,7 +30,6 @@ void Element::Element_GPMP()
 	Weight = 100;
 
 	HeatConduct = 0;
-	Description = "Gravity pump. Changes gravity to its temp when activated. (use HEAT/COOL)";
 
 	Properties = TYPE_SOLID;
 
