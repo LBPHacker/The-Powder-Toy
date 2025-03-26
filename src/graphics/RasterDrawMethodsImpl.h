@@ -5,7 +5,7 @@
 #include "VideoBuffer.h"
 #include "RasterDrawMethods.h"
 
-#define clipRect() (static_cast<Derived const &>(*this).GetClipRect())
+#define clipRect() (static_cast<Derived const &>(*this).GetClipRect()) // TODO-REDO_UI: remove
 
 template<typename Derived, typename V>
 static inline void drawPixelUnchecked(RasterDrawMethods<Derived> &self, V Derived::*video, Vec2<int> pos, RGB colour)

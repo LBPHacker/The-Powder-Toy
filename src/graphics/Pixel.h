@@ -77,6 +77,9 @@ struct alignas(alignof(uint32_t)) RGB
 	{
 		return RGB(px >> 16, px >> 8, px);
 	}
+
+	constexpr bool operator ==(const RGB &) const = default;
+	constexpr bool operator !=(const RGB &) const = default;
 };
 
 constexpr inline RGB operator ""_rgb(unsigned long long value)
@@ -123,6 +126,9 @@ struct alignas(alignof(uint32_t)) RGBA
 	{
 		return RGBA(px >> 16, px >> 8, px, px >> 24);
 	}
+
+	constexpr bool operator ==(const RGBA &) const = default;
+	constexpr bool operator !=(const RGBA &) const = default;
 };
 
 // Blend and Add get called in tight loops so it's important that they
@@ -156,4 +162,9 @@ constexpr RGB RGB::Add(RGBA other) const
 constexpr RGBA RGB::WithAlpha(uint8_t a) const
 {
 	return RGBA(Red, Green, Blue, a);
+}
+
+constexpr inline RGBA operator ""_argb(unsigned long long value)
+{
+	return RGBA::Unpack(value);
 }

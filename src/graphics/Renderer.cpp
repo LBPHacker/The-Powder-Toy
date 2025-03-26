@@ -12,6 +12,7 @@
 #include "simulation/Air.h"
 #include "simulation/gravity/Gravity.h"
 #include "simulation/orbitalparts.h"
+#include "simulation/SignDraw.h"
 #include <cmath>
 #include <algorithm>
 
@@ -210,30 +211,11 @@ std::unique_ptr<VideoBuffer> Renderer::WallIcon(int wallID, Vec2<int> size)
 
 void Renderer::DrawSigns()
 {
-	int x, y, w, h;
-	std::vector<sign> signs = sim->signs;
-	for (auto &currentSign : signs)
+	for (auto &currentSign : sim->signs)
 	{
 		if (currentSign.text.length())
 		{
-			String text = currentSign.getDisplayText(sim, x, y, w, h);
-			DrawFilledRect(RectSized(Vec2{ x + 1, y + 1 }, Vec2{ w, h - 1 }), 0x000000_rgb);
-			DrawRect(RectSized(Vec2{ x, y }, Vec2{ w+1, h }), 0xC0C0C0_rgb);
-			BlendText({ x+3, y+4 }, text, 0xFFFFFF_rgb .WithAlpha(255));
-
-			if (currentSign.ju != sign::None)
-			{
-				int x = currentSign.x;
-				int y = currentSign.y;
-				int dx = 1 - currentSign.ju;
-				int dy = (currentSign.y > 18) ? -1 : 1;
-				for (int j = 0; j < 4; j++)
-				{
-					DrawPixel({ x, y }, 0xC0C0C0_rgb);
-					x += dx;
-					y += dy;
-				}
-			}
+			currentSign.Draw(sim, *this);
 		}
 	}
 }
@@ -1587,3 +1569,5 @@ void Renderer::ApplySettings(const RendererSettings &newSettings)
 }
 
 template struct RasterDrawMethods<Renderer>;
+
+template void sign::Draw<Renderer>(const RenderableSimulation *sim, Renderer &g) const;
