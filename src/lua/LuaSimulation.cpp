@@ -5,9 +5,7 @@
 #include "client/SaveInfo.h"
 #include "common/RasterGeometry.h"
 #include "Format.h"
-#include "gui/game/GameController.h"
-#include "gui/game/GameModel.h"
-#include "gui/game/GameView.h"
+#include "Powder/Activity/Game.hpp"
 #include "gui/game/Brush.h"
 #include "gui/game/tool/Tool.h"
 #include "simulation/Air.h"
@@ -30,7 +28,6 @@ static int ambientHeatSim(lua_State *L)
 	lsi->AssertInterfaceEvent();
 	auto aheatstate = lua_toboolean(L, 1);
 	lsi->sim->aheat_enable = aheatstate;
-	lsi->gameModel->UpdateQuickOptions();
 
 	return 0;
 }
@@ -61,7 +58,6 @@ static int newtonianGravity(lua_State *L)
 	}
 	lsi->AssertInterfaceEvent();
 	lsi->sim->EnableNewtonianGravity(lua_toboolean(L, 1));
-	lsi->gameModel->UpdateQuickOptions();
 	return 0;
 }
 
@@ -72,11 +68,11 @@ static int paused(lua_State *L)
 	int acount = lua_gettop(L);
 	if (acount == 0)
 	{
-		lua_pushboolean(L, lsi->gameModel->GetPaused());
+		lua_pushboolean(L, lsi->game.GetSimPaused());
 		return 1;
 	}
 	auto pausestate = lua_toboolean(L, 1);
-	lsi->gameModel->SetPaused(pausestate);
+	lsi->game.SetSimPaused(pausestate);
 	return 0;
 }
 
@@ -93,7 +89,7 @@ static int decoSpace(lua_State *L)
 	lsi->AssertInterfaceEvent();
 	if (lua_gettop(L) < 1)
 	{
-		lua_pushnumber(L, lsi->gameModel->GetDecoSpace());
+		lua_pushnumber(L, lsi->sim->deco_space);
 		return 1;
 	}
 	auto index = luaL_checkint(L, 1);
@@ -101,7 +97,7 @@ static int decoSpace(lua_State *L)
 	{
 		return luaL_error(L, "Invalid deco space index %i", index);
 	}
-	lsi->gameModel->SetDecoSpace(index);
+	lsi->sim->SetDecoSpace(index);
 	return 0;
 }
 
@@ -523,13 +519,14 @@ static int createParts(lua_State *L)
 
 	lsi->AssertInterfaceEvent();
 	int uiFlags = luaL_optint(L,7,lsi->sim->replaceModeFlags);
-	Brush *brush = lsi->gameModel->GetBrushByID(brushID);
+	auto *brush = lsi->game.GetBrush(brushID);
 	if (!brush)
 		return luaL_error(L, "Invalid brush id '%d'", brushID);
 	auto newBrush = brush->Clone();
 	newBrush->SetRadius(ui::Point(rx, ry));
 
-	int c = luaL_optint(L,5,lsi->gameModel->GetActiveTool(0)->ToolID);
+auto tool = lsi->game.GetSelectedTool(0);
+	int c = luaL_optint(L,5,tool ? tool->ToolID : 0);
 	int ret = lsi->sim->CreateParts(-2, x, y, c, *newBrush, uiFlags);
 	lua_pushinteger(L, ret);
 	return 1;
@@ -555,9 +552,10 @@ static int createLine(lua_State *L)
 	}
 
 	lsi->AssertInterfaceEvent();
-	int c = luaL_optint(L,7,lsi->gameModel->GetActiveTool(0)->ToolID);
+	auto tool = lsi->game.GetSelectedTool(0);
+	int c = luaL_optint(L,7,tool ? tool->ToolID : 0);
 	int uiFlags = luaL_optint(L,9,lsi->sim->replaceModeFlags);
-	Brush *brush = lsi->gameModel->GetBrushByID(brushID);
+	auto *brush = lsi->game.GetBrush(brushID);
 	if (!brush)
 		return luaL_error(L, "Invalid brush id '%d'", brushID);
 	auto newBrush = brush->Clone();
@@ -584,7 +582,8 @@ static int createBox(lua_State *L)
 	}
 
 	lsi->AssertInterfaceEvent();
-	int c = luaL_optint(L,5,lsi->gameModel->GetActiveTool(0)->ToolID);
+	auto tool = lsi->game.GetSelectedTool(0);
+	int c = luaL_optint(L,5,tool ? tool->ToolID : 0);
 	int uiFlags = luaL_optint(L,6,lsi->sim->replaceModeFlags);
 
 	lsi->sim->CreateBox(-2, x1, y1, x2, y2, c, uiFlags);
@@ -597,7 +596,8 @@ static int floodParts(lua_State *L)
 	lsi->AssertInterfaceEvent();
 	int x = luaL_optint(L,1,-1);
 	int y = luaL_optint(L,2,-1);
-	int c = luaL_optint(L,3,lsi->gameModel->GetActiveTool(0)->ToolID);
+	auto tool = lsi->game.GetSelectedTool(0);
+	int c = luaL_optint(L,3,tool ? tool->ToolID : 0);
 	int cm = luaL_optint(L,4,-1);
 	int flags = luaL_optint(L,5,lsi->sim->replaceModeFlags);
 
@@ -702,13 +702,13 @@ static int toolBrush(lua_State *L)
 	int tool = luaL_optint(L,5,0);
 	int brushID = luaL_optint(L,6,BRUSH_CIRCLE);
 	float strength = luaL_optnumber(L,7,1.0f);
-	auto *toolPtr = lsi->gameModel->GetToolByIndex(tool);
+	auto *toolPtr = lsi->game.GetToolFromIndex(tool);
 	if (!toolPtr)
 	{
 		return luaL_error(L, "Invalid tool id '%d'", tool);
 	}
 
-	Brush *brush = lsi->gameModel->GetBrushByID(brushID);
+	auto *brush = lsi->game.GetBrush(brushID);
 	if (!brush)
 		return luaL_error(L, "Invalid brush id '%d'", brushID);
 	auto newBrush = brush->Clone();
@@ -735,13 +735,13 @@ static int toolLine(lua_State *L)
 
 	if (x1 < 0 || x2 < 0 || x1 >= XRES || x2 >= XRES || y1 < 0 || y2 < 0 || y1 >= YRES || y2 >= YRES)
 		return luaL_error(L, "coordinates out of range (%d,%d),(%d,%d)", x1, y1, x2, y2);
-	auto *toolPtr = lsi->gameModel->GetToolByIndex(tool);
+	auto *toolPtr = lsi->game.GetToolFromIndex(tool);
 	if (!toolPtr)
 	{
 		return luaL_error(L, "Invalid tool id '%d'", tool);
 	}
 
-	Brush *brush = lsi->gameModel->GetBrushByID(brushID);
+	auto *brush = lsi->game.GetBrush(brushID);
 	if (!brush)
 		return luaL_error(L, "Invalid brush id '%d'", brushID);
 	auto newBrush = brush->Clone();
@@ -766,12 +766,12 @@ static int toolBox(lua_State *L)
 	int brushID = luaL_optint(L,7,BRUSH_CIRCLE);
 	int rx = luaL_optint(L,8,0);
 	int ry = luaL_optint(L,9,0);
-	Brush *brush = lsi->gameModel->GetBrushByID(brushID);
+	auto *brush = lsi->game.GetBrush(brushID);
 	if (!brush)
 	{
 		return luaL_error(L, "Invalid brush id '%d'", brushID);
 	}
-	auto *toolPtr = lsi->gameModel->GetToolByIndex(tool);
+	auto *toolPtr = lsi->game.GetToolFromIndex(tool);
 	if (!toolPtr)
 	{
 		return luaL_error(L, "Invalid tool id '%d'", tool);
@@ -798,7 +798,7 @@ static int decoBrush(lua_State *L)
 	int tool = luaL_optint(L,9,DECO_DRAW);
 	int brushID = luaL_optint(L,10,BRUSH_CIRCLE);
 
-	Brush *brush = lsi->gameModel->GetBrushByID(brushID);
+	auto *brush = lsi->game.GetBrush(brushID);
 	if (!brush)
 		return luaL_error(L, "Invalid brush id '%d'", brushID);
 	auto newBrush = brush->Clone();
@@ -828,7 +828,7 @@ static int decoLine(lua_State *L)
 	if (x1 < 0 || x2 < 0 || x1 >= XRES || x2 >= XRES || y1 < 0 || y2 < 0 || y1 >= YRES || y2 >= YRES)
 		return luaL_error(L, "coordinates out of range (%d,%d),(%d,%d)", x1, y1, x2, y2);
 
-	Brush *brush = lsi->gameModel->GetBrushByID(brushID);
+	auto *brush = lsi->game.GetBrush(brushID);
 	if (!brush)
 		return luaL_error(L, "Invalid brush id '%d'", brushID);
 	auto newBrush = brush->Clone();
@@ -867,7 +867,7 @@ static int decoColor(lua_State *L)
 	RGBA color(0, 0, 0, 0);
 	if (acount == 0)
 	{
-		lua_pushnumber(L, lsi->gameModel->GetColourSelectorColour().Pack());
+		lua_pushnumber(L, lsi->game.GetDecoColor().Pack());
 		return 1;
 	}
 	else if (acount == 1)
@@ -879,7 +879,7 @@ static int decoColor(lua_State *L)
 		color.Blue  = std::clamp(luaL_optint(L, 3, 255), 0, 255);
 		color.Alpha = std::clamp(luaL_optint(L, 4, 255), 0, 255);
 	}
-	lsi->gameModel->SetColourSelectorColour(color);
+	lsi->game.SetDecoColor(color);
 	return 0;
 }
 
@@ -898,7 +898,7 @@ static int floodDeco(lua_State *L)
 		return luaL_error(L, "coordinates out of range (%d,%d)", x, y);
 
 	// hilariously broken, intersects with console and all Lua graphics
-	auto &rendererFrame = lsi->gameModel->GetView()->GetRendererFrame();
+	auto &rendererFrame = lsi->game.GetRendererFrame();
 	auto loc = RGB::Unpack(rendererFrame[{ x, y }]);
 	lsi->sim->ApplyDecorationFill(rendererFrame, x, y, r, g, b, a, loc.Red, loc.Green, loc.Blue);
 	return 0;
@@ -908,7 +908,7 @@ static int clearSim(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
-	lsi->gameController->ClearSim();
+	lsi->game.ClearSim();
 	return 0;
 }
 
@@ -984,8 +984,8 @@ static int saveStamp(lua_State *L)
 	int w = luaL_optint(L,3,XRES-1);
 	int h = luaL_optint(L,4,YRES-1);
 	bool includePressure = luaL_optint(L, 5, 1);
-	ByteString name = lsi->gameController->StampRegion(ui::Point(x, y), ui::Point(x+w, y+h), includePressure);
-	tpt_lua_pushByteString(L, name);
+	auto name = lsi->game.EndSelect({ x, y }, { x + w, y + h}, Powder::Activity::Game::SelectMode::stamp, includePressure);
+	tpt_lua_pushByteString(L, name ? *name : ByteString(""));
 	return 1;
 }
 
@@ -1107,7 +1107,7 @@ static int loadSave(lua_State *L)
 	int saveID = luaL_optint(L,1,0);
 	int instant = luaL_optint(L,2,0);
 	int history = luaL_optint(L,3,0); //Exact second a previous save was saved
-	lsi->gameController->OpenSavePreview(saveID, history, instant ? savePreviewInstant : savePreviewNormal);
+	lsi->game.OpenOnlinePreview(saveID, history, instant);
 	return 0;
 }
 
@@ -1115,7 +1115,7 @@ static int reloadSave(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
-	lsi->gameController->ReloadSim();
+	lsi->game.ReloadSim(true);
 	return 0;
 }
 
@@ -1123,7 +1123,7 @@ static int getSaveID(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
-	auto *tempSave = lsi->gameModel->GetSave();
+	auto *tempSave = lsi->game.GetOnlineSave();
 	if (tempSave)
 	{
 		lua_pushinteger(L, tempSave->GetID());
@@ -1139,7 +1139,7 @@ static int adjustCoords(lua_State *L)
 	lsi->AssertInterfaceEvent();
 	int x = luaL_optint(L,1,0);
 	int y = luaL_optint(L,2,0);
-	ui::Point Coords = lsi->gameController->PointTranslate(ui::Point(x, y));
+	ui::Point Coords = lsi->game.ResolveZoom(ui::Point(x, y));
 	lua_pushinteger(L, Coords.X);
 	lua_pushinteger(L, Coords.Y);
 	return 2;
@@ -1157,7 +1157,6 @@ static int prettyPowders(lua_State *L)
 	lsi->AssertInterfaceEvent();
 	int prettyPowder = luaL_optint(L, 1, 0);
 	lsi->sim->pretty_powder = prettyPowder;
-	lsi->gameModel->UpdateQuickOptions();
 	return 0;
 }
 
@@ -1168,12 +1167,11 @@ static int gravityGrid(lua_State *L)
 	int acount = lua_gettop(L);
 	if (acount == 0)
 	{
-		lua_pushnumber(L, lsi->gameModel->GetGravityGrid());
+		lua_pushnumber(L, int(lsi->game.GetRendererSettings().gravityFieldEnabled));
 		return 1;
 	}
 	int gravityGrid = luaL_optint(L, 1, 0);
-	lsi->gameModel->ShowGravityGrid(gravityGrid);
-	lsi->gameModel->UpdateQuickOptions();
+	lsi->game.GetRendererSettings().gravityFieldEnabled = bool(gravityGrid);
 	return 0;
 }
 
@@ -1183,12 +1181,12 @@ static int edgeMode(lua_State *L)
 	int acount = lua_gettop(L);
 	if (acount == 0)
 	{
-		lua_pushnumber(L, lsi->gameModel->GetEdgeMode());
+		lua_pushnumber(L, int32_t(lsi->game.GetEdgeMode()));
 		return 1;
 	}
 	lsi->AssertInterfaceEvent();
 	int edgeMode = luaL_optint(L, 1, EDGE_VOID);
-	lsi->gameModel->SetEdgeMode(edgeMode);
+	lsi->game.SetEdgeMode(EdgeMode(edgeMode));
 	return 0;
 }
 
@@ -1266,12 +1264,12 @@ static int ambientAirTemp(lua_State *L)
 	int acount = lua_gettop(L);
 	if (acount == 0)
 	{
-		lua_pushnumber(L, lsi->sim->air->ambientAirTemp);
+		lua_pushnumber(L, lsi->game.GetAmbientAirTemp());
 		return 1;
 	}
 	lsi->AssertInterfaceEvent();
 	float ambientAirTemp = restrict_flt(luaL_optnumber(L, 1, R_TEMP + 273.15f), MIN_TEMP, MAX_TEMP);
-	lsi->gameModel->SetAmbientAirTemperature(ambientAirTemp);
+	lsi->game.SetAmbientAirTemp(ambientAirTemp);
 	return 0;
 }
 
@@ -1281,12 +1279,12 @@ static int vorticityCoeff(lua_State *L)
 	int acount = lua_gettop(L);
 	if (acount == 0)
 	{
-		lua_pushnumber(L, lsi->sim->air->vorticityCoeff);
+		lua_pushnumber(L, lsi->game.GetVorticityCoeff());
 		return 1;
 	}
 	lsi->AssertInterfaceEvent();
 	float vorticityCoeff = restrict_flt(luaL_optnumber(L, 1, 0.0f), 0.0f, 1.0f);
-	lsi->gameModel->SetVorticityCoeff(vorticityCoeff);
+	lsi->game.SetVorticityCoeff(vorticityCoeff);
 	return 0;
 }
 
@@ -1360,13 +1358,13 @@ static int brush(lua_State *L)
 	}
 	else
 	{
-		ui::Point radius = lsi->gameModel->GetBrush().GetRadius();
+		ui::Point radius = lsi->game.GetBrushRadius();
 		brushradiusX = radius.X;
 		brushradiusY = radius.Y;
 	}
-	int brushID = luaL_optint(L, 5, lsi->gameModel->GetBrushID());
+	int brushID = luaL_optint(L, 5, lsi->game.GetBrushIndex());
 
-	Brush *brush = lsi->gameModel->GetBrushByID(brushID);
+	auto *brush = lsi->game.GetBrush(brushID);
 	if (!brush)
 		return luaL_error(L, "Invalid brush id '%d'", brushID);
 	auto newBrush = brush->Clone();
@@ -1515,13 +1513,13 @@ static int frameRender(lua_State *L)
 	lsi->AssertInterfaceEvent();
 	if (lua_gettop(L) == 0)
 	{
-		lua_pushinteger(L, lsi->gameModel->GetQueuedFrames());
+		lua_pushinteger(L, lsi->game.GetQueuedFrames());
 		return 1;
 	}
 	int frames = luaL_checkinteger(L, 1);
 	if (frames < 0)
 		return luaL_error(L, "Can't simulate a negative number of frames");
-	lsi->gameModel->SetQueuedFrames(frames);
+	lsi->game.SetQueuedFrames(frames);
 	return 0;
 }
 
@@ -1545,7 +1543,7 @@ static int takeSnapshot(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
-	lsi->gameController->HistorySnapshot();
+	lsi->game.CreateHistoryEntry();
 	return 0;
 }
 
@@ -1554,7 +1552,7 @@ static int historyRestore(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
-	bool successful = lsi->gameController->HistoryRestore();
+	bool successful = lsi->game.UndoHistoryEntry();
 	lua_pushboolean(L, successful);
 	return 1;
 }
@@ -1563,7 +1561,7 @@ static int historyForward(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
-	bool successful = lsi->gameController->HistoryForward();
+	bool successful = lsi->game.RedoHistoryEntry();
 	lua_pushboolean(L, successful);
 	return 1;
 }
@@ -1574,7 +1572,7 @@ static int replaceModeFlags(lua_State *L)
 	lsi->AssertInterfaceEvent();
 	if (lua_gettop(L) == 0)
 	{
-		lua_pushinteger(L, lsi->gameController->GetReplaceModeFlags());
+		lua_pushinteger(L, lsi->sim->replaceModeFlags);
 		return 1;
 	}
 	unsigned int flags = luaL_checkinteger(L, 1);
@@ -1582,7 +1580,7 @@ static int replaceModeFlags(lua_State *L)
 		return luaL_error(L, "Invalid flags");
 	if ((flags & REPLACE_MODE) && (flags & SPECIFIC_DELETE))
 		return luaL_error(L, "Cannot set replace mode and specific delete at the same time");
-	lsi->gameController->SetReplaceModeFlags(flags);
+	lsi->sim->replaceModeFlags = flags;
 	return 0;
 }
 
@@ -1660,8 +1658,10 @@ static int addCustomGol(lua_State *L)
 	if (sd.GetCustomGOLByRule(rule))
 		return luaL_error(L, "This Custom GoL rule already exists");
 
-	if (!lsi->gameModel->AddCustomGol(ruleString, nameString, RGB::Unpack(color1), RGB::Unpack(color2)))
+	auto cgd = lsi->game.CheckCustomGolToAdd(ruleString, nameString, RGB::Unpack(color1), RGB::Unpack(color2));
+	if (!cgd)
 		return luaL_error(L, "Duplicate name, cannot add");
+	lsi->game.AddCustomGol(*cgd);
 	return 0;
 }
 
@@ -1670,7 +1670,7 @@ static int removeCustomGol(lua_State *L)
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
 	ByteString nameString = tpt_lua_checkByteString(L, 1);
-	bool removedAny = lsi->gameModel->RemoveCustomGol("DEFAULT_PT_LIFECUST_" + nameString);
+	bool removedAny = lsi->game.RemoveCustomGol("DEFAULT_PT_LIFECUST_" + nameString);
 	lua_pushboolean(L, removedAny);
 	return 1;
 }
@@ -1705,8 +1705,8 @@ static int updateUpTo(lua_State *L)
 	{
 		return luaL_error(L, "ID not in valid range");
 	}
-	lsi->gameModel->SetQueuedFrames(1);
-	lsi->gameModel->UpdateUpTo(upTo + 1);
+	lsi->game.SetQueuedFrames(1);
+	lsi->game.UpdateSimUpTo(upTo + 1);
 	return 0;
 }
 
@@ -1716,13 +1716,13 @@ static int temperatureScale(lua_State *L)
 	lsi->AssertInterfaceEvent();
 	if (lua_gettop(L) == 0)
 	{
-		lua_pushinteger(L, int(lsi->gameModel->GetTemperatureScale()));
+		lua_pushinteger(L, int(lsi->game.GetTemperatureScale()));
 		return 1;
 	}
 	int temperatureScale = luaL_checkinteger(L, 1);
 	if (temperatureScale < 0 || temperatureScale >= NUM_TEMPSCALES)
 		return luaL_error(L, "Invalid temperature scale");
-	lsi->gameModel->SetTemperatureScale(TempScale(temperatureScale));
+	lsi->game.SetTemperatureScale(TempScale(temperatureScale));
 	return 0;
 }
 
@@ -1926,7 +1926,7 @@ static int resetSpark(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
-	lsi->gameController->ResetSpark();
+	lsi->game.ResetSparkAction();
 	return 0;
 }
 
@@ -2119,7 +2119,7 @@ void LuaSimulation::Open(lua_State *L)
 	LCONST(BRUSH_SQUARE);
 	LCONST(BRUSH_TRIANGLE);
 	LCONST(NUM_DEFAULTBRUSHES);
-	LCONSTAS("NUM_BRUSHES", lsi->gameModel->BrushListSize());
+	LCONSTAS("NUM_BRUSHES", lsi->game.GetBrushCount());
 
 	LCONST(EDGE_VOID);
 	LCONST(EDGE_SOLID);

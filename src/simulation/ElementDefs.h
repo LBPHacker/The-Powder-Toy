@@ -84,3 +84,6 @@ constexpr bool InBounds(int x, int y)
 
 struct playerst;
 class Parts;
+class Simulation;
+struct Particle;
+struct GraphicsFuncContext;

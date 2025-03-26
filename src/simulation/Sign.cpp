@@ -1,5 +1,4 @@
 #include "Sign.h"
-
 #include "graphics/Renderer.h"
 #include "Simulation.h"
 #include "SimulationData.h"

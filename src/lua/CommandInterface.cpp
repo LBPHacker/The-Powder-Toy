@@ -6,8 +6,7 @@
 #include "simulation/Simulation.h"
 #include "simulation/Air.h"
 #include "simulation/ElementClasses.h"
-#include "gui/game/GameController.h"
-#include "gui/game/GameModel.h"
+#include "Powder/Activity/Game.hpp"
 #include "gui/interface/Engine.h"
 #include "common/tpt-compat.h"
 #include <cassert>
@@ -17,15 +16,20 @@
 #include <cstring>
 #include <deque>
 
-CommandInterface::CommandInterface(GameController *newGameController, GameModel *newGameModel)
+CommandInterface::CommandInterface(Powder::Activity::Game &newGame) : game(newGame)
 {
-	this->m = newGameModel;
-	this->c = newGameController;
 }
 
 void CommandInterface::Log(LogType type, String message)
 {
-	m->Log(message, type == LogError || type == LogNotice);
+	if (type == LogError || type == LogNotice)
+	{
+		game.Log(message.ToUtf8());
+	}
+	else
+	{
+		game.VisualLog(message.ToUtf8());
+	}
 }
 
 static std::optional<int> GetPropertyOffset(ByteString key)
@@ -355,7 +359,7 @@ AnyType CommandInterface::tptS_set(std::deque<String> * words)
 	AnyType selector = eval(words);
 	AnyType value = eval(words);
 
-	Simulation * sim = m->GetSimulation();
+	Simulation * sim = &game.GetSimulation();
 	auto prop = GetPropertyOffset(property.Value().ToUtf8());
 	if (!prop)
 	{
@@ -413,7 +417,7 @@ AnyType CommandInterface::tptS_set(std::deque<String> * words)
 
 		case TypeString:
 			// AccessProperty::Parse returns the appropriate variant
-			changeProperty = AccessProperty::Parse(*prop, StringType(value).Value());
+			changeProperty = AccessProperty::Parse(*prop, StringType(value).Value(), game.GetTemperatureScale());
 			break;
 
 		default:
@@ -445,7 +449,7 @@ AnyType CommandInterface::tptS_get(std::deque<String> * words)
 	StringType property = eval(words);
 	AnyType selector = eval(words);
 
-	Simulation *sim = m->GetSimulation();
+	Simulation *sim = &game.GetSimulation();
 	auto prop = GetPropertyOffset(property.Value().ToUtf8());
 	if (!prop)
 	{
@@ -486,7 +490,7 @@ AnyType CommandInterface::tptS_create(std::deque<String> * words)
 	AnyType createType = eval(words);
 	PointType position = eval(words);
 
-	Simulation * sim = m->GetSimulation();
+	Simulation * sim = &game.GetSimulation();
 
 	int type;
 	if(createType.GetType() == TypeNumber)
@@ -519,7 +523,7 @@ AnyType CommandInterface::tptS_delete(std::deque<String> * words)
 	//Arguments from stack
 	AnyType partRef = eval(words);
 
-	Simulation * sim = m->GetSimulation();
+	Simulation * sim = &game.GetSimulation();
 
 	if(partRef.GetType() == TypePoint)
 	{
@@ -548,7 +552,8 @@ AnyType CommandInterface::tptS_load(std::deque<String> * words)
 
 	if (saveID.Value() > 0)
 	{
-		c->OpenSavePreview(saveID.Value(), 0, savePreviewNormal);
+		game.CloseConsoleAction();
+		game.OpenOnlinePreview(saveID.Value(), 0, false);
 		return NumberType(0);
 	}
 	else
@@ -564,7 +569,7 @@ AnyType CommandInterface::tptS_bubble(std::deque<String> * words)
 	if(bubblePos.X<0 || bubblePos.Y<0 || bubblePos.Y >= YRES || bubblePos.X >= XRES)
 			throw GeneralException("Invalid position");
 
-	Simulation * sim = m->GetSimulation();
+	Simulation * sim = &game.GetSimulation();
 
 	int first, rem1, rem2;
 
@@ -597,7 +602,7 @@ AnyType CommandInterface::tptS_reset(std::deque<String> * words)
 	StringType reset = eval(words);
 	String resetStr = reset.Value();
 
-	Simulation * sim = m->GetSimulation();
+	Simulation * sim = &game.GetSimulation();
 
 	if (resetStr == "pressure")
 	{
@@ -618,7 +623,7 @@ AnyType CommandInterface::tptS_reset(std::deque<String> * words)
 	}
 	else if (resetStr == "sparks")
 	{
-		c->ResetSpark();
+		game.ResetSparkAction();
 	}
 	else if (resetStr == "temp")
 	{

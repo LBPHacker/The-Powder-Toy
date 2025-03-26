@@ -1,4 +1,5 @@
 #include "LuaScriptInterface.h"
+#include "client/Client.h"
 #include "client/http/Request.h"
 #include "common/platform/Platform.h"
 #include "compat_lua.h"
@@ -6,16 +7,14 @@
 #include "Config.h"
 #include "gui/dialogues/ErrorMessage.h"
 #include "gui/dialogues/InformationMessage.h"
-#include "gui/game/GameController.h"
-#include "gui/game/GameModel.h"
-#include "gui/game/GameView.h"
+#include "Powder/Activity/Game.hpp"
 #include "gui/interface/Engine.h"
 
 static int getUserName(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
-	auto user = lsi->gameModel->GetUser();
+	auto user = Client::Ref().GetAuthUser();
 	if (user)
 	{
 		tpt_lua_pushByteString(L, user->Username);
@@ -27,21 +26,21 @@ static int getUserName(lua_State *L)
 
 static int installScriptManager(lua_State *L)
 {
-	auto *lsi = GetLSI();
-	lsi->AssertInterfaceEvent();
-	if (lsi->scriptManagerDownload)
-	{
-		new ErrorMessage("Script download", "A script download is already pending");
-		return 0;
-	}
-	lsi->gameController->HideConsole();
-	if (ui::Engine::Ref().GetWindow() != lsi->gameController->GetView())
-	{
-		new ErrorMessage("Script download", "You must run this function from the console");
-		return 0;
-	}
-	lsi->scriptManagerDownload = std::make_unique<http::Request>(format::Url{ "https://starcatcher.us/scripts/main.lua", {{ "get", "1" }} }.ToByteString());
-	lsi->scriptManagerDownload->Start();
+	// auto *lsi = GetLSI(); // TODO-REDO_UI
+	// lsi->AssertInterfaceEvent();
+	// if (lsi->scriptManagerDownload)
+	// {
+	// 	new ErrorMessage("Script download", "A script download is already pending");
+	// 	return 0;
+	// }
+	// lsi->gameController->HideConsole();
+	// if (ui::Engine::Ref().GetWindow() != lsi->gameController->GetView())
+	// {
+	// 	new ErrorMessage("Script download", "You must run this function from the console");
+	// 	return 0;
+	// }
+	// lsi->scriptManagerDownload = std::make_unique<http::Request>(format::Url{ "https://starcatcher.us/scripts/main.lua", {{ "get", "1" }} }.ToByteString());
+	// lsi->scriptManagerDownload->Start();
 	return 0;
 }
 
@@ -146,15 +145,18 @@ static int flog(lua_State *L)
 
 static int screenshot(lua_State *L)
 {
-	auto *lsi = GetLSI();
+	auto *lsi = GetLSI(); // TODO-REDO_UI
 	lsi->AssertInterfaceEvent();
-	int captureUI = luaL_optint(L, 1, 0);
+	auto captureUI = bool(luaL_optint(L, 1, 0));
 	int fileType = luaL_optint(L, 2, 0);
-
-	ByteString filename = lsi->gameController->TakeScreenshot(captureUI, fileType);
-	if (filename.size())
+	if (!(fileType >= 0 && fileType <= 2))
 	{
-		tpt_lua_pushByteString(L, filename);
+		return luaL_error(L, "invalid format");
+	}
+	auto filename = lsi->game.TakeScreenshot(captureUI, Powder::Activity::Game::ScreenshotFormat(fileType));
+	if (filename)
+	{
+		tpt_lua_pushByteString(L, *filename);
 		return 1;
 	}
 	return 0;
@@ -162,13 +164,13 @@ static int screenshot(lua_State *L)
 
 static int record(lua_State *L)
 {
-	auto *lsi = GetLSI();
-	lsi->AssertInterfaceEvent();
-	if (!lua_isboolean(L, -1))
-		return luaL_typerror(L, 1, lua_typename(L, LUA_TBOOLEAN));
-	bool record = lua_toboolean(L, -1);
-	int recordingFolder = lsi->gameController->Record(record);
-	lua_pushinteger(L, recordingFolder);
+	// auto *lsi = GetLSI(); // TODO-REDO_UI
+	// lsi->AssertInterfaceEvent();
+	// if (!lua_isboolean(L, -1))
+	// 	return luaL_typerror(L, 1, lua_typename(L, LUA_TBOOLEAN));
+	// bool record = lua_toboolean(L, -1);
+	// int recordingFolder = lsi->gameController->Record(record);
+	// lua_pushinteger(L, recordingFolder);
 	return 1;
 }
 
@@ -185,82 +187,82 @@ static int debug(lua_State *L)
 	int acount = lua_gettop(L);
 	if (acount == 0)
 	{
-		lua_pushinteger(L, lsi->gameController->GetDebugFlags());
+		lua_pushinteger(L, lsi->game.debugFlags);
 		return 1;
 	}
 	int debugFlags = luaL_optint(L, 1, 0);
-	lsi->gameController->SetDebugFlags(debugFlags);
+	lsi->game.debugFlags = debugFlags;
 	return 0;
 }
 
 static int fpsCap(lua_State *L)
 {
-	auto *lsi = GetLSI();
-	lsi->AssertInterfaceEvent();
-	int acount = lua_gettop(L);
-	if (acount == 0)
-	{
-		auto fpsLimit = lsi->window->GetSimFpsLimit();
-		if (std::holds_alternative<FpsLimitNone>(fpsLimit))
-		{
-			lua_pushnumber(L, 2);
-		}
-		else
-		{
-			lua_pushnumber(L, std::get<FpsLimitExplicit>(fpsLimit).value);
-		}
-		return 1;
-	}
-	float fpscap = luaL_checknumber(L, 1);
-	if (fpscap < 2)
-	{
-		return luaL_error(L, "fps cap too small");
-	}
-	if (fpscap == 2)
-	{
-		lsi->window->SetSimFpsLimit(FpsLimitNone{});
-		return 0;
-	}
-	lsi->window->SetSimFpsLimit(FpsLimitExplicit{ fpscap });
+	// auto *lsi = GetLSI(); // TODO-REDO_UI
+	// lsi->AssertInterfaceEvent();
+	// int acount = lua_gettop(L);
+	// if (acount == 0)
+	// {
+	// 	auto fpsLimit = lsi->window->GetSimFpsLimit();
+	// 	if (std::holds_alternative<FpsLimitNone>(fpsLimit))
+	// 	{
+	// 		lua_pushnumber(L, 2);
+	// 	}
+	// 	else
+	// 	{
+	// 		lua_pushnumber(L, std::get<FpsLimitExplicit>(fpsLimit).value);
+	// 	}
+	// 	return 1;
+	// }
+	// float fpscap = luaL_checknumber(L, 1);
+	// if (fpscap < 2)
+	// {
+	// 	return luaL_error(L, "fps cap too small");
+	// }
+	// if (fpscap == 2)
+	// {
+	// 	lsi->window->SetSimFpsLimit(FpsLimitNone{});
+	// 	return 0;
+	// }
+	// lsi->window->SetSimFpsLimit(FpsLimitExplicit{ fpscap });
 	return 0;
 }
 
 static int drawCap(lua_State *L)
 {
-	GetLSI()->AssertInterfaceEvent();
-	int acount = lua_gettop(L);
-	if (acount == 0)
-	{
-		auto drawLimit = ui::Engine::Ref().GetDrawingFrequencyLimit();
-		if (std::holds_alternative<DrawLimitDisplay>(drawLimit))
-		{
-			lua_pushliteral(L, "display");
-		}
-		else if (std::holds_alternative<DrawLimitNone>(drawLimit))
-		{
-			lua_pushinteger(L, 0);
-		}
-		else
-		{
-			lua_pushinteger(L, std::get<DrawLimitExplicit>(drawLimit).value);
-		}
-		return 1;
-	}
-	// if (lua_isstring(L, 1) && byteStringEqualsLiteral(tpt_lua_toByteString(L, 1), "vsync")) // TODO: DrawLimitVsync
-	if (lua_isstring(L, 1) && byteStringEqualsLiteral(tpt_lua_toByteString(L, 1), "display"))
-	{
-		ui::Engine::Ref().SetDrawingFrequencyLimit(DrawLimitDisplay{});
-		return 0;
-	}
-	int drawcap = luaL_checkinteger(L, 1);
-	if(drawcap < 0)
-		return luaL_error(L, "draw cap too small");
-	if (drawcap == 0)
-	{
-		ui::Engine::Ref().SetDrawingFrequencyLimit(DrawLimitNone{});
-		return 0;
-	}
-	ui::Engine::Ref().SetDrawingFrequencyLimit(DrawLimitExplicit{ drawcap });
+	// GetLSI()->AssertInterfaceEvent(); // TODO-REDO_UI
+	// int acount = lua_gettop(L);
+	// if (acount == 0)
+	// {
+	// 	auto drawLimit = ui::Engine::Ref().GetDrawingFrequencyLimit();
+	// 	if (std::holds_alternative<DrawLimitDisplay>(drawLimit))
+	// 	{
+	// 		lua_pushliteral(L, "display");
+	// 	}
+	// 	else if (std::holds_alternative<DrawLimitNone>(drawLimit))
+	// 	{
+	// 		lua_pushinteger(L, 0);
+	// 	}
+	// 	else
+	// 	{
+	// 		lua_pushinteger(L, std::get<DrawLimitExplicit>(drawLimit).value);
+	// 	}
+	// 	return 1;
+	// }
+	// // if (lua_isstring(L, 1) && byteStringEqualsLiteral(tpt_lua_toByteString(L, 1), "vsync")) // TODO: DrawLimitVsync
+	// if (lua_isstring(L, 1) && byteStringEqualsLiteral(tpt_lua_toByteString(L, 1), "display"))
+	// {
+	// 	ui::Engine::Ref().SetDrawingFrequencyLimit(DrawLimitDisplay{});
+	// 	return 0;
+	// }
+	// int drawcap = luaL_checkinteger(L, 1);
+	// if(drawcap < 0)
+	// 	return luaL_error(L, "draw cap too small");
+	// if (drawcap == 0)
+	// {
+	// 	ui::Engine::Ref().SetDrawingFrequencyLimit(DrawLimitNone{});
+	// 	return 0;
+	// }
+	// ui::Engine::Ref().SetDrawingFrequencyLimit(DrawLimitExplicit{ drawcap });
 	return 0;
 }
 
