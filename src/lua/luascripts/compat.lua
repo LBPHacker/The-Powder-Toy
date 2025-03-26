@@ -730,3 +730,19 @@ function ren.displayModes(tbl)
 	end
 	return { ren.displayMode() }
 end
+
+function ren.zoomWindow(x, y, f)
+	local from_x, from_y, from_w, from_h, to_x, to_y, scale = ren.zoomMetrics()
+	if not x then
+		return to_x, to_y, scale, from_w * scale
+	end
+	ren.zoomMetrics(from_x, from_y, from_w, from_h, x, y, f)
+end
+
+function ren.zoomScope(x, y, s)
+	local from_x, from_y, from_w, from_h, to_x, to_y, scale = ren.zoomMetrics()
+	if not x then
+		return from_x, from_y, from_w
+	end
+	ren.zoomMetrics(x, y, s, s, to_x, to_y, scale)
+end

@@ -11,19 +11,24 @@ class GameModel;
 class GameController;
 class Tool;
 
+namespace Powder::Activity
+{
+	class Game;
+}
+
 class CommandInterface : public ExplicitSingleton<CommandInterface>
 {
+public:
+	Powder::Activity::Game &game;
+
 protected:
 	String lastError;
-	GameModel * m;
-	GameController * c;
-
 
 	int PlainCommand(String command);
 	String PlainFormatCommand(String command);
 
 public:
-	CommandInterface(GameController *newGameController, GameModel *newGameModel);
+	CommandInterface(Powder::Activity::Game &newGame);
 
 	enum LogType { LogError, LogWarning, LogNotice };
 	enum FormatType { FormatInt, FormatString, FormatChar, FormatFloat, FormatElement };
@@ -57,7 +62,7 @@ public:
 	ValueType testType(String word);
 
 	void SetToolIndex(ByteString identifier, std::optional<int> index);
-	void RemoveComponents();
+	// void RemoveComponents(); // TODO-REDO_UI
 
-	static CommandInterfacePtr Create(GameController *newGameController, GameModel *newGameModel);
+	static CommandInterfacePtr Create(Powder::Activity::Game &newGame);
 };

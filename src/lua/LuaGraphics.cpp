@@ -1,6 +1,71 @@
 #include "LuaScriptInterface.h"
 #include "graphics/Graphics.h"
 #include "graphics/Renderer.h"
+#include "Powder/Gui/Host.hpp"
+
+LuaHostGraphics::LuaHostGraphics(Powder::Gui::Host &newHost) : host(newHost)
+{
+}
+
+void LuaHostGraphics::BlendPixel(Vec2<int> p, RGBA c)
+{
+	host.DrawPoint(p, c);
+}
+
+void LuaHostGraphics::DrawLine(Vec2<int> p1, Vec2<int> p2, RGB c)
+{
+	host.DrawLine(p1, p2, c.WithAlpha(255));
+}
+
+void LuaHostGraphics::BlendLine(Vec2<int> p1, Vec2<int> p2, RGBA c)
+{
+	host.DrawLine(p1, p2, c);
+}
+
+void LuaHostGraphics::DrawRect(Rect<int> r, RGB c)
+{
+	host.DrawRect(r, c.WithAlpha(255));
+}
+
+void LuaHostGraphics::BlendRect(Rect<int> r, RGBA c)
+{
+	host.DrawRect(r, c);
+}
+
+void LuaHostGraphics::DrawFilledRect(Rect<int> r, RGB c)
+{
+	host.FillRect(r, c.WithAlpha(255));
+}
+
+void LuaHostGraphics::BlendFilledRect(Rect<int> r, RGBA c)
+{
+	host.FillRect(r, c);
+}
+
+void LuaHostGraphics::BlendEllipse(Vec2<int> center, Vec2<int> size, RGBA)
+{
+	// TODO-REDO_UI
+}
+
+void LuaHostGraphics::BlendFilledEllipse(Vec2<int> center, Vec2<int> size, RGBA)
+{
+	// TODO-REDO_UI
+}
+
+Vec2<int> LuaHostGraphics::BlendText(Vec2<int> p, String const &s, RGBA c)
+{
+	// TODO-REDO_UI: make sure position is correct
+	host.DrawText(p, s.ToUtf8(), c);
+	return { 0, 0 }; // TODO-REDO_UI-POSTCLEANUP: remove return value, never used in the codebase
+}
+
+void LuaHostGraphics::SwapClipRect(Rect<int> &rect)
+{
+	auto prevRect = host.GetClipRect();
+	host.SetClipRect(rect);
+	rect = prevRect;
+}
+
 
 void NonGraphicsContext::Die()
 {
@@ -320,7 +385,7 @@ static int setClipRect(lua_State *L)
 	int w = luaL_optinteger(L, 3, WINDOWW);
 	int h = luaL_optinteger(L, 4, WINDOWH);
 	auto rect = RectSized(Vec2(x, y), Vec2(w, h));
-	lsi->g->SwapClipRect(rect);
+	lsi->hostGraphics.SwapClipRect(rect);
 	lua_pushinteger(L, rect.pos.X);
 	lua_pushinteger(L, rect.pos.Y);
 	lua_pushinteger(L, rect.size.X);

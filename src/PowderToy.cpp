@@ -243,7 +243,7 @@ struct ExplicitSingletons
 };
 static std::unique_ptr<ExplicitSingletons> explicitSingletons;
 
-int main(int argc, char *argv[])
+int main_unused(int argc, char *argv[])
 {
 	Platform::SetupCrt();
 	return Platform::InvokeMain(argc, argv);

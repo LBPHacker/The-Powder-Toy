@@ -12,6 +12,11 @@
 #include <list>
 #include <deque>
 
+namespace Powder::Activity
+{
+	class Game;
+}
+
 namespace http
 {
 	class Request;
@@ -91,6 +96,33 @@ struct NonGraphicsContext
 	void BlendFilledEllipse(Vec2<int>, Vec2<int>, RGBA);
 };
 
+namespace Powder::Gui
+{
+	class Host;
+}
+
+class LuaHostGraphics
+{
+	Powder::Gui::Host &host;
+
+public:
+	LuaHostGraphics(Powder::Gui::Host &newHost);
+
+	void BlendPixel(Vec2<int> p, RGBA c);
+	void DrawLine(Vec2<int> p1, Vec2<int> p2, RGB c);
+	void BlendLine(Vec2<int> p1, Vec2<int> p2, RGBA c);
+	void DrawRect(Rect<int> r, RGB c);
+	void BlendRect(Rect<int> r, RGBA c);
+	void DrawFilledRect(Rect<int> r, RGB c);
+	void BlendFilledRect(Rect<int> r, RGBA c);
+	void BlendEllipse(Vec2<int> center, Vec2<int> size, RGBA);
+	void BlendFilledEllipse(Vec2<int> center, Vec2<int> size, RGBA);
+	Vec2<int> BlendText(Vec2<int> p, String const &s, RGBA c);
+	void SwapClipRect(Rect<int> &rect);
+};
+
+class LuaHostGraphics;
+
 class LuaScriptInterface : public CommandInterface
 {
 public:
@@ -104,15 +136,13 @@ private:
 public:
 	lua_State *L{};
 
-	GameModel *gameModel;
-	GameController *gameController;
-	GameView *window;
+	// GameView *window; // TODO-REDO_UI
 	Simulation *sim;
-	Graphics *g;
+	LuaHostGraphics hostGraphics;
 
 	NonGraphicsContext ngc;
 
-	std::variant<Graphics *, Renderer *, NonGraphicsContext *> GetGraphics()
+	std::variant<LuaHostGraphics *, Renderer *, NonGraphicsContext *> GetGraphics()
 	{
 		if (eventTraits & eventTraitSimGraphics)
 		{
@@ -123,7 +153,7 @@ public:
 		}
 		if (eventTraits & eventTraitInterfaceGraphics)
 		{
-			return g;
+			return &hostGraphics;
 		}
 		return &ngc;
 	}
@@ -152,7 +182,7 @@ public:
 
 	std::map<LuaComponent *, LuaSmartRef> grabbedComponents; // must come after luaState
 
-	LuaScriptInterface(GameController *newGameController, GameModel *newGameModel);
+	LuaScriptInterface(Powder::Activity::Game &newGame);
 	~LuaScriptInterface();
 
 	char customCanMove[PT_NUM][PT_NUM];

@@ -4,9 +4,7 @@
 #include "gui/dialogues/InformationMessage.h"
 #include "gui/dialogues/TextPrompt.h"
 #include "gui/game/Brush.h"
-#include "gui/game/GameController.h"
-#include "gui/game/GameModel.h"
-#include "gui/game/GameView.h"
+#include "Powder/Activity/Game.hpp"
 #include "gui/game/tool/Tool.h"
 #include "gui/interface/Engine.h"
 #include "LuaButton.h"
@@ -189,13 +187,13 @@ static int console(lua_State *L)
 	int acount = lua_gettop(L);
 	if (acount == 0)
 	{
-		lua_pushboolean(L, lsi->window != ui::Engine::Ref().GetWindow());
+		lua_pushboolean(L, lsi->game.GetOnTop());
 		return 1;
 	}
 	if (lua_toboolean(L, 1))
-		lsi->gameController->ShowConsole();
+		lsi->game.OpenConsoleAction();
 	else
-		lsi->gameController->HideConsole();
+		lsi->game.CloseConsoleAction();
 	return 0;
 }
 
@@ -205,15 +203,15 @@ static int brushID(lua_State *L)
 	lsi->AssertInterfaceEvent();
 	if (lua_gettop(L) < 1)
 	{
-		lua_pushnumber(L, lsi->gameModel->GetBrushID());
+		lua_pushnumber(L, lsi->game.GetBrushIndex());
 		return 1;
 	}
 	auto index = luaL_checkint(L, 1);
-	if (index < 0 || index >= int(lsi->gameModel->BrushListSize()))
+	if (index < 0 || index >= int(lsi->game.GetBrushCount()))
 	{
 		return luaL_error(L, "Invalid brush index %i", index);
 	}
-	lsi->gameModel->SetBrushID(index);
+	lsi->game.SetBrushIndex(index);
 	return 0;
 }
 
@@ -223,12 +221,12 @@ static int brushRadius(lua_State *L)
 	lsi->AssertInterfaceEvent();
 	if (lua_gettop(L) < 1)
 	{
-		auto radius = lsi->gameModel->GetBrush().GetRadius();
+		auto radius = lsi->game.GetBrushRadius();
 		lua_pushnumber(L, radius.X);
 		lua_pushnumber(L, radius.Y);
 		return 2;
 	}
-	lsi->gameModel->GetBrush().SetRadius({ luaL_checkint(L, 1), luaL_checkint(L, 2) });
+	lsi->game.SetBrushRadius({ luaL_checkint(L, 1), luaL_checkint(L, 2) });
 	return 0;
 }
 
@@ -236,9 +234,9 @@ static int mousePosition(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
-	auto pos = lsi->gameController->GetView()->GetMousePosition();
-	lua_pushnumber(L, pos.X);
-	lua_pushnumber(L, pos.Y);
+	auto pos = lsi->game.GetMousePos();
+	lua_pushnumber(L, pos ? pos->X : -1);
+	lua_pushnumber(L, pos ? pos->Y : -1);
 	return 2;
 }
 
@@ -247,92 +245,93 @@ static int activeTool(lua_State *L)
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
 	auto index = luaL_checkint(L, 1);
-	if (index < 0 || index >= NUM_TOOLINDICES)
+	if (index < 0 || index >= Powder::Activity::Game::toolSlotCount)
 	{
 		return luaL_error(L, "Invalid tool index %i", index);
 	}
 	if (lua_gettop(L) < 2)
 	{
-		tpt_lua_pushByteString(L, lsi->gameModel->GetActiveTool(index)->Identifier);
+		auto *tool = lsi->game.GetSelectedTool(index);
+		tpt_lua_pushByteString(L, tool->Identifier); // TODO-REDO_UI: make sure tool is not nullptr
 		return 1;
 	}
 	lsi->AssertMutableToolsEvent();
 	auto identifier = tpt_lua_checkByteString(L, 2);
-	auto *tool = lsi->gameModel->GetToolFromIdentifier(identifier);
+	auto *tool = lsi->game.GetToolFromIdentifier(identifier);
 	if (!tool)
 	{
 		return luaL_error(L, "Invalid tool identifier %s", identifier.c_str());
 	}
-	lsi->gameController->SetActiveTool(index, tool);
+	lsi->game.SelectTool(index, tool);
 	return 0;
 }
 
 static int addComponent(lua_State *L)
 {
-	auto *lsi = GetLSI();
-	lsi->AssertInterfaceEvent();
-	void *opaque = nullptr;
-	LuaComponent *luaComponent = nullptr;
-	if ((opaque = Luna<LuaButton>::tryGet(L, 1)))
-		luaComponent = Luna<LuaButton>::get(opaque);
-	else if ((opaque = Luna<LuaLabel>::tryGet(L, 1)))
-		luaComponent = Luna<LuaLabel>::get(opaque);
-	else if ((opaque = Luna<LuaTextbox>::tryGet(L, 1)))
-		luaComponent = Luna<LuaTextbox>::get(opaque);
-	else if ((opaque = Luna<LuaCheckbox>::tryGet(L, 1)))
-		luaComponent = Luna<LuaCheckbox>::get(opaque);
-	else if ((opaque = Luna<LuaSlider>::tryGet(L, 1)))
-		luaComponent = Luna<LuaSlider>::get(opaque);
-	else if ((opaque = Luna<LuaProgressBar>::tryGet(L, 1)))
-		luaComponent = Luna<LuaProgressBar>::get(opaque);
-	else
-		luaL_typerror(L, 1, "Component");
-	if (lsi->window && luaComponent)
-	{
-		auto ok = lsi->grabbedComponents.insert(std::make_pair(luaComponent, LuaSmartRef()));
-		if (ok.second)
-		{
-			auto it = ok.first;
-			it->second.Assign(L, 1);
-			it->first->owner_ref = it->second;
-		}
-		lsi->window->AddComponent(luaComponent->GetComponent());
-	}
+	// auto *lsi = GetLSI(); // TODO-REDO_UI
+	// lsi->AssertInterfaceEvent();
+	// void *opaque = nullptr;
+	// LuaComponent *luaComponent = nullptr;
+	// if ((opaque = Luna<LuaButton>::tryGet(L, 1)))
+	// 	luaComponent = Luna<LuaButton>::get(opaque);
+	// else if ((opaque = Luna<LuaLabel>::tryGet(L, 1)))
+	// 	luaComponent = Luna<LuaLabel>::get(opaque);
+	// else if ((opaque = Luna<LuaTextbox>::tryGet(L, 1)))
+	// 	luaComponent = Luna<LuaTextbox>::get(opaque);
+	// else if ((opaque = Luna<LuaCheckbox>::tryGet(L, 1)))
+	// 	luaComponent = Luna<LuaCheckbox>::get(opaque);
+	// else if ((opaque = Luna<LuaSlider>::tryGet(L, 1)))
+	// 	luaComponent = Luna<LuaSlider>::get(opaque);
+	// else if ((opaque = Luna<LuaProgressBar>::tryGet(L, 1)))
+	// 	luaComponent = Luna<LuaProgressBar>::get(opaque);
+	// else
+	// 	luaL_typerror(L, 1, "Component");
+	// if (lsi->window && luaComponent)
+	// {
+	// 	auto ok = lsi->grabbedComponents.insert(std::make_pair(luaComponent, LuaSmartRef()));
+	// 	if (ok.second)
+	// 	{
+	// 		auto it = ok.first;
+	// 		it->second.Assign(L, 1);
+	// 		it->first->owner_ref = it->second;
+	// 	}
+	// 	lsi->window->AddComponent(luaComponent->GetComponent());
+	// }
 	return 0;
 }
 
 static int removeComponent(lua_State *L)
 {
-	auto *lsi = GetLSI();
-	lsi->AssertInterfaceEvent();
-	void *opaque = nullptr;
-	LuaComponent *luaComponent = nullptr;
-	if ((opaque = Luna<LuaButton>::tryGet(L, 1)))
-		luaComponent = Luna<LuaButton>::get(opaque);
-	else if ((opaque = Luna<LuaLabel>::tryGet(L, 1)))
-		luaComponent = Luna<LuaLabel>::get(opaque);
-	else if ((opaque = Luna<LuaTextbox>::tryGet(L, 1)))
-		luaComponent = Luna<LuaTextbox>::get(opaque);
-	else if ((opaque = Luna<LuaCheckbox>::tryGet(L, 1)))
-		luaComponent = Luna<LuaCheckbox>::get(opaque);
-	else if ((opaque = Luna<LuaSlider>::tryGet(L, 1)))
-		luaComponent = Luna<LuaSlider>::get(opaque);
-	else if ((opaque = Luna<LuaProgressBar>::tryGet(L, 1)))
-		luaComponent = Luna<LuaProgressBar>::get(opaque);
-	else
-		luaL_typerror(L, 1, "Component");
-	if(lsi->window && luaComponent)
-	{
-		ui::Component *component = luaComponent->GetComponent();
-		lsi->window->RemoveComponent(component);
-		auto it = lsi->grabbedComponents.find(luaComponent);
-		if (it != lsi->grabbedComponents.end())
-		{
-			it->second.Clear();
-			it->first->owner_ref = it->second;
-			lsi->grabbedComponents.erase(it);
-		}
-	}
+	// auto *lsi = GetLSI(); // TODO-REDO_UI
+	// lsi->AssertInterfaceEvent();
+	// void *opaque = nullptr;
+	// LuaComponent *luaComponent = nullptr;
+	// if ((opaque = Luna<LuaButton>::tryGet(L, 1)))
+	// 	luaComponent = Luna<LuaButton>::get(opaque);
+	// else if ((opaque = Luna<LuaLabel>::tryGet(L, 1)))
+	// 	luaComponent = Luna<LuaLabel>::get(opaque);
+	// else if ((opaque = Luna<LuaTextbox>::tryGet(L, 1)))
+	// 	luaComponent = Luna<LuaTextbox>::get(opaque);
+	// else if ((opaque = Luna<LuaCheckbox>::tryGet(L, 1)))
+	// 	luaComponent = Luna<LuaCheckbox>::get(opaque);
+	// else if ((opaque = Luna<LuaSlider>::tryGet(L, 1)))
+	// 	luaComponent = Luna<LuaSlider>::get(opaque);
+	// else if ((opaque = Luna<LuaProgressBar>::tryGet(L, 1)))
+	// 	luaComponent = Luna<LuaProgressBar>::get(opaque);
+	// else
+	// 	luaL_typerror(L, 1, "Component");
+	// if(lsi->window && luaComponent)
+	// {
+	// 	ui::Component *component = luaComponent->GetComponent();
+	// 	lsi->window->RemoveComponent(component);
+	// 	auto it = lsi->grabbedComponents.find(luaComponent);
+	// 	if (it != lsi->grabbedComponents.end())
+	// 	{
+	// 		it->second.Clear();
+	// 		it->first->owner_ref = it->second;
+	// 		lsi->grabbedComponents.erase(it);
+	// 	}
+	// }
 	return 0;
 }
 
@@ -341,7 +340,7 @@ static int grabTextInput(lua_State *L)
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
 	lsi->textInputRefcount += 1;
-	lsi->gameController->GetView()->DoesTextInput = lsi->textInputRefcount > 0;
+	lsi->game.wantTextInputOverride = lsi->textInputRefcount > 0;
 	return 0;
 }
 
@@ -350,7 +349,7 @@ static int dropTextInput(lua_State *L)
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
 	lsi->textInputRefcount -= 1;
-	lsi->gameController->GetView()->DoesTextInput = lsi->textInputRefcount > 0;
+	lsi->game.wantTextInputOverride = lsi->textInputRefcount > 0;
 	return 0;
 }
 
@@ -367,20 +366,20 @@ static int textInputRect(lua_State *L)
 
 static int showWindow(lua_State *L)
 {
-	GetLSI()->AssertInterfaceEvent();
-	LuaWindow * window = Luna<LuaWindow>::check(L, 1);
+	// GetLSI()->AssertInterfaceEvent(); // TODO-REDO_UI
+	// LuaWindow * window = Luna<LuaWindow>::check(L, 1);
 
-	if(window && ui::Engine::Ref().GetWindow()!=window->GetWindow())
-		ui::Engine::Ref().ShowWindow(window->GetWindow());
+	// if(window && ui::Engine::Ref().GetWindow()!=window->GetWindow())
+	// 	ui::Engine::Ref().ShowWindow(window->GetWindow());
 	return 0;
 }
 
 static int closeWindow(lua_State *L)
 {
-	GetLSI()->AssertInterfaceEvent();
-	LuaWindow * window = Luna<LuaWindow>::check(L, 1);
-	if (window)
-		window->GetWindow()->CloseActiveWindow();
+	// GetLSI()->AssertInterfaceEvent(); // TODO-REDO_UI
+	// LuaWindow * window = Luna<LuaWindow>::check(L, 1);
+	// if (window)
+	// 	window->GetWindow()->CloseActiveWindow();
 	return 0;
 }
 
@@ -390,11 +389,11 @@ static int perfectCircleBrush(lua_State *L)
 	lsi->AssertInterfaceEvent();
 	if (!lua_gettop(L))
 	{
-		lua_pushboolean(L, lsi->gameModel->GetPerfectCircle());
+		lua_pushboolean(L, lsi->game.GetPerfectCircleBrush());
 		return 1;
 	}
 	luaL_checktype(L, 1, LUA_TBOOLEAN);
-	lsi->gameModel->SetPerfectCircle(lua_toboolean(L, 1));
+	lsi->game.SetPerfectCircleBrush(lua_toboolean(L, 1));
 	return 0;
 }
 
@@ -405,13 +404,13 @@ static int activeMenu(lua_State *L)
 	int acount = lua_gettop(L);
 	if (acount == 0)
 	{
-		lua_pushinteger(L, lsi->gameModel->GetActiveMenu());
+		lua_pushinteger(L, lsi->game.activeMenuSection);
 		return 1;
 	}
 	auto &sd = SimulationData::CRef();
 	int menuid = luaL_checkint(L, 1);
 	if (menuid >= 0 && menuid < int(sd.msections.size()))
-		lsi->gameController->SetActiveMenu(menuid);
+		lsi->game.activeMenuSection = menuid;
 	else
 		return luaL_error(L, "Invalid menu");
 	return 0;
@@ -439,7 +438,6 @@ static int menuEnabled(lua_State *L)
 		auto &sd = SimulationData::Ref();
 		sd.msections[menusection].doshow = enabled;
 	}
-	lsi->gameModel->BuildMenus();
 	return 0;
 }
 
@@ -454,7 +452,23 @@ static int numMenus(lua_State *L)
 		luaL_checktype(L, 1, LUA_TBOOLEAN);
 		onlyEnabled = lua_toboolean(L, 1);
 	}
-	lua_pushinteger(L, lsi->gameController->GetNumMenus(onlyEnabled));
+	auto &sd = SimulationData::CRef();
+	if (onlyEnabled)
+	{
+		int32_t visible = 0;
+		for (auto &msection : sd.msections)
+		{
+			if (msection.doshow)
+			{
+				visible += 1;
+			}
+		}
+		lua_pushinteger(L, visible);
+	}
+	else
+	{
+		lua_pushinteger(L, int32_t(sd.msections.size()));
+	}
 	return 1;
 }
 
@@ -518,20 +532,22 @@ void LuaInterface::Open(lua_State *L)
 	lua_newtable(L);
 	luaL_register(L, nullptr, reg);
 #define LCONSTAS(k, v) lua_pushinteger(L, int(v)); lua_setfield(L, -2, k)
-	LCONSTAS("MOUSEUP_NORMAL" , GameController::mouseUpNormal);
-	LCONSTAS("MOUSEUP_BLUR"   , GameController::mouseUpBlur);
-	LCONSTAS("MOUSEUP_DRAWEND", GameController::mouseUpDrawEnd);
-	LCONSTAS("NUM_TOOLINDICES", NUM_TOOLINDICES);
+#define LCONST(v) lua_pushinteger(L, int(v)); lua_setfield(L, -2, #v)
+	LCONST(MOUSEUP_NORMAL);
+	LCONST(MOUSEUP_BLUR);
+	LCONST(MOUSEUP_DRAWEND);
+	LCONSTAS("NUM_TOOLINDICES", Powder::Activity::Game::toolSlotCount);
+#undef LCONST
 #undef LCONSTAS
 	initLuaSDLKeys(L);
 	lua_pushvalue(L, -1);
 	lua_setglobal(L, "interface");
 	lua_setglobal(L, "ui");
-	Luna<LuaWindow     >::Register(L);
-	Luna<LuaButton     >::Register(L);
-	Luna<LuaLabel      >::Register(L);
-	Luna<LuaTextbox    >::Register(L);
-	Luna<LuaCheckbox   >::Register(L);
-	Luna<LuaSlider     >::Register(L);
-	Luna<LuaProgressBar>::Register(L);
+	// Luna<LuaWindow     >::Register(L); // TODO-REDO_UI
+	// Luna<LuaButton     >::Register(L);
+	// Luna<LuaLabel      >::Register(L);
+	// Luna<LuaTextbox    >::Register(L);
+	// Luna<LuaCheckbox   >::Register(L);
+	// Luna<LuaSlider     >::Register(L);
+	// Luna<LuaProgressBar>::Register(L);
 }
