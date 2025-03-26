@@ -409,6 +409,7 @@ elif host_platform == 'android'
 	project_cpp_args += args_ccomp_android
 endif
 
+redo_ui_cpp_args = project_cpp_args
 if cpp_compiler.get_argument_syntax() == 'msvc' and cpp_compiler.get_id() not in [ 'clang-cl' ]
 	project_cpp_args += [
 		'/wd4834',
@@ -445,6 +446,8 @@ embedded_files = []
 
 subdir('src')
 subdir('resources')
+
+subdir('Powder')
 
 foreach embedded_file : embedded_files
 	name = embedded_file[0]
@@ -529,6 +532,19 @@ if get_option('build_powder')
 		sta_libs['gui'],
 		sta_libs['simulation'],
 	]
+	redo_ui_sta = declare_dependency(
+		link_with: static_library(
+			'redo_ui',
+			sources: redo_ui_files,
+			include_directories: project_inc,
+			cpp_args: redo_ui_cpp_args,
+			link_args: project_link_args,
+			dependencies: powder_deps,
+			override_options: target_options,
+			pic: host_platform == 'android',
+		),
+	)
+	powder_deps += [ redo_ui_sta ]
 	if host_platform == 'android'
 		powder_sha = shared_library(
 			app_exe,

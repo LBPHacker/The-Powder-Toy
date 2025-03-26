@@ -44,7 +44,7 @@ void SampleTool::Draw(Simulation * sim, Brush const &brush, ui::Point position)
 			{
 				auto *propTool = static_cast<PropertyTool *>(gameModel.GetToolFromIdentifier("DEFAULT_UI_PROPERTY"));
 				gameModel.SetActiveTool(0, propTool);
-				propTool->OpenWindow(gameModel.GetSimulation(), i);
+				propTool->OpenWindow(i);
 			}
 			else if (part->type == PT_LIFE)
 			{
