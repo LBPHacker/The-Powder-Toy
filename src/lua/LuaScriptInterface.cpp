@@ -3,8 +3,7 @@
 #include "common/platform/Platform.h"
 #include "common/tpt-rand.h"
 #include "compat_lua.h"
-#include "gui/game/GameController.h"
-#include "gui/game/GameModel.h"
+#include "Powder/Activity/Game.hpp"
 #include "gui/game/GameView.h"
 #include "gui/interface/Engine.h"
 #include "gui/interface/Window.h"
@@ -114,14 +113,12 @@ String LuaGetError()
 	return err;
 }
 
-LuaScriptInterface::LuaScriptInterface(GameController *newGameController, GameModel *newGameModel) :
-	CommandInterface(newGameController, newGameModel),
-	ren(newGameModel->GetRenderer()),
-	gameModel(newGameModel),
-	gameController(newGameController),
-	window(gameController->GetView()),
-	sim(gameModel->GetSimulation()),
-	g(ui::Engine::Ref().g),
+LuaScriptInterface::LuaScriptInterface(Powder::Activity::Game &newGame) :
+	CommandInterface(newGame),
+	ren(&newGame.GetRenderer()),
+	// window(gameController->GetView()), // TODO-REDO_UI
+	sim(&newGame.GetSimulation()),
+	hostGraphics(newGame.GetHost()),
 	customElements(PT_NUM),
 	gameControllerEventHandlers(std::variant_size_v<GameControllerEvent>)
 {
@@ -224,17 +221,17 @@ void CommandInterface::SetToolIndex(ByteString identifier, std::optional<int> in
 	LuaTools::SetToolIndex(lsi->L, identifier, index);
 }
 
-void CommandInterface::RemoveComponents()
-{
-	auto *lsi = static_cast<LuaScriptInterface *>(this);
-	for (auto &[ component, ref ] : lsi->grabbedComponents)
-	{
-		lsi->window->RemoveComponent(component->GetComponent());
-		ref.Clear();
-		component->owner_ref = ref;
-		component->SetParentWindow(nullptr);
-	}
-}
+// void CommandInterface::RemoveComponents() // TODO-REDO_UI
+// {
+// 	auto *lsi = static_cast<LuaScriptInterface *>(this);
+// 	for (auto &[ component, ref ] : lsi->grabbedComponents)
+// 	{
+// 		lsi->window->RemoveComponent(component->GetComponent());
+// 		ref.Clear();
+// 		component->owner_ref = ref;
+// 		component->SetParentWindow(nullptr);
+// 	}
+// }
 
 void LuaGetProperty(lua_State *L, StructProperty property, intptr_t propertyAddress)
 {
@@ -537,7 +534,7 @@ int CommandInterface::Command(String command)
 	else
 	{
 		int level = lua_gettop(L), ret = -1;
-		lsi->gameModel->logSink = [this](String text) {
+		lsi->game.visualLogSink = [this](String text) {
 			auto *lsi = static_cast<LuaScriptInterface *>(this);
 			auto lastError = GetLastError();
 			if (lsi->luacon_hasLastError)
@@ -602,7 +599,7 @@ int CommandInterface::Command(String command)
 
 			}
 		}
-		lsi->gameModel->logSink = nullptr;
+		lsi->game.visualLogSink = nullptr;
 		return ret;
 	}
 }
@@ -887,9 +884,9 @@ int tpt_lua_pcall(lua_State *L, int numArgs, int numResults, int errorFunc, Even
 	return lua_pcall(L, numArgs, numResults, errorFunc);
 }
 
-CommandInterfacePtr CommandInterface::Create(GameController *newGameController, GameModel *newGameModel)
+CommandInterfacePtr CommandInterface::Create(Powder::Activity::Game &newGame)
 {
-	return CommandInterfacePtr(new LuaScriptInterface(newGameController, newGameModel));
+	return CommandInterfacePtr(new LuaScriptInterface(newGame));
 }
 
 void CommandInterfaceDeleter::operator ()(CommandInterface *ptr) const
