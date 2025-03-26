@@ -92,7 +92,7 @@ GameController::GameController():
 
 	gameView->SetDebugHUD(GlobalPrefs::Ref().Get("Renderer.DebugMode", false));
 
-	commandInterface = CommandInterface::Create(this, gameModel);
+	// commandInterface = CommandInterface::Create(this, gameModel); // TODO-REDO_UI
 
 	Client::Ref().AddListener(this);
 
@@ -150,7 +150,7 @@ GameController::~GameController()
 		delete *iter;
 	}
 	gameView->PauseRendererThread();
-	commandInterface->RemoveComponents();
+	// commandInterface->RemoveComponents(); // TODO-REDO_UI
 	gameView->CloseActiveWindow();
 	delete gameView;
 	commandInterface.reset();

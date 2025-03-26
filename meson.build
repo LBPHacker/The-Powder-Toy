@@ -495,6 +495,7 @@ foreach sta_info : [
 	] ],
 	[ 'gui', gui_files, [
 		sdl2_dep,
+		json_dep,
 	] ],
 	[ 'simulation', simulation_files, [
 		json_dep,

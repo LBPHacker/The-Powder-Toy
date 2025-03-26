@@ -1,9 +1,9 @@
 #include "PropertyTool.h"
+#include "Powder/Activity/Game.hpp"
+#include "Powder/Activity/Property.hpp"
 #include "prefs/GlobalPrefs.h"
 #include "gui/Style.h"
 #include "gui/game/Brush.h"
-#include "gui/game/GameModel.h"
-#include "gui/game/GameController.h"
 #include "gui/interface/Window.h"
 #include "gui/interface/Button.h"
 #include "gui/interface/Textbox.h"
@@ -108,7 +108,7 @@ std::optional<std::pair<int, String>> PropertyWindow::TakePropertyFrom(const Sim
 	if (prop.Name == "temp")
 	{
 		StringBuilder sb;
-		format::RenderTemperature(sb, std::get<float>(value), GameController::Ref().GetTemperatureScale());
+		// format::RenderTemperature(sb, std::get<float>(value), GameController::Ref().GetTemperatureScale()); // TODO-REDO_UI
 		valueString = sb.Build();
 	}
 	else
@@ -129,10 +129,10 @@ void PropertyWindow::Update()
 	configuration.reset();
 	try
 	{
-		configuration = PropertyTool::Configuration{
-			AccessProperty::Parse(property->GetOption().second, textField->GetText()),
-			textField->GetText(),
-		};
+		// configuration = PropertyTool::Configuration{ // TODO-REDO_UI
+		// 	AccessProperty::Parse(property->GetOption().second, textField->GetText(), GameController::Ref().GetTemperatureScale()),
+		// 	textField->GetText(),
+		// };
 	}
 	catch (const AccessProperty::ParseError &ex)
 	{
@@ -187,9 +187,11 @@ void PropertyWindow::OnKeyPress(int key, int scan, bool repeat, bool shift, bool
 	}
 }
 
-void PropertyTool::OpenWindow(Simulation *sim, std::optional<int> takePropertyFrom)
+void PropertyTool::OpenWindow()
 {
-	new PropertyWindow(this, sim, takePropertyFrom);
+	std::optional<int> newTakePropertyFrom;
+	std::swap(newTakePropertyFrom, takePropertyFrom);
+	game.PushAboveThis(std::make_shared<Powder::Activity::Property>(*this, game, newTakePropertyFrom));
 }
 
 void PropertyTool::SetProperty(Simulation *sim, ui::Point position)
@@ -297,5 +299,5 @@ void PropertyTool::DrawFill(Simulation *sim, Brush const &cBrush, ui::Point posi
 
 void PropertyTool::Select(int toolSelection)
 {
-	OpenWindow(gameModel.GetSimulation(), std::nullopt);
+	OpenWindow();
 }

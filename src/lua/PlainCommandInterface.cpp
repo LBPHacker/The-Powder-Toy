@@ -1,8 +1,8 @@
 #include "CommandInterface.h"
 
-CommandInterfacePtr CommandInterface::Create(GameController *newGameController, GameModel *newGameModel)
+CommandInterfacePtr CommandInterface::Create(Powder::Activity::Game &newGame)
 {
-	return CommandInterfacePtr(new CommandInterface(newGameController, newGameModel));
+	return CommandInterfacePtr(new CommandInterface(newGame));
 }
 
 void CommandInterfaceDeleter::operator ()(CommandInterface *ptr) const
@@ -42,6 +42,6 @@ void CommandInterface::SetToolIndex(ByteString identifier, std::optional<int> in
 {
 }
 
-void CommandInterface::RemoveComponents()
-{
-}
+// void CommandInterface::RemoveComponents() // TODO-REDO_UI
+// {
+// }
