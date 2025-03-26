@@ -6,7 +6,8 @@
 #include "gui/interface/Label.h"
 #include "gui/interface/Textbox.h"
 #include "gui/interface/DropDown.h"
-#include "gui/game/GameModel.h"
+#include "Activity/Game.hpp"
+#include "Activity/Sign.hpp"
 #include "graphics/Graphics.h"
 
 class SignWindow: public ui::Window
@@ -194,7 +195,7 @@ void SignWindow::DoMouseMove(int x, int y, int dx, int dy) {
 		ui::Window::DoMouseMove(x, y, dx, dy);
 	else
 	{
-		ui::Point pos = tool->gameModel.AdjustZoomCoords(ui::Point(x, y));
+		ui::Point pos = tool->game.ResolveZoom(ui::Point(x, y));
 		if(pos.X < XRES && pos.Y < YRES)
 		{
 			movingSign->x = pos.X;
@@ -234,7 +235,8 @@ std::unique_ptr<VideoBuffer> SignTool::GetIcon(int toolID, Vec2<int> size)
 
 void SignTool::Click(Simulation * sim, Brush const &brush, ui::Point position)
 {
-	int signX, signY, signW, signH, signIndex = -1;
+	int signX, signY, signW, signH;
+	std::optional<int32_t> signIndex;
 	for (int i = 0; i < int(sim->signs.size()); i++)
 	{
 		sim->signs[i].getDisplayText(sim, signX, signY, signW, signH);
@@ -244,6 +246,8 @@ void SignTool::Click(Simulation * sim, Brush const &brush, ui::Point position)
 			break;
 		}
 	}
-	if (signIndex != -1 || sim->signs.size() < MAXSIGNS)
-		new SignWindow(this, sim, signIndex, position);
+	if (signIndex || sim->signs.size() < MAXSIGNS)
+	{
+		game.PushAboveThis(std::make_shared<Powder::Activity::Sign>(game, signIndex, position));
+	}
 }

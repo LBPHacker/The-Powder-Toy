@@ -4,20 +4,23 @@
 #include "graphics/Graphics.h"
 #include "graphics/RendererFrame.h"
 
+namespace Powder::Activity
+{
+	class Game;
+}
+
 class Renderer;
 class GameView;
 class DecorationTool: public Tool
 {
 public:
-	RGBA Colour;
-	GameView *gameView;
+	Powder::Activity::Game &game;
 
 	std::unique_ptr<VideoBuffer> GetIcon(int toolID, Vec2<int> size);
 
-	DecorationTool(GameView *newGameView, int decoMode, String name, String description, RGB colour, ByteString identifier):
+	DecorationTool(Powder::Activity::Game &newGame, int decoMode, String name, String description, RGB colour, ByteString identifier):
 		Tool(decoMode, name, description, colour, identifier),
-		Colour(0x000000_rgb .WithAlpha(0x00)),
-		gameView(newGameView)
+		game(newGame)
 	{
 		MenuSection = SC_DECO;
 	}

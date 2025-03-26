@@ -1,0 +1,444 @@
+DEFAULT_ACTIONCATEGORY_EDITING     simple "Editing"
+DEFAULT_ACTIONCATEGORY_RENDERING   simple "Rendering"
+
+DEFAULT_ACTIONGROUP_BRUSH          simple "Brush"
+DEFAULT_ACTIONGROUP_CLIPBOARD      simple "Clipboard"
+DEFAULT_ACTIONGROUP_DRAWING        simple "Drawing"
+DEFAULT_ACTIONGROUP_HISTORY        simple "History"
+DEFAULT_ACTIONGROUP_MISC           simple "Miscellaneous"
+DEFAULT_ACTIONGROUP_PASTECTX       simple "Pasting"
+DEFAULT_ACTIONGROUP_PLACEZOOMCTX   simple "Zoom window"
+DEFAULT_ACTIONGROUP_RENDERERPRESET simple "Renderer presets"
+DEFAULT_ACTIONGROUP_RENDER         simple "Layers"
+DEFAULT_ACTIONGROUP_SELECTCTX      simple "Selection"
+DEFAULT_ACTIONGROUP_SIM            simple "Simulation"
+DEFAULT_ACTIONGROUP_STAMP          simple "Stamping"
+DEFAULT_ACTIONGROUP_TOOL           simple "Tools"
+
+DEFAULT_ACTION_COPY                   simple "Copy"
+DEFAULT_ACTION_CUT                    simple "Cut"
+DEFAULT_ACTION_CYCLEAIRMODE           simple "Cycle air mode"
+DEFAULT_ACTION_CYCLEBRUSH             simple "Cycle brush"
+DEFAULT_ACTION_CYCLEEDGEMODE          simple "Cycle edge mode"
+DEFAULT_ACTION_DRAW0                  simple "Use or select primary tool"
+DEFAULT_ACTION_DRAW1                  simple "Use or select secondary tool"
+DEFAULT_ACTION_DRAW2                  simple "Use or select tertiary tool"
+DEFAULT_ACTION_SELECT3                simple "Select replacement element"
+DEFAULT_ACTION_DRAWFILL               simple "Flood-fill area"
+DEFAULT_ACTION_DRAWLINE               simple "Draw line"
+DEFAULT_ACTION_DRAWRECT               simple "Draw rectangle"
+DEFAULT_ACTION_ELEMENTSEARCH          simple "Element search"
+DEFAULT_ACTION_FINALIZEZOOM           simple "Place zoom window"
+DEFAULT_ACTION_FRAMESTEP              simple "Single-frame step"
+DEFAULT_ACTION_GROWGRID               simple "Grow grid"
+DEFAULT_ACTION_INSTALL                simple "Install game"
+DEFAULT_ACTION_INVERTAIR              simple "Invert air"
+DEFAULT_ACTION_INVERTINCLUDEPRESSURE  simple "Include or exclude pressure and other blocky data"
+DEFAULT_ACTION_LOADLASTSTAMP          simple "Load last stamp"
+DEFAULT_ACTION_OPENCONSOLE            simple "Open console"
+DEFAULT_ACTION_OPENPROPERTY           simple "Open Property tool"
+DEFAULT_ACTION_PASTECANCEL            simple "Cancel"
+DEFAULT_ACTION_PASTEDOWN              simple "Move down"
+DEFAULT_ACTION_PASTEFINISH            simple "Place"
+DEFAULT_ACTION_PASTEHFLIP             simple "Flip horizontally"
+DEFAULT_ACTION_PASTELEFT              simple "Move left"
+DEFAULT_ACTION_PASTERIGHT             simple "Move right"
+DEFAULT_ACTION_PASTEROTATE            simple "Rotate counter-clockwise"
+DEFAULT_ACTION_PASTE                  simple "Paste"
+DEFAULT_ACTION_PASTEUP                simple "Move up"
+DEFAULT_ACTION_PASTEVFLIP             simple "Flip vertically"
+DEFAULT_ACTION_PICKSTAMP              simple "Pick stamp"
+DEFAULT_ACTION_PLACEZOOM              simple "Move zoom window"
+DEFAULT_ACTION_REDOHISTORYENTRY       simple "Redo"
+DEFAULT_ACTION_RELOADSIM              simple "Reload simulation"
+DEFAULT_ACTION_REMOVECUSTOMGOL        simple "Remove custom GOL"
+DEFAULT_ACTION_RESETAIR               simple "Reset air"
+DEFAULT_ACTION_RESETAMBIENTHEAT       simple "Reset ambient heat"
+DEFAULT_ACTION_RESETSPARK             simple "Reset sparks"
+DEFAULT_ACTION_SAMPLEPROPERTY         simple "Sample property"
+DEFAULT_ACTION_SAVEBUTTONSALTFUNCTION simple "Manage local saves"
+DEFAULT_ACTION_SCREENSHOT             simple "Take screenshot"
+DEFAULT_ACTION_SELECTCANCEL           simple "Cancel"
+DEFAULT_ACTION_SELECTFINISH           simple "Confirm"
+DEFAULT_ACTION_SHRINKGRID             simple "Shrink grid"
+DEFAULT_ACTION_STAMP                  simple "Create stamp"
+DEFAULT_ACTION_TOGGLEAMBIENTHEAT      simple "Toggle ambient heat"
+DEFAULT_ACTION_TOGGLEDEBUGHUD         simple "Toggle debug HUD"
+DEFAULT_ACTION_TOGGLEDECOMENU         simple "Toggle deco menu"
+DEFAULT_ACTION_TOGGLEDECO             simple "Toggle deco layer"
+DEFAULT_ACTION_TOGGLEDRAWGRAVITY      simple "Toggle gravity layer"
+DEFAULT_ACTION_TOGGLEFAVORITE         simple "Toggle favorite status"
+DEFAULT_ACTION_TOGGLEFIND             simple "Toggle FIND mode"
+DEFAULT_ACTION_TOGGLEFULLSCREEN       simple "Toggle fullscreen"
+DEFAULT_ACTION_TOGGLEGINTROTEXT       simple "Toggle intro text"
+DEFAULT_ACTION_TOGGLEHUD              simple "Toggle HUD"
+DEFAULT_ACTION_TOGGLENEWTONIAN        simple "Toggle newtonian gravity"
+DEFAULT_ACTION_TOGGLEPAUSE            simple "Pause simulation"
+DEFAULT_ACTION_TOGGLEREPLACE          simple "Toggle REPLACE mode"
+DEFAULT_ACTION_TOGGLESDELETE          simple "Toggle SPECIFIC DELETE mode"
+DEFAULT_ACTION_TOOLSIZECONSTRAINX     simple "Lock horizontal size"
+DEFAULT_ACTION_TOOLSIZECONSTRAINY     simple "Lock vertical size"
+DEFAULT_ACTION_TOOLSIZEDOWN           simple "Shrink brush"
+DEFAULT_ACTION_TOOLSIZELOGARITHMIC    simple "Change size more quickly"
+DEFAULT_ACTION_TOOLSIZEUP             simple "Grow brush"
+DEFAULT_ACTION_TOOLSTRENGTHDIV10      simple "Decrease tool strength"
+DEFAULT_ACTION_TOOLSTRENGTHMUL10      simple "Increase tool strength"
+DEFAULT_ACTION_UNDOHISTORYENTRY       simple "Undo"
+
+DEFAULT_LANG_ADDLIFE_NAME    simple "name" # placeholder shown when the name box is empty
+DEFAULT_LANG_ADDLIFE_RULESET simple "ruleset" # placeholder shown when the ruleset box is empty
+DEFAULT_LANG_ADDLIFE_TITLE   simple "Edit custom GOL type"
+
+DEFAULT_LANG_BROWSER_CLEARSELECTION simple "Clear selection"
+DEFAULT_LANG_BROWSER_DESELECT       simple "Deselect"
+DEFAULT_LANG_BROWSER_NEXTPAGE       simple "Next"
+DEFAULT_LANG_BROWSER_OPEN           simple "Open"
+DEFAULT_LANG_BROWSER_PREVPAGE       simple "Prev"
+DEFAULT_LANG_BROWSER_QUERY          simple "search, F1 for help" # placeholder shown when the search box is empty
+DEFAULT_LANG_BROWSER_SEARCHFAILED   simple "Search failed: @0@" # @0@: reason
+DEFAULT_LANG_BROWSER_SELECT         simple "Select"
+
+DEFAULT_LANG_CONFIRMQUIT simple "Exit game"
+
+DEFAULT_LANG_CONSOLE_COMMAND    simple "command" # placeholder shown when the command box is empty
+DEFAULT_LANG_CONSOLE_INPUTHERE  simple "Input will appear here"
+DEFAULT_LANG_CONSOLE_OUTPUTHERE simple "Output will appear here"
+DEFAULT_LANG_CONSOLE_SUBMIT     simple "Submit"
+DEFAULT_LANG_CONSOLE_TITLE      simple "Console"
+
+DEFAULT_LANG_DIALOG_APPLY  simple "Apply"
+DEFAULT_LANG_DIALOG_CANCEL simple "Cancel"
+DEFAULT_LANG_DIALOG_NO     simple "No"
+DEFAULT_LANG_DIALOG_OK     simple "OK"
+DEFAULT_LANG_DIALOG_YES    simple "Yes"
+
+DEFAULT_LANG_ELEMENTSEARCH_TITLE simple "Element search"
+DEFAULT_LANG_ELEMENTSEARCH_QUERY simple "name, description, or category" # placeholder shown when the search box is empty
+
+DEFAULT_LANG_FORMAT_TIME_JUSTNOW simple "just now"
+DEFAULT_LANG_FORMAT_TIME_YEARS   plural2   "a year ago"   "@0@ years ago"
+DEFAULT_LANG_FORMAT_TIME_MONTHS  plural2  "a month ago"  "@0@ months ago"
+DEFAULT_LANG_FORMAT_TIME_WEEKS   plural2   "a week ago"   "@0@ weeks ago"
+DEFAULT_LANG_FORMAT_TIME_DAYS    plural2    "a day ago"    "@0@ days ago"
+DEFAULT_LANG_FORMAT_TIME_HOURS   plural2  "an hour ago"   "@0@ hours ago"
+DEFAULT_LANG_FORMAT_TIME_MINUTES plural2 "a minute ago" "@0@ minutes ago"
+DEFAULT_LANG_FORMAT_TIME_SECONDS plural2 "a second ago" "@0@ seconds ago"
+
+DEFAULT_LANG_GAME_AIRTIP              simple "Air: @0@" # @0@: one of DEFAULT_LANG_SIMSTATE_AIR_*
+DEFAULT_LANG_GAME_DECOTIP             simple "Decorations Layer: @0@" # @0@: one of DEFAULT_LANG_SIMSTATE_DECO_*
+DEFAULT_LANG_GAME_DROPFORMATERRORDESC simple "Dropped file is not a TPT save file (.cps or .stm format)"
+DEFAULT_LANG_GAME_DROPSAVEERRORDESC   simple "Dropped save file could not be loaded: @0@" # @0@: reason
+DEFAULT_LANG_GAME_DROPSAVEERROR       simple "Error loading save"
+DEFAULT_LANG_GAME_DROPSTAMPERRORDESC  simple "Dropped stamp could not be loaded: @0@" # @0@: reason
+DEFAULT_LANG_GAME_DROPSTAMPERROR      simple "Error loading stamp"
+DEFAULT_LANG_GAME_EDGETIP             simple "Edge Mode: @0@" # @0@: one of DEFAULT_LANG_SIMSTATE_EDGE_*
+DEFAULT_LANG_GAME_ELEMENTSEARCH       simple "Search for elements"
+DEFAULT_LANG_GAME_NOCLIPBOARD         simple "Nothing on the clipboard to paste"
+DEFAULT_LANG_GAME_NOLASTSTAMP         simple "No last stamp to paste"
+DEFAULT_LANG_GAME_NOPREVIEW           simple "No online preview to show"
+DEFAULT_LANG_GAME_NOREDO              simple "Nothing left to redo"
+DEFAULT_LANG_GAME_NORELOAD            simple "No save to reload from"
+DEFAULT_LANG_GAME_NOTAGS              simple "no tags set"
+DEFAULT_LANG_GAME_NOUNDO              simple "Nothing left to undo"
+DEFAULT_LANG_GAME_PASTEBROKEN         simple "Paste content has missing custom elements"
+DEFAULT_LANG_GAME_RECENTSTAMPERROR    simple "Failed to load stamp: @0@" # @0@: reason
+DEFAULT_LANG_GAME_SAVESIGN            simple "Go to save ID:@0@" # @0@: save ID
+DEFAULT_LANG_GAME_SAVESTAMPERRORDESC  simple "Error serializing save file"
+DEFAULT_LANG_GAME_SAVESTAMPERROR      simple "Could not create stamp"
+DEFAULT_LANG_GAME_SEARCHSIGN          simple "Search for @0@" # @0@: search query
+DEFAULT_LANG_GAME_SIGNIN              simple "sign in"
+DEFAULT_LANG_GAME_THREADSIGN          simple "Open forum thread @0@ in browser" # @0@: thread ID
+DEFAULT_LANG_GAME_UNTITLEDSIM         simple "untitled simulation"
+DEFAULT_LANG_GAME_UPDATEAVAILABLE     simple "@0@ is available; click here to update" # @0@: one of DEFAULT_LANG_GAME_UPDATEKIND_*
+DEFAULT_LANG_GAME_UPDATEKIND_BETA     simple "A new version"
+DEFAULT_LANG_GAME_UPDATEKIND_MOD      simple "A new mod update"
+DEFAULT_LANG_GAME_UPDATEKIND_SNAPSHOT simple "A new snapshot"
+DEFAULT_LANG_GAME_UPDATEKIND_STABLE   simple "A new beta"
+DEFAULT_LANG_GAME_UPVOTE              simple "Vote"
+
+DEFAULT_LANG_GAMEHUD_FILT0       simple "set color"
+DEFAULT_LANG_GAMEHUD_FILT1       simple "AND"
+DEFAULT_LANG_GAMEHUD_FILT2       simple "OR"
+DEFAULT_LANG_GAMEHUD_FILT3       simple "AND-NOT"
+DEFAULT_LANG_GAMEHUD_FILT4       simple "red shift"
+DEFAULT_LANG_GAMEHUD_FILT5       simple "blue shift"
+DEFAULT_LANG_GAMEHUD_FILT6       simple "no effect"
+DEFAULT_LANG_GAMEHUD_FILT7       simple "XOR"
+DEFAULT_LANG_GAMEHUD_FILT8       simple "NOT"
+DEFAULT_LANG_GAMEHUD_FILT9       simple "old QRTZ scattering"
+DEFAULT_LANG_GAMEHUD_FILT10      simple "variable red shift"
+DEFAULT_LANG_GAMEHUD_FILT11      simple "variable blue shift"
+DEFAULT_LANG_GAMEHUD_FILTUNKNOWN simple "unknown mode"
+
+DEFAULT_LANG_GAMEHUD_AIRTEMP    simple "AHeat: @0@" # @0@: ambient heat formatted as temperature
+DEFAULT_LANG_GAMEHUD_EMPTY      simple "Empty"
+DEFAULT_LANG_GAMEHUD_FIND       simple "FIND"
+DEFAULT_LANG_GAMEHUD_FPS        simple "FPS: @0@" # @0@: FPS
+DEFAULT_LANG_GAMEHUD_GRAVITY    simple "GX: @0@ GY: @1@" # (@0@, @1@): gravity force vector
+DEFAULT_LANG_GAMEHUD_GRID       simple "GRID: @0@" # @0@: grid size
+DEFAULT_LANG_GAMEHUD_HDISPAUTO  simple "TEMP L:@0@ H:@1@" # @0@: lower bound, @1@ upper bound for temperature
+DEFAULT_LANG_GAMEHUD_LIFE       simple "Life: @0@" # @0@: life property
+DEFAULT_LANG_GAMEHUD_MOLTEN     simple "Molten @0@" # @0@: element name
+DEFAULT_LANG_GAMEHUD_PARTS      simple "Parts: @0@" # @0@: particle count
+DEFAULT_LANG_GAMEHUD_PARTSFOUND simple "Parts: @0@/@1@" # @0@: count of particles found, @1@: count of all particles
+DEFAULT_LANG_GAMEHUD_PIPE       simple "@0@ with @1@" # @0@: pipe element name, @1@: element name
+DEFAULT_LANG_GAMEHUD_PIPEMOLTEN simple "@0@ with molten @1@" # @0@: pipe element name, @1@: element name
+DEFAULT_LANG_GAMEHUD_PRESSURE   simple "Pressure: @0@" # @0@: air pressure
+DEFAULT_LANG_GAMEHUD_REPLACE    simple "REPLACE MODE"
+DEFAULT_LANG_GAMEHUD_SDELETE    simple "SPECIFIC DELETE"
+DEFAULT_LANG_GAMEHUD_TEMP       simple "Temp: @0@" # @0@: temp property formatted as temperature
+DEFAULT_LANG_GAMEHUD_TMP        simple "Tmp: @0@" # @0@: tmp property
+DEFAULT_LANG_GAMEHUD_TMP2       simple "Tmp2: @0@" # @0@: tmp2 property
+
+DEFAULT_LANG_LOCALBROWSER_DELETE  simple "Delete"
+DEFAULT_LANG_LOCALBROWSER_NOSAVES simple "No local saves found"
+DEFAULT_LANG_LOCALBROWSER_RENAME  simple "Rename"
+DEFAULT_LANG_LOCALBROWSER_TITLE   simple "Open local simulation"
+
+DEFAULT_LANG_LOCALSAVER_TITLE simple "Save local simulation"
+
+DEFAULT_LANG_LOGIN_FAILED   simple "Failed to sign in"
+DEFAULT_LANG_LOGIN_PASSWORD simple "password" # placeholder shown when the password box is empty
+DEFAULT_LANG_LOGIN_PROGRESS simple "Signing in"
+DEFAULT_LANG_LOGIN_TITLE    simple "Sign in"
+DEFAULT_LANG_LOGIN_USERNAME simple "username" # placeholder shown when the username box is empty
+
+DEFAULT_LANG_ONLINEBROWSER_CATEGORY_FAVORITES simple "Favorites"
+DEFAULT_LANG_ONLINEBROWSER_CATEGORY_MYOWN     simple "My own"
+DEFAULT_LANG_ONLINEBROWSER_CATEGORY_PUBLIC    simple "Public"
+DEFAULT_LANG_ONLINEBROWSER_CONTEXT_HISTORY    simple "View history"
+DEFAULT_LANG_ONLINEBROWSER_CONTEXT_MOREBYUSER simple "More by this user"
+DEFAULT_LANG_ONLINEBROWSER_CONTEXT_PREVIEW    simple "Preview"
+DEFAULT_LANG_ONLINEBROWSER_DELETE             simple "Delete"
+DEFAULT_LANG_ONLINEBROWSER_FAVOURITE          simple "Favorite"
+DEFAULT_LANG_ONLINEBROWSER_LOADINGTAGS        simple "Loading tags..."
+DEFAULT_LANG_ONLINEBROWSER_NOSAVES            simple "No online saves found"
+DEFAULT_LANG_ONLINEBROWSER_PERIOD_ALLTIME     simple "All time"
+DEFAULT_LANG_ONLINEBROWSER_PERIOD_THISMONTH   simple "This month"
+DEFAULT_LANG_ONLINEBROWSER_PERIOD_THISWEEK    simple "This week"
+DEFAULT_LANG_ONLINEBROWSER_PERIOD_THISYEAR    simple "This year"
+DEFAULT_LANG_ONLINEBROWSER_PERIOD_TODAY       simple "Today"
+DEFAULT_LANG_ONLINEBROWSER_POPULARTAGS        simple "Popular tags"
+DEFAULT_LANG_ONLINEBROWSER_SORT_BYDATE        simple "By date"
+DEFAULT_LANG_ONLINEBROWSER_SORT_BYVOTES       simple "By votes"
+DEFAULT_LANG_ONLINEBROWSER_TAGS               simple "Tags"
+DEFAULT_LANG_ONLINEBROWSER_TITLE              simple "Open online simulation"
+DEFAULT_LANG_ONLINEBROWSER_UNPUBLISH          simple "Unpublish"
+
+DEFAULT_LANG_ONLINESAVER_DESC     simple "description" # placeholder shown when the description box is empty
+DEFAULT_LANG_ONLINESAVER_FAILED   simple "Failed to upload online simulation"
+DEFAULT_LANG_ONLINESAVER_INFO     simple "Publishing info"
+DEFAULT_LANG_ONLINESAVER_PAUSED   simple "Paused"
+DEFAULT_LANG_ONLINESAVER_PROGRESS simple "Uploading online simulation"
+DEFAULT_LANG_ONLINESAVER_PUBLISH  simple "Publish"
+DEFAULT_LANG_ONLINESAVER_RULES    simple "Save uploading rules"
+DEFAULT_LANG_ONLINESAVER_TITLE    simple "Save online simulation"
+
+DEFAULT_LANG_PAGEINPUT_LEFT  simple "Page"   # @0@: total number of pages (even though it is not used by this pattern)
+DEFAULT_LANG_PAGEINPUT_RIGHT simple "of @0@" # @0@: total number of pages
+
+DEFAULT_LANG_PICKCOLOR simple "Pick color"
+
+DEFAULT_LANG_PREVIEW_COMMENTFAILED   simple "Failed to submit comment"
+DEFAULT_LANG_PREVIEW_COMMENTNOUSER   simple "Log in to submit comments"
+DEFAULT_LANG_PREVIEW_COMMENTPROGRESS simple "Submitting comment"
+DEFAULT_LANG_PREVIEW_COMMENTSUBMIT   simple "Submit"
+DEFAULT_LANG_PREVIEW_COMMENT_VALUE   simple "comment" # placeholder shown when the comment box is empty
+DEFAULT_LANG_PREVIEW_CREATED         simple "Created"
+DEFAULT_LANG_PREVIEW_FAVOR_FAILED    simple "Failed to save favorite"
+DEFAULT_LANG_PREVIEW_FAVOR_PROGRESS  simple "Saving favorite"
+DEFAULT_LANG_PREVIEW_FAVOR           simple "Favor"
+DEFAULT_LANG_PREVIEW_LOADERROR       simple "Failed to open save"
+DEFAULT_LANG_PREVIEW_NOCOMMENTS      simple "No comments found"
+DEFAULT_LANG_PREVIEW_OPENINBROWSER   simple "Open in browser"
+DEFAULT_LANG_PREVIEW_OPENINGSAVE     simple "Opening save"
+DEFAULT_LANG_PREVIEW_OPEN            simple "Open"
+DEFAULT_LANG_PREVIEW_REPORT          simple "Report"
+DEFAULT_LANG_PREVIEW_SAVEID          simple "Save ID"
+DEFAULT_LANG_PREVIEW_UPDATED         simple "Updated"
+DEFAULT_LANG_PREVIEW_VIEWS           simple "Views"
+
+DEFAULT_LANG_PROFILE_AGE               simple "Age"
+DEFAULT_LANG_PROFILE_AVERAGESCORE      simple "Average score"
+DEFAULT_LANG_PROFILE_BIOGRAPHY         simple "Biography"
+DEFAULT_LANG_PROFILE_COUNT             simple "Count"
+DEFAULT_LANG_PROFILE_EDIT              simple "Edit profile"
+DEFAULT_LANG_PROFILE_FORUM             simple "Forum"
+DEFAULT_LANG_PROFILE_HIGHESTSCORE      simple "Highest score"
+DEFAULT_LANG_PROFILE_LOCATION          simple "Location"
+DEFAULT_LANG_PROFILE_REGISTERED        simple "Registered"
+DEFAULT_LANG_PROFILE_REGISTEREDUNKNOWN simple "a long time ago"
+DEFAULT_LANG_PROFILE_REPLIES           simple "Replies"
+DEFAULT_LANG_PROFILE_REPUTATION        simple "Reputation"
+DEFAULT_LANG_PROFILE_SAVES             simple "Saves"
+DEFAULT_LANG_PROFILE_TOPICS            simple "Topics"
+DEFAULT_LANG_PROFILE_WEBSITE           simple "Website"
+
+DEFAULT_LANG_PROFILE_LOGOUT_FAILED   simple "Failed to log out"
+DEFAULT_LANG_PROFILE_LOGOUT_PROGRESS simple "Logging out"
+DEFAULT_LANG_PROFILE_LOGOUT_SUBMIT   simple "Log out"
+
+DEFAULT_LANG_PROP_TITLE simple "Edit property"
+DEFAULT_LANG_PROP_VALUE simple "value" # placeholder shown when the value box is empty
+
+DEFAULT_LANG_QUICKOPTION_AMBIENTHEAT      simple "Enable ambient heat"
+DEFAULT_LANG_QUICKOPTION_DECORATIONS      simple "Draw decorations"
+DEFAULT_LANG_QUICKOPTION_DRAWGRAVITY      simple "Draw gravity field"
+DEFAULT_LANG_QUICKOPTION_NEWTONIANGRAVITY simple "Enable newtonian gravity"
+DEFAULT_LANG_QUICKOPTION_OPENCONSOLE      simple "Open console"
+DEFAULT_LANG_QUICKOPTION_PRETTYPOWDER     simple "Enable pretty powders"
+
+DEFAULT_LANG_RENDEREXPL_COLOUR_BASC simple "No special effects at all for anything, overrides all other options and deco"
+DEFAULT_LANG_RENDEREXPL_COLOUR_GRAD simple "Changes colors of elements slightly to show heat diffusing through them"
+DEFAULT_LANG_RENDEREXPL_COLOUR_HEAT simple "Displays temperatures of the elements, dark blue is coldest, pink is hottest"
+DEFAULT_LANG_RENDEREXPL_COLOUR_LIFE simple "Displays the life value of elements in greyscale gradients"
+
+DEFAULT_LANG_RENDEREXPL_DISPLAY_AIRC simple "Displays pressure as red and blue, and velocity as white"
+DEFAULT_LANG_RENDEREXPL_DISPLAY_AIRH simple "Displays the temperature of the air like heat display does"
+DEFAULT_LANG_RENDEREXPL_DISPLAY_AIRP simple "Displays pressure, red is positive and blue is negative"
+DEFAULT_LANG_RENDEREXPL_DISPLAY_AIRV simple "Displays velocity and positive pressure: up/down adds blue, right/left adds red, still pressure adds green"
+DEFAULT_LANG_RENDEREXPL_DISPLAY_EFFE simple "Enables moving solids, stickmen guns, and premium(tm) graphics"
+DEFAULT_LANG_RENDEREXPL_DISPLAY_PERS simple "Element paths persist on the screen for a while"
+DEFAULT_LANG_RENDEREXPL_DISPLAY_WARP simple "Gravity lensing, Newtonian Gravity bends light with this on"
+
+DEFAULT_LANG_RENDEREXPL_RENDER_BASC simple "Basic rendering, without this, most things will be invisible"
+DEFAULT_LANG_RENDEREXPL_RENDER_BLOB simple "Makes everything be drawn like a blob"
+DEFAULT_LANG_RENDEREXPL_RENDER_BLUR simple "Blur effect for liquids"
+DEFAULT_LANG_RENDEREXPL_RENDER_EFFE simple "Adds Special flare effects to some elements"
+DEFAULT_LANG_RENDEREXPL_RENDER_FIRE simple "Fire effect for gasses"
+DEFAULT_LANG_RENDEREXPL_RENDER_GLOW simple "Glow effect on some elements"
+DEFAULT_LANG_RENDEREXPL_RENDER_SPRK simple "Glow effect on sparks"
+
+DEFAULT_LANG_SAVER_INTERACTIVE simple "Interactive thumbnail preview"
+DEFAULT_LANG_SAVER_TITLE       simple "save title" # placeholder shown when the title box is empty
+
+DEFAULT_LANG_SC_DECO      simple "Decoration tools"
+DEFAULT_LANG_SC_ELEC      simple "Electronics"
+DEFAULT_LANG_SC_EXPLOSIVE simple "Explosives"
+DEFAULT_LANG_SC_FAVORITES simple "Favorites"
+DEFAULT_LANG_SC_FORCE     simple "Force"
+DEFAULT_LANG_SC_GAS       simple "Gases"
+DEFAULT_LANG_SC_LIFE      simple "Game Of Life"
+DEFAULT_LANG_SC_LIQUID    simple "Liquids"
+DEFAULT_LANG_SC_NUCLEAR   simple "Radioactive"
+DEFAULT_LANG_SC_POWDERS   simple "Powders"
+DEFAULT_LANG_SC_POWERED   simple "Powered Materials"
+DEFAULT_LANG_SC_SENSOR    simple "Sensors"
+DEFAULT_LANG_SC_SOLIDS    simple "Solids"
+DEFAULT_LANG_SC_SPECIAL   simple "Special"
+DEFAULT_LANG_SC_TOOL      simple "Tools"
+DEFAULT_LANG_SC_WALL      simple "Walls"
+
+DEFAULT_LANG_SELECTEXPL_COPY  simple "??? to specify an area to copy, ??? to cancel"
+DEFAULT_LANG_SELECTEXPL_CUT   simple "??? to specify an area to copy then cut, ??? to cancel"
+DEFAULT_LANG_SELECTEXPL_STAMP simple "??? to specify an area to stamp, ??? to cancel"
+
+DEFAULT_LANG_SETTINGS_DISP simple "Display mode"
+
+DEFAULT_LANG_SETTINGS_ENV           simple "Environment"
+DEFAULT_LANG_SETTINGS_ENV_AIRMODE   simple "Air simulation mode"
+DEFAULT_LANG_SETTINGS_ENV_AIRTEMP   simple "Ambient air temperature"
+DEFAULT_LANG_SETTINGS_ENV_EDGEMODE  simple "Edge mode"
+DEFAULT_LANG_SETTINGS_ENV_GRAVMODE  simple "Gravity simulation mode"
+DEFAULT_LANG_SETTINGS_ENV_TEMPSCALE simple "Temperature scale"
+
+DEFAULT_LANG_SETTINGS_FEATURE                 simple "Features"
+DEFAULT_LANG_SETTINGS_FEATURE_AMBHEATDETAIL   simple "Can cause odd / broken behavior with many saves"
+DEFAULT_LANG_SETTINGS_FEATURE_AMBHEAT         simple "Ambient heat simulation"
+DEFAULT_LANG_SETTINGS_FEATURE_HEATSIMDETAIL   simple "Can cause odd behavior when disabled"
+DEFAULT_LANG_SETTINGS_FEATURE_HEATSIM         simple "Heat simulation"
+DEFAULT_LANG_SETTINGS_FEATURE_NEWTONIANDETAIL simple "May cause poor performance on older computers"
+DEFAULT_LANG_SETTINGS_FEATURE_NEWTONIAN       simple "Newtonian gravity"
+DEFAULT_LANG_SETTINGS_FEATURE_WATEREQDETAIL   simple "May cause poor performance with a lot of water"
+DEFAULT_LANG_SETTINGS_FEATURE_WATEREQ         simple "Water equalization"
+
+DEFAULT_LANG_SETTINGS_SCALING                    simple "Scaling"
+DEFAULT_LANG_SETTINGS_SCALING_FIXED              simple "Fixed-size window"
+DEFAULT_LANG_SETTINGS_SCALING_RESIZABLE          simple "Resizable window"
+DEFAULT_LANG_SETTINGS_SCALING_FULLSCREEN         simple "Fullscreen"
+DEFAULT_LANG_SETTINGS_SCALING_SETRES             simple "Set optimal screen resolution"
+DEFAULT_LANG_SETTINGS_SCALING_FORCEINTEGER       simple "Force integer scaling"
+DEFAULT_LANG_SETTINGS_SCALING_FORCEINTEGERDETAIL simple "Less blurry"
+DEFAULT_LANG_SETTINGS_SCALING_LINEAR             simple "Blurry scaling"
+DEFAULT_LANG_SETTINGS_SCALING_LINEARDETAIL       simple "More blurry, better on very big screens"
+
+DEFAULT_LANG_SETTINGS_TAB_SHORTCUTS  simple "Shortcuts"
+DEFAULT_LANG_SETTINGS_TAB_SIMULATION simple "Simulation"
+DEFAULT_LANG_SETTINGS_TAB_VIDEO      simple "Video"
+
+DEFAULT_LANG_SETTINGS_TITLE simple "Settings"
+
+DEFAULT_LANG_SIGN_ALIGNLEFT   simple "Left"
+DEFAULT_LANG_SIGN_ALIGNMIDDLE simple "Middle"
+DEFAULT_LANG_SIGN_ALIGNNONE   simple "None"
+DEFAULT_LANG_SIGN_ALIGNRIGHT  simple "Right"
+DEFAULT_LANG_SIGN_DELETE      simple "Delete"
+DEFAULT_LANG_SIGN_EDITTITLE   simple "Edit sign"
+DEFAULT_LANG_SIGN_MOVE        simple "Move"
+DEFAULT_LANG_SIGN_NEWTITLE    simple "New sign"
+DEFAULT_LANG_SIGN_TEXT        simple "text" # placeholder shown when the content box is empty
+
+DEFAULT_LANG_SIMSTATE_AIR_NOUPDATE         simple "No Update"
+DEFAULT_LANG_SIMSTATE_AIR_OFF              simple "Off"
+DEFAULT_LANG_SIMSTATE_AIR_ON               simple "On"
+DEFAULT_LANG_SIMSTATE_AIR_PRESSUREOFF      simple "Pressure Off"
+DEFAULT_LANG_SIMSTATE_AIR_VELOCITYOFF      simple "Velocity Off"
+DEFAULT_LANG_SIMSTATE_DECO_OFF             simple "Off"
+DEFAULT_LANG_SIMSTATE_DECO_ON              simple "On"
+DEFAULT_LANG_SIMSTATE_EDGE_LOOP            simple "Loop"
+DEFAULT_LANG_SIMSTATE_EDGE_SOLID           simple "Solid"
+DEFAULT_LANG_SIMSTATE_EDGE_VOID            simple "Void"
+DEFAULT_LANG_SIMSTATE_GRAV_CUSTOM          simple "Custom"
+DEFAULT_LANG_SIMSTATE_GRAV_OFF             simple "Off"
+DEFAULT_LANG_SIMSTATE_GRAV_RADIAL          simple "Radial"
+DEFAULT_LANG_SIMSTATE_GRAV_VERTICAL        simple "Vertical"
+DEFAULT_LANG_SIMSTATE_TEMPSCALE_CELSIUS    simple "Celsius"
+DEFAULT_LANG_SIMSTATE_TEMPSCALE_FAHRENHEIT simple "Fahrenheit"
+DEFAULT_LANG_SIMSTATE_TEMPSCALE_KELVIN     simple "Kelvin"
+
+DEFAULT_LANG_STAMPBROWSER_TITLE     simple "Pick stamp to place"
+DEFAULT_LANG_STAMPBROWSER_NOSTAMPS  simple "No stamps found"
+DEFAULT_LANG_STAMPBROWSER_RESCAN    simple "Rescan"
+DEFAULT_LANG_STAMPBROWSER_LOADERROR simple "Failed to load stamp: @0@" # @0@: reason
+
+DEFAULT_LANG_STAMPDELETE         simple "Delete"
+DEFAULT_LANG_STAMPDELETE_TITLE   simple "Delete stamps"
+DEFAULT_LANG_STAMPDELETE_CONTENT simple "Are you sure you want to delete @0@ stamps?" # @0@: total number of stamps selected
+
+DEFAULT_LANG_STAMPRENAME           simple "Rename"
+DEFAULT_LANG_STAMPRENAME_TITLE     simple "Rename stamp"
+DEFAULT_LANG_STAMPRENAME_DESC      simple "Enter a new name for the stamp:"
+DEFAULT_LANG_STAMPRENAME_NEWNAME   simple "new name" # placeholder shown when the name box is empty
+DEFAULT_LANG_STAMPRENAME_ERROR     simple "Error renaming stamp"
+DEFAULT_LANG_STAMPRENAME_EMPTYNAME simple "You have to specify the filename."
+
+DEFAULT_LANG_TAGS_ADDFAILED      simple "Failed to add tag"
+DEFAULT_LANG_TAGS_ADDPROGRESS    simple "Adding tag"
+DEFAULT_LANG_TAGS_ADD            simple "Add"
+DEFAULT_LANG_TAGS_ADVICE         simple "Tags are only to be used to improve search results."
+DEFAULT_LANG_TAGS_NEWTAG         simple "new tag" # placeholder shown when the tag box is empty
+DEFAULT_LANG_TAGS_NOTAGS         simple "No tags set"
+DEFAULT_LANG_TAGS_NOUSER         simple "Log in to add tags"
+DEFAULT_LANG_TAGS_REMOVEFAILED   simple "Failed to remove tag"
+DEFAULT_LANG_TAGS_REMOVEPROGRESS simple "Removing tag"
+DEFAULT_LANG_TAGS_REMOVE         simple "Remove"
+DEFAULT_LANG_TAGS_TITLE          simple "Manage tags"
+
+DEFAULT_LANG_UPDATE_BETA                          simple "@0@.@1@ Beta, Build @2@" # @0@: major version, @1@: minor version, @2@: build number
+DEFAULT_LANG_UPDATE_CHANGELOG                     simple "Changelog:"
+DEFAULT_LANG_UPDATE_CONFIRM_CANNOTUPDATE_CONTINUE simple "Continue"
+DEFAULT_LANG_UPDATE_CONFIRM_CANNOTUPDATE          simple "Click \"Continue\" to download the latest version from our website."
+DEFAULT_LANG_UPDATE_CONFIRM_CANUPDATE             simple "Are you sure you want to run the updater? The game restarts at the end of a successful update, please save any changes before updating."
+DEFAULT_LANG_UPDATE_CONFIRM                       simple "Update available"
+DEFAULT_LANG_UPDATE_CURRENTVERSION                simple "Current version: @0@" # @0@: version string
+DEFAULT_LANG_UPDATE_FAILEDTOAPPLY                 simple "Failed to apply update"
+DEFAULT_LANG_UPDATE_FAILEDTODOWNLOAD              simple "Failed to download update"
+DEFAULT_LANG_UPDATE_GOTOWEBSITE                   simple "Click \"OK\" to go to the website."
+DEFAULT_LANG_UPDATE_MOD                           simple "Mod @0@" # @0@: mod ID
+DEFAULT_LANG_UPDATE_MODVERSION                    simple "Mod version @0@" # @0@: build number
+DEFAULT_LANG_UPDATE_NEWVERSION                    simple "New version: @0@" # @0@: version string
+DEFAULT_LANG_UPDATE_POSSIBLYFAILEDTOAPPLY         simple "Possibly failed to write update. The update may have been applied successfully; try restarting the game to check."
+DEFAULT_LANG_UPDATE_SNAPSHOT                      simple "Snapshot @0@" # @0@: build number
+DEFAULT_LANG_UPDATE_STABLE                        simple "@0@.@1@ Stable, Build @2@" # @0@: major version, @1@: minor version, @2@: build number
+DEFAULT_LANG_UPDATE_TITLE                         simple "Downloading update"
+DEFAULT_LANG_UPDATE_TRYMANUALLY                   simple "Try downloading the new version manually."

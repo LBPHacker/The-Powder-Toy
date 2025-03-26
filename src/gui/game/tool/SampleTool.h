@@ -1,18 +1,21 @@
 #pragma once
 #include "Tool.h"
 
-class GameModel;
+namespace Powder::Activity
+{
+	class Game;
+}
 
 class SampleTool: public Tool
 {
-	GameModel &gameModel;
+	Powder::Activity::Game &game;
 
 public:
-	SampleTool(GameModel &model):
+	SampleTool(Powder::Activity::Game &newGame):
 		Tool(0, "SMPL", "Sample an element on the screen.",
 			0x000000_rgb, "DEFAULT_UI_SAMPLE", SampleTool::GetIcon
 		),
-		gameModel(model)
+		game(newGame)
 	{}
 
 	static std::unique_ptr<VideoBuffer> GetIcon(int toolID, Vec2<int> size);

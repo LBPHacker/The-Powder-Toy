@@ -4,6 +4,8 @@
 #include "common/tpt-rand.h"
 #include "simulation/GOLString.h"
 #include "simulation/SimulationData.h"
+#include "Activity/AddLife.hpp"
+#include "Activity/Game.hpp"
 #include "gui/Style.h"
 #include "gui/interface/Button.h"
 #include "gui/interface/Label.h"
@@ -196,12 +198,12 @@ void GOLWindow::OnDraw()
 	}
 }
 
-void GOLTool::OpenWindow(Simulation *sim, int toolSelection, int rule, RGB colour1, RGB colour2)
+void GOLTool::OpenWindow(int toolSelection, int rule, RGB colour1, RGB colour2)
 {
-	new GOLWindow(gameModel, toolSelection, rule, colour1, colour2);
+	game.PushAboveThis(std::make_shared<Powder::Activity::AddLife>(game, toolSelection, rule, colour1, colour2));
 }
 
 void GOLTool::Select(int toolSelection)
 {
-	OpenWindow(gameModel.GetSimulation(), toolSelection);
+	OpenWindow(toolSelection);
 }

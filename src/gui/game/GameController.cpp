@@ -106,7 +106,7 @@ GameController::GameController():
 		gameView->SetSimFpsLimit(DefaultFpsLimit);
 	}
 
-	commandInterface = CommandInterface::Create(this, gameModel);
+	// commandInterface = CommandInterface::Create(this, gameModel); // TODO-REDO_UI-STUBBED
 
 	Client::Ref().AddListener(this);
 
@@ -164,7 +164,7 @@ GameController::~GameController()
 		delete *iter;
 	}
 	gameView->PauseRendererThread();
-	commandInterface->RemoveComponents();
+	// commandInterface->RemoveComponents(); // TODO-REDO_UI-STUBBED
 	gameView->CloseActiveWindow();
 	delete gameView;
 	commandInterface.reset();
