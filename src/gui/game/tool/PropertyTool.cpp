@@ -1,4 +1,6 @@
 #include "PropertyTool.h"
+#include "Powder/Activity/Game.hpp"
+#include "Powder/Activity/Property.hpp"
 #include "prefs/GlobalPrefs.h"
 #include "gui/Style.h"
 #include "gui/game/Brush.h"
@@ -130,7 +132,7 @@ void PropertyWindow::Update()
 	try
 	{
 		configuration = PropertyTool::Configuration{
-			AccessProperty::Parse(property->GetOption().second, textField->GetText()),
+			AccessProperty::Parse(property->GetOption().second, textField->GetText(), GameController::Ref().GetTemperatureScale()),
 			textField->GetText(),
 		};
 	}
@@ -187,9 +189,11 @@ void PropertyWindow::OnKeyPress(int key, int scan, bool repeat, bool shift, bool
 	}
 }
 
-void PropertyTool::OpenWindow(Simulation *sim, std::optional<int> takePropertyFrom)
+void PropertyTool::OpenWindow()
 {
-	new PropertyWindow(this, sim, takePropertyFrom);
+	std::optional<int> newTakePropertyFrom;
+	std::swap(newTakePropertyFrom, takePropertyFrom);
+	game.PushAboveThis(std::make_shared<Powder::Activity::Property>(*this, game, newTakePropertyFrom));
 }
 
 void PropertyTool::SetProperty(Simulation *sim, ui::Point position)
@@ -297,5 +301,5 @@ void PropertyTool::DrawFill(Simulation *sim, Brush const &cBrush, ui::Point posi
 
 void PropertyTool::Select(int toolSelection)
 {
-	OpenWindow(gameModel.GetSimulation(), std::nullopt);
+	OpenWindow();
 }

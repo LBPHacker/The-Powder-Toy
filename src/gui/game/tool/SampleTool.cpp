@@ -3,7 +3,7 @@
 #include "GOLTool.h"
 #include "graphics/Graphics.h"
 #include "graphics/Renderer.h"
-#include "gui/game/GameModel.h"
+#include "Activity/Game.hpp"
 #include "gui/game/GameView.h"
 #include "gui/interface/Colour.h"
 #include "simulation/Simulation.h"
@@ -21,10 +21,12 @@ std::unique_ptr<VideoBuffer> SampleTool::GetIcon(int toolID, Vec2<int> size)
 
 void SampleTool::Draw(Simulation * sim, Brush const &brush, ui::Point position)
 {
-	if(gameModel.GetColourSelectorVisibility())
+	if(game.GetShowingDecoTools())
 	{
-		pixel colour = gameModel.GetView()->GetPixelUnderMouse();
-		gameModel.SetColourSelectorColour(RGB::Unpack(colour).WithAlpha(0xFF));
+		if (auto colour = game.GetColorUnderMouse())
+		{
+			game.SetDecoColor(colour->WithAlpha(0xFF));
+		}
 	}
 	else
 	{
@@ -40,34 +42,38 @@ void SampleTool::Draw(Simulation * sim, Brush const &brush, ui::Point position)
 		if (i != -1)
 		{
 			auto *part = &sim->parts[i];
-			if (shiftBehaviour)
+			if (game.GetSampleProperty())
 			{
-				auto *propTool = static_cast<PropertyTool *>(gameModel.GetToolFromIdentifier("DEFAULT_UI_PROPERTY"));
-				gameModel.SetActiveTool(0, propTool);
-				propTool->OpenWindow(gameModel.GetSimulation(), i);
+				auto *propTool = static_cast<PropertyTool *>(game.GetToolFromIdentifier("DEFAULT_UI_PROPERTY"));
+				propTool->QueueTakePropertyFrom(i);
+				game.SelectTool(0, propTool);
 			}
 			else if (part->type == PT_LIFE)
 			{
 				bool found = false;
-				for (auto *elementTool : gameModel.GetMenuList()[SC_LIFE]->GetToolList())
+				for (auto &tool : game.GetTools())
 				{
-					if (elementTool && ID(elementTool->ToolID) == part->ctype)
+					if (!tool)
 					{
-						gameModel.SetActiveTool(0, elementTool);
+						continue;
+					}
+					if (tool->tool->Identifier.Contains("_PT_LIFE_") && ID(tool->tool->ToolID) == part->ctype)
+					{
+						game.SelectTool(0, tool->tool.get());
 						found = true;
 						break;
 					}
 				}
 				if (!found)
 				{
-					static_cast<GOLTool *>(gameModel.GetToolFromIdentifier("DEFAULT_UI_ADDLIFE"))->OpenWindow(gameModel.GetSimulation(), 0, part->ctype, RGB::Unpack(part->dcolour & 0xFFFFFF), RGB::Unpack(part->tmp & 0xFFFFFF));
+					static_cast<GOLTool *>(game.GetToolFromIdentifier("DEFAULT_UI_ADDLIFE"))->OpenWindow(0, part->ctype, RGB::Unpack(part->dcolour & 0xFFFFFF), RGB::Unpack(part->tmp & 0xFFFFFF));
 				}
 			}
 			else
 			{
 				auto &sd = SimulationData::Ref();
 				auto &elements = sd.elements;
-				gameModel.SetActiveTool(0, gameModel.GetToolFromIdentifier(elements[part->type].Identifier));
+				game.SelectTool(0, game.GetToolFromIdentifier(elements[part->type].Identifier));
 			}
 		}
 	}
