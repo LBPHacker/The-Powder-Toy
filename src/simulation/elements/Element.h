@@ -49,6 +49,17 @@ public:
 	int LowTemperatureTransition;
 	float HighTemperature;
 	int HighTemperatureTransition;
+	float GasTemperaturetransition = MAX_TEMP+1.f;
+	int GasTransition = -1;
+	float PlsmTemperaturetransition = -1.f;
+	float Liquidtransition = -1.f;
+	float SolidLiquidlatent = 0.f;
+	float LiquidGaslatent = 0.f;
+	float GasPlsmlatent = 5000.f; // default
+	float Heatcapacity = 1.f;
+	float InvHeatcapacity = 1.f;
+
+
 
 	int (*Update) (UPDATE_FUNC_ARGS);
 	int (*Graphics) (GRAPHICS_FUNC_ARGS);

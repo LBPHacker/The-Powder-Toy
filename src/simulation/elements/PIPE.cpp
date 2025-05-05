@@ -33,7 +33,7 @@ Element_PIPE::Element_PIPE()
 	HeatConduct = 0;
 	Description = "PIPE, moves particles around. Once the BRCK generates, erase some for the exit. Then the PIPE generates and is usable.";
 
-	Properties = TYPE_SOLID|PROP_LIFE_DEC;
+	Properties = TYPE_SOLID|PROP_LIFE_DEC | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -43,6 +43,9 @@ Element_PIPE::Element_PIPE()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_PIPE::update;
 	Graphics = &Element_PIPE::graphics;

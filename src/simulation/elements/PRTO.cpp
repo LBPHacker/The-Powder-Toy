@@ -40,6 +40,9 @@ Element_PRTO::Element_PRTO()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_PRTO::update;
 	Graphics = &Element_PRTO::graphics;

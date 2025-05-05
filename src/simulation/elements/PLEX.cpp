@@ -41,6 +41,9 @@ Element_PLEX::Element_PLEX()
 	LowTemperatureTransition = NT;
 	HighTemperature = 673.0f;
 	HighTemperatureTransition = PT_FIRE;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 }

@@ -31,7 +31,7 @@ Element_PSCN::Element_PSCN()
 	HeatConduct = 251;
 	Description = "P-Type Silicon, Will transfer current to any conductor.";
 
-	Properties = TYPE_SOLID|PROP_CONDUCTS|PROP_LIFE_DEC;
+	Properties = TYPE_SOLID|PROP_CONDUCTS|PROP_LIFE_DEC | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -41,6 +41,9 @@ Element_PSCN::Element_PSCN()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1687.0f;
 	HighTemperatureTransition = PT_LAVA;
+	GasTemperaturetransition = 3000.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = NULL;
 }

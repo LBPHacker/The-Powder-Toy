@@ -30,7 +30,7 @@ Element_BGLA::Element_BGLA()
 	HeatConduct = 150;
 	Description = "Broken Glass, heavy particles formed when glass breaks under pressure. Meltable. Bagels.";
 
-	Properties = TYPE_PART | PROP_HOT_GLOW;
+	Properties = TYPE_PART | PROP_HOT_GLOW | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,12 @@ Element_BGLA::Element_BGLA()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1973.0f;
 	HighTemperatureTransition = PT_LAVA;
+	GasTemperaturetransition = 3300.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
+	SolidLiquidlatent = 15.6f;
+	LiquidGaslatent = 420.f;
+	GasPlsmlatent = 5000.f;
 
 	Update = NULL;
 }

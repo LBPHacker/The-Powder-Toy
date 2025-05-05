@@ -40,6 +40,9 @@ Element_STOR::Element_STOR()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_STOR::update;
 	Graphics = &Element_STOR::graphics;

@@ -44,6 +44,9 @@ Element_LIFE::Element_LIFE()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 	Graphics = &Element_LIFE::graphics;

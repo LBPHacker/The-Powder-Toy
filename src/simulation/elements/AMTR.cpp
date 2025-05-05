@@ -40,6 +40,9 @@ Element_AMTR::Element_AMTR()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_AMTR::update;
 	Graphics = &Element_AMTR::graphics;

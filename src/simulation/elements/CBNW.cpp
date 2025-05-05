@@ -40,6 +40,9 @@ Element_CBNW::Element_CBNW()
 	LowTemperatureTransition = PT_ICEI;
 	HighTemperature = 373.0f;
 	HighTemperatureTransition = PT_WTRV;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_CBNW::update;
 	Graphics = &Element_CBNW::graphics;

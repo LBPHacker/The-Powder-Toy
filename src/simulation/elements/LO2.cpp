@@ -30,7 +30,7 @@ Element_LO2::Element_LO2()
 	HeatConduct = 70;
 	Description = "Liquid Oxygen. Very cold. Reacts with fire.";
 
-	Properties = TYPE_LIQUID;
+	Properties = TYPE_LIQUID | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -38,8 +38,15 @@ Element_LO2::Element_LO2()
 	HighPressureTransition = NT;
 	LowTemperature = ITL;
 	LowTemperatureTransition = NT;
-	HighTemperature = 90.1f;
+	HighTemperature = 90.2f;
 	HighTemperatureTransition = PT_O2;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
+	SolidLiquidlatent = 1.4f;
+	LiquidGaslatent = 21.3f;
+	GasPlsmlatent = 5000.f;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = NULL;
 }

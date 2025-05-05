@@ -87,6 +87,7 @@ public:
 	float (*vy)[XRES/CELL];
 	float (*pv)[XRES/CELL];
 	float (*hv)[XRES/CELL];
+	//float dpv[YRES/CELL][XRES/CELL];
 	//Gravity sim
 	float *gravx;//gravx[(YRES/CELL) * (XRES/CELL)];
 	float *gravy;//gravy[(YRES/CELL) * (XRES/CELL)];
@@ -99,8 +100,11 @@ public:
 	float fvy[YRES/CELL][XRES/CELL];
 	//Particles
 	Particle parts[NPART];
+	int idpointer[NPART][3];
 	int pmap[YRES][XRES];
+	int pmap2[YRES][XRES][4];
 	int photons[YRES][XRES];
+	float flttransitiontemp[NPART];
 	unsigned int pmap_count[YRES][XRES];
 	//Simulation Settings
 	int edgeMode;
@@ -137,6 +141,7 @@ public:
 	bool IsValidElement(int type) {
 		return (type >= 0 && type < PT_NUM && elements[type].Enabled);
 	}
+	void nuclear_fusion(int id);
 	void create_cherenkov_photon(int pp);
 	void create_gain_photon(int pp);
 	void kill_part(int i);

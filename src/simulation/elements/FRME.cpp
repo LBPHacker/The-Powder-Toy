@@ -40,6 +40,9 @@ Element_FRME::Element_FRME()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Graphics = &Element_FRME::graphics;
 }

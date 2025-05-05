@@ -40,6 +40,9 @@ Element_FILT::Element_FILT()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 	Graphics = &Element_FILT::graphics;
@@ -96,8 +99,8 @@ int Element_FILT::interactWavelengths(Particle* cpart, int origWl)
 		}
 		case 5:
 		{
-			int shift = int((cpart->temp-273.0f)*0.025f);
-			if (shift<=0) shift = 1;
+			int shift = int((cpart->temp - 273.0f)*0.025f);
+			if(shift <= 0) shift = 1;
 			return (origWl >> shift) & mask; // blue shift
 		}
 		case 6:
@@ -122,6 +125,110 @@ int Element_FILT::interactWavelengths(Particle* cpart, int origWl)
 		{
 			long long int lsb = filtWl & (-filtWl);
 			return (origWl / lsb) & 0x3FFFFFFF; // blue shift
+		}
+		case 12:
+		{
+			return origWl + filtWl; // adder number color
+		}
+		case 13:
+		{
+			return origWl - filtWl; // subtract number color
+		}
+		case 14: //integer multiplication
+		{
+			return origWl * filtWl;
+		}
+		case 15: //integer division
+		{
+			return origWl / filtWl;
+		}
+		case 16: //integer exponential
+		{
+			return pow(filtWl, origWl);
+		}
+		case 17: //integer logarithm
+		{
+			return log(origWl)/log(filtWl);
+		}
+		case 18: // float point ADDER
+		{
+			float a, b, c;
+			a = origWl;
+			b = filtWl;
+			c = a + b;
+			return *(int *)&c;  
+		}
+		case 19: // float point SUB
+		{
+			float a, b, c;
+			a = origWl;
+			b = filtWl;
+			c = a - b;
+			return *(int *)&c;  
+		}
+		case 20: // float point multiplication
+		{
+			float a,b,c;
+			a = origWl;
+			b = filtWl;
+			c = a * b;                      
+			return *(int *)&c;  
+		}
+		case 21: // float point DIV
+		{
+			float a, b, c;
+			a = origWl;
+			b = filtWl;
+			c = a / b;
+			return *(int *)&c;
+		}
+		case 22: // float point EXP;
+		{
+			float a, c;
+			a = origWl;
+			c = exp(a);
+			return *(int *)&c;
+		}
+		case 23: // float point LN
+		{
+			float a, b, c;
+			a = origWl;
+			b = filtWl;
+			c = log(a)/log(b);
+			return *(int *)&c;
+		}
+		case 24: // float point POW
+		{
+			float a, b, c;
+			a = origWl;
+			b = filtWl;
+			c = pow(b, a);
+			return *(int *)&c;
+		}
+		case 25: // float point COS
+		{
+			float a, c;
+			a = origWl;
+			c = cos(a);
+			return *(int *)&c;
+		}
+		case 26: // float point SIN
+		{
+			float a, c;
+			a = origWl;
+			c = sin(a);
+			return *(int *)&c;
+		}
+		case 27: //integer SQRT
+		{
+			return sqrt(origWl);
+		}
+		case 28: // float point SQRT
+		{
+			float a, c;
+			a = origWl;
+			c = sqrt(a);
+			return *(int *)&c;
 		}
 		default:
 			return filtWl;

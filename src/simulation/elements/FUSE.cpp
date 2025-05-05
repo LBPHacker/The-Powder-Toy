@@ -30,7 +30,7 @@ Element_FUSE::Element_FUSE()
 	HeatConduct = 200;
 	Description = "Burns slowly. Ignites at somewhat high temperatures or with electricity.";
 
-	Properties = TYPE_SOLID;
+	Properties = TYPE_SOLID | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_FUSE::Element_FUSE()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_FUSE::update;
 }

@@ -40,6 +40,9 @@ Element_DCEL::Element_DCEL()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_DCEL::update;
 	Graphics = &Element_DCEL::graphics;

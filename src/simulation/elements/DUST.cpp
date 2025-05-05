@@ -31,7 +31,7 @@ Element_DUST::Element_DUST()
 	HeatConduct = 70;
 	Description = "Very light dust. Flammable.";
 
-	Properties = TYPE_PART;
+	Properties = TYPE_PART | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -41,6 +41,9 @@ Element_DUST::Element_DUST()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = 3300.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = NULL;
 	Graphics = NULL;

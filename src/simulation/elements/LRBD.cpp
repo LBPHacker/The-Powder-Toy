@@ -40,6 +40,9 @@ Element_LRBD::Element_LRBD()
 	LowTemperatureTransition = PT_RBDM;
 	HighTemperature = 961.0f;
 	HighTemperatureTransition = PT_FIRE;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 }

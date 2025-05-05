@@ -40,6 +40,9 @@ Element_DMG::Element_DMG()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_DMG::update;
 	Graphics = &Element_DMG::graphics;

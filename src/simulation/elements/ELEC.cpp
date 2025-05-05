@@ -40,6 +40,9 @@ Element_ELEC::Element_ELEC()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_ELEC::update;
 	Graphics = &Element_ELEC::graphics;

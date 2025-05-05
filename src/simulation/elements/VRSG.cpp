@@ -30,7 +30,7 @@ Element_VRSG::Element_VRSG()
 	HeatConduct = 251;
 	Description = "Gas Virus. Turns everything it touches into virus.";
 
-	Properties = TYPE_GAS|PROP_DEADLY;
+	Properties = TYPE_GAS | PROP_DEADLY | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_VRSG::Element_VRSG()
 	LowTemperatureTransition = PT_VIRS;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_VIRS::update;
 	Graphics = &Element_VRSG::graphics;

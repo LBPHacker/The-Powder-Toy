@@ -40,6 +40,9 @@ Element_PRTI::Element_PRTI()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_PRTI::update;
 	Graphics = &Element_PRTI::graphics;

@@ -30,7 +30,7 @@ Element_FRZZ::Element_FRZZ()
 	HeatConduct = 46;
 	Description = "Freeze powder. When melted, forms ice that always cools. Spreads with regular water.";
 
-	Properties = TYPE_PART;
+	Properties = TYPE_PART | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_FRZZ::Element_FRZZ()
 	LowTemperatureTransition = PT_ICEI;
 	HighTemperature = 273.15;
 	HighTemperatureTransition = PT_FRZW;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_FRZZ::update;
 }

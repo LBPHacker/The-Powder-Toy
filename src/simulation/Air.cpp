@@ -131,7 +131,7 @@ void Air::update_airh(void)
 void Air::update_air(void)
 {
 	int x = 0, y = 0, i = 0, j = 0;
-	float dp = 0.0f, dx = 0.0f, dy = 0.0f, f = 0.0f, tx = 0.0f, ty = 0.0f;
+	float dp = 0.0f, dx = 0.0f, dy = 0.0f, f = 0.0f, tx = 0.0f, ty = 0.0f, vv = 0.0f;
 	const float advDistanceMult = 0.7f;
 	float stepX, stepY;
 	int stepLimit, step;
@@ -140,75 +140,101 @@ void Air::update_air(void)
 
 		for (i=0; i<YRES/CELL; i++) //reduces pressure/velocity on the edges every frame
 		{
-			pv[i][0] = pv[i][0]*0.8f;
-			pv[i][1] = pv[i][1]*0.8f;
-			pv[i][2] = pv[i][2]*0.8f;
-			pv[i][XRES/CELL-2] = pv[i][XRES/CELL-2]*0.8f;
-			pv[i][XRES/CELL-1] = pv[i][XRES/CELL-1]*0.8f;
-			vx[i][0] = vx[i][1]*0.9f;
-			vx[i][1] = vx[i][2]*0.9f;
-			vx[i][XRES/CELL-2] = vx[i][XRES/CELL-3]*0.9f;
-			vx[i][XRES/CELL-1] = vx[i][XRES/CELL-2]*0.9f;
-			vy[i][0] = vy[i][1]*0.9f;
-			vy[i][1] = vy[i][2]*0.9f;
-			vy[i][XRES/CELL-2] = vy[i][XRES/CELL-3]*0.9f;
-			vy[i][XRES/CELL-1] = vy[i][XRES/CELL-2]*0.9f;
+			pv[i][0] = 0.8f*pv[i][0];
+			pv[i][XRES/CELL-1] = 0.8f*pv[i][XRES / CELL - 1];
+			vx[i][0] = 0.8f*vx[i][0];
+			vx[i][XRES / CELL - 1] = 0.8f*vx[i][XRES / CELL - 1];
+			vy[i][0] = 0.8f*vy[i][0];
+			vy[i][XRES / CELL - 1] = 0.8f*vy[i][XRES / CELL - 1];
 		}
 		for (i=0; i<XRES/CELL; i++) //reduces pressure/velocity on the edges every frame
 		{
-			pv[0][i] = pv[0][i]*0.8f;
-			pv[1][i] = pv[1][i]*0.8f;
-			pv[2][i] = pv[2][i]*0.8f;
-			pv[YRES/CELL-2][i] = pv[YRES/CELL-2][i]*0.8f;
-			pv[YRES/CELL-1][i] = pv[YRES/CELL-1][i]*0.8f;
-			vx[0][i] = vx[1][i]*0.9f;
-			vx[1][i] = vx[2][i]*0.9f;
-			vx[YRES/CELL-2][i] = vx[YRES/CELL-3][i]*0.9f;
-			vx[YRES/CELL-1][i] = vx[YRES/CELL-2][i]*0.9f;
-			vy[0][i] = vy[1][i]*0.9f;
-			vy[1][i] = vy[2][i]*0.9f;
-			vy[YRES/CELL-2][i] = vy[YRES/CELL-3][i]*0.9f;
-			vy[YRES/CELL-1][i] = vy[YRES/CELL-2][i]*0.9f;
+			pv[0][i] = 0.8f*pv[0][i];
+			pv[YRES / CELL - 1][i] = 0.8f*pv[YRES / CELL - 1][i];
+			vx[0][i] = 0.8f*vx[0][i];
+			vx[YRES / CELL - 1][i] = 0.8f*vx[YRES / CELL - 1][i];
+			vy[0][i] = 0.8f*vy[0][i];
+			vy[YRES / CELL - 1][i] = 0.8f*vy[YRES / CELL - 1][i];
 		}
 
-		for (j=1; j<YRES/CELL; j++) //clear some velocities near walls
+		for (j=0; j<YRES/CELL; j++) //clear some velocities near walls
 		{
-			for (i=1; i<XRES/CELL; i++)
+			for (i=0; i<XRES/CELL; i++)
 			{
 				if (bmap_blockair[j][i])
 				{
+					//set 0 vx left and right
+					if(i > 0){
+						vx[j][i - 1] = 0.0f;
+					}
 					vx[j][i] = 0.0f;
-					vx[j][i-1] = 0.0f;
+					if(i < (XRES / CELL - 1)){
+						vx[j][i + 1] = 0.0f;
+					}
+					//set 0 vy up and bottom
+					if(j > 0){
+						vy[j - 1][i] = 0.0f;
+					}
 					vy[j][i] = 0.0f;
-					vy[j-1][i] = 0.0f;
+					if(j < (XRES / CELL - 1)){
+						vy[j + 1][i] = 0.0f;
+					}
 				}
 			}
 		}
 
-		for (y=1; y<YRES/CELL; y++) //pressure adjustments from velocity
-			for (x=1; x<XRES/CELL; x++)
-			{
+		for(y = 0; y < (YRES / CELL); y++){ //pressure adjustments from velocity
+			for(x = 0; x < (XRES / CELL); x++){
 				dp = 0.0f;
-				dp += vx[y][x-1] - vx[y][x];
-				dp += vy[y-1][x] - vy[y][x];
-				pv[y][x] *= AIR_PLOSS;
-				pv[y][x] += dp*AIR_TSTEPP;
-			}
+				if(x > 0){
+					dp += vx[y][x - 1] - vx[y][x];
+				}
+				if((x + 1) < (XRES / CELL)){
+					dp += vx[y][x] - vx[y][x + 1];
+				}
+				if(y > 0){
+					dp += vy[y - 1][x] - vy[y][x];
+				}
+				if((y + 1) < (YRES / CELL)){
+					dp += vy[y][x] - vy[y + 1][x];
+				}
 
-		for (y=0; y<YRES/CELL-1; y++) //velocity adjustments from pressure
-			for (x=0; x<XRES/CELL-1; x++)
+				//opv[y][x] = pv[y][x];
+				pv[y][x] *= AIR_PLOSS;
+				pv[y][x] += dp * AIR_TSTEPP;
+
+				if(bmap_blockair[y][x]){
+					pv[y][x] = 0;
+				}
+			}
+		}
+		for (y=0; y<YRES/CELL; y++) //velocity adjustments from pressure
+			for (x=0; x<XRES/CELL; x++)
 			{
 				dx = dy = 0.0f;
-				dx += pv[y][x] - pv[y][x+1];
-				dy += pv[y][x] - pv[y+1][x];
+				if(x + 1 != (XRES/CELL)){
+					dx += pv[y][x] - pv[y][x+1];
+				}
+				if(x - 1 != -1){
+					dx += pv[y][x-1] - pv[y][x];
+				}
+				if(y + 1 != (YRES / CELL)){
+					dy += pv[y][x] - pv[y+1][x];
+				}
+				if(y - 1 != -1){
+					dy += pv[y-1][x] - pv[y][x];
+				}
+
 				vx[y][x] *= AIR_VLOSS;
 				vy[y][x] *= AIR_VLOSS;
 				vx[y][x] += dx*AIR_TSTEPV;
 				vy[y][x] += dy*AIR_TSTEPV;
-				if (bmap_blockair[y][x] || bmap_blockair[y][x+1])
+				
+				if (bmap_blockair[y][x] || (bmap_blockair[y][x+1] && x != (YRES / CELL-1)) || (bmap_blockair[y][x-1] && x != 0))
 					vx[y][x] = 0;
-				if (bmap_blockair[y][x] || bmap_blockair[y+1][x])
+				if (bmap_blockair[y][x] || (bmap_blockair[y+1][x] && y != (YRES / CELL-1)) || (bmap_blockair[y-1][x] && x != 0))
 					vy[y][x] = 0;
+
 			}
 
 		for (y=0; y<YRES/CELL; y++) //update velocity and pressure

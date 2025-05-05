@@ -30,7 +30,7 @@ Element_FRZW::Element_FRZW()
 	HeatConduct = 29;
 	Description = "Freeze water. Hybrid liquid formed when Freeze powder melts.";
 
-	Properties = TYPE_LIQUID | PROP_LIFE_DEC;
+	Properties = TYPE_LIQUID | PROP_LIFE_DEC | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_FRZW::Element_FRZW()
 	LowTemperatureTransition = PT_ICEI;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_FRZW::update;
 }

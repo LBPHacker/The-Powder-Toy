@@ -30,7 +30,7 @@ Element_VIRS::Element_VIRS()
 	HeatConduct = 251;
 	Description = "Virus. Turns everything it touches into virus.";
 
-	Properties = TYPE_LIQUID|PROP_DEADLY;
+	Properties = TYPE_LIQUID|PROP_DEADLY | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_VIRS::Element_VIRS()
 	LowTemperatureTransition = PT_VRSS;
 	HighTemperature = 673.0f;
 	HighTemperatureTransition = PT_VRSG;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_VIRS::update;
 	Graphics = &Element_VIRS::graphics;

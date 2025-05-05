@@ -32,7 +32,7 @@ Element_FIRE::Element_FIRE()
 	HeatConduct = 88;
 	Description = "Ignites flammable materials. Heats air.";
 
-	Properties = TYPE_GAS|PROP_LIFE_DEC|PROP_LIFE_KILL;
+	Properties = TYPE_GAS|PROP_LIFE_DEC|PROP_LIFE_KILL | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,8 +40,11 @@ Element_FIRE::Element_FIRE()
 	HighPressureTransition = NT;
 	LowTemperature = ITL;
 	LowTemperatureTransition = NT;
-	HighTemperature = 2773.0f;
+	HighTemperature = 9999.0f;
 	HighTemperatureTransition = PT_PLSM;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_FIRE::update;
 	Graphics = &Element_FIRE::graphics;

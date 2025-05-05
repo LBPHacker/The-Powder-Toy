@@ -14,8 +14,8 @@ Element_PLSM::Element_PLSM()
 	AirLoss = 0.97f;
 	Loss = 0.20f;
 	Collision = 0.0f;
-	Gravity = -0.1f;
-	Diffusion = 0.30f;
+	Gravity = 0.f;
+	Diffusion = 0.60f;
 	HotAir = 0.001f	* CFDS;
 	Falldown = 0;
 
@@ -30,7 +30,7 @@ Element_PLSM::Element_PLSM()
 	HeatConduct = 5;
 	Description = "Plasma, extremely hot.";
 
-	Properties = TYPE_GAS|PROP_LIFE_DEC|PROP_LIFE_KILL;
+	Properties = TYPE_GAS|PROP_LIFE_DEC|PROP_LIFE_KILL | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_PLSM::Element_PLSM()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_FIRE::update;
 	Graphics = &Element_PLSM::graphics;

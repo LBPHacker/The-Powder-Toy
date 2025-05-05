@@ -30,7 +30,7 @@ Element_MWAX::Element_MWAX()
 	HeatConduct = 44;
 	Description = "Liquid Wax. Hardens into WAX at 45 degrees.";
 
-	Properties = TYPE_LIQUID;
+	Properties = TYPE_LIQUID | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_MWAX::Element_MWAX()
 	LowTemperatureTransition = PT_WAX;
 	HighTemperature = 673.0f;
 	HighTemperatureTransition = PT_FIRE;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 }

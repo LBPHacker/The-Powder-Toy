@@ -30,7 +30,7 @@ Element_RFGL::Element_RFGL()
 	HeatConduct = 3;
 	Description = "Liquid refrigerant.";
 
-	Properties = TYPE_LIQUID|PROP_DEADLY;
+	Properties = TYPE_LIQUID|PROP_DEADLY | PROP_NEUTPASS;
 
 	LowPressure = 2;
 	LowPressureTransition = PT_RFRG;
@@ -40,6 +40,9 @@ Element_RFGL::Element_RFGL()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_RFRG::update;
 }

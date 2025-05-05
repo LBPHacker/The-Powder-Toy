@@ -40,6 +40,9 @@ Element_ISOZ::Element_ISOZ()
 	LowTemperatureTransition = PT_ISZS;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_ISOZ::update;
 }

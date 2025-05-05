@@ -40,6 +40,12 @@ Element_GLAS::Element_GLAS()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1973.0f;
 	HighTemperatureTransition = PT_LAVA;
+	GasTemperaturetransition = 3300.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
+	SolidLiquidlatent = 15.6f;
+	LiquidGaslatent = 420.f;
+	GasPlsmlatent = 5000.f;
 
 	Update = &Element_GLAS::update;
 }

@@ -30,16 +30,22 @@ Element_O2::Element_O2()
 	HeatConduct = 70;
 	Description = "Oxygen gas. Ignites easily.";
 
-	Properties = TYPE_GAS;
+	Properties = TYPE_GAS | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
 	HighPressure = IPH;
 	HighPressureTransition = NT;
-	LowTemperature = 90.0f;
+	LowTemperature = 90.188f;
 	LowTemperatureTransition = PT_LO2;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	SolidLiquidlatent = 1.4f;
+	LiquidGaslatent = 21.3f;
+	GasPlsmlatent = 5000.f;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = &Element_O2::update;
 }
@@ -48,33 +54,7 @@ Element_O2::Element_O2()
 int Element_O2::update(UPDATE_FUNC_ARGS)
 {
 	int r,rx,ry;
-	for (rx=-2; rx<3; rx++)
-		for (ry=-2; ry<3; ry++)
-			if (BOUNDS_CHECK && (rx || ry))
-			{
-				r = pmap[y+ry][x+rx];
-				if (!r)
-					continue;
-
-				if (TYP(r)==PT_FIRE)
-				{
-					parts[ID(r)].temp += RNG::Ref().between(0, 99);
-					if (parts[ID(r)].tmp & 0x01)
-						parts[ID(r)].temp = 3473;
-					parts[ID(r)].tmp |= 2;
-
-					sim->create_part(i,x,y,PT_FIRE);
-					parts[i].temp += RNG::Ref().between(0, 99);
-					parts[i].tmp |= 2;
-				}
-				else if (TYP(r)==PT_PLSM && !(parts[ID(r)].tmp&4))
-				{
-					sim->create_part(i,x,y,PT_FIRE);
-					parts[i].temp += RNG::Ref().between(0, 99);
-					parts[i].tmp |= 2;
-				}
-			}
-	if (parts[i].temp > 9973.15 && sim->pv[y/CELL][x/CELL] > 250.0f)
+	if (parts[i].temp > 90273.15 && sim->pv[y/CELL][x/CELL] > 250.0f)
 	{
 		int gravPos = ((y/CELL)*(XRES/CELL))+(x/CELL);
 		float gravx = sim->gravx[gravPos];

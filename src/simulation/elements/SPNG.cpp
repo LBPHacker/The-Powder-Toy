@@ -30,7 +30,7 @@ Element_SPNG::Element_SPNG()
 	HeatConduct = 251;
 	Description = "Sponge, absorbs water. Is not a moving solid.";
 
-	Properties = TYPE_SOLID;
+	Properties = TYPE_SOLID | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_SPNG::Element_SPNG()
 	LowTemperatureTransition = NT;
 	HighTemperature = 2730.0f;
 	HighTemperatureTransition = PT_FIRE;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_SPNG::update;
 	Graphics = &Element_SPNG::graphics;

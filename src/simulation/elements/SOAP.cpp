@@ -40,6 +40,9 @@ Element_SOAP::Element_SOAP()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_SOAP::update;
 	Graphics = &Element_SOAP::graphics;

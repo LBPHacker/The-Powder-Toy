@@ -44,6 +44,9 @@ Element_HEAC::Element_HEAC()
 	// can't melt by normal heat conduction, this is used by other elements for special melting behavior
 	HighTemperature = 1887.15f;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_HEAC::update;
 }

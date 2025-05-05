@@ -30,7 +30,7 @@ Element_SALT::Element_SALT()
 	HeatConduct = 110;
 	Description = "Salt, dissolves in water.";
 
-	Properties = TYPE_PART;
+	Properties = TYPE_PART | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_SALT::Element_SALT()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1173.0f;
 	HighTemperatureTransition = PT_LAVA;
+	GasTemperaturetransition = 1600.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = NULL;
 }

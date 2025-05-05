@@ -40,6 +40,14 @@ Element_WATR::Element_WATR()
 	LowTemperatureTransition = PT_ICEI;
 	HighTemperature = 373.0f;
 	HighTemperatureTransition = PT_WTRV;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
+	SolidLiquidlatent = 52.f;
+	LiquidGaslatent = 350.f;
+	GasPlsmlatent = 5000.f;
+	Heatcapacity = 4.2f;
+	InvHeatcapacity = 0.238095f;
 
 	Update = &Element_WATR::update;
 }

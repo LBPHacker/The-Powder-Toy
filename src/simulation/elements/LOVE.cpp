@@ -40,6 +40,9 @@ Element_LOVE::Element_LOVE()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 }
 
 //#TPT-Directive ElementHeader Element_LOVE static int RuleTable[9][9]

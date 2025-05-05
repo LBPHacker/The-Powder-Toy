@@ -30,7 +30,7 @@ Element_FSEP::Element_FSEP()
 	HeatConduct = 70;
 	Description = "Fuse Powder. Burns slowly like FUSE.";
 
-	Properties = TYPE_PART;
+	Properties = TYPE_PART | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_FSEP::Element_FSEP()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_FSEP::update;
 }

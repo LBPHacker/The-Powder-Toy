@@ -40,6 +40,9 @@ Element_GBMB::Element_GBMB()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_GBMB::update;
 	Graphics = &Element_GBMB::graphics;

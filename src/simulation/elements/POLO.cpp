@@ -41,6 +41,9 @@ Element_POLO::Element_POLO()
 	LowTemperatureTransition = NT;
 	HighTemperature = 526.95f;
 	HighTemperatureTransition = PT_LAVA;
+	GasTemperaturetransition = 1200.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = &Element_POLO::update;
 	Graphics = &Element_POLO::graphics;

@@ -30,7 +30,7 @@ Element_CLST::Element_CLST()
 	HeatConduct = 70;
 	Description = "Clay dust. Produces paste when mixed with water.";
 
-	Properties = TYPE_PART;
+	Properties = TYPE_PART | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_CLST::Element_CLST()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1256.0f;
 	HighTemperatureTransition = PT_LAVA;
+	GasTemperaturetransition = 3300.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = &Element_CLST::update;
 	Graphics = &Element_CLST::graphics;

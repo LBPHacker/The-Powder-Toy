@@ -30,7 +30,7 @@ Element_BTRY::Element_BTRY()
 	HeatConduct = 251;
 	Description = "Battery. Generates infinite electricity.";
 
-	Properties = TYPE_SOLID;
+	Properties = TYPE_SOLID | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_BTRY::Element_BTRY()
 	LowTemperatureTransition = NT;
 	HighTemperature = 2273.0f;
 	HighTemperatureTransition = PT_PLSM;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_BTRY::update;
 }

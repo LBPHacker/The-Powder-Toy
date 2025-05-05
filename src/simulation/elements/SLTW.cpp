@@ -40,6 +40,14 @@ Element_SLTW::Element_SLTW()
 	LowTemperatureTransition = PT_ICEI;
 	HighTemperature = 383.0f;
 	HighTemperatureTransition = ST;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
+	SolidLiquidlatent = 52.f;
+	LiquidGaslatent = 350.f;
+	GasPlsmlatent = 5000.f;
+	Heatcapacity = 4.2f;
+	InvHeatcapacity = 0.238095f;
 
 	Update = &Element_SLTW::update;
 }

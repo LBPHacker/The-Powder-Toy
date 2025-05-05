@@ -30,7 +30,7 @@ Element_SMKE::Element_SMKE()
 	HeatConduct = 88;
 	Description = "Smoke, created by fire.";
 
-	Properties = TYPE_GAS|PROP_LIFE_DEC|PROP_LIFE_KILL_DEC;
+	Properties = TYPE_GAS|PROP_LIFE_DEC|PROP_LIFE_KILL_DEC | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_SMKE::Element_SMKE()
 	LowTemperatureTransition = NT;
 	HighTemperature = 625.0f;
 	HighTemperatureTransition = PT_FIRE;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 	Graphics = &Element_SMKE::graphics;

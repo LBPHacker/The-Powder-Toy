@@ -1,6 +1,6 @@
 #include "simulation/Elements.h"
-//#TPT-Directive ElementClass Element_BRMT PT_BRMT 30
-Element_BRMT::Element_BRMT()
+//#TPT-Directive ElementClass Element_BROKEN PT_BROKEN 190
+Element_BROKEN::Element_BROKEN()
 {
 	Identifier = "DEFAULT_PT_BRMT";
 	Name = "BRMT";

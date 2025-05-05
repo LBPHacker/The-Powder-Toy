@@ -15,7 +15,7 @@ Element_H2::Element_H2()
 	Loss = 0.30f;
 	Collision = -0.10f;
 	Gravity = 0.00f;
-	Diffusion = 3.00f;
+	Diffusion = 2.00f;
 	HotAir = 0.000f	* CFDS;
 	Falldown = 0;
 
@@ -30,7 +30,7 @@ Element_H2::Element_H2()
 	HeatConduct = 251;
 	Description = "Hydrogen. Combusts with OXYG to make WATR. Undergoes fusion at high temperature and pressure.";
 
-	Properties = TYPE_GAS;
+	Properties = TYPE_GAS | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,15 @@ Element_H2::Element_H2()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = 9999.f;
+	Liquidtransition = 20.271f;
+	SolidLiquidlatent = 57.f;
+	LiquidGaslatent = 45.f;
+	GasPlsmlatent = 5000.f;
+	//Heatcapacity = 14.3f;
+	//InvHeatcapacity = 0.06993f;
 
 	Update = &Element_H2::update;
 }
@@ -66,31 +75,31 @@ int Element_H2::update(UPDATE_FUNC_ARGS)
 				{
 					if (parts[ID(r)].temp > 2273.15)
 						continue;
-				}
-				else
-				{
-					if (rt==PT_FIRE)
-					{
-						if(parts[ID(r)].tmp&0x02)
-							parts[ID(r)].temp=3473.0f;
-						else
-							parts[ID(r)].temp=2473.15f;
-						parts[ID(r)].tmp |= 1;
-						sim->create_part(i,x,y,PT_FIRE);
-						parts[i].temp += RNG::Ref().between(0, 99);
-						parts[i].tmp |= 1;
-						return 1;
-					}
-					else if ((rt==PT_PLSM && !(parts[ID(r)].tmp&4)) || (rt==PT_LAVA && parts[ID(r)].ctype != PT_BMTL))
-					{
-						sim->create_part(i,x,y,PT_FIRE);
-						parts[i].temp += RNG::Ref().between(0, 99);
-						parts[i].tmp |= 1;
-						return 1;
+				}else{
+				    if(parts[i].temp < 4000){
+						if (rt==PT_FIRE)
+						{
+							if(parts[ID(r)].tmp&0x02)
+								parts[ID(r)].temp=3473.0f;
+							else
+								parts[ID(r)].temp=2473.15f;
+							parts[ID(r)].tmp |= 1;
+							sim->create_part(i,x,y,PT_FIRE);
+							parts[i].temp += RNG::Ref().between(0, 99);
+							parts[i].tmp |= 1;
+							return 1;
+						}
+						else if ((rt==PT_PLSM && !(parts[ID(r)].tmp&4)) || (rt==PT_LAVA && parts[ID(r)].ctype != PT_BMTL))
+						{
+							sim->create_part(i,x,y,PT_FIRE);
+							parts[i].temp += RNG::Ref().between(0, 99);
+							parts[i].tmp |= 1;
+							return 1;
+						}
 					}
 				}
 			}
-	if (parts[i].temp > 2273.15 && sim->pv[y/CELL][x/CELL] > 50.0f)
+	if (parts[i].temp > 22730.15 && sim->pv[y/CELL][x/CELL] > 50.0f)
 	{
 		if (RNG::Ref().chance(1, 5))
 		{
@@ -101,18 +110,18 @@ int Element_H2::update(UPDATE_FUNC_ARGS)
 
 			j = sim->create_part(-3,x,y,PT_NEUT);
 			if (j>-1)
-				parts[j].temp = temp;
+				parts[j].temp = temp + 2 * RNG::Ref().between(7500, 12490);
 			if (RNG::Ref().chance(1, 10))
 			{
 				j = sim->create_part(-3,x,y,PT_ELEC);
 				if (j>-1)
-					parts[j].temp = temp;
+					parts[j].temp = temp + 2 * RNG::Ref().between(7500, 12490);
 			}
 			j = sim->create_part(-3,x,y,PT_PHOT);
 			if (j>-1)
 			{
 				parts[j].ctype = 0x7C0000;
-				parts[j].temp = temp;
+				parts[j].temp = temp + 2 * RNG::Ref().between(7500, 12490);
 				parts[j].tmp = 0x1;
 			}
 			rx = x + RNG::Ref().between(-1, 1), ry = y + RNG::Ref().between(-1, 1), rt = TYP(pmap[ry][rx]);
@@ -121,11 +130,11 @@ int Element_H2::update(UPDATE_FUNC_ARGS)
 				j = sim->create_part(-3,rx,ry,PT_PLSM);
 				if (j>-1)
 				{
-					parts[j].temp = temp;
+					parts[j].temp = temp + 2 * RNG::Ref().between(7500, 12490);
 					parts[j].tmp |= 4;
 				}
 			}
-			parts[i].temp = temp + RNG::Ref().between(750, 1249);
+			parts[i].temp = temp + 2*RNG::Ref().between(7500, 12490);
 			sim->pv[y/CELL][x/CELL] += 30;
 			return 1;
 		}

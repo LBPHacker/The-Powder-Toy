@@ -1196,6 +1196,14 @@ void Renderer::render_parts()
 	int deca, decr, decg, decb, cola, colr, colg, colb, firea, firer, fireg, fireb, pixel_mode, q, i, t, nx, ny, x, y, caddress;
 	int orbd[4] = {0, 0, 0, 0}, orbl[4] = {0, 0, 0, 0};
 	float gradv, flicker;
+	float a = 1023, b = MAX_TEMP, invlnb = a * (1.f / log(b + 1.f));/// division and logarithm is expensive
+	int heatcolor[1024][3], isvalid;
+	for (int i = 0, s = 0; s < 1024 && i < 3071; i += 3) {
+		heatcolor[s][0] = color_data[i];
+		heatcolor[s][1] = color_data[i + 1];
+		heatcolor[s][2] = color_data[i + 2];
+		s++;
+	}
 	Particle * parts;
 	Element *elements;
 	if(!sim)
@@ -1235,7 +1243,7 @@ void Renderer::render_parts()
 #endif
 	foundElements = 0;
 	for(i = 0; i<=sim->parts_lastActiveIndex; i++) {
-		if (sim->parts[i].type && sim->parts[i].type >= 0 && sim->parts[i].type < PT_NUM) {
+		if (sim->parts[i].type && sim->parts[i].type >= 0 && sim->parts[i].type < PT_NUM && sim->idpointer[i][2] <= 3) { // só desenha, se a particula tem profundidade menor que 3;
 			t = sim->parts[i].type;
 
 			nx = (int)(sim->parts[i].x+0.5f);
@@ -1253,15 +1261,27 @@ void Renderer::render_parts()
 			//Defaults
 			pixel_mode = 0 | PMODE_FLAT;
 			cola = 255;
-			colr = PIXR(elements[t].Colour);
-			colg = PIXG(elements[t].Colour);
-			colb = PIXB(elements[t].Colour);
+
+			isvalid = parts[i].ctype;
+			isvalid = (isvalid >= 0 && isvalid < PT_NUM && elements[isvalid].Enabled);
+
+			if((t == PT_BRMT || t == PT_PLSM || t == PT_GASEOUS || t == PT_LIQUID)
+				&& isvalid && parts[i].ctype != PT_NONE){
+					colr = PIXR(elements[parts[i].ctype].Colour);
+					colg = PIXG(elements[parts[i].ctype].Colour);
+					colb = PIXB(elements[parts[i].ctype].Colour);
+			} else{
+				colr = PIXR(elements[t].Colour);
+				colg = PIXG(elements[t].Colour);
+				colb = PIXB(elements[t].Colour);
+			}
+
 			firer = fireg = fireb = firea = 0;
 
-			deca = (sim->parts[i].dcolour>>24)&0xFF;
-			decr = (sim->parts[i].dcolour>>16)&0xFF;
-			decg = (sim->parts[i].dcolour>>8)&0xFF;
-			decb = (sim->parts[i].dcolour)&0xFF;
+			deca = (sim->parts[i].dcolour >> 24) & 0xFF;
+			decr = (sim->parts[i].dcolour >> 16) & 0xFF;
+			decg = (sim->parts[i].dcolour >> 8) & 0xFF;
+			decb = (sim->parts[i].dcolour) & 0xFF;
 
 			if(decorations_enable && blackDecorations)
 			{
@@ -1360,15 +1380,16 @@ void Renderer::render_parts()
 					pixel_mode |= PMODE_BLOB;
 
 				pixel_mode &= render_mode;
-
+				/////
 				//Alter colour based on display mode
 				if(colour_mode & COLOUR_HEAT)
 				{
-					caddress = restrict_flt((int)( restrict_flt((float)(sim->parts[i].temp+(-MIN_TEMP)), 0.0f, MAX_TEMP+(-MIN_TEMP)) / ((MAX_TEMP+(-MIN_TEMP))/1024) ) *3, 0.0f, (1024.0f*3)-3);
+					//caddress = restrict_flt((int)( restrict_flt((float)(sim->parts[i].temp+(-MIN_TEMP)), 0.0f, MAX_TEMP+(-MIN_TEMP)) / ((MAX_TEMP+(-MIN_TEMP))/1024) ) *3, 0.0f, (1024.0f*3)-3);
+					caddress = restrict_flt((2.5466622703f*invlnb*log(1.f + restrict_flt(sim->parts[i].temp, 0.f, MAX_TEMP) * 0.00090909090909f)), 0.0f, a); // escala logaritmica
 					firea = 255;
-					firer = colr = color_data[caddress];
-					fireg = colg = color_data[caddress+1];
-					fireb = colb = color_data[caddress+2];
+					firer = colr = heatcolor[caddress][0];
+					fireg = colg = heatcolor[caddress][1];
+					fireb = colb = heatcolor[caddress][2];
 					cola = 255;
 					if(pixel_mode & (FIREMODE | PMODE_GLOW))
 						pixel_mode = (pixel_mode & ~(FIREMODE|PMODE_GLOW)) | PMODE_BLUR;
@@ -2026,7 +2047,7 @@ void Renderer::render_parts()
 							type = PT_PRTI;
 						for (int z = 0; z <= sim->parts_lastActiveIndex; z++)
 						{
-							if (parts[z].type == type)
+							if (parts[z].type == type && sim->idpointer[z][2] <= 3)
 							{
 								othertmp = (int)((parts[z].temp-73.15f)/100+1);
 								if (tmp == othertmp)
@@ -2370,7 +2391,16 @@ void Renderer::draw_air()
 	float (*hv)[XRES/CELL] = sim->air->hv;
 	float (*vx)[XRES/CELL] = sim->air->vx;
 	float (*vy)[XRES/CELL] = sim->air->vy;
+	float a = 1023, b = MAX_TEMP, invlnb = a*(1.f / log(b + 1.f));/// division and logarithm is expensive
 	pixel c = 0;
+	int heatcolor[1024][3];
+	for (int i = 0, s = 0; s < 1024 && i < 3071; i+=3){
+		heatcolor[s][0] = color_data[i];
+		heatcolor[s][1] = color_data[i+1];
+		heatcolor[s][2] = color_data[i+2];
+		s++;
+	}
+
 	for (y=0; y<YRES/CELL; y++)
 		for (x=0; x<XRES/CELL; x++)
 		{
@@ -2390,8 +2420,10 @@ void Renderer::draw_air()
 			else if (display_mode & DISPLAY_AIRH)
 			{
 				float ttemp = hv[y][x]+(-MIN_TEMP);
-				int caddress = restrict_flt((int)( restrict_flt(ttemp, 0.0f, MAX_TEMP+(-MIN_TEMP)) / ((MAX_TEMP+(-MIN_TEMP))/1024) ) *3, 0.0f, (1024.0f*3)-3);
-				c = PIXRGB((int)(color_data[caddress]*0.7f), (int)(color_data[caddress+1]*0.7f), (int)(color_data[caddress+2]*0.7f));
+				int caddress = restrict_flt((2.5466622703f*invlnb*log(1.f+ restrict_flt(ttemp, 0.f, MAX_TEMP)*0.00090909090909f)), 0.0f, a);
+				c = PIXRGB((int)(heatcolor[caddress][0] * 0.7f), (int)(heatcolor[caddress][1] * 0.7f), (int)(heatcolor[caddress][2] * 0.7f));
+				//int caddress = restrict_flt((int)(restrict_flt(ttemp, 0.0f, MAX_TEMP + (-MIN_TEMP)) / ((MAX_TEMP + (-MIN_TEMP)) / 1024)) * 3, 0.0f, (1024.0f * 3) - 3);
+				//c = PIXRGB((int)(color_data[caddress]*0.7f), (int)(color_data[caddress+1]*0.7f), (int)(color_data[caddress+2]*0.7f)); //// lol
 				//c  = PIXRGB(clamp_flt(fabsf(vx[y][x]), 0.0f, 8.0f),//vx adds red
 				//	clamp_flt(hv[y][x], 0.0f, 1600.0f),//heat adds green
 				//	clamp_flt(fabsf(vy[y][x]), 0.0f, 8.0f));//vy adds blue

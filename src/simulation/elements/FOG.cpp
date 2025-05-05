@@ -30,7 +30,7 @@ Element_FOG::Element_FOG()
 	HeatConduct = 100;
 	Description = "Fog, created when an electric current is passed through RIME.";
 
-	Properties = TYPE_GAS|PROP_LIFE_DEC;
+	Properties = TYPE_GAS|PROP_LIFE_DEC | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_FOG::Element_FOG()
 	LowTemperatureTransition = NT;
 	HighTemperature = 373.15f;
 	HighTemperatureTransition = PT_WTRV;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_FOG::update;
 }

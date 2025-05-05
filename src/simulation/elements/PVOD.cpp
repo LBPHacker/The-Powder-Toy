@@ -40,6 +40,9 @@ Element_PVOD::Element_PVOD()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_PVOD::update;
 	Graphics = &Element_PVOD::graphics;

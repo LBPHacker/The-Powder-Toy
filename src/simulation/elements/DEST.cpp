@@ -40,6 +40,9 @@ Element_DEST::Element_DEST()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_DEST::update;
 	Graphics = &Element_DEST::graphics;

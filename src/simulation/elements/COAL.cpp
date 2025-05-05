@@ -31,7 +31,7 @@ Element_COAL::Element_COAL()
 	HeatConduct = 200;
 	Description = "Coal, Burns very slowly. Gets red when hot.";
 
-	Properties = TYPE_SOLID;
+	Properties = TYPE_SOLID | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -41,6 +41,9 @@ Element_COAL::Element_COAL()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = 4600.f;
+	GasTransition = PT_LAVA;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = &Element_COAL::update;
 	Graphics = &Element_COAL::graphics;
@@ -52,7 +55,7 @@ int Element_COAL::update(UPDATE_FUNC_ARGS)
 	if (parts[i].life<=0) {
 		sim->create_part(i, x, y, PT_FIRE);
 		return 1;
-	} else if (parts[i].life < 100) {
+	} else if (parts[i].life < 100 && parts[i].temp > 723.15f) {
 		parts[i].life--;
 		sim->create_part(-1, x + RNG::Ref().between(-1, 1), y + RNG::Ref().between(-1, 1), PT_FIRE);
 	}

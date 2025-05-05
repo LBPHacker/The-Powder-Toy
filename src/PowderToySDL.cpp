@@ -466,7 +466,7 @@ void EngineProcess()
 		}
 		int correctedFrameTime = SDL_GetTicks() - frameStart;
 		correctedFrameTimeAvg = correctedFrameTimeAvg * 0.95 + correctedFrameTime * 0.05;
-		if (frameStart - lastFpsUpdate > 200)
+		if (frameStart - lastFpsUpdate > 50)
 		{
 			engine->SetFps(1000.0 / correctedFrameTimeAvg);
 			lastFpsUpdate = frameStart;
@@ -520,6 +520,7 @@ void BlueScreen(String detailMessage)
 		while (SDL_PollEvent(&event))
 			if(event.type == SDL_QUIT)
 				exit(-1);
+		Sleep(16);
 #ifdef OGLI
 		blit();
 #else

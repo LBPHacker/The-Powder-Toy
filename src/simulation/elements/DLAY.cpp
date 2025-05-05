@@ -40,6 +40,9 @@ Element_DLAY::Element_DLAY()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_DLAY::update;
 	Graphics = &Element_DLAY::graphics;

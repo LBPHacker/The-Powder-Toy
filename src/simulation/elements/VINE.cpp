@@ -32,7 +32,7 @@ Element_VINE::Element_VINE()
 	HeatConduct = 65;
 	Description = "Vine, can grow along WOOD.";
 
-	Properties = TYPE_SOLID;
+	Properties = TYPE_SOLID | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -42,6 +42,9 @@ Element_VINE::Element_VINE()
 	LowTemperatureTransition = NT;
 	HighTemperature = 573.0f;
 	HighTemperatureTransition = PT_FIRE;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_VINE::update;
 }

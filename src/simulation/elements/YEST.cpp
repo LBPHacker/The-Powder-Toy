@@ -30,7 +30,7 @@ Element_YEST::Element_YEST()
 	HeatConduct = 70;
 	Description = "Yeast, grows when warm (~37C).";
 
-	Properties = TYPE_PART;
+	Properties = TYPE_PART | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_YEST::Element_YEST()
 	LowTemperatureTransition = NT;
 	HighTemperature = 373.0f;
 	HighTemperatureTransition = PT_DYST;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_YEST::update;
 }

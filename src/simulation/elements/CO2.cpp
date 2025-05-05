@@ -30,7 +30,7 @@ Element_CO2::Element_CO2()
 	HeatConduct = 88;
 	Description = "Carbon Dioxide. Heavy gas, drifts downwards. Carbonates water and turns to dry ice when cold.";
 
-	Properties = TYPE_GAS;
+	Properties = TYPE_GAS | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,12 @@ Element_CO2::Element_CO2()
 	LowTemperatureTransition = PT_DRIC;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = 9999.f;
+	//SolidLiquidlatent = 52.f;
+	LiquidGaslatent = 135.f;
+	GasPlsmlatent = 5000.f;
 
 	Update = &Element_CO2::update;
 }
@@ -86,7 +92,7 @@ int Element_CO2::update(UPDATE_FUNC_ARGS)
 					}
 				}
 			}
-	if (parts[i].temp > 9773.15 && sim->pv[y/CELL][x/CELL] > 200.0f)
+	if (parts[i].temp > 75273.15 && sim->pv[y/CELL][x/CELL] > 200.0f)
 	{
 		if (RNG::Ref().chance(1, 5))
 		{

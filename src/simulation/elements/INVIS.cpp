@@ -40,6 +40,9 @@ Element_INVIS::Element_INVIS()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_INVIS::update;
 	Graphics = &Element_INVIS::graphics;

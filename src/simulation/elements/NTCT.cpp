@@ -30,7 +30,7 @@ Element_NTCT::Element_NTCT()
 	HeatConduct = 251;
 	Description = "Semi-conductor. Only conducts electricity when hot. (More than 100C)";
 
-	Properties = TYPE_SOLID|PROP_CONDUCTS|PROP_LIFE_DEC;
+	Properties = TYPE_SOLID|PROP_CONDUCTS|PROP_LIFE_DEC | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,12 @@ Element_NTCT::Element_NTCT()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1687.0f;
 	HighTemperatureTransition = PT_LAVA;
+	GasTemperaturetransition = 3000.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
+	SolidLiquidlatent = 28.9f;
+	LiquidGaslatent = 634.3f;
+	GasPlsmlatent = 5000.f;
 
 	Update = &Element_NTCT::update;
 }

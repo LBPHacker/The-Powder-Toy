@@ -30,7 +30,7 @@ Element_WIFI::Element_WIFI()
 	HeatConduct = 0;
 	Description = "Wireless transmitter, transfers spark to any other wifi on the same temperature channel.";
 
-	Properties = TYPE_SOLID;
+	Properties = TYPE_SOLID | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_WIFI::Element_WIFI()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_WIFI::update;
 	Graphics = &Element_WIFI::graphics;

@@ -40,6 +40,9 @@ Element_GPMP::Element_GPMP()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_GPMP::update;
 	Graphics = &Element_GPMP::graphics;

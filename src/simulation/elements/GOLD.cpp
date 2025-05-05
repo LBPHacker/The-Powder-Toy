@@ -42,6 +42,12 @@ Element_GOLD::Element_GOLD()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1337.0f;
 	HighTemperatureTransition = PT_LAVA;
+	GasTemperaturetransition = 3000.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
+	SolidLiquidlatent = 6.3f;
+	LiquidGaslatent = 172.f;
+	GasPlsmlatent = 5000.f;
 
 	Update = &Element_GOLD::update;
 	Graphics = &Element_GOLD::graphics;

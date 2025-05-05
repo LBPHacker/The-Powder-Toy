@@ -31,7 +31,7 @@ Element_TUNG::Element_TUNG()
 	HeatConduct = 251;
 	Description = "Tungsten. Brittle metal with a very high melting point.";
 
-	Properties = TYPE_SOLID|PROP_CONDUCTS|PROP_LIFE_DEC;
+	Properties = TYPE_SOLID|PROP_CONDUCTS|PROP_LIFE_DEC | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -41,6 +41,12 @@ Element_TUNG::Element_TUNG()
 	LowTemperatureTransition = NT;
 	HighTemperature = 3695.0f;// TUNG melts in its update function instead of in the normal way, but store the threshold here so that it can be changed from Lua
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = 5828.15;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
+	SolidLiquidlatent = 18.4f;
+	LiquidGaslatent = 480.0f;
+	GasPlsmlatent = 5000.f;
 
 	Update = &Element_TUNG::update;
 	Graphics = &Element_TUNG::graphics;

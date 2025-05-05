@@ -40,6 +40,9 @@ Element_FIGH::Element_FIGH()
 	LowTemperatureTransition = NT;
 	HighTemperature = 620.0f;
 	HighTemperatureTransition = PT_FIRE;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_FIGH::update;
 	Graphics = &Element_STKM::graphics;

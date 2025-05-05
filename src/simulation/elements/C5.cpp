@@ -40,6 +40,9 @@ Element_C5::Element_C5()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_C5::update;
 	Graphics = &Element_C5::graphics;

@@ -30,7 +30,7 @@ Element_SAND::Element_SAND()
 	HeatConduct = 150;
 	Description = "Sand, Heavy particles. Melts into glass.";
 
-	Properties = TYPE_PART;
+	Properties = TYPE_PART | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_SAND::Element_SAND()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1973.0f;
 	HighTemperatureTransition = PT_LAVA;
+	GasTemperaturetransition = 3300.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = NULL;
 }

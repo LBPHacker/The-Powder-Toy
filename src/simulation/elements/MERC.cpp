@@ -40,6 +40,9 @@ Element_MERC::Element_MERC()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = &Element_MERC::update;
 }

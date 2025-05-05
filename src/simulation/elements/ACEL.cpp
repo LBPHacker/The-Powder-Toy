@@ -40,6 +40,9 @@ Element_ACEL::Element_ACEL()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_ACEL::update;
 	Graphics = &Element_ACEL::graphics;

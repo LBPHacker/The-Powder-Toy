@@ -40,6 +40,12 @@ Element_CRMC::Element_CRMC()
 	LowTemperatureTransition = NT;
 	HighTemperature = 2887.15f;
 	HighTemperatureTransition = ST;
+	GasTemperaturetransition = 5000.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
+	SolidLiquidlatent = 15.6f;
+	LiquidGaslatent = 420.f;
+	GasPlsmlatent = 5000.f;
 
 	Update = &Element_CRMC::update;
 	Graphics = &Element_CRMC::graphics;

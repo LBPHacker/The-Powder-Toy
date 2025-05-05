@@ -32,7 +32,7 @@ Element_CFLM::Element_CFLM()
 	HeatConduct = 88;
 	Description = "Sub-zero flame.";
 
-	Properties = TYPE_GAS|PROP_LIFE_DEC|PROP_LIFE_KILL;
+	Properties = TYPE_GAS|PROP_LIFE_DEC|PROP_LIFE_KILL | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -42,6 +42,9 @@ Element_CFLM::Element_CFLM()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 	Graphics = &Element_CFLM::graphics;

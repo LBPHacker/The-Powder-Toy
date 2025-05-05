@@ -40,6 +40,9 @@ Element_PCLN::Element_PCLN()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_PCLN::update;
 	Graphics = &Element_PCLN::graphics;

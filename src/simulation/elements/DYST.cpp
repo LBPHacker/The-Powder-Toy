@@ -40,6 +40,9 @@ Element_DYST::Element_DYST()
 	LowTemperatureTransition = NT;
 	HighTemperature = 473.0f;
 	HighTemperatureTransition = PT_DUST;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 }

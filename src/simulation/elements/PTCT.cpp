@@ -30,7 +30,7 @@ Element_PTCT::Element_PTCT()
 	HeatConduct = 251;
 	Description = "Semi-conductor. Only conducts electricity when cold. (Less than 100C)";
 
-	Properties = TYPE_SOLID|PROP_CONDUCTS|PROP_LIFE_DEC;
+	Properties = TYPE_SOLID|PROP_CONDUCTS|PROP_LIFE_DEC | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_PTCT::Element_PTCT()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1687.0f;
 	HighTemperatureTransition = PT_LAVA;
+	GasTemperaturetransition = 3000.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = &Element_PTCT::update;
 }

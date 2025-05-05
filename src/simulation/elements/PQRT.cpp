@@ -30,7 +30,7 @@ Element_PQRT::Element_PQRT()
 	HeatConduct = 3;
 	Description = "Powdered quartz, broken form of QRTZ.";
 
-	Properties = TYPE_PART| PROP_HOT_GLOW;
+	Properties = TYPE_PART| PROP_HOT_GLOW | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,12 @@ Element_PQRT::Element_PQRT()
 	LowTemperatureTransition = NT;
 	HighTemperature = 2573.15f;
 	HighTemperatureTransition = PT_LAVA;
+	GasTemperaturetransition = 5000.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
+	SolidLiquidlatent = 15.6f;
+	LiquidGaslatent = 420.f;
+	GasPlsmlatent = 5000.f;
 
 	Update = &Element_QRTZ::update;
 	Graphics = &Element_QRTZ::graphics;

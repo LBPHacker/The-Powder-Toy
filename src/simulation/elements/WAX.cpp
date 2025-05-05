@@ -30,7 +30,7 @@ Element_WAX::Element_WAX()
 	HeatConduct = 44;
 	Description = "Wax. Melts at moderately high temperatures.";
 
-	Properties = TYPE_SOLID;
+	Properties = TYPE_SOLID | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_WAX::Element_WAX()
 	LowTemperatureTransition = NT;
 	HighTemperature = 319.0f;
 	HighTemperatureTransition = PT_MWAX;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 }

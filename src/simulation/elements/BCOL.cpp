@@ -31,7 +31,7 @@ Element_BCOL::Element_BCOL()
 	HeatConduct = 150;
 	Description = "Broken Coal. Heavy particles, burns slowly.";
 
-	Properties = TYPE_PART;
+	Properties = TYPE_PART | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -41,6 +41,9 @@ Element_BCOL::Element_BCOL()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = &Element_COAL::update;
 	Graphics = &Element_COAL::graphics;

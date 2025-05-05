@@ -40,6 +40,9 @@ Element_LNTG::Element_LNTG()
 	LowTemperatureTransition = PT_NICE;
 	HighTemperature = 77.0f;
 	HighTemperatureTransition = PT_NONE;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 }

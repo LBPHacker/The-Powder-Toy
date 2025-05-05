@@ -40,6 +40,9 @@ Element_STKM::Element_STKM()
 	LowTemperatureTransition = NT;
 	HighTemperature = 620.0f;
 	HighTemperatureTransition = PT_FIRE;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_STKM::update;
 	Graphics = &Element_STKM::graphics;

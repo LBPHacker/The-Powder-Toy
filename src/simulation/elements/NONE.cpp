@@ -40,6 +40,9 @@ Element_NONE::Element_NONE()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 	IconGenerator = &Element_NONE::iconGen;

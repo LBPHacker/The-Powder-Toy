@@ -30,7 +30,7 @@ Element_GLOW::Element_GLOW()
 	HeatConduct = 44;
 	Description = "Glow, Glows under pressure.";
 
-	Properties = TYPE_LIQUID | PROP_LIFE_DEC;
+	Properties = TYPE_LIQUID | PROP_LIFE_DEC | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_GLOW::Element_GLOW()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_GLOW::update;
 	Graphics = &Element_GLOW::graphics;

@@ -40,6 +40,9 @@ Element_TRON::Element_TRON()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_TRON::update;
 	Graphics = &Element_TRON::graphics;

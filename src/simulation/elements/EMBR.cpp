@@ -40,6 +40,9 @@ Element_EMBR::Element_EMBR()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_EMBR::update;
 	Graphics = &Element_EMBR::graphics;

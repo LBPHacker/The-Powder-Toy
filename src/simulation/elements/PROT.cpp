@@ -9,7 +9,7 @@ Element_PROT::Element_PROT()
 	MenuSection = SC_NUCLEAR;
 	Enabled = 1;
 
-	Advection = 0.0f;
+	Advection = 0.02f;
 	AirDrag = 0.00f * CFDS;
 	AirLoss = 1.00f;
 	Loss = 1.00f;
@@ -28,7 +28,7 @@ Element_PROT::Element_PROT()
 
 	Temperature = R_TEMP+273.15f;
 	HeatConduct = 61;
-	Description = "Protons. Transfer heat to materials, and removes sparks.";
+	Description = "Protons. Positively charged, remove sparks.";
 
 	Properties = TYPE_ENERGY;
 
@@ -40,6 +40,9 @@ Element_PROT::Element_PROT()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_PROT::update;
 	Graphics = &Element_PROT::graphics;
@@ -48,75 +51,84 @@ Element_PROT::Element_PROT()
 //#TPT-Directive ElementHeader Element_PROT static int update(UPDATE_FUNC_ARGS)
 int Element_PROT::update(UPDATE_FUNC_ARGS)
 {
-	sim->pv[y/CELL][x/CELL] -= .003f;
-	int under = pmap[y][x];
-	int utype = TYP(under);
-	int uID = ID(under);
-	switch (utype)
-	{
-	case PT_SPRK:
-	{
-		//remove active sparks
-		int sparked = parts[uID].ctype;
-		if (!sim->part_change_type(uID, x, y, sparked))
-		{
-			parts[uID].life = 44 + parts[uID].life;
-			parts[uID].ctype = 0;
+	int under, rx, ry, utype, uID;
+	//sim->pv[y/CELL][x/CELL] -= .003f;
+
+	for (rx = -1; rx < 2; rx++) {
+		for (ry = -1; ry < 2; ry++) {
+			if (BOUNDS_CHECK)
+			{
+				under = pmap[y + rx][x + ry];
+				utype = TYP(under);
+				uID = ID(under);
+				switch (utype)
+				{
+				case PT_SPRK:
+				{
+					//remove active sparks
+					int sparked = parts[uID].ctype;
+					if (!sim->part_change_type(uID, x, y, sparked))
+					{
+						parts[uID].life = 44 + parts[uID].life;
+						parts[uID].ctype = 0;
+					}
+					else
+						utype = 0;
+					break;
+				}
+				case PT_DEUT:
+					if (RNG::Ref().chance(1 + (parts[uID].life / 100), 1000))
+					{
+						DeutImplosion(sim, parts[uID].life, x + rx, y + ry, restrict_flt(parts[uID].temp + parts[uID].life * 500, MIN_TEMP, MAX_TEMP), PT_PROT);
+						sim->kill_part(uID);
+					}
+					break;
+				case PT_LCRY:
+					//Powered LCRY reaction: PROT->PHOT
+					if (parts[uID].life > 5 && RNG::Ref().chance(1, 10))
+					{
+						sim->part_change_type(i, x, y, PT_PHOT);
+						parts[i].life *= 2;
+						parts[i].ctype = 0x3FFFFFFF;
+					}
+					break;
+				case PT_EXOT:
+					parts[uID].ctype = PT_PROT;
+					break;
+				case PT_WIFI:
+					float change;
+					if (parts[i].temp < 173.15f) change = -1000.0f;
+					else if (parts[i].temp < 273.15f) change = -100.0f;
+					else if (parts[i].temp > 473.15f) change = 1000.0f;
+					else if (parts[i].temp > 373.15f) change = 100.0f;
+					else change = 0.0f;
+					parts[uID].temp = restrict_flt(parts[uID].temp + change, MIN_TEMP, MAX_TEMP);
+					break;
+				case PT_NONE:
+					//slowly kill if it's not inside an element
+					if (parts[i].life)
+					{
+						if (!--parts[i].life)
+							sim->kill_part(i);
+					}
+					break;
+				default:
+					//set off explosives (only when hot because it wasn't as fun when it made an entire save explode)
+					if (parts[i].temp > 273.15f + 500.0f && (sim->elements[utype].Flammable || sim->elements[utype].Explosive || utype == PT_BANG))
+					{
+						sim->create_part(uID, x, y, PT_FIRE);
+						parts[uID].temp += restrict_flt(sim->elements[utype].Flammable * 5, MIN_TEMP, MAX_TEMP);
+						sim->pv[y / CELL][x / CELL] += 1.00f;
+					}
+					//prevent inactive sparkable elements from being sparked
+					else if ((sim->elements[utype].Properties&PROP_CONDUCTS) && parts[uID].life <= 4)
+					{
+						parts[uID].life = 40 + parts[uID].life;
+					}
+					break;
+				}
+			}
 		}
-		else
-			utype = 0;
-		break;
-	}
-	case PT_DEUT:
-		if (RNG::Ref().chance(-((int)sim->pv[y / CELL][x / CELL] - 4) + (parts[uID].life / 100), 200))
-		{
-			DeutImplosion(sim, parts[uID].life, x, y, restrict_flt(parts[uID].temp + parts[uID].life * 500, MIN_TEMP, MAX_TEMP), PT_PROT);
-			sim->kill_part(uID);
-		}
-		break;
-	case PT_LCRY:
-		//Powered LCRY reaction: PROT->PHOT
-		if (parts[uID].life > 5 && RNG::Ref().chance(1, 10))
-		{
-			sim->part_change_type(i, x, y, PT_PHOT);
-			parts[i].life *= 2;
-			parts[i].ctype = 0x3FFFFFFF;
-		}
-		break;
-	case PT_EXOT:
-		parts[uID].ctype = PT_PROT;
-		break;
-	case PT_WIFI:
-		float change;
-		if (parts[i].temp < 173.15f) change = -1000.0f;
-		else if (parts[i].temp < 273.15f) change = -100.0f;
-		else if (parts[i].temp > 473.15f) change = 1000.0f;
-		else if (parts[i].temp > 373.15f) change = 100.0f;
-		else change = 0.0f;
-		parts[uID].temp = restrict_flt(parts[uID].temp + change, MIN_TEMP, MAX_TEMP);
-		break;
-	case PT_NONE:
-		//slowly kill if it's not inside an element
-		if (parts[i].life)
-		{
-			if (!--parts[i].life)
-				sim->kill_part(i);
-		}
-		break;
-	default:
-		//set off explosives (only when hot because it wasn't as fun when it made an entire save explode)
-		if (parts[i].temp > 273.15f + 500.0f && (sim->elements[utype].Flammable || sim->elements[utype].Explosive || utype == PT_BANG))
-		{
-			sim->create_part(uID, x, y, PT_FIRE);
-			parts[uID].temp += restrict_flt(sim->elements[utype].Flammable * 5, MIN_TEMP, MAX_TEMP);
-			sim->pv[y / CELL][x / CELL] += 1.00f;
-		}
-		//prevent inactive sparkable elements from being sparked
-		else if ((sim->elements[utype].Properties&PROP_CONDUCTS) && parts[uID].life <= 4)
-		{
-			parts[uID].life = 40 + parts[uID].life;
-		}
-		break;
 	}
 	//make temp of other things closer to it's own temperature. This will change temp of things that don't conduct, and won't change the PROT's temperature
 	if (utype && utype != PT_WIFI)

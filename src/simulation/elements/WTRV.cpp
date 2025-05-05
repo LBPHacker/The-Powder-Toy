@@ -30,7 +30,7 @@ Element_WTRV::Element_WTRV()
 	HeatConduct = 48;
 	Description = "Steam. Produced from hot water.";
 
-	Properties = TYPE_GAS;
+	Properties = TYPE_GAS | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,14 @@ Element_WTRV::Element_WTRV()
 	LowTemperatureTransition = ST;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = 9999.f;
+	SolidLiquidlatent = 52.f;
+	LiquidGaslatent = 350.f;
+	GasPlsmlatent = 5000.f;
+	Heatcapacity = 2.0f;
+	InvHeatcapacity = 1.0f;
 
 	Update = &Element_WTRV::update;
 }
@@ -62,8 +70,13 @@ int Element_WTRV::update(UPDATE_FUNC_ARGS)
 					parts[i].ctype = PT_WATR;
 				}
 			}
-	if(parts[i].temp>1273&&parts[i].ctype==PT_FIRE)
-		parts[i].temp-=parts[i].temp/1000;
+	if(parts[i].temp>1273&&parts[i].ctype==PT_FIRE){
+		parts[i].temp -= parts[i].temp/1000;
+	}
+	if(parts[i].temp > 4000){
+		parts[i].type = RNG::Ref().chance(1, 2) ? PT_H2 : PT_O2;
+		parts[i].ctype = PT_NONE;
+	}
 	return 0;
 }
 

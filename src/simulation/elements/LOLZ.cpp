@@ -40,6 +40,9 @@ Element_LOLZ::Element_LOLZ()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 }
 
 //#TPT-Directive ElementHeader Element_LOLZ static int RuleTable[9][9]

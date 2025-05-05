@@ -30,7 +30,7 @@ Element_STNE::Element_STNE()
 	HeatConduct = 150;
 	Description = "Heavy particles. Meltable.";
 
-	Properties = TYPE_PART;
+	Properties = TYPE_PART | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_STNE::Element_STNE()
 	LowTemperatureTransition = NT;
 	HighTemperature = 983.0f;
 	HighTemperatureTransition = PT_LAVA;
+	GasTemperaturetransition = 3000.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = NULL;
 }

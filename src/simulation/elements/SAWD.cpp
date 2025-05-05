@@ -30,7 +30,7 @@ Element_SAWD::Element_SAWD()
 	HeatConduct = 70;
 	Description = "Sawdust. Floats on water.";
 
-	Properties = TYPE_PART | PROP_NEUTPASS;
+	Properties = TYPE_PART | PROP_NEUTPASS | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_SAWD::Element_SAWD()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 	Graphics = NULL;

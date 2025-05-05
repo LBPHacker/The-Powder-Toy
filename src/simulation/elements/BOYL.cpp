@@ -30,7 +30,7 @@ Element_BOYL::Element_BOYL()
 	HeatConduct = 42;
 	Description = "Boyle, variable pressure gas. Expands when heated.";
 
-	Properties = TYPE_GAS;
+	Properties = TYPE_GAS | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_BOYL::Element_BOYL()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_BOYL::update;
 }

@@ -30,7 +30,7 @@ Element_CAUS::Element_CAUS()
 	HeatConduct = 70;
 	Description = "Caustic Gas, acts like ACID.";
 
-	Properties = TYPE_GAS|PROP_DEADLY;
+	Properties = TYPE_GAS|PROP_DEADLY | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_CAUS::Element_CAUS()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_CAUS::update;
 }

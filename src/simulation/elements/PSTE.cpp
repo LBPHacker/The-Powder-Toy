@@ -30,7 +30,7 @@ Element_PSTE::Element_PSTE()
 	HeatConduct = 29;
 	Description = "Colloid, Hardens under pressure.";
 
-	Properties = TYPE_LIQUID;
+	Properties = TYPE_LIQUID | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_PSTE::Element_PSTE()
 	LowTemperatureTransition = NT;
 	HighTemperature = 747.0f;
 	HighTemperatureTransition = PT_BRCK;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 }

@@ -9,12 +9,12 @@ Element_DSTW::Element_DSTW()
 	MenuSection = SC_LIQUID;
 	Enabled = 1;
 
-	Advection = 0.6f;
+	Advection = 0.1f;
 	AirDrag = 0.01f * CFDS;
 	AirLoss = 0.98f;
 	Loss = 0.95f;
 	Collision = 0.0f;
-	Gravity = 0.1f;
+	Gravity = 0.5f;
 	Diffusion = 0.00f;
 	HotAir = 0.000f	* CFDS;
 	Falldown = 2;
@@ -27,7 +27,7 @@ Element_DSTW::Element_DSTW()
 	Weight = 30;
 
 	Temperature = R_TEMP-2.0f	+273.15f;
-	HeatConduct = 23;
+	HeatConduct = 10;
 	Description = "Distilled water, does not conduct electricity.";
 
 	Properties = TYPE_LIQUID|PROP_NEUTPASS;
@@ -40,6 +40,14 @@ Element_DSTW::Element_DSTW()
 	LowTemperatureTransition = PT_ICEI;
 	HighTemperature = 373.0f;
 	HighTemperatureTransition = PT_WTRV;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
+	SolidLiquidlatent = 52.f;
+	LiquidGaslatent = 350.f;
+	GasPlsmlatent = 5000.f;
+	Heatcapacity = 4.2f;
+	InvHeatcapacity = 1.0f;
 
 	Update = &Element_DSTW::update;
 }

@@ -30,7 +30,7 @@ Element_VRSS::Element_VRSS()
 	HeatConduct = 251;
 	Description = "Solid Virus. Turns everything it touches into virus.";
 
-	Properties = TYPE_SOLID|PROP_DEADLY;
+	Properties = TYPE_SOLID|PROP_DEADLY | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_VRSS::Element_VRSS()
 	LowTemperatureTransition = NT;
 	HighTemperature = 305.0f;
 	HighTemperatureTransition = PT_VIRS;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_VIRS::update;
 	Graphics = &Element_VRSS::graphics;

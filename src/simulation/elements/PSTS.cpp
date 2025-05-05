@@ -30,7 +30,7 @@ Element_PSTS::Element_PSTS()
 	HeatConduct = 29;
 	Description = "Solid form of PSTE.";
 
-	Properties = TYPE_SOLID;
+	Properties = TYPE_SOLID | PROP_NEUTPASS;
 
 	LowPressure = 0.5f;
 	LowPressureTransition = PT_PSTE;
@@ -40,6 +40,9 @@ Element_PSTS::Element_PSTS()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 }

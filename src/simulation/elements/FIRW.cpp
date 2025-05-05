@@ -41,6 +41,9 @@ Element_FIRW::Element_FIRW()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_FIRW::update;
 	Graphics = &Element_FIRW::graphics;

@@ -40,6 +40,14 @@ Element_ICEI::Element_ICEI()
 	LowTemperatureTransition = NT;
 	HighTemperature = 252.05f;
 	HighTemperatureTransition = ST;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
+	SolidLiquidlatent = 52.f;
+	LiquidGaslatent = 350.f;
+	GasPlsmlatent = 5000.f;
+	Heatcapacity = 2.0f;
+	InvHeatcapacity = 0.5f;
 
 	Update = &Element_ICEI::update;
 }

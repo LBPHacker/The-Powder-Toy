@@ -42,6 +42,9 @@ Element_WOOD::Element_WOOD()
 	LowTemperatureTransition = NT;
 	HighTemperature = 873.0f;
 	HighTemperatureTransition = PT_FIRE;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_WOOD::update;
 	Graphics = &Element_WOOD::graphics;

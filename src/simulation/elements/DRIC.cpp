@@ -30,7 +30,7 @@ Element_DRIC::Element_DRIC()
 	HeatConduct = 2;
 	Description = "Dry Ice, formed when CO2 is cooled.";
 
-	Properties = TYPE_SOLID;
+	Properties = TYPE_SOLID | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_DRIC::Element_DRIC()
 	LowTemperatureTransition = NT;
 	HighTemperature = 195.65f;
 	HighTemperatureTransition = PT_CO2;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 }

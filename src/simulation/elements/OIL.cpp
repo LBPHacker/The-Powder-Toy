@@ -40,6 +40,9 @@ Element_OIL::Element_OIL()
 	LowTemperatureTransition = NT;
 	HighTemperature = 333.0f;
 	HighTemperatureTransition = PT_GAS;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 }

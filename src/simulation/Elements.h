@@ -5,7 +5,7 @@
 //#include "Simulation.h"
 
 #define R_TEMP 22
-#define MAX_TEMP 9999
+#define MAX_TEMP 99999
 #define MIN_TEMP 0
 #define O_MAX_TEMP 3500
 #define O_MIN_TEMP -273
@@ -32,6 +32,38 @@
 #define PROP_NOAMBHEAT		0x40000  //2^18 Don't transfer or receive heat from ambient heat.
 #define PROP_DRAWONCTYPE	0x80000  //2^19 Set its ctype to another element if the element is drawn upon it (like what CLNE does)
 #define PROP_NOCTYPEDRAW	0x100000 // 2^20 When this element is drawn upon with, do not set ctype (like BCLN for CLNE)
+
+// filt tmp operations
+#define SET 0
+#define AND 1
+#define OR 2
+#define NAND 3
+#define RSHIFT 4
+#define BSHIFT 5
+#define UNABLE 6
+#define XOR 7
+#define NOT 8
+#define RANDOM 9
+#define VRSHIFT 10
+#define VBSHIFT 11
+#define INT_ADD 12
+#define INT_SUB 13
+#define INT_MUL 14
+#define INT_DIV 15
+#define INT_EXP 16
+#define INT_LOG 17
+#define FLOAT_ADD 18
+#define FLOAT_SUB 19
+#define FLOAT_MUL 20
+#define FLOAT_DIV 21
+#define FLOAT_EXP 22
+#define FLOAT_LOG 23
+#define FLOAT_POW 24
+#define FLOAT_COS 25
+#define FLOAT_SIN 26
+#define INT_SQRT 27
+#define FLOAT_SQRT 28
+
 
 #define FLAG_STAGNANT	0x1
 #define FLAG_SKIPMOVE  0x2 // skip movement for one frame, only implemented for PHOT

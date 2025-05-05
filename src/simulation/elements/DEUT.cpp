@@ -40,6 +40,9 @@ Element_DEUT::Element_DEUT()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_DEUT::update;
 	Graphics = &Element_DEUT::graphics;

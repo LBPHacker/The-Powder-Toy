@@ -40,6 +40,9 @@ Element_GRVT::Element_GRVT()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_GRVT::update;
 	Graphics = &Element_GRVT::graphics;

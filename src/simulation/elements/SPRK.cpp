@@ -31,7 +31,7 @@ Element_SPRK::Element_SPRK()
 	HeatConduct = 251;
 	Description = "Electricity. The basis of all electronics in TPT, travels along wires and other conductive elements.";
 
-	Properties = TYPE_SOLID|PROP_LIFE_DEC;
+	Properties = TYPE_SOLID|PROP_LIFE_DEC | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -41,6 +41,9 @@ Element_SPRK::Element_SPRK()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_SPRK::update;
 	Graphics = &Element_SPRK::graphics;

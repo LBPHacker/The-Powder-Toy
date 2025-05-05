@@ -30,7 +30,7 @@ Element_BRCK::Element_BRCK()
 	HeatConduct = 251;
 	Description = "Brick, breakable building material.";
 
-	Properties = TYPE_SOLID|PROP_HOT_GLOW;
+	Properties = TYPE_SOLID|PROP_HOT_GLOW | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_BRCK::Element_BRCK()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1223.0f;
 	HighTemperatureTransition = PT_LAVA;
+	GasTemperaturetransition = 3300.f;
+	GasTransition = PT_GASEOUS;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = NULL;
 	Graphics = &Element_BRCK::graphics;

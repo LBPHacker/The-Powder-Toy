@@ -40,6 +40,9 @@ Element_EXOT::Element_EXOT()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_EXOT::update;
 	Graphics = &Element_EXOT::graphics;

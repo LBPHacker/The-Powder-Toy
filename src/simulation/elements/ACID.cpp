@@ -41,6 +41,9 @@ Element_ACID::Element_ACID()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_ACID::update;
 	Graphics = &Element_ACID::graphics;

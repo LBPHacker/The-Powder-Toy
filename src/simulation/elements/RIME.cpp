@@ -30,7 +30,7 @@ Element_RIME::Element_RIME()
 	HeatConduct = 100;
 	Description = "Solid, created when steam cools rapidly and goes through sublimation.";
 
-	Properties = TYPE_SOLID;
+	Properties = TYPE_SOLID | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,14 @@ Element_RIME::Element_RIME()
 	LowTemperatureTransition = NT;
 	HighTemperature = 273.15f;
 	HighTemperatureTransition = PT_WATR;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
+	SolidLiquidlatent = 52.f;
+	LiquidGaslatent = 350.f;
+	GasPlsmlatent = 5000.f;
+	Heatcapacity = 2.0f;
+	InvHeatcapacity = 0.5f;
 
 	Update = &Element_RIME::update;
 }

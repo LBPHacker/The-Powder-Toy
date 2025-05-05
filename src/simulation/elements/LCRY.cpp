@@ -40,6 +40,9 @@ Element_LCRY::Element_LCRY()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1273.0f;
 	HighTemperatureTransition = PT_BGLA;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = 9999.f;
 
 	Update = &Element_LCRY::update;
 	Graphics = &Element_LCRY::graphics;

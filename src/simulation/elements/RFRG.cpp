@@ -16,7 +16,7 @@ Element_RFRG::Element_RFRG()
 	Collision = -0.1f;
 	Gravity = 0.0f;
 	Diffusion = 1.3f;
-	HotAir = 0.0001f * CFDS;
+	HotAir = 0.000f * CFDS;
 	Falldown = 0;
 
 	Flammable = 0;
@@ -30,7 +30,7 @@ Element_RFRG::Element_RFRG()
 	HeatConduct = 3;
 	Description = "Refrigerant. Heats up and liquefies under pressure.";
 
-	Properties = TYPE_GAS|PROP_DEADLY;
+	Properties = TYPE_GAS|PROP_DEADLY | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_RFRG::Element_RFRG()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_RFRG::update;
 }

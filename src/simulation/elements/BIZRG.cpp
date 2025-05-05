@@ -40,6 +40,9 @@ Element_BIZRG::Element_BIZRG()
 	LowTemperatureTransition = NT;
 	HighTemperature = 100.0f;
 	HighTemperatureTransition = PT_BIZR;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_BIZR::update;
 	Graphics = &Element_BIZR::graphics;

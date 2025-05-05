@@ -30,7 +30,7 @@ Element_NICE::Element_NICE()
 	HeatConduct = 46;
 	Description = "Nitrogen Ice. Very cold, will melt into LN2 when heated only slightly.";
 
-	Properties = TYPE_SOLID;
+	Properties = TYPE_SOLID | PROP_NEUTPASS;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -40,6 +40,9 @@ Element_NICE::Element_NICE()
 	LowTemperatureTransition = NT;
 	HighTemperature = 63.1f;
 	HighTemperatureTransition = PT_LNTG;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = NULL;
 }

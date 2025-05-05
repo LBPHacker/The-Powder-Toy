@@ -42,6 +42,9 @@ Element_GRAV::Element_GRAV()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_GRAV::update;
 	Graphics = &Element_GRAV::graphics;

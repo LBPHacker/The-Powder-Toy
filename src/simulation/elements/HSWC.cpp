@@ -40,6 +40,9 @@ Element_HSWC::Element_HSWC()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_HSWC::update;
 	Graphics = &Element_HSWC::graphics;

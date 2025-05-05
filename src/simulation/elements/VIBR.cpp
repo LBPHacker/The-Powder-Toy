@@ -40,6 +40,9 @@ Element_VIBR::Element_VIBR()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+	GasTemperaturetransition = ITH;
+	GasTransition = NT;
+	PlsmTemperaturetransition = -1;
 
 	Update = &Element_VIBR::update;
 	Graphics = &Element_VIBR::graphics;
