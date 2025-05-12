@@ -16,6 +16,7 @@
 #include "simulation/gravity/Gravity.h"
 #include "simulation/Snapshot.h"
 #include "simulation/ToolClasses.h"
+#include "ffisim_lua.h"
 #include <type_traits>
 
 static int ambientHeatSim(lua_State *L)
@@ -1956,7 +1957,7 @@ static int ensureDeterminism(lua_State *L)
 	return 1;
 }
 
-void LuaSimulation::Open(lua_State *L)
+void LuaSimulation::Open(lua_State *L, bool ffiSim)
 {
 	auto *lsi = GetLSI();
 	auto &sd = SimulationData::CRef();
@@ -2209,4 +2210,25 @@ void LuaSimulation::Open(lua_State *L)
 	lua_pushvalue(L, -1);
 	lua_setglobal(L, "simulation");
 	lua_setglobal(L, "sim");
+	if (ffiSim)
+	{
+		if (tpt_lua_loadstring(L, R"str(
+			local ffisim = assert(loadstring((...):gsub("sim%.([A-Z_][A-Z0-9_]*)", function(cap)
+				return sim[cap]
+			end), "@[patched built-in ffisim.lua]"))
+			ffisim(select(2, ...))
+		)str"))
+		{
+			throw std::runtime_error(ByteString("failed to load built-in ffisim patcher: ") + tpt_lua_toByteString(L, -1));
+		}
+		auto ffisimSpan = ffisim_lua.AsCharSpan();
+		lua_pushlstring(L, ffisimSpan.data(), ffisimSpan.size());
+		lua_pushlightuserdata(L, lsi->sim->parts.data.data());
+		lua_pushlightuserdata(L, &lsi->sim->pmap[0][0]);
+		lua_pushlightuserdata(L, &lsi->sim->photons[0][0]);
+		if (tpt_lua_pcall(L, 4, 0, 0, eventTraitNone))
+		{
+			throw std::runtime_error(ByteString("failed to run built-in ffisim patcher: ") + tpt_lua_toByteString(L, -1));
+		}
+	}
 }

@@ -280,7 +280,7 @@ namespace LuaRenderer
 
 namespace LuaSimulation
 {
-	void Open(lua_State *L);
+	void Open(lua_State *L, bool ffiSim);
 }
 
 namespace LuaSocket
