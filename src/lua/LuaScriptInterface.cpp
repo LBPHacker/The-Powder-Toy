@@ -126,6 +126,7 @@ LuaScriptInterface::LuaScriptInterface(GameController *newGameController, GameMo
 	gameControllerEventHandlers(std::variant_size_v<GameControllerEvent>)
 {
 	auto &prefs = GlobalPrefs::Ref();
+	auto ffiSim = prefs.Get("LuaFfiSim", false);
 	luaHookTimeout = prefs.Get("LuaHookTimeout", 3000);
 	for (auto moving = 0; moving < PT_NUM; ++moving)
 	{
@@ -153,7 +154,7 @@ LuaScriptInterface::LuaScriptInterface(GameController *newGameController, GameMo
 	LuaMisc::Open(L);
 	LuaPlatform::Open(L);
 	LuaRenderer::Open(L);
-	LuaSimulation::Open(L);
+	LuaSimulation::Open(L, ffiSim);
 	LuaSocket::Open(L);
 	LuaTools::Open(L);
 	{
