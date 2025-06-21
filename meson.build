@@ -203,7 +203,6 @@ fftw_dep = dependency('fftw3f', static: is_static)
 threads_dep = dependency('threads')
 if host_platform == 'emscripten'
 	app_exe_jssafe = app_exe.underscorify()
-	zlib_dep = []
 	png_dep = []
 	sdl2_dep = []
 	bzip2_dep = []
@@ -226,14 +225,13 @@ if host_platform == 'emscripten'
 		'-s', 'USE_BZIP2=1',
 		'-s', 'USE_LIBPNG',
 		'-s', 'USE_PTHREADS',
-		'-s', 'USE_ZLIB=1',
+#		'-s', 'USE_ZLIB=1',
 		'-s', 'DISABLE_EXCEPTION_CATCHING=0',
 		'-gsource-map',
 	]
 	project_link_args += emcc_args
 	project_cpp_args += emcc_args
 else
-	zlib_dep = dependency('zlib', static: is_static)
 	png_dep = dependency('libpng16', static: is_static)
 	sdl2_dep = dependency('sdl2', static: is_static)
 	bzip2_dep = dependency('bzip2', static: is_static)
@@ -492,7 +490,6 @@ foreach sta_info : [
 	[ 'common', common_files, [
 		host_platform == 'android' ? sdl2_dep : [],
 		png_dep,
-		zlib_dep,
 		bzip2_dep,
 	] ],
 	[ 'gui', gui_files, [
