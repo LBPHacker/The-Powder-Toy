@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-x86-windows-msvc-static-release-v20250622192228
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20250622192228/tpt-libs-prebuilt-x86-windows-msvc-static-release-v20250622192228.zip
+source_filename = tpt-libs-prebuilt-x86-windows-msvc-static-release-v20250622192228.zip
+source_hash = 71bb5288f7448b1f834d0c0eac85edbee9f04ebade05b218b32bc949ec6e13f9

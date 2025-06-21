@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-x86_64-darwin-macos-static-debug-v20250622192228
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20250622192228/tpt-libs-prebuilt-x86_64-darwin-macos-static-debug-v20250622192228.zip
+source_filename = tpt-libs-prebuilt-x86_64-darwin-macos-static-debug-v20250622192228.zip
+source_hash = 6bae67771561c77b40a893dd44b3a9089add8db0c56fe9b9e6b141cda095d7ff

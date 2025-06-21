@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-aarch64-windows-msvc-dynamic-debug-v20250622192228
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20250622192228/tpt-libs-prebuilt-aarch64-windows-msvc-dynamic-debug-v20250622192228.zip
+source_filename = tpt-libs-prebuilt-aarch64-windows-msvc-dynamic-debug-v20250622192228.zip
+source_hash = 92d93671b1bf38d16a68a7d5acb68df579256d4f9725fc7264aa236db9851cf6

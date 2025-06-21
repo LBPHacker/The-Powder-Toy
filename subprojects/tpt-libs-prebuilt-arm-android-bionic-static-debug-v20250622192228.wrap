@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-arm-android-bionic-static-debug-v20250622192228
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20250622192228/tpt-libs-prebuilt-arm-android-bionic-static-debug-v20250622192228.zip
+source_filename = tpt-libs-prebuilt-arm-android-bionic-static-debug-v20250622192228.zip
+source_hash = fd8d9f21c8b3968720be20ee3d05b4324ca4c29287ea22d8543667144e965639
