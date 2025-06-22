@@ -343,20 +343,13 @@ endif
 copied_dlls = []
 if host_platform == 'windows'
 	args_ccomp_win = []
-	defs_ccomp_win = []
-	defs_ccomp_win += [
+	defs_ccomp_win = [
 		'_WIN32_WINNT=0x0501',
 		'NOMINMAX',
 		'UNICODE',
 		'_UNICODE',
 	]
 	windows_mod = import('windows')
-	if is_static
-		defs_ccomp_win += [ 'CURL_STATICLIB' ]
-		if host_arch == 'x86_64'
-			defs_ccomp_win += [ 'ZLIB_WINAPI' ]
-		endif
-	endif
 	if tpt_libs_static == 'dynamic'
 		foreach input_output_condition : tpt_libs.get_variable('config_dlls')
 			dll_input = input_output_condition[0]
