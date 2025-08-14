@@ -2,10 +2,11 @@
 #include "graphics/Renderer.h"
 #include "simulation/SimulationData.h"
 #include "simulation/Simulation.h"
-#include "gui/game/GameView.h"
+#include "Powder/Activity/Game.hpp"
 
 std::unique_ptr<VideoBuffer> DecorationTool::GetIcon(int ToolID, Vec2<int> size)
 {
+	auto Colour = 0xFFFFFFFF_argb; // TODO-REDO_UI: get deco tool textures
 	auto texture = std::make_unique<VideoBuffer>(size);
 
 	if (ToolID == DECO_SMUDGE)
@@ -38,31 +39,39 @@ std::unique_ptr<VideoBuffer> DecorationTool::GetIcon(int ToolID, Vec2<int> size)
 
 void DecorationTool::Draw(Simulation * sim, Brush const &brush, ui::Point position)
 {
+	auto Colour = game.GetDecoColor();
 	sim->ApplyDecorationPoint(position.X, position.Y, Colour.Red, Colour.Green, Colour.Blue, Colour.Alpha, ToolID, brush);
 }
 
 void DecorationTool::DrawLine(Simulation * sim, Brush const &brush, ui::Point position1, ui::Point position2, bool dragging)
 {
+	auto Colour = game.GetDecoColor();
 	sim->ApplyDecorationLine(position1.X, position1.Y, position2.X, position2.Y, Colour.Red, Colour.Green, Colour.Blue, Colour.Alpha, ToolID, brush);
 }
 
 void DecorationTool::DrawRect(Simulation * sim, Brush const &brush, ui::Point position1, ui::Point position2)
 {
+	auto Colour = game.GetDecoColor();
 	sim->ApplyDecorationBox(position1.X, position1.Y, position2.X, position2.Y, Colour.Red, Colour.Green, Colour.Blue, Colour.Alpha, ToolID);
 }
 
 void DecorationTool::DrawFill(Simulation * sim, Brush const &brush, ui::Point position)
 {
-	auto &rendererFrame = gameView->GetRendererFrame();
+	auto &rendererFrame = game.GetRendererFrame();
 	if (!rendererFrame.Size().OriginRect().Contains(position))
 	{
 		return;
 	}
 	auto loc = RGB::Unpack(rendererFrame[position]);
 	if (ToolID == DECO_CLEAR)
+	{
 		// TODO: this is actually const-correct
 		sim->ApplyDecorationFill(rendererFrame, position.X, position.Y, 0, 0, 0, 0, loc.Red, loc.Green, loc.Blue);
+	}
 	else
+	{
+		auto Colour = game.GetDecoColor();
 		sim->ApplyDecorationFill(rendererFrame, position.X, position.Y, Colour.Red, Colour.Green, Colour.Blue, Colour.Alpha, loc.Red, loc.Green, loc.Blue);
+	}
 }
 

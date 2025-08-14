@@ -1296,73 +1296,73 @@ int HeatToColour(float temp, float hdispLimitMin, float hdispLimitMax)
 
 const std::vector<RenderPreset> Renderer::renderModePresets = {
 	{
-		"Alternative Velocity Display",
+		"Alternative Velocity Display", // TODO-REDO_UI-TRANSLATE
 		RENDER_EFFE | RENDER_BASC,
 		DISPLAY_AIRC,
 		0,
 	},
 	{
-		"Velocity Display",
+		"Velocity Display", // TODO-REDO_UI-TRANSLATE
 		RENDER_EFFE | RENDER_BASC,
 		DISPLAY_AIRV,
 		0,
 	},
 	{
-		"Pressure Display",
+		"Pressure Display", // TODO-REDO_UI-TRANSLATE
 		RENDER_EFFE | RENDER_BASC,
 		DISPLAY_AIRP,
 		0,
 	},
 	{
-		"Persistent Display",
+		"Persistent Display", // TODO-REDO_UI-TRANSLATE
 		RENDER_EFFE | RENDER_BASC,
 		DISPLAY_PERS,
 		0,
 	},
 	{
-		"Fire Display",
+		"Fire Display", // TODO-REDO_UI-TRANSLATE
 		RENDER_FIRE | RENDER_SPRK | RENDER_EFFE | RENDER_BASC,
 		0,
 		0,
 	},
 	{
-		"Blob Display",
+		"Blob Display", // TODO-REDO_UI-TRANSLATE
 		RENDER_FIRE | RENDER_SPRK | RENDER_EFFE | RENDER_BLOB,
 		0,
 		0,
 	},
 	{
-		"Heat Display",
+		"Heat Display", // TODO-REDO_UI-TRANSLATE
 		RENDER_BASC,
 		DISPLAY_AIRH,
 		COLOUR_HEAT,
 	},
 	{
-		"Fancy Display",
+		"Fancy Display", // TODO-REDO_UI-TRANSLATE
 		RENDER_FIRE | RENDER_SPRK | RENDER_GLOW | RENDER_BLUR | RENDER_EFFE | RENDER_BASC,
 		DISPLAY_WARP,
 		0,
 	},
 	{
-		"Nothing Display",
+		"Nothing Display", // TODO-REDO_UI-TRANSLATE
 		RENDER_BASC,
 		0,
 		0,
 	},
 	{
-		"Heat Gradient Display",
+		"Heat Gradient Display", // TODO-REDO_UI-TRANSLATE
 		RENDER_BASC,
 		0,
 		COLOUR_GRAD,
 	},
 	{
-		"Life Gradient Display",
+		"Life Gradient Display", // TODO-REDO_UI-TRANSLATE
 		RENDER_BASC,
 		0,
 		COLOUR_LIFE,
 	},
 	{
-		"Dynamic Heat Display",
+		"Dynamic Heat Display", // TODO-REDO_UI-TRANSLATE
 		RENDER_BASC,
 		DISPLAY_AIRH,
 		COLOUR_HEAT,

@@ -1,6 +1,7 @@
 #pragma once
-#include <variant>
+#include <stdexcept>
 #include <utility>
+#include <variant>
 
 // https://stackoverflow.com/a/52303671
 template<typename VariantType, typename T, std::size_t index = 0>
