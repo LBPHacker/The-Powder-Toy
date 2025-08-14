@@ -1,0 +1,18 @@
+powder_src += files(
+	'AddLife.cpp',
+	'Avatar.cpp',
+	'Browser.cpp',
+	'ColorPicker.cpp',
+	'ConfirmQuit.cpp',
+	'ElementSearch.cpp',
+	'Game.cpp',
+	'LocalBrowser.cpp',
+	'Login.cpp',
+	'OnlineBrowser.cpp',
+	'Preview.cpp',
+	'Profile.cpp',
+	'Property.cpp',
+	'Settings.cpp',
+	'Sign.cpp',
+	'Tags.cpp',
+)
