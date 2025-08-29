@@ -484,7 +484,10 @@ void GameController::CopyRegion(ui::Point point1, ui::Point point2)
 	{
 		Json::Value clipboardInfo;
 		clipboardInfo["type"] = "clipboard";
-		clipboardInfo["username"] = Client::Ref().GetAuthUser().Username;
+		if (auto user = Client::Ref().GetAuthUser())
+		{
+			clipboardInfo["username"] = user->Username;
+		}
 		clipboardInfo["date"] = (Json::Value::UInt64)time(nullptr);
 		Client::Ref().SaveAuthorInfo(&clipboardInfo);
 		newSave->authors = clipboardInfo;
@@ -1235,7 +1238,10 @@ void GameController::OpenLocalSaveWindow(bool asCurrent)
 		{
 			Json::Value localSaveInfo;
 			localSaveInfo["type"] = "localsave";
-			localSaveInfo["username"] = Client::Ref().GetAuthUser().Username;
+			if (auto user = Client::Ref().GetAuthUser())
+			{
+				localSaveInfo["username"] = user->Username;
+			}
 			localSaveInfo["title"] = gameModel->GetSaveFile()->GetName();
 			localSaveInfo["date"] = (Json::Value::UInt64)time(nullptr);
 			Client::Ref().SaveAuthorInfo(&localSaveInfo);
@@ -1318,9 +1324,10 @@ void GameController::OpenLogin()
 
 void GameController::OpenProfile()
 {
-	if(Client::Ref().GetAuthUser().UserID)
+	auto user = Client::Ref().GetAuthUser();
+	if (user)
 	{
-		new ProfileActivity(Client::Ref().GetAuthUser().Username);
+		new ProfileActivity(user->Username);
 	}
 	else
 	{
@@ -1412,7 +1419,8 @@ void GameController::OpenRenderOptions()
 
 void GameController::OpenSaveWindow()
 {
-	if(gameModel->GetUser().UserID)
+	auto user = gameModel->GetUser();
+	if (user)
 	{
 		Simulation * sim = gameModel->GetSimulation();
 		auto gameSave = sim->Save(gameModel->GetIncludePressure() != gameView->ShiftBehaviour(), RES.OriginRect());
@@ -1436,7 +1444,7 @@ void GameController::OpenSaveWindow()
 			}
 			else
 			{
-				auto tempSave = std::make_unique<SaveInfo>(0, 0, 0, 0, 0, gameModel->GetUser().Username, "");
+				auto tempSave = std::make_unique<SaveInfo>(0, 0, 0, 0, 0, user->Username, "");
 				tempSave->SetGameSave(std::move(gameSave));
 				new ServerSaveActivity(std::move(tempSave), [this](auto save) {
 					save->SetVote(1);
@@ -1454,7 +1462,8 @@ void GameController::OpenSaveWindow()
 
 void GameController::SaveAsCurrent()
 {
-	if(gameModel->GetSave() && gameModel->GetUser().UserID && gameModel->GetUser().Username == gameModel->GetSave()->GetUserName())
+	auto user = gameModel->GetUser();
+	if (gameModel->GetSave() && user && user->Username == gameModel->GetSave()->GetUserName())
 	{
 		Simulation * sim = gameModel->GetSimulation();
 		auto gameSave = sim->Save(gameModel->GetIncludePressure() != gameView->ShiftBehaviour(), RES.OriginRect());
@@ -1474,13 +1483,13 @@ void GameController::SaveAsCurrent()
 			}
 			else
 			{
-				auto tempSave = std::make_unique<SaveInfo>(0, 0, 0, 0, 0, gameModel->GetUser().Username, "");
+				auto tempSave = std::make_unique<SaveInfo>(0, 0, 0, 0, 0, user->Username, "");
 				tempSave->SetGameSave(std::move(gameSave));
 				new ServerSaveActivity(std::move(tempSave), true, [this](auto save) { LoadSave(std::move(save)); });
 			}
 		}
 	}
-	else if(gameModel->GetUser().UserID)
+	else if (user)
 	{
 		OpenSaveWindow();
 	}
@@ -1498,7 +1507,7 @@ void GameController::FrameStep()
 
 void GameController::Vote(int direction)
 {
-	if (gameModel->GetSave() && gameModel->GetUser().UserID && gameModel->GetSave()->GetID())
+	if (gameModel->GetSave() && gameModel->GetUser() && gameModel->GetSave()->GetID())
 	{
 		gameModel->SetVote(direction);
 	}
@@ -1572,7 +1581,7 @@ int GameController::Record(bool record)
 
 void GameController::NotifyAuthUserChanged(Client * sender)
 {
-	User newUser = sender->GetAuthUser();
+	auto newUser = sender->GetAuthUser();
 	gameModel->SetUser(newUser);
 }
 
