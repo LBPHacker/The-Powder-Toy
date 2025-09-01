@@ -87,6 +87,7 @@ if tpt_libs_static != 'none'
 		'x86_64-linux-gnu-static',
 		'aarch64-linux-gnu-static',
 		'x86_64-windows-mingw-static',
+		'x86-windows-mingw-static',
 		'x86_64-windows-msvc-static',
 		'x86_64-windows-msvc-dynamic',
 		'x86-windows-msvc-static',
