@@ -245,3 +245,5 @@ configure_file(
 	output: 'Config.h',
 	configuration: conf_data
 )
+
+subdir('Powder')
