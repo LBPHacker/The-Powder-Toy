@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-x86-windows-msvc-dynamic-debug-v20251019131007
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20251019131007/tpt-libs-prebuilt-x86-windows-msvc-dynamic-debug-v20251019131007.zip
+source_filename = tpt-libs-prebuilt-x86-windows-msvc-dynamic-debug-v20251019131007.zip
+source_hash = 38f9d67233df15be11bfbff160ff3acbc5b13c1584a7bc36fab53588ddaa315b

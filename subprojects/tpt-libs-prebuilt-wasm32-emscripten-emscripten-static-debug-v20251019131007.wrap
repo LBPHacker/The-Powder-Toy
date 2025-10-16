@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-wasm32-emscripten-emscripten-static-debug-v20251019131007
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20251019131007/tpt-libs-prebuilt-wasm32-emscripten-emscripten-static-debug-v20251019131007.zip
+source_filename = tpt-libs-prebuilt-wasm32-emscripten-emscripten-static-debug-v20251019131007.zip
+source_hash = a3c20a392d7d0197c90b17882ec54de10a48e4d1c46183f23f2d7d200d88f743
