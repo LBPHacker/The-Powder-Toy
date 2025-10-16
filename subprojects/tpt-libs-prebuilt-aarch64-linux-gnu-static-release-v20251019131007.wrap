@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-aarch64-linux-gnu-static-release-v20251019131007
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20251019131007/tpt-libs-prebuilt-aarch64-linux-gnu-static-release-v20251019131007.zip
+source_filename = tpt-libs-prebuilt-aarch64-linux-gnu-static-release-v20251019131007.zip
+source_hash = 76cb11f748a06ee3d919836baa3dbaa8cdf36e58a66674692a38997b298852dd

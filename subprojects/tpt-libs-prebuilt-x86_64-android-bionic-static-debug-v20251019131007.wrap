@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-x86_64-android-bionic-static-debug-v20251019131007
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20251019131007/tpt-libs-prebuilt-x86_64-android-bionic-static-debug-v20251019131007.zip
+source_filename = tpt-libs-prebuilt-x86_64-android-bionic-static-debug-v20251019131007.zip
+source_hash = f2acf1a1b7526108090f665a6c212289e3b02af558e793722193533ccd2f2520
