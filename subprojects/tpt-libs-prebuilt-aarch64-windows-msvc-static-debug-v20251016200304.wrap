@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-aarch64-windows-msvc-static-debug-v20251016200304
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20251016200304/tpt-libs-prebuilt-aarch64-windows-msvc-static-debug-v20251016200304.zip
+source_filename = tpt-libs-prebuilt-aarch64-windows-msvc-static-debug-v20251016200304.zip
+source_hash = 1a99855bfe088165567ae4c290f6a274a7cf0905a352d7a0c67afed2248ad263

@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-x86_64-linux-gnu-static-debug-v20251016200304
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20251016200304/tpt-libs-prebuilt-x86_64-linux-gnu-static-debug-v20251016200304.zip
+source_filename = tpt-libs-prebuilt-x86_64-linux-gnu-static-debug-v20251016200304.zip
+source_hash = b3aa2f8f4bbea369371945445e8a5999c4fdf17e29fe0c788b34853175e93506

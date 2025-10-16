@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-x86_old-windows-mingw-static-debug-v20251016200304
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20251016200304/tpt-libs-prebuilt-x86_old-windows-mingw-static-debug-v20251016200304.zip
+source_filename = tpt-libs-prebuilt-x86_old-windows-mingw-static-debug-v20251016200304.zip
+source_hash = ca0a7139bfda789449d2a5ca9d53d8fa3a8ce6b464cde7f927401d2320c4eeb3

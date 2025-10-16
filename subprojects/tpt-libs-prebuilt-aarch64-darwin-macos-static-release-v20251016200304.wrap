@@ -1,0 +1,6 @@
+[wrap-file]
+directory = tpt-libs-prebuilt-aarch64-darwin-macos-static-release-v20251016200304
+
+source_url = https://github.com/LBPHacker/tpt-libs/releases/download/v20251016200304/tpt-libs-prebuilt-aarch64-darwin-macos-static-release-v20251016200304.zip
+source_filename = tpt-libs-prebuilt-aarch64-darwin-macos-static-release-v20251016200304.zip
+source_hash = 0f1b1d11297e236980eaf6840e2bb3491d4a204279c6aaea5cf197d492ced2c3

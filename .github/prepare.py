@@ -145,6 +145,7 @@ for        arch,     platform,         libc,   statdyn, bplatform,         runso
 	(  'x86_64',    'windows',      'mingw',  'static', 'windows', 'windows-2022', '.exe',         'check',      None,         None,                     None,   'debug',        0, False ), # priority = 0: static debug build
 	(  'x86_64',    'windows',      'mingw',  'static', 'windows', 'windows-2022', '.exe',       'archive',    '.dbg',         None,                     None, 'release',       10, False ),
 	(     'x86',    'windows',      'mingw',  'static', 'windows', 'windows-2022', '.exe',       'archive',    '.dbg',         None,                     None, 'release',       10, False ), # windows xp
+	( 'x86_old',    'windows',      'mingw',  'static', 'windows', 'windows-2022', '.exe',       'archive',    '.dbg',         None,                     None, 'release',       10, False ), # windows xp, no sse
 	(  'x86_64',    'windows',      'mingw', 'dynamic', 'windows', 'windows-2022', '.exe',         'check',      None,         None,                     None,   'debug',       10, False ),
 	(  'x86_64',    'windows',      'mingw', 'dynamic', 'windows', 'windows-2022', '.exe',         'check',      None,         None,                     None, 'release',       10,  True ),
 	(  'x86_64',    'windows',       'msvc',  'static', 'windows', 'windows-2022', '.exe',         'check',      None,         None,                     None,   'debug',        0, False ), # priority = 0: static debug build
