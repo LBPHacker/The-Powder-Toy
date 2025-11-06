@@ -1,40 +1,15 @@
 #include "LuaScriptInterface.h"
-#include "client/http/requestmanager/CurlError.h"
+#include "LuaSocketTcpHttp.h"
 #include "client/http/requestmanager/RequestManager.h"
 #include "Misc.h"
-#include "common/String.h"
-#include <curl/curl.h>
-#include <vector>
 #include <stdexcept>
 #include <cstring>
 #include <stdint.h>
 #include <algorithm>
+#include <iostream>
 
 namespace LuaSocket
 {
-	enum Status
-	{
-		StatusReady,
-		StatusConnecting,
-		StatusConnected,
-		StatusDead,
-	};
-
-	struct TCPSocket
-	{
-		CURL *easy;
-		CURLM *multi;
-		char errorBuf[CURL_ERROR_SIZE];
-		Status status;
-		bool timeoutIndefinite;
-		bool blocking;
-		double timeout;
-		std::vector<char> recvBuf;
-		size_t stashedLen;
-		bool readClosed;
-		bool writeClosed;
-	};
-
 	static void Reset(TCPSocket *tcps)
 	{
 		using http::HandleCURLMcode;
@@ -421,15 +396,36 @@ namespace LuaSocket
 					//   CURLOPT_CONNECT_ONLY is 1 and there are no proxies involved. The
 					//   only ugly bit is that we have to prepend http:// or https:// to
 					//   the hostnames.
+					HandleCURLcode(curl_easy_setopt(tcps->easy, CURLOPT_PRIVATE, tcps));
 					HandleCURLcode(curl_easy_setopt(tcps->easy, CURLOPT_ERRORBUFFER, tcps->errorBuf));
 					HandleCURLcode(curl_easy_setopt(tcps->easy, CURLOPT_CONNECT_ONLY, 1L));
 					ByteString address = tpt_lua_checkByteString(L, 2);
 					HandleCURLcode(curl_easy_setopt(tcps->easy, CURLOPT_PORT, long(luaL_checkinteger(L, 3))));
 					HandleCURLcode(curl_easy_setopt(tcps->easy, CURLOPT_NOSIGNAL, 1L));
-					HandleCURLcode(curl_easy_setopt(tcps->easy, CURLOPT_SSL_ENABLE_ALPN, 0L));
 					HandleCURLcode(curl_easy_setopt(tcps->easy, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0));
+					bool allowAlpn = false;
 					if (lua_toboolean(L, 4))
 					{
+						if (!lua_isnoneornil(L, 5))
+						{
+							allowAlpn = true;
+							HandleCURLcode(curl_easy_setopt(tcps->easy, CURLOPT_SSL_CTX_FUNCTION, SetAlpn));
+							HandleCURLcode(curl_easy_setopt(tcps->easy, CURLOPT_SSL_CTX_DATA, tcps));
+							std::vector<ByteString> protos;
+							luaL_checktype(L, 5, LUA_TTABLE);
+							auto size = lua_objlen(L, 5);
+							for (auto i = 0U; i < size; ++i)
+							{
+								lua_rawgeti(L, 5, i + 1);
+								if (!lua_isstring(L, -1))
+								{
+									luaL_error(L, "alpn protocol %i is not a string", i + 1);
+								}
+								protos.push_back(tpt_lua_toByteString(L, -1));
+								lua_pop(L, 1);
+							}
+							tcps->alpnProtos = TCPSocket::AlpnProtos{ protos };
+						}
 #if defined(CURL_AT_LEAST_VERSION) && CURL_AT_LEAST_VERSION(7, 85, 0)
 						HandleCURLcode(curl_easy_setopt(tcps->easy, CURLOPT_PROTOCOLS_STR, "https"));
 						HandleCURLcode(curl_easy_setopt(tcps->easy, CURLOPT_REDIR_PROTOCOLS_STR, "https"));
@@ -450,6 +446,10 @@ namespace LuaSocket
 						HandleCURLcode(curl_easy_setopt(tcps->easy, CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTP));
 #endif
 						address = "http://" + address;
+					}
+					if (!allowAlpn)
+					{
+						HandleCURLcode(curl_easy_setopt(tcps->easy, CURLOPT_SSL_ENABLE_ALPN, 0L));
 					}
 					HandleCURLcode(curl_easy_setopt(tcps->easy, CURLOPT_URL, address.c_str()));
 				}

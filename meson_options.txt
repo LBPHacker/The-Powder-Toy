@@ -300,3 +300,10 @@ option(
 	value: false,
 	description: 'Run clang-tidy to lint programming issues'
 )
+option(
+	'alpn_backend',
+	type: 'combo',
+	choices: [ 'auto', 'none', 'mbedtls' ],
+	value: 'auto',
+	description: 'TLS backend to add ALPN configuration glue code for'
+)
