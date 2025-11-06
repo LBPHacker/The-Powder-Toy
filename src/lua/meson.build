@@ -35,11 +35,24 @@ else
 	luaconsole_files += files('LuaSocketDefault.cpp')
 endif
 if not enable_http
-	luaconsole_files += files('LuaSocketTCPNone.cpp')
+	luaconsole_files += files('LuaSocketTcpNone.cpp')
 elif host_platform == 'emscripten'
-	luaconsole_files += files('LuaSocketTCPWebsocket.cpp')
+	luaconsole_files += files('LuaSocketTcpWebsocket.cpp')
 else
-	luaconsole_files += files('LuaSocketTCPHttp.cpp')
+	luaconsole_files += files('LuaSocketTcpHttp.cpp')
+	alpn_backend = get_option('alpn_backend')
+	if alpn_backend == 'auto'
+		if static_variant == 'prebuilt' and host_platform != 'emscripten'
+			alpn_backend = 'mbedtls'
+		else
+			alpn_backend = 'none'
+		endif
+	endif
+	if alpn_backend == 'mbedtls'
+		luaconsole_files += files('LuaSocketAlpnMbedtls.cpp')
+	else
+		luaconsole_files += files('LuaSocketAlpnNone.cpp')
+	endif
 endif
 conf_data.set('LUACONSOLE', (lua_variant != 'none').to_string())
 
