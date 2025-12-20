@@ -158,6 +158,10 @@ void Air::update_airh(void)
 				dh += AIR_VADV*tx*ty*((bmap_blockairh[j+1][i+1]&0x8) ? odh : hv[j+1][i+1]);
 			}
 
+			// Don't update if the current cell blocks ambient heat
+			if (bmap_blockairh[y][x]&0x8)
+				dh = hv[y][x];
+
 			// Temp caps
 			if (dh > MAX_TEMP) dh = MAX_TEMP;
 			if (dh < MIN_TEMP) dh = MIN_TEMP;
