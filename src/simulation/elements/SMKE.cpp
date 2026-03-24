@@ -44,6 +44,8 @@ void Element::Element_SMKE()
 	HighTemperatureTransition = PT_FIRE;
 
 	Graphics = &graphics;
+
+	Neighborhood = 1;
 }
 
 static int graphics(GRAPHICS_FUNC_ARGS)

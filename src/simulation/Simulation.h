@@ -14,12 +14,21 @@
 #include "Element.h"
 #include "SimulationConfig.h"
 #include "SimulationSettings.h"
+#include "common/ThreadIndex.h"
+#include "common/ThreadPool.h"
+#include "Misc.h"
 #include <cstring>
 #include <cstddef>
 #include <vector>
 #include <array>
 #include <memory>
 #include <optional>
+
+constexpr int TILE = 16; // in cells
+constexpr Vec2<int> TILES = { ceilDiv(CELLS.X, TILE).first, ceilDiv(CELLS.Y, TILE).first };
+
+template<class Item>
+using TilePlane = PlaneAdapter<std::array<Item, TILES.X * TILES.Y>, TILES.X, TILES.Y>;
 
 constexpr int CHANNELS = int(MAX_TEMP - 73) / 100 + 2;
 
@@ -36,12 +45,22 @@ class GameSave;
 
 class Parts
 {
-	int pfree;
-
 public:
+	int pfree;
+	std::mutex pfreeMx;
+	int pfreeMxLockedTimes = 0;
+	int active;
+	alignas(64) bool useThreadLocal = false;
+
+	struct alignas(64) PfreeThreadLocal
+	{
+		int pfree;
+		int freeListLength;
+	};
+	alignas(64) std::vector<PfreeThreadLocal> pfreesThreadLocal;
+
 	std::array<Particle, NPART> data;
 	// initialized in clear_sim
-	int active;
 
 	operator const Particle *() const
 	{
@@ -78,11 +97,11 @@ public:
 
 	bool MaxPartsReached() const
 	{
-		return pfree == -1;
+		return false; // TODO-TILES
 	}
 };
 
-struct RenderableSimulation
+struct alignas(64) RenderableSimulation
 {
 	GravityInput gravIn;
 	GravityOutput gravOut; // invariant: when grav is empty, this is in its default-constructed state
@@ -96,30 +115,92 @@ struct RenderableSimulation
 	playerst player2;
 	playerst fighters[MAX_FIGHTERS]; //Defined in Stickman.h
 
-	float vx[YCELLS][XCELLS];
-	float vy[YCELLS][XCELLS];
-	float pv[YCELLS][XCELLS];
-	float hv[YCELLS][XCELLS];
+	alignas(64) float vx[YCELLS][XCELLSPERF];
+	alignas(64) float vy[YCELLS][XCELLSPERF];
+	alignas(64) float pv[YCELLS][XCELLSPERF];
+	alignas(64) float hv[YCELLS][XCELLSPERF];
 
-	unsigned char bmap[YCELLS][XCELLS];
-	unsigned char emap[YCELLS][XCELLS];
+	alignas(64) unsigned char bmap[YCELLS][XCELLSPERF];
+	alignas(64) unsigned char emap[YCELLS][XCELLSPERF];
 
 	Parts parts;
-	int pmap[YRES][XRES];
-	int photons[YRES][XRES];
+	alignas(64) int pmap[YRES][XRESPERF];
+	alignas(64) int photons[YRES][XRESPERF];
 
 	int aheat_enable = 0;
 
 	bool useLuaCallbacks = false;
 };
 
-class Simulation : public RenderableSimulation
+struct RNGMultiplexer
+{
+	RNG global;
+	struct alignas(64) ThreadRng
+	{
+		RNG inner;
+	};
+	alignas(64) std::vector<ThreadRng> threadLocal;
+
+	alignas(64) bool useThreadLocal = false;
+
+	RNG &Instance()
+	{
+		return useThreadLocal ? threadLocal[ThreadIndex()].inner : global;
+	}
+
+	const RNG &Instance() const
+	{
+		return useThreadLocal ? threadLocal[ThreadIndex()].inner : global;
+	}
+
+	unsigned int operator()()
+	{
+		return Instance()();
+	}
+
+	unsigned int gen()
+	{
+		return Instance().gen();
+	}
+
+	int between(int lower, int upper)
+	{
+		return Instance().between(lower, upper);
+	}
+
+	bool chance(int numerator, unsigned int denominator)
+	{
+		return Instance().chance(numerator, denominator);
+	}
+
+	float uniform01()
+	{
+		return Instance().uniform01();
+	}
+
+	void seed(unsigned int sd)
+	{
+		Instance().seed(sd);
+	}
+
+	void state(RNG::State ns)
+	{
+		Instance().state(ns);
+	}
+
+	RNG::State state() const
+	{
+		return Instance().state();
+	}
+};
+
+class alignas(64) Simulation : public RenderableSimulation
 {
 public:
-	GravityPtr grav;
-	std::unique_ptr<Air> air;
+	alignas(64) GravityPtr grav;
+	alignas(64) std::unique_ptr<Air> air;
 
-	RNG rng;
+	alignas(64) RNGMultiplexer rng;
 
 	int replaceModeSelected = 0;
 	int replaceModeFlags = 0;
@@ -148,7 +229,7 @@ public:
 	int Element_PSTN_tempParts[std::max(XRES, YRES)];
 	int Element_PPIP_ppip_changed;
 
-	unsigned int pmap_count[YRES][XRES];
+	alignas(64) unsigned int pmap_count[YRES][XRESPERF];
 
 	int edgeMode = EDGE_VOID;
 	int gravityMode = GRAV_VERTICAL;
@@ -217,6 +298,8 @@ public:
 	void set_emap(int x, int y);
 	int parts_avg(int ci, int ni, int t);
 	void UpdateParticles(int start, int end); // Dispatches an update to the range [start, end).
+	double updateParticlesParallelTime = 0.0;
+	double updateParticlesSerialTime = 0.0;
 	void SimulateGoL();
 	void RecalcFreeParticles(bool do_life_dec);
 	void CheckStacking();
@@ -268,6 +351,12 @@ public:
 
 	void EnableNewtonianGravity(bool enable);
 
+	void SetTileThreadCount(int newThreadCount);
+	int GetTileThreadCount() const
+	{
+		return tileThreads.GetThreadCount();
+	}
+
 private:
 	CoordStack& getCoordStackSingleton();
 
@@ -286,4 +375,16 @@ private:
 	void MovementPhase(int i, Neighbourhood neighbourhood);
 	Neighbourhood GetNeighbourhood(int i) const;
 	bool TransitionPhase(int i, const Neighbourhood &neighbourhood);
+
+	struct alignas(64) TileInfo
+	{
+		std::vector<int> parts;
+		std::vector<int> partsDeferred;
+	};
+	alignas(64) TilePlane<TileInfo> tiles;
+	std::vector<int> partsDeferred;
+	void UpdateOne(int i);
+	bool EligibleForTiledUpdate(int i) const;
+
+	ThreadPool tileThreads;
 };

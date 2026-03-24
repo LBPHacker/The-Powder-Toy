@@ -52,6 +52,8 @@ void Element::Element_SOAP()
 	Update = &update;
 	Graphics = &graphics;
 	ChangeType = &changeType;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD;
 }
 
 static bool validIndex(int i)

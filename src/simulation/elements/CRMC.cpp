@@ -47,6 +47,8 @@ void Element::Element_CRMC()
 	Update = &update;
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = 5; // does something weird with neighbouring cells, see Simulation.cpp
 }
 
 static int update(UPDATE_FUNC_ARGS)

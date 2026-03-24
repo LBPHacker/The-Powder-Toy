@@ -42,4 +42,6 @@ void Element::Element_RFGL()
 	HighTemperatureTransition = NT;
 
 	Update = &Element_RFRG_update;
+
+	Neighborhood = Element_RFRG_neighborhood;
 }

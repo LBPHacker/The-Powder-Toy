@@ -47,6 +47,8 @@ void Element::Element_SLCN()
 	Update = &update;
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = 4;
 }
 
 static const RGB SLCN_COLOUR[16] = {

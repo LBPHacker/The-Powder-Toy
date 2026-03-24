@@ -41,6 +41,8 @@ void Element::Element_LOLZ()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+
+	Neighborhood = 1;
 }
 
 extern const int Element_LOLZ_RuleTable[9][9] =

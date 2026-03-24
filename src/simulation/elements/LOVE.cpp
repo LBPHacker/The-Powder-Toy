@@ -40,6 +40,8 @@ void Element::Element_LOVE()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+
+	Neighborhood = 1;
 }
 
 extern const int Element_LOVE_RuleTable[9][9] =

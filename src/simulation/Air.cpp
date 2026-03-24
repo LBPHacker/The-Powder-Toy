@@ -43,14 +43,14 @@ float Air::vorticity(const RenderableSimulation & sm, int y, int x)
 
 void Air::Clear()
 {
-	std::fill(&sim.pv[0][0], &sim.pv[0][0]+NCELL, edgePressure);
-	std::fill(&sim.vx[0][0], &sim.vx[0][0]+NCELL, edgeVelocityX);
-	std::fill(&sim.vy[0][0], &sim.vy[0][0]+NCELL, edgeVelocityY);
+	std::fill(&sim.pv[0][0], &sim.pv[0][0]+NCELLPERF, edgePressure);
+	std::fill(&sim.vx[0][0], &sim.vx[0][0]+NCELLPERF, edgeVelocityX);
+	std::fill(&sim.vy[0][0], &sim.vy[0][0]+NCELLPERF, edgeVelocityY);
 }
 
 void Air::ClearAirH()
 {
-	std::fill(&sim.hv[0][0], &sim.hv[0][0]+NCELL, ambientAirTemp);
+	std::fill(&sim.hv[0][0], &sim.hv[0][0]+NCELLPERF, ambientAirTemp);
 }
 
 // Used when updating temp or velocity from far away
@@ -545,14 +545,14 @@ Air::Air(Simulation & simulation):
 {
 	//Simulation should do this.
 	make_kernel();
-	std::fill(&bmap_blockair [0][0], &bmap_blockair [0][0] + NCELL, 0);
-	std::fill(&bmap_blockairh[0][0], &bmap_blockairh[0][0] + NCELL, 0);
-	std::fill(&sim.vx[0][0], &sim.vx[0][0] + NCELL, 0.0f);
-	std::fill(&ovx   [0][0], &ovx   [0][0] + NCELL, 0.0f);
-	std::fill(&sim.vy[0][0], &sim.vy[0][0] + NCELL, 0.0f);
-	std::fill(&ovy   [0][0], &ovy   [0][0] + NCELL, 0.0f);
-	std::fill(&sim.hv[0][0], &sim.hv[0][0] + NCELL, 0.0f);
-	std::fill(&ohv   [0][0], &ohv   [0][0] + NCELL, 0.0f);
-	std::fill(&sim.pv[0][0], &sim.pv[0][0] + NCELL, 0.0f);
-	std::fill(&opv   [0][0], &opv   [0][0] + NCELL, 0.0f);
+	std::fill(&bmap_blockair [0][0], &bmap_blockair [0][0] + NCELLPERF, 0);
+	std::fill(&bmap_blockairh[0][0], &bmap_blockairh[0][0] + NCELLPERF, 0);
+	std::fill(&sim.vx[0][0], &sim.vx[0][0] + NCELLPERF, 0.0f);
+	std::fill(&ovx   [0][0], &ovx   [0][0] + NCELLPERF, 0.0f);
+	std::fill(&sim.vy[0][0], &sim.vy[0][0] + NCELLPERF, 0.0f);
+	std::fill(&ovy   [0][0], &ovy   [0][0] + NCELLPERF, 0.0f);
+	std::fill(&sim.hv[0][0], &sim.hv[0][0] + NCELLPERF, 0.0f);
+	std::fill(&ohv   [0][0], &ohv   [0][0] + NCELLPERF, 0.0f);
+	std::fill(&sim.pv[0][0], &sim.pv[0][0] + NCELLPERF, 0.0f);
+	std::fill(&opv   [0][0], &opv   [0][0] + NCELLPERF, 0.0f);
 }

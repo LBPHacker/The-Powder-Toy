@@ -850,7 +850,7 @@ void GameModel::SaveToSimParameters(const GameSave &saveData)
 	}
 	else
 	{
-		sim->rng = RNG();
+		sim->rng.Instance() = RNG();
 	}
 	sim->ensureDeterminism = saveData.ensureDeterminism;
 }
@@ -1940,4 +1940,9 @@ void GameModel::BuildMenus()
 	notifyActiveMenuToolListChanged();
 	notifyActiveToolsChanged();
 	notifyLastToolChanged();
+}
+
+void GameModel::SetTileThreadCount(int newThreadCount)
+{
+	sim->SetTileThreadCount(newThreadCount);
 }

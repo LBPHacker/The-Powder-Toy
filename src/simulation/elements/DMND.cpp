@@ -39,4 +39,6 @@ void Element::Element_DMND()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+
+	Neighborhood = 1;
 }

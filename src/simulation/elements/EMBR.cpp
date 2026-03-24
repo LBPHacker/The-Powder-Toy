@@ -48,6 +48,8 @@ void Element::Element_EMBR()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

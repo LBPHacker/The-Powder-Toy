@@ -46,6 +46,8 @@ void Element::Element_DMG()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = 25;
 }
 
 static int update(UPDATE_FUNC_ARGS)

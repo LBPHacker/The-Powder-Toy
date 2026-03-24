@@ -40,4 +40,6 @@ void Element::Element_VOID()
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
 	CtypeDraw = &Element::basicCtypeDraw;
+
+	Neighborhood = 1;
 }

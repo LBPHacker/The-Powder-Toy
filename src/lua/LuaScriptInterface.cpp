@@ -29,7 +29,7 @@ static int mathRandom(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	// only thing that matters is that the rng not be sim->rng when !(eventTraits & eventTraitSimRng)
-	auto &rng = (lsi->eventTraits & eventTraitSimRng) ? lsi->sim->rng : interfaceRng;
+	auto &rng = (lsi->eventTraits & eventTraitSimRng) ? lsi->sim->rng.Instance() : interfaceRng;
 	int lower, upper;
 	switch (lua_gettop(L))
 	{

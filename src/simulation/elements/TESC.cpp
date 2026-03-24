@@ -43,6 +43,8 @@ void Element::Element_TESC()
 	HighTemperatureTransition = NT;
 
 	Create = &create;
+
+	Neighborhood = 1;
 }
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)

@@ -46,6 +46,8 @@ void Element::Element_GLOW()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

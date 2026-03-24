@@ -40,4 +40,6 @@ void Element::Element_WHOL()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+
+	Neighborhood = 1;
 }

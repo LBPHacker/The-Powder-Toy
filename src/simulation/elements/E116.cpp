@@ -39,4 +39,6 @@ void Element::Element_E116()
 	LowTemperatureTransition = NT;
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
+
+	Neighborhood = 1;
 }

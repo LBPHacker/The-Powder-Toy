@@ -47,6 +47,8 @@ void Element::Element_MORT()
 	DefaultProperties.vx = 2.0f;
 
 	Update = &update;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

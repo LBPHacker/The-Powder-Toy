@@ -39,4 +39,6 @@ void Element::Element_SALT()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1173.0f;
 	HighTemperatureTransition = PT_LAVA;
+
+	Neighborhood = 1;
 }

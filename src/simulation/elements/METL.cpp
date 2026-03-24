@@ -39,4 +39,6 @@ void Element::Element_METL()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1273.0f;
 	HighTemperatureTransition = PT_LAVA;
+
+	Neighborhood = 1;
 }

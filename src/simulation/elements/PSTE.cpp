@@ -40,4 +40,6 @@ void Element::Element_PSTE()
 	LowTemperatureTransition = NT;
 	HighTemperature = 747.0f;
 	HighTemperatureTransition = PT_BRCK;
+
+	Neighborhood = 1;
 }

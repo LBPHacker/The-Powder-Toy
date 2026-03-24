@@ -46,6 +46,8 @@ void Element::Element_QRTZ()
 	Update = &Element_QRTZ_update;
 	Graphics = &Element_QRTZ_graphics;
 	Create = &create;
+
+	Neighborhood = Element_QRTZ_neighborhood;
 }
 
 int Element_QRTZ_update(UPDATE_FUNC_ARGS)

@@ -45,6 +45,8 @@ void Element::Element_RPEL()
 
 	Update = &update;
 	CtypeDraw = &Element::basicCtypeDraw;
+
+	Neighborhood = 10;
 }
 
 static int update(UPDATE_FUNC_ARGS)

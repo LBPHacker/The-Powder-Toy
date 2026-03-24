@@ -48,6 +48,8 @@ void Element::Element_PUMP()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = 4;
 }
 
 static int update(UPDATE_FUNC_ARGS)

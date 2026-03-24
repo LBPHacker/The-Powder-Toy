@@ -43,6 +43,8 @@ void Element::Element_BMTL()
 	HighTemperatureTransition = PT_LAVA;
 
 	Update = &update;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

@@ -45,6 +45,8 @@ void Element::Element_SING()
 
 	Update = &update;
 	Create = &create;
+
+	Neighborhood = 4;
 }
 
 static int update(UPDATE_FUNC_ARGS)

@@ -47,6 +47,8 @@ void Element::Element_GOLD()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = 4;
 }
 
 static int update(UPDATE_FUNC_ARGS)

@@ -45,6 +45,8 @@ void Element::Element_CAUS()
 	DefaultProperties.life = 75;
 
 	Update = &update;
+
+	Neighborhood = 2;
 }
 
 static int update(UPDATE_FUNC_ARGS)

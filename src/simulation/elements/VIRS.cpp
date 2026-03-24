@@ -49,6 +49,8 @@ void Element::Element_VIRS()
 
 	Update = &Element_VIRS_update;
 	Graphics = &graphics;
+
+	Neighborhood = Element_VIRS_neighborhood;
 }
 
 int Element_VIRS_update(UPDATE_FUNC_ARGS)

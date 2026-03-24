@@ -48,6 +48,8 @@ void Element::Element_PLNT()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = 2;
 }
 
 // Fields used for tree growth (see also PLNT.h):

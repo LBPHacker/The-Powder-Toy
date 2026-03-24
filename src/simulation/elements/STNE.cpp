@@ -39,4 +39,6 @@ void Element::Element_STNE()
 	LowTemperatureTransition = NT;
 	HighTemperature = 983.0f;
 	HighTemperatureTransition = PT_LAVA;
+
+	Neighborhood = 1;
 }

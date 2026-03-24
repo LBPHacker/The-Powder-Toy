@@ -53,6 +53,8 @@ void Element::Element_PSTN()
 	Update = &update;
 	Graphics = &graphics;
 	CtypeDraw = &ctypeDraw;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD;
 }
 
 struct StackData

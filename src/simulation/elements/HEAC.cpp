@@ -45,6 +45,8 @@ void Element::Element_HEAC()
 	HighTemperatureTransition = NT;
 
 	Update = &update;
+
+	Neighborhood = 4;
 }
 
 // If this is used elsewhere (GOLD), it should be moved into Simulation.h

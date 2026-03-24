@@ -39,4 +39,6 @@ void Element::Element_DESL()
 	LowTemperatureTransition = NT;
 	HighTemperature = 335.0f;
 	HighTemperatureTransition = PT_FIRE;
+
+	Neighborhood = 1;
 }

@@ -47,6 +47,8 @@ void Element::Element_WARP()
 	Update = &update;
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

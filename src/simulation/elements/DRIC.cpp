@@ -40,4 +40,6 @@ void Element::Element_DRIC()
 	LowTemperatureTransition = NT;
 	HighTemperature = 195.65f;
 	HighTemperatureTransition = PT_CO2;
+
+	Neighborhood = 1;
 }

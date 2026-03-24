@@ -46,6 +46,8 @@ void Element::Element_THDR()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = 2;
 }
 
 static int update(UPDATE_FUNC_ARGS)

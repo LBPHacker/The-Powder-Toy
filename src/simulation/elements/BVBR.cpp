@@ -44,4 +44,6 @@ void Element::Element_BVBR()
 
 	Update = &Element_VIBR_update;
 	Graphics = &Element_VIBR_graphics;
+
+	Neighborhood = Element_VIBR_neighborhood;
 }

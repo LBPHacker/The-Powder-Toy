@@ -43,6 +43,8 @@ void Element::Element_FRME()
 	HighTemperatureTransition = NT;
 
 	Graphics = &graphics;
+
+	Neighborhood = 1;
 }
 
 static int graphics(GRAPHICS_FUNC_ARGS)

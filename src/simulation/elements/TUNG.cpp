@@ -48,6 +48,8 @@ void Element::Element_TUNG()
 	Update = &update;
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

@@ -49,6 +49,8 @@ void Element::Element_EXOT()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = 2;
 }
 
 static int update(UPDATE_FUNC_ARGS)

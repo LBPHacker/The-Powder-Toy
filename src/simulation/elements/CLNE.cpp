@@ -45,6 +45,8 @@ void Element::Element_CLNE()
 
 	Update = &update;
 	CtypeDraw = &Element::ctypeDrawVInTmp;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

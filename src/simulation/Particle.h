@@ -2,7 +2,7 @@
 #include "StructProperty.h"
 #include <vector>
 
-struct Particle
+struct alignas(64) Particle
 {
 	int type;
 	int life, ctype;

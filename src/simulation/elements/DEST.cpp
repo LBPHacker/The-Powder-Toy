@@ -45,6 +45,8 @@ void Element::Element_DEST()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = 2;
 }
 
 static int update(UPDATE_FUNC_ARGS)

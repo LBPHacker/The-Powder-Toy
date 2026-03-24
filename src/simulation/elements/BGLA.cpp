@@ -39,4 +39,6 @@ void Element::Element_BGLA()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1973.0f;
 	HighTemperatureTransition = PT_LAVA;
+
+	Neighborhood = 1;
 }
