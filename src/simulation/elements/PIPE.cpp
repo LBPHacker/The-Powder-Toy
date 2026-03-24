@@ -52,6 +52,8 @@ void Element::Element_PIPE()
 
 	Update = &Element_PIPE_update;
 	Graphics = &Element_PIPE_graphics;
+
+	Neighborhood = Element_PIPE_neighborhood;
 }
 
 constexpr int PPIP_TMPFLAG_REVERSED        = 0x01000000;

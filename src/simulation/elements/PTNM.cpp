@@ -46,6 +46,8 @@ void Element::Element_PTNM()
 	Update = &update;
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = 4;
 }
 
 static void wtrv_reactions(int wtrv1_id, UPDATE_FUNC_ARGS)

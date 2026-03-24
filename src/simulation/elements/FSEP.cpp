@@ -45,6 +45,8 @@ void Element::Element_FSEP()
 	DefaultProperties.life = 50;
 
 	Update = &update;
+
+	Neighborhood = 2;
 }
 
 static int update(UPDATE_FUNC_ARGS)

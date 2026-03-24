@@ -408,6 +408,20 @@ int Main(int argc, char *argv[])
 		}
 	}
 
+	int threads = 1;
+	auto threadsArg = arguments["threads"];
+	if (threadsArg.has_value())
+	{
+		try
+		{
+			threads = std::clamp(threadsArg.value().ToNumber<int>(), 1, 100);
+		}
+		catch (const std::runtime_error &e)
+		{
+			std::cerr << "failed to set threads: " << e.what() << std::endl;
+		}
+	}
+
 	auto clientConfig = [&prefs](Argument arg, ByteString name) {
 		if (!arg)
 		{
@@ -484,6 +498,7 @@ int Main(int argc, char *argv[])
 	auto *gameController = explicitSingletons->gameController.get();
 	engine.ShowWindow(gameController->GetView());
 	gameController->InitCommandInterface();
+	gameController->SetTileThreadCount(threads);
 
 	auto openArg = arguments["open"];
 	if (openArg.has_value())

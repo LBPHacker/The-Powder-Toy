@@ -44,6 +44,8 @@ void Element::Element_FRZZ()
 	HighTemperatureTransition = PT_FRZW;
 
 	Update = &update;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

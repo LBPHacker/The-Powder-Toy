@@ -40,4 +40,6 @@ void Element::Element_LRBD()
 	LowTemperatureTransition = PT_RBDM;
 	HighTemperature = 961.0f;
 	HighTemperatureTransition = PT_FIRE;
+
+	Neighborhood = 1;
 }

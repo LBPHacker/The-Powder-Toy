@@ -47,6 +47,8 @@ void Element::Element_COAL()
 
 	Update = &Element_COAL_update;
 	Graphics = &Element_COAL_graphics;
+
+	Neighborhood = Element_COAL_neighborhood;
 }
 
 int Element_COAL_update(UPDATE_FUNC_ARGS)

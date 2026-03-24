@@ -46,6 +46,8 @@ void Element::Element_LDTC()
 
 	Update = &update;
 	CtypeDraw = &Element::ctypeDrawVInCtype;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD; // TODO-TILES: this is a function of tmp2 and tmp
 }
 
 constexpr int FLAG_INVERT_FILTER =  0x1;

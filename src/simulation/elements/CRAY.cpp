@@ -48,6 +48,8 @@ void Element::Element_CRAY()
 
 	Update = &update;
 	CtypeDraw = &ctypeDraw;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD;
 }
 
 static int update(UPDATE_FUNC_ARGS)

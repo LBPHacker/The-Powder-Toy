@@ -44,6 +44,8 @@ void Element::Element_ISZS()
 	HighTemperatureTransition = PT_ISOZ;
 
 	Update = &update;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

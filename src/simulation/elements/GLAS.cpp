@@ -45,6 +45,8 @@ void Element::Element_GLAS()
 
 	Update = &update;
 	Create = &create;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

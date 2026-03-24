@@ -46,6 +46,8 @@ void Element::Element_PVOD()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = 2;
 }
 
 static int update(UPDATE_FUNC_ARGS)

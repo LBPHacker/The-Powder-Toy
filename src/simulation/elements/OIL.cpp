@@ -39,4 +39,6 @@ void Element::Element_OIL()
 	LowTemperatureTransition = NT;
 	HighTemperature = 333.0f;
 	HighTemperatureTransition = PT_GAS;
+
+	Neighborhood = 1;
 }

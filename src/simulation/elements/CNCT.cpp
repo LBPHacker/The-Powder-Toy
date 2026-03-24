@@ -39,4 +39,6 @@ void Element::Element_CNCT()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1123.0f;
 	HighTemperatureTransition = PT_LAVA;
+
+	Neighborhood = 1;
 }

@@ -40,4 +40,6 @@ void Element::Element_PSCN()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1687.0f;
 	HighTemperatureTransition = PT_LAVA;
+
+	Neighborhood = 1;
 }

@@ -46,6 +46,8 @@ void Element::Element_FRZW()
 	DefaultProperties.life = 100;
 
 	Update = &update;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

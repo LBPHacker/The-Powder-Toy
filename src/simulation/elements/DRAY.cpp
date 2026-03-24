@@ -46,6 +46,8 @@ void Element::Element_DRAY()
 	Update = &update;
 	Graphics = nullptr; // is this needed?
 	CtypeDraw = &Element::ctypeDrawVInCtype;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD;
 }
 
 static int update(UPDATE_FUNC_ARGS)

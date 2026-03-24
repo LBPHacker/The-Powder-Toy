@@ -44,6 +44,8 @@ void Element::Element_PSNS()
 	HighTemperatureTransition = NT;
 
 	Update = &update;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD; // TODO-TILES: this is only for tmp=1
 }
 
 static int update(UPDATE_FUNC_ARGS)

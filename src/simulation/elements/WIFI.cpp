@@ -45,6 +45,8 @@ void Element::Element_WIFI()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD;
 }
 
 static int update(UPDATE_FUNC_ARGS)

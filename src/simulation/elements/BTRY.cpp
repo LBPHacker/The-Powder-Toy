@@ -43,6 +43,8 @@ void Element::Element_BTRY()
 	HighTemperatureTransition = PT_PLSM;
 
 	Update = &update;
+
+	Neighborhood = 2;
 }
 
 static int update(UPDATE_FUNC_ARGS)

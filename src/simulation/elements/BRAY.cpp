@@ -45,6 +45,8 @@ void Element::Element_BRAY()
 	DefaultProperties.life = 30;
 
 	Graphics = &graphics;
+
+	Neighborhood = 1;
 }
 
 static int graphics(GRAPHICS_FUNC_ARGS)

@@ -51,6 +51,8 @@ void Element::Element_SPRK()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD;
 }
 
 static int update(UPDATE_FUNC_ARGS)

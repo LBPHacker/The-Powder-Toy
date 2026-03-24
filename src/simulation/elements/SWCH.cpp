@@ -45,6 +45,8 @@ void Element::Element_SWCH()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = 2;
 }
 
 static bool isRedBRAY(UPDATE_FUNC_ARGS, int xc, int yc)

@@ -50,6 +50,8 @@ void Element::Element_FIRE()
 	Update = &Element_FIRE_update;
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = Element_FIRE_neighborhood;
 }
 
 int Element_FIRE_update(UPDATE_FUNC_ARGS)

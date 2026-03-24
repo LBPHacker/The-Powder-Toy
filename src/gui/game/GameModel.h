@@ -347,4 +347,6 @@ public:
 	{
 		return !paused || queuedFrames;
 	}
+
+	void SetTileThreadCount(int newThreadCount);
 };

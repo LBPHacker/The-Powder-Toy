@@ -1760,3 +1760,8 @@ void GameController::SetToolIndex(ByteString identifier, std::optional<int> inde
 		commandInterface->SetToolIndex(identifier, index);
 	}
 }
+
+void GameController::SetTileThreadCount(int newThreadCount)
+{
+	gameModel->SetTileThreadCount(newThreadCount);
+}

@@ -49,6 +49,8 @@ void Element::Element_VRSG()
 
 	Update = &Element_VIRS_update;
 	Graphics = &graphics;
+
+	Neighborhood = Element_VIRS_neighborhood;
 }
 
 static int graphics(GRAPHICS_FUNC_ARGS)

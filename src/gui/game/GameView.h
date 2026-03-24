@@ -289,4 +289,7 @@ public:
 	{
 		return simFpsLimit;
 	}
+
+	double updateParticlesParallelTime = 0.0;
+	double updateParticlesSerialTime   = 0.0;
 };

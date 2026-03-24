@@ -50,6 +50,8 @@ void Element::Element_LIGH()
 	Update = &update;
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD;
 }
 
 constexpr float LIGHTING_POWER = 0.65f;

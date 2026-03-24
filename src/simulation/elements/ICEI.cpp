@@ -47,6 +47,8 @@ void Element::Element_ICEI()
 	DefaultProperties.ctype = PT_WATR;
 
 	Update = &update;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

@@ -45,6 +45,8 @@ void Element::Element_LITH()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = 3;
 }
 
 /*

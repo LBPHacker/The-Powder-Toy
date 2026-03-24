@@ -39,4 +39,6 @@ void Element::Element_INWR()
 	LowTemperatureTransition = NT;
 	HighTemperature = 1687.0f;
 	HighTemperatureTransition = PT_LAVA;
+
+	Neighborhood = 1;
 }

@@ -44,6 +44,8 @@ void Element::Element_GOO()
 	HighTemperatureTransition = NT;
 
 	Update = &update;
+
+	Neighborhood = 1;
 }
 
 constexpr float ADVECTION = 0.1f;

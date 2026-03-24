@@ -49,6 +49,8 @@ void Element::Element_SEED()
 	Update = &update;
 	Create = &create;
 	Graphics = &graphics;
+
+	Neighborhood = 1;
 }
 
 // Fields used (see also PLNT.cpp):

@@ -44,6 +44,8 @@ void Element::Element_BOYL()
 	HighTemperatureTransition = NT;
 
 	Update = &update;
+
+	Neighborhood = 4;
 }
 
 static int update(UPDATE_FUNC_ARGS)

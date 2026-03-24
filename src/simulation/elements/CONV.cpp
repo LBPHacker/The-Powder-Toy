@@ -45,6 +45,8 @@ void Element::Element_CONV()
 
 	Update = &update;
 	CtypeDraw = &Element::ctypeDrawVInCtype;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

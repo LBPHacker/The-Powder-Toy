@@ -15,12 +15,12 @@ public:
 	float edgeVelocityY;
 	float vorticityCoeff;
 	int convectionMode;
-	float ovx[YCELLS][XCELLS];
-	float ovy[YCELLS][XCELLS];
-	float opv[YCELLS][XCELLS];
-	float ohv[YCELLS][XCELLS]; // Ambient Heat
-	unsigned char bmap_blockair[YCELLS][XCELLS];
-	unsigned char bmap_blockairh[YCELLS][XCELLS];
+	float ovx[YCELLS][XCELLSPERF];
+	float ovy[YCELLS][XCELLSPERF];
+	float opv[YCELLS][XCELLSPERF];
+	float ohv[YCELLS][XCELLSPERF]; // Ambient Heat
+	unsigned char bmap_blockair[YCELLS][XCELLSPERF];
+	unsigned char bmap_blockairh[YCELLS][XCELLSPERF];
 	float kernel[9];
 	void make_kernel(void);
 	static float vorticity(const RenderableSimulation & sm, int y, int x);

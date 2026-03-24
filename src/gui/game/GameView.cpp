@@ -2542,6 +2542,11 @@ void GameView::OnDraw()
 		//FPS and some version info
 		StringBuilder fpsInfo;
 		fpsInfo << Format::Precision(2) << "FPS: " << ui::Engine::Ref().GetFps();
+		updateParticlesParallelTime += (sim->updateParticlesParallelTime - updateParticlesParallelTime) * 0.05;
+		updateParticlesSerialTime   += (sim->updateParticlesSerialTime   - updateParticlesSerialTime  ) * 0.05;
+		fpsInfo << ", PT: " << Format::Precision(2) << (                             updateParticlesParallelTime  / 1000.0) << "us";
+		fpsInfo << ", ST: " << Format::Precision(2) << ((updateParticlesSerialTime - updateParticlesParallelTime) / 1000.0) << "us";
+		fpsInfo << ", PFMXLT: " << sim->parts.pfreeMxLockedTimes;
 
 		if (showDebug)
 		{

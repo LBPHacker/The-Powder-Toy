@@ -47,6 +47,8 @@ void Element::Element_POLO()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = 1;
 }
 
 constexpr int COOLDOWN = 15;

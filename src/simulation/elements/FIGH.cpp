@@ -55,6 +55,8 @@ void Element::Element_FIGH()
 	Graphics = &Element_STKM_graphics;
 	CreateAllowed = &createAllowed;
 	ChangeType = &changeType;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD;
 }
 
 static int update(UPDATE_FUNC_ARGS)

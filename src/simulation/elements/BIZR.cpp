@@ -45,6 +45,8 @@ void Element::Element_BIZR()
 
 	Update = &Element_BIZR_update;
 	Graphics = &Element_BIZR_graphics;
+
+	Neighborhood = Element_BIZR_neighborhood;
 }
 
 constexpr float BLEND = 0.95f;

@@ -215,4 +215,6 @@ public:
 
 	void SetToolIndex(ByteString identifier, std::optional<int> index);
 	void InitCommandInterface();
+
+	void SetTileThreadCount(int newThreadCount);
 };

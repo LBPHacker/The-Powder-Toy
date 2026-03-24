@@ -39,4 +39,6 @@ void Element::Element_RBDM()
 	LowTemperatureTransition = NT;
 	HighTemperature = 312.0f;
 	HighTemperatureTransition = PT_LRBD;
+
+	Neighborhood = 1;
 }

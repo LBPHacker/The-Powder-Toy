@@ -44,6 +44,8 @@ void Element::Element_FWRK()
 	HighTemperatureTransition = NT;
 
 	Update = &update;
+
+	Neighborhood = 2;
 }
 
 static int update(UPDATE_FUNC_ARGS)
