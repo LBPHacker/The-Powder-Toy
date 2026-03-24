@@ -48,6 +48,8 @@ void Element::Element_PBCN()
 	Update = &update;
 	Graphics = &graphics;
 	CtypeDraw = &Element_PCLN_ctypeDraw;
+
+	Neighborhood = 2;
 }
 
 constexpr float ADVECTION = 0.1f;

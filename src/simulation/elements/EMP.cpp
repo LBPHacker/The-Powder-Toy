@@ -45,6 +45,8 @@ void Element::Element_EMP()
 	HighTemperatureTransition = NT;
 
 	Graphics = &graphics;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD;
 }
 
 class DeltaTempGenerator

@@ -40,4 +40,6 @@ void Element::Element_NICE()
 	LowTemperatureTransition = NT;
 	HighTemperature = 63.1f;
 	HighTemperatureTransition = PT_LNTG;
+
+	Neighborhood = 1;
 }

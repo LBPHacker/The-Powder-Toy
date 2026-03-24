@@ -44,6 +44,8 @@ void Element::Element_FRAY()
 	HighTemperatureTransition = NT;
 
 	Update = &update;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD;
 }
 
 static int update(UPDATE_FUNC_ARGS)

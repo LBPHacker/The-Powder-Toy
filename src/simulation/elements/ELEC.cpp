@@ -48,6 +48,8 @@ void Element::Element_ELEC()
 	Update = &update;
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = 3;
 }
 
 static int update(UPDATE_FUNC_ARGS)

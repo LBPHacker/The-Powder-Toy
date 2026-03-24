@@ -39,4 +39,6 @@ void Element::Element_GUNP()
 	LowTemperatureTransition = NT;
 	HighTemperature = 673.0f;
 	HighTemperatureTransition = PT_FIRE;
+
+	Neighborhood = 1;
 }

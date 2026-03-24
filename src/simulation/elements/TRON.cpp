@@ -51,6 +51,8 @@ void Element::Element_TRON()
 	Update = &update;
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = 1;
 }
 
 /* TRON element is meant to resemble a tron bike (or worm) moving around and trying to avoid obstacles itself.

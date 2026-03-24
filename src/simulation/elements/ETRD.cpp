@@ -45,6 +45,8 @@ void Element::Element_ETRD()
 	HighTemperatureTransition = NT;
 
 	ChangeType = &changeType;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD;
 }
 
 static void changeType(ELEMENT_CHANGETYPE_FUNC_ARGS)

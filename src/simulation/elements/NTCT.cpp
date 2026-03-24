@@ -42,6 +42,8 @@ void Element::Element_NTCT()
 	HighTemperatureTransition = PT_LAVA;
 
 	Update = &Element_NTCT_update;
+
+	Neighborhood = 1;
 }
 
 int Element_NTCT_update(UPDATE_FUNC_ARGS)

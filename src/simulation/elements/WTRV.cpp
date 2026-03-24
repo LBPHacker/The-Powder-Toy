@@ -44,6 +44,8 @@ void Element::Element_WTRV()
 	HighTemperatureTransition = NT;
 
 	Update = &update;
+
+	Neighborhood = 2; // see Element::legacyUpdate
 }
 
 static int update(UPDATE_FUNC_ARGS)

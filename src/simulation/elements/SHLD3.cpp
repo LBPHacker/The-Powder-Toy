@@ -43,6 +43,8 @@ void Element::Element_SHLD3()
 	HighTemperatureTransition = NT;
 
 	Update = &update;
+
+	Neighborhood = 2;
 }
 
 static int update(UPDATE_FUNC_ARGS)

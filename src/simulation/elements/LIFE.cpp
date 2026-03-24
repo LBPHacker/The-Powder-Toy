@@ -46,6 +46,8 @@ void Element::Element_LIFE()
 
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = 1;
 }
 
 static int graphics(GRAPHICS_FUNC_ARGS)

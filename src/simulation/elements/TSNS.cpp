@@ -45,6 +45,8 @@ void Element::Element_TSNS()
 	DefaultProperties.tmp2 = 2;
 
 	Update = &update;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD; // TODO-TILES: this is only for tmp=1
 }
 
 static int update(UPDATE_FUNC_ARGS)

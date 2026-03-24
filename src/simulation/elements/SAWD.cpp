@@ -41,4 +41,6 @@ void Element::Element_SAWD()
 	HighTemperatureTransition = NT;
 
 	Graphics = nullptr; // is this needed?
+
+	Neighborhood = 1;
 }

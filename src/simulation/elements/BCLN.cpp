@@ -45,6 +45,8 @@ void Element::Element_BCLN()
 
 	Update = &update;
 	CtypeDraw = &Element::ctypeDrawVInTmp;
+
+	Neighborhood = 1;
 }
 
 constexpr float ADVECTION = 0.1f;

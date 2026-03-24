@@ -46,6 +46,8 @@ void Element::Element_FUSE()
 	DefaultProperties.tmp = 50;
 
 	Update = &update;
+
+	Neighborhood = 2;
 }
 
 static int update(UPDATE_FUNC_ARGS)

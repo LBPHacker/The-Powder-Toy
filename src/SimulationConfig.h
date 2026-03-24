@@ -1,6 +1,7 @@
 #pragma once
+#include "common/Vec2.h"
+#include "common/RoundDiv.h"
 #include <cstdint>
-#include <common/Vec2.h>
 
 constexpr int MENUSIZE = 40;
 constexpr int BARSIZE  = 17;
@@ -18,6 +19,10 @@ constexpr int NCELL  = XCELLS * YCELLS;
 constexpr int XRES   = RES.X;
 constexpr int YRES   = RES.Y;
 constexpr int NPART  = XRES * YRES;
+
+constexpr auto XRES_ALIGNED   = ceilDiv(XRES  , 16).first * 16;
+constexpr auto XCELLS_ALIGNED = ceilDiv(XCELLS, 16).first * 16;
+constexpr auto NCELL_ALIGNED  = XCELLS_ALIGNED * YCELLS;
 
 constexpr int XCNTR = XRES / 2;
 constexpr int YCNTR = YRES / 2;

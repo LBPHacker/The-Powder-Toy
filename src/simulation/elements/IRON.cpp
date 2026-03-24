@@ -43,6 +43,8 @@ void Element::Element_IRON()
 	HighTemperatureTransition = PT_LAVA;
 
 	Update = &update;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

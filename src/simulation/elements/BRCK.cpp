@@ -43,6 +43,8 @@ void Element::Element_BRCK()
 	HighTemperatureTransition = PT_LAVA;
 
 	Graphics = &graphics;
+
+	Neighborhood = 1;
 }
 
 static int graphics(GRAPHICS_FUNC_ARGS)

@@ -47,6 +47,8 @@ void Element::Element_PRTO()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD;
 }
 
 /*these are the count values of where the particle gets stored, depending on where it came from

@@ -9,6 +9,7 @@
 #include "common/tpt-compat.h"
 #include "common/tpt-rand.h"
 #include "common/Defer.h"
+#include "common/Assert.h"
 #include "gui/game/Brush.h"
 #include "elements/EMP.h"
 #include "elements/LOLZ.h"
@@ -20,6 +21,7 @@
 #include <iostream>
 #include <set>
 #include <stack>
+#include <chrono>
 
 static float remainder_p(float x, float y)
 {
@@ -906,6 +908,12 @@ int Simulation::get_wavelength_bin(int *wm)
 
 void Simulation::set_emap(int x, int y)
 {
+	if (useThreadContext)
+	{
+		threadContexts[ThreadIndex()].emapActivation.push_back({ x, y });
+		return;
+	}
+
 	int x1, x2;
 
 	if (!is_wire_off(x, y))
@@ -1026,7 +1034,7 @@ void Simulation::clear_sim(void)
 	memset(&Element_LOVE_love, 0, sizeof(Element_LOVE_love));
 	memset(&Element_PSTN_tempParts, 0, sizeof(Element_PSTN_tempParts));
 	Element_PPIP_ppip_changed = 0;
-	std::fill(elementCount, elementCount+PT_NUM, 0);
+	std::fill(elementCount.begin(), elementCount.end(), 0);
 	elementRecount = true;
 	fighcount = 0;
 	player.spwn = 0;
@@ -1763,15 +1771,48 @@ void Simulation::kill_part(int i)//kills particle number i
 	if (t == PT_NONE)
 		return;
 
-	elementCount[t]--;
+
+	auto &elementCountRef = useThreadContext ? threadContexts[ThreadIndex()].elementCount : elementCount;
+	auto &numPartsRef = useThreadContext ? threadContexts[ThreadIndex()].NUM_PARTS : NUM_PARTS;
+
+	elementCountRef[t]--;
 
 	parts.Free(i);
-	NUM_PARTS -= 1;
+	numPartsRef -= 1;
 }
 
+constexpr int freeListTargetLength = 64;
 void Parts::Free(int i)
 {
 	data[i].type = PT_NONE;
+	auto *sim = static_cast<Simulation *>(ContainerOf<&RenderableSimulation::parts>(this));
+	if (sim->useThreadContext)
+	{
+		auto &threadContext = sim->threadContexts[ThreadIndex()];
+		if (threadContext.freeListLength >= 2 * freeListTargetLength)
+		{
+			auto oldHead = threadContext.pfree;
+			auto newHead = oldHead;
+			int toLink;
+			for (int j = 0; j < freeListTargetLength; ++j)
+			{
+				toLink = newHead;
+				newHead = data[newHead].life;
+			}
+			threadContext.pfree = newHead;
+			{
+				std::lock_guard lk(pfreeMx);
+				pfreeMxLockedTimes += 1;
+				data[toLink].life = pfree;
+				pfree = oldHead;
+			}
+			threadContext.freeListLength -= freeListTargetLength;
+		}
+		threadContext.freeListLength += 1;
+		data[i].life = threadContext.pfree;
+		threadContext.pfree = i;
+		return;
+	}
 	data[i].life = pfree;
 	pfree = i;
 }
@@ -1801,9 +1842,10 @@ bool Simulation::part_change_type(int i, int x, int y, int t)
 	if (elements[t].ChangeType)
 		(*(elements[t].ChangeType))(this, i, x, y, parts[i].type, t);
 
-	if (parts[i].type > 0 && parts[i].type < PT_NUM && elementCount[parts[i].type])
-		elementCount[parts[i].type]--;
-	elementCount[t]++;
+	auto &elementCountRef = useThreadContext ? threadContexts[ThreadIndex()].elementCount : elementCount;
+	if (parts[i].type > 0 && parts[i].type < PT_NUM && elementCountRef[parts[i].type])
+		elementCountRef[parts[i].type]--;
+	elementCountRef[t]++;
 
 	parts[i].type = t;
 	if (elements[t].Properties & TYPE_ENERGY)
@@ -1878,6 +1920,8 @@ int Simulation::create_part(int p, int x, int y, int t, int v)
 			return -1;
 	}
 
+
+	auto &elementCountRef = useThreadContext ? threadContexts[ThreadIndex()].elementCount : elementCount;
 	if (p == -1 || //creating from anything but brush
 	    p == -2 || //creating from brush
 	    p == -3) //skip pmap checks, e.g. for sing explosion
@@ -1898,7 +1942,8 @@ int Simulation::create_part(int p, int x, int y, int t, int v)
 		{
 			return -1;
 		}
-		NUM_PARTS += 1;
+		auto &numPartsRef = useThreadContext ? threadContexts[ThreadIndex()].NUM_PARTS : NUM_PARTS;
+		numPartsRef += 1;
 	}
 	else
 	{
@@ -1914,7 +1959,7 @@ int Simulation::create_part(int p, int x, int y, int t, int v)
 		if (elements[oldType].ChangeType)
 			(*(elements[oldType].ChangeType))(this, p, oldX, oldY, oldType, t);
 		if (oldType)
-			elementCount[oldType]--;
+			elementCountRef[oldType]--;
 
 		i = p;
 	}
@@ -1952,12 +1997,54 @@ int Simulation::create_part(int p, int x, int y, int t, int v)
 	if (elements[t].ChangeType)
 		(*(elements[t].ChangeType))(this, i, x, y, oldType, t);
 
-	elementCount[t]++;
+	elementCountRef[t]++;
 	return i;
 }
 
 int Parts::Alloc()
 {
+	auto *sim = static_cast<Simulation *>(ContainerOf<&RenderableSimulation::parts>(this));
+	if (sim->useThreadContext)
+	{
+		auto &threadContext = sim->threadContexts[ThreadIndex()];
+		if (threadContext.pfree == -1)
+		{
+			std::lock_guard lk(pfreeMx);
+			pfreeMxLockedTimes += 1;
+			// TODO: in theory this could be done with one traversal through the global free list and two relinks;
+			//       but I'm lazy and don't feel like wasting time debugging an inevitably buggy implementation
+			//       of this smarter method, so the dumber one has to suffice for now.
+			while (threadContext.freeListLength < freeListTargetLength)
+			{
+				if (pfree != -1)
+				{
+					auto oldPfree = pfree;
+					pfree = data[oldPfree].life;
+					data[oldPfree].life = threadContext.pfree;
+					threadContext.pfree = oldPfree;
+				}
+				else if (active < NPART)
+				{
+					data[active].life = threadContext.pfree;
+					threadContext.pfree = active;
+					active += 1;
+				}
+				else
+				{
+					break;
+				}
+				threadContext.freeListLength += 1;
+			}
+		}
+		if (threadContext.pfree != -1)
+		{
+			threadContext.freeListLength -= 1;
+			auto i = threadContext.pfree;
+			threadContext.pfree = data[i].life;
+			return i;
+		}
+		return -1;
+	}
 	if (pfree != -1)
 	{
 		auto i = pfree;
@@ -2248,140 +2335,132 @@ Simulation::Neighbourhood Simulation::GetNeighbourhood(int i) const
 	return n;
 }
 
-void Simulation::UpdateParticles(int start, int end)
+constexpr auto TILECELL = TILE * CELL;
+
+void Simulation::UpdateOne(int i, int deferTiledMovement)
 {
-	//the main particle loop function, goes over all particles.
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	for (auto i = start; i < end && i < parts.active; i++)
+
+	auto t = parts[i].type;
+	if (!t)
 	{
-		auto t = parts[i].type;
-		if (!t)
-		{
-			continue;
-		}
-		debug_mostRecentlyUpdated = i;
-
-		auto x = int(parts[i].x+0.5f);
-		auto y = int(parts[i].y+0.5f);
-
-		// Kill a particle off screen
-		if (x<CELL || y<CELL || x>=XRES-CELL || y>=YRES-CELL)
-		{
-			kill_part(i);
-			continue;
-		}
-
-		// Kill a particle in a wall where it isn't supposed to go
-		if (bmap[y/CELL][x/CELL] &&
-		   (bmap[y/CELL][x/CELL]==WL_WALL ||
-		    bmap[y/CELL][x/CELL]==WL_WALLELEC ||
-		    bmap[y/CELL][x/CELL]==WL_ALLOWAIR ||
-		    (bmap[y/CELL][x/CELL]==WL_DESTROYALL) ||
-		    (bmap[y/CELL][x/CELL]==WL_ALLOWLIQUID && !(elements[t].Properties&TYPE_LIQUID)) ||
-		    (bmap[y/CELL][x/CELL]==WL_ALLOWPOWDER && !(elements[t].Properties&TYPE_PART)) ||
-		    (bmap[y/CELL][x/CELL]==WL_ALLOWGAS && !(elements[t].Properties&TYPE_GAS)) || //&& elements[t].Falldown!=0 && parts[i].type!=PT_FIRE && parts[i].type!=PT_SMKE && parts[i].type!=PT_CFLM) ||
-		            (bmap[y/CELL][x/CELL]==WL_ALLOWENERGY && !(elements[t].Properties&TYPE_ENERGY)) ||
-		    (bmap[y/CELL][x/CELL]==WL_EWALL && !emap[y/CELL][x/CELL])) && (t!=PT_STKM) && (t!=PT_STKM2) && (t!=PT_FIGH))
-		{
-			kill_part(i);
-			continue;
-		}
-
-		// Make sure that STASIS'd particles don't tick.
-		if (bmap[y/CELL][x/CELL] == WL_STASIS && emap[y/CELL][x/CELL]<8) {
-			continue;
-		}
-
-		if (bmap[y/CELL][x/CELL]==WL_DETECT && emap[y/CELL][x/CELL]<8)
-			set_emap(x/CELL, y/CELL);
-
-		//adding to velocity from the particle's velocity
-		vx[y/CELL][x/CELL] = vx[y/CELL][x/CELL]*elements[t].AirLoss + elements[t].AirDrag*parts[i].vx;
-		vy[y/CELL][x/CELL] = vy[y/CELL][x/CELL]*elements[t].AirLoss + elements[t].AirDrag*parts[i].vy;
-
-		if (elements[t].HotAir)
-		{
-			if (t==PT_GAS||t==PT_NBLE)
-			{
-				if (pv[y/CELL][x/CELL]<3.5f)
-					pv[y/CELL][x/CELL] += elements[t].HotAir*(3.5f-pv[y/CELL][x/CELL]);
-				if (y+CELL<YRES && pv[y/CELL+1][x/CELL]<3.5f)
-					pv[y/CELL+1][x/CELL] += elements[t].HotAir*(3.5f-pv[y/CELL+1][x/CELL]);
-				if (x+CELL<XRES)
-				{
-					if (pv[y/CELL][x/CELL+1]<3.5f)
-						pv[y/CELL][x/CELL+1] += elements[t].HotAir*(3.5f-pv[y/CELL][x/CELL+1]);
-					if (y+CELL<YRES && pv[y/CELL+1][x/CELL+1]<3.5f)
-						pv[y/CELL+1][x/CELL+1] += elements[t].HotAir*(3.5f-pv[y/CELL+1][x/CELL+1]);
-				}
-			}
-			else//add the hotair variable to the pressure map, like black hole, or white hole.
-			{
-				pv[y/CELL][x/CELL] += elements[t].HotAir;
-				if (y+CELL<YRES)
-					pv[y/CELL+1][x/CELL] += elements[t].HotAir;
-				if (x+CELL<XRES)
-				{
-					pv[y/CELL][x/CELL+1] += elements[t].HotAir;
-					if (y+CELL<YRES)
-						pv[y/CELL+1][x/CELL+1] += elements[t].HotAir;
-				}
-			}
-		}
-
-		auto neighbourhood = GetNeighbourhood(i);
-
-		//velocity updates for the particle
-		if (t != PT_SPNG || !(parts[i].flags&FLAG_MOVABLE))
-		{
-			parts[i].vx *= elements[t].Loss;
-			parts[i].vy *= elements[t].Loss;
-		}
-		//particle gets velocity from the vx and vy maps
-		parts[i].vx += elements[t].Advection*vx[y/CELL][x/CELL] + neighbourhood.pGravX;
-		parts[i].vy += elements[t].Advection*vy[y/CELL][x/CELL] + neighbourhood.pGravY;
-
-
-		if (elements[t].Diffusion)//the random diffusion that gasses have
-		{
-			parts[i].vx += elements[t].Diffusion*(2.0f*rng.uniform01()-1.0f);
-			parts[i].vy += elements[t].Diffusion*(2.0f*rng.uniform01()-1.0f);
-		}
-
-		auto transitionOccurred = TransitionPhase(i, neighbourhood);
-		if (!parts[i].type)
-		{
-			continue;
-		}
-		if (transitionOccurred)
-		{
-			t = parts[i].type;
-		}
-
-		//call the particle update function, if there is one
-		if (elements[t].Update)
-		{
-			if ((*(elements[t].Update))(this, i, x, y, neighbourhood.surround_space, neighbourhood.nt, parts, pmap))
-				continue;
-			x = int(parts[i].x+0.5f);
-			y = int(parts[i].y+0.5f);
-		}
-
-		if(legacy_enable)//if heat sim is off
-			Element::legacyUpdate(this, i,x,y,neighbourhood.surround_space,neighbourhood.nt, parts, pmap);
-
-		if (parts[i].type == PT_NONE)//if its dead, skip to next particle
-			continue;
-
-		if (transitionOccurred)
-			continue;
-
-		if (!parts[i].vx&&!parts[i].vy)//if its not moving, skip to next particle, movement code it next
-			continue;
-
-		MovementPhase(i, neighbourhood);
+		return;
 	}
+	auto &debug_mostRecentlyUpdatedRef = useThreadContext ? threadContexts[ThreadIndex()].debug_mostRecentlyUpdated : debug_mostRecentlyUpdated;
+	debug_mostRecentlyUpdatedRef = i;
+
+	auto x = int(parts[i].x+0.5f);
+	auto y = int(parts[i].y+0.5f);
+	auto origX = x;
+	auto origY = y;
+
+	// Kill a particle off screen
+	if (x<CELL || y<CELL || x>=XRES-CELL || y>=YRES-CELL)
+	{
+		kill_part(i);
+		return;
+	}
+
+	// Kill a particle in a wall where it isn't supposed to go
+	if (bmap[y/CELL][x/CELL] &&
+	   (bmap[y/CELL][x/CELL]==WL_WALL ||
+	    bmap[y/CELL][x/CELL]==WL_WALLELEC ||
+	    bmap[y/CELL][x/CELL]==WL_ALLOWAIR ||
+	    (bmap[y/CELL][x/CELL]==WL_DESTROYALL) ||
+	    (bmap[y/CELL][x/CELL]==WL_ALLOWLIQUID && !(elements[t].Properties&TYPE_LIQUID)) ||
+	    (bmap[y/CELL][x/CELL]==WL_ALLOWPOWDER && !(elements[t].Properties&TYPE_PART)) ||
+	    (bmap[y/CELL][x/CELL]==WL_ALLOWGAS && !(elements[t].Properties&TYPE_GAS)) || //&& elements[t].Falldown!=0 && parts[i].type!=PT_FIRE && parts[i].type!=PT_SMKE && parts[i].type!=PT_CFLM) ||
+	            (bmap[y/CELL][x/CELL]==WL_ALLOWENERGY && !(elements[t].Properties&TYPE_ENERGY)) ||
+	    (bmap[y/CELL][x/CELL]==WL_EWALL && !emap[y/CELL][x/CELL])) && (t!=PT_STKM) && (t!=PT_STKM2) && (t!=PT_FIGH))
+	{
+		kill_part(i);
+		return;
+	}
+
+	// Make sure that STASIS'd particles don't tick.
+	if (bmap[y/CELL][x/CELL] == WL_STASIS && emap[y/CELL][x/CELL]<8) {
+		return;
+	}
+
+	if (bmap[y/CELL][x/CELL]==WL_DETECT && emap[y/CELL][x/CELL]<8)
+		set_emap(x/CELL, y/CELL);
+
+	//adding to velocity from the particle's velocity
+	vx[y/CELL][x/CELL] = vx[y/CELL][x/CELL]*elements[t].AirLoss + elements[t].AirDrag*parts[i].vx;
+	vy[y/CELL][x/CELL] = vy[y/CELL][x/CELL]*elements[t].AirLoss + elements[t].AirDrag*parts[i].vy;
+
+	if (elements[t].HotAir)
+	{
+		if (t==PT_GAS||t==PT_NBLE)
+		{
+			if (pv[y/CELL][x/CELL]<3.5f)
+				pv[y/CELL][x/CELL] += elements[t].HotAir * 4.f * (3.5f-pv[y/CELL][x/CELL]);
+		}
+		else//add the hotair variable to the pressure map, like black hole, or white hole.
+		{
+			pv[y/CELL][x/CELL] += elements[t].HotAir * 4.f;
+		}
+	}
+
+	auto neighbourhood = GetNeighbourhood(i);
+
+	//velocity updates for the particle
+	if (t != PT_SPNG || !(parts[i].flags&FLAG_MOVABLE))
+	{
+		parts[i].vx *= elements[t].Loss;
+		parts[i].vy *= elements[t].Loss;
+	}
+	//particle gets velocity from the vx and vy maps
+	parts[i].vx += elements[t].Advection*vx[y/CELL][x/CELL] + neighbourhood.pGravX;
+	parts[i].vy += elements[t].Advection*vy[y/CELL][x/CELL] + neighbourhood.pGravY;
+
+
+	if (elements[t].Diffusion)//the random diffusion that gasses have
+	{
+		parts[i].vx += elements[t].Diffusion*(2.0f*rng.uniform01()-1.0f);
+		parts[i].vy += elements[t].Diffusion*(2.0f*rng.uniform01()-1.0f);
+	}
+
+	auto transitionOccurred = TransitionPhase(i, neighbourhood);
+	if (!parts[i].type)
+	{
+		return;
+	}
+	if (transitionOccurred)
+	{
+		t = parts[i].type;
+	}
+
+	//call the particle update function, if there is one
+	if (elements[t].Update)
+	{
+		if ((*(elements[t].Update))(this, i, x, y, neighbourhood.surround_space, neighbourhood.nt, parts, pmap))
+			return;
+		x = int(parts[i].x+0.5f);
+		y = int(parts[i].y+0.5f);
+	}
+
+	if(legacy_enable)//if heat sim is off
+		Element::legacyUpdate(this, i,x,y,neighbourhood.surround_space,neighbourhood.nt, parts, pmap);
+
+	if (parts[i].type == PT_NONE)//if its dead, skip to next particle
+		return;
+
+	if (transitionOccurred)
+		return;
+
+	if (!parts[i].vx&&!parts[i].vy)//if its not moving, skip to next particle, movement code it next
+		return;
+
+	if (deferTiledMovement != -1 && !EligibleForTiledUpdate(i, deferTiledMovement))
+	{
+		auto &round = tileRounds[deferTiledMovement];
+		Vec2<int> tileP{ (origX + round.offset.X) / TILECELL, (origY + round.offset.Y) / TILECELL };
+		round.tiles[tileP].partsDeferredMovement.push_back(i);
+		return;
+	}
+	MovementPhase(i, neighbourhood);
 }
 
 bool Simulation::TransitionPhase(int i, const Neighbourhood &neighbourhood)
@@ -3286,6 +3365,32 @@ void Simulation::MovementPhase(int i, Neighbourhood neighbourhood)
 	}
 }
 
+bool Simulation::EligibleForTiledUpdate(int i, int tileRoundIndex) const
+{
+	auto t = parts[i].type;
+	auto x = int(parts[i].x+0.5f);
+	auto y = int(parts[i].y+0.5f);
+	auto &sd = SimulationData::CRef();
+	auto &elements = sd.elements;
+	auto vx = parts[i].vx;
+	auto vy = parts[i].vy;
+	auto maxVel = std::max(std::abs(vx), std::abs(vy));
+	if (elements[t].Neighborhood != INFINITE_NEIGHBORHOOD && maxVel <= TILECELL)
+	{
+		auto tileOff = tileRounds[tileRoundIndex].offset;
+		Vec2<int> tileP{ floorDiv(x - tileOff.X, TILECELL).first, floorDiv(y - tileOff.Y, TILECELL).first };
+		auto nhood = std::max(elements[t].Neighborhood, int(std::ceil(maxVel)));
+		if ( tileP.X      * TILECELL + tileOff.X <= x - nhood &&
+		     tileP.Y      * TILECELL + tileOff.Y <= y - nhood &&
+		    (tileP.X + 1) * TILECELL + tileOff.X >  x + nhood &&
+		    (tileP.Y + 1) * TILECELL + tileOff.Y >  y + nhood)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void Simulation::RecalcFreeParticles(bool do_life_dec)
 {
 	memset(pmap, 0, sizeof(pmap));
@@ -3691,7 +3796,7 @@ void Simulation::BeforeSim(bool willUpdate)
 
 		elementRecount |= !(currentTick%180);
 		if (elementRecount)
-			std::fill(elementCount, elementCount+PT_NUM, 0);
+			std::fill(elementCount.begin(), elementCount.end(), 0);
 	}
 	sandcolour_interface = (int)(20.0f*sin((float)sandcolour_frame*(TPT_PI_FLT/180.0f)));
 	sandcolour_frame = (sandcolour_frame+1)%360;
@@ -3872,7 +3977,7 @@ Simulation::~Simulation() = default;
 
 Simulation::Simulation()
 {
-	std::fill(elementCount, elementCount+PT_NUM, 0);
+	std::fill(elementCount.begin(), elementCount.end(), 0);
 	elementRecount = true;
 
 	//Create and attach air simulation
@@ -3924,6 +4029,230 @@ void Simulation::EnableNewtonianGravity(bool enable)
 		DispatchNewtonianGravity();
 		// gravIn is now potentially garbage, set it again
 		gravIn = std::move(oldGravIn);
+	}
+}
+
+void Simulation::SetTileThreadCount(int newThreadCount)
+{
+	tileThreadCount = newThreadCount;
+}
+
+
+template<class Func>
+void Simulation::TilePartilces(Func func, int tileRoundIndex)
+{
+	auto &round = tileRounds[tileRoundIndex];
+	for (auto &tile : round.tiles.Base)
+	{
+		tile.partsPerThreads.resize(GetTileThreadCount());
+		for (auto &partsPerThread : tile.partsPerThreads)
+		{
+			partsPerThread.parts.clear();
+		}
+		tile.partsDeferredMovement.clear();
+		tile.partsDeferred.clear();
+	}
+	round.deferredPerThreads.resize(GetTileThreadCount());
+	for (auto &deferredPerThread : round.deferredPerThreads)
+	{
+		deferredPerThread.partsDeferred.clear();
+	}
+	auto handle = [&](int i) {
+		if (!parts[i].type)
+		{
+			return;
+		}
+		auto x = int(parts[i].x+0.5f);
+		auto y = int(parts[i].y+0.5f);
+		if (func(i))
+		{
+			round.tiles[{ (x + round.offset.X) / TILECELL, (y + round.offset.Y) / TILECELL }].partsPerThreads[ThreadIndex()].parts.push_back(i);
+		}
+		else
+		{
+			round.deferredPerThreads[ThreadIndex()].partsDeferred.push_back(i);
+		}
+	};
+	constexpr int chunkSize = 10000;
+	if (tileRoundIndex == 0)
+	{
+		for (int begin = 0; begin < parts.active; begin += chunkSize)
+		{
+			auto end = std::min(begin + chunkSize, parts.active);
+			tileThreads.PushWorkItem([&, begin, end]() {
+				for (int i = begin; i < end; i++)
+				{
+					handle(i);
+				}
+			});
+		}
+	}
+	else
+	{
+		for (auto &deferredPerThread : tileRounds[tileRoundIndex - 1].deferredPerThreads)
+		{
+			auto &prevDeferred = deferredPerThread.partsDeferred;
+			auto count = int(prevDeferred.size());
+			for (int begin = 0; begin < count; begin += chunkSize)
+			{
+				auto end = std::min(begin + chunkSize, count);
+				tileThreads.PushWorkItem([&, begin, end]() {
+					for (int i = begin; i < end; i++)
+					{
+						handle(prevDeferred[i]);
+					}
+				});
+			}
+		}
+	}
+	tileThreads.Flush();
+}
+
+void Simulation::UpdateParticles(int start, int end)
+{
+	if (tileThreadCount == 1 || water_equal_test || !(start == 0 && end == NPART))
+	{
+		for (int i = start; i < end && i < parts.active; i++)
+		{
+			UpdateOne(i, -1);
+		}
+		return;
+	}
+	updatePhaseTimes.clear();
+
+	if (enableTiming)
+	{
+		if (!timingT0)
+		{
+			timingT0 = std::chrono::high_resolution_clock::now();
+		}
+	}
+	else
+	{
+		timingT0.reset();
+	}
+	auto recordSpan = [&](ByteString s){
+		if (!enableTiming)
+		{
+			return;
+		}
+		auto t1 = std::chrono::high_resolution_clock::now();
+		updatePhaseTimes.push_back({ std::move(s), double(std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - *timingT0).count()) });
+		*timingT0 = t1;
+	};
+	recordSpan("external");
+
+	tileThreads.SetThreadCount(tileThreadCount);
+	threadContexts.resize(tileThreadCount);
+	parts.pfreeMxLockedTimes = 0;
+	for (auto &threadContext : threadContexts)
+	{
+		threadContext.pfree = -1;
+		threadContext.freeListLength = 0;
+		for (auto &item : threadContext.elementCount)
+		{
+			item = 0;
+		}
+		threadContext.NUM_PARTS = 0;
+		threadContext.debug_mostRecentlyUpdated = -1;
+	}
+	RNG tileInitRng = rng.Instance();
+	tileRounds[0].offset.X = tileInitRng.between(0, TILECELL - 1);
+	tileRounds[0].offset.Y = tileInitRng.between(0, TILECELL - 1);
+	tileRounds[1].offset.X = tileRounds[0].offset.X ^ (TILECELL / 2);
+	tileRounds[1].offset.Y = tileRounds[0].offset.Y ^ (TILECELL / 2);
+	recordSpan("init");
+
+	for (int tileRoundIndex = 0; tileRoundIndex < TILE_ROUNDS; ++tileRoundIndex)
+	{
+		TilePartilces([this, tileRoundIndex](int i) {
+			return EligibleForTiledUpdate(i, tileRoundIndex);
+		}, tileRoundIndex);
+		recordSpan(ByteString::Build("tile", tileRoundIndex + 1));
+		useThreadContext = true;
+		for (auto &tile : tileRounds[tileRoundIndex].tiles.Base)
+		{
+			bool empty = true;
+			for (auto &partsPerThread : tile.partsPerThreads)
+			{
+				if (!partsPerThread.parts.empty())
+				{
+					empty = false;
+				}
+			}
+			if (empty)
+			{
+				continue;
+			}
+			auto seed = tileInitRng();
+			tileThreads.PushWorkItem([this, &tile, seed, tileRoundIndex]() {
+				auto &threadContext = threadContexts[ThreadIndex()];
+				threadContext.rng.seed(seed);
+				for (auto &partsPerThread : tile.partsPerThreads)
+				{
+					for (auto i : partsPerThread.parts)
+					{
+						if (!parts[i].type)
+						{
+							continue;
+						}
+						if (!EligibleForTiledUpdate(i, tileRoundIndex))
+						{
+							tile.partsDeferred.push_back(i);
+							continue;
+						}
+						UpdateOne(i, tileRoundIndex);
+					}
+				}
+			});
+		}
+		tileThreads.Flush();
+		useThreadContext = false;
+		recordSpan(ByteString::Build("parallel", tileRoundIndex));
+	}
+	{
+		for (auto &threadContext : threadContexts)
+		{
+			for (int j = 0; j < PT_NUM; ++j)
+			{
+				elementCount[j] += threadContext.elementCount[j];
+			}
+			NUM_PARTS += threadContext.NUM_PARTS;
+			debug_mostRecentlyUpdated = std::max(debug_mostRecentlyUpdated, threadContext.debug_mostRecentlyUpdated);
+			for (auto p : threadContext.emapActivation)
+			{
+				set_emap(p.X, p.Y);
+			}
+			threadContext.emapActivation.clear();
+		}
+		recordSpan("merge");
+		for (int tileRoundIndex = 0; tileRoundIndex < TILE_ROUNDS; ++tileRoundIndex)
+		{
+			for (auto &tile : tileRounds[tileRoundIndex].tiles.Base)
+			{
+				for (auto i : tile.partsDeferredMovement)
+				{
+					MovementPhase(i, GetNeighbourhood(i));
+				}
+			}
+			recordSpan(ByteString::Build("deferredLateMovement", tileRoundIndex));
+			for (auto &tile : tileRounds[tileRoundIndex].tiles.Base)
+			{
+				for (auto i : tile.partsDeferred)
+				{
+					UpdateOne(i, -1);
+				}
+			}
+			recordSpan(ByteString::Build("deferredLateUpdateMovement", tileRoundIndex));
+		}
+		for (auto &deferredPerThread : tileRounds[TILE_ROUNDS - 1].deferredPerThreads)
+		{
+			for (auto i : deferredPerThread.partsDeferred)
+			{
+				UpdateOne(i, -1);
+			}
+		}
+		recordSpan("deferredLeftover");
 	}
 }
 

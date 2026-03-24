@@ -45,6 +45,8 @@ void Element::Element_IGNT()
 	DefaultProperties.life = 3;
 
 	Update = &update;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

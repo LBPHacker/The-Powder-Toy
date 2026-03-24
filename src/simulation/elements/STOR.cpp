@@ -49,6 +49,8 @@ void Element::Element_STOR()
 	Update = &update;
 	Graphics = &graphics;
 	CtypeDraw = &ctypeDraw;
+
+	Neighborhood = INFINITE_NEIGHBORHOOD;
 }
 
 static int update(UPDATE_FUNC_ARGS)

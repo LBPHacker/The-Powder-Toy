@@ -47,6 +47,8 @@ void Element::Element_DTEC()
 
 	Update = &update;
 	CtypeDraw = &Element::ctypeDrawVInTmp;
+
+	Neighborhood = 25; // TODO-TILES: this is a function of tmp2
 }
 
 static int update(UPDATE_FUNC_ARGS)

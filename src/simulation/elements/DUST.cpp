@@ -42,4 +42,6 @@ void Element::Element_DUST()
 	HighTemperatureTransition = NT;
 
 	Graphics = nullptr; // it this needed?
+
+	Neighborhood = 1;
 }

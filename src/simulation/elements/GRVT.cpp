@@ -49,6 +49,8 @@ void Element::Element_GRVT()
 	Update = &update;
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

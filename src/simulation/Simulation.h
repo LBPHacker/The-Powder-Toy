@@ -9,17 +9,30 @@
 #include "AccessProperty.h"
 #include "CoordStack.h"
 #include "common/tpt-rand.h"
+#include "common/ContainerOf.h"
 #include "gravity/Gravity.h"
 #include "graphics/RendererFrame.h"
 #include "Element.h"
 #include "SimulationConfig.h"
 #include "SimulationSettings.h"
+#include "common/ThreadIndex.h"
+#include "common/ThreadPool.h"
+#include "Misc.h"
 #include <cstring>
 #include <cstddef>
 #include <vector>
 #include <array>
 #include <memory>
 #include <optional>
+#include <chrono>
+
+constexpr int TILE_ROUNDS = 2;
+
+constexpr int TILE = 16; // in cells
+constexpr Vec2<int> TILES = { ceilDiv(CELLS.X, TILE).first, ceilDiv(CELLS.Y, TILE).first };
+
+template<class Item>
+using TilePlane = PlaneAdapter<std::array<Item, (TILES.X + 1) * (TILES.Y + 1)>, TILES.X + 1, TILES.Y + 1>;
 
 constexpr int CHANNELS = int(MAX_TEMP - 73) / 100 + 2;
 
@@ -34,14 +47,27 @@ class Renderer;
 class Air;
 class GameSave;
 
+struct alignas(64) ThreadContext
+{
+	RNG rng;
+	int pfree;
+	int freeListLength;
+	std::array<int, PT_NUM> elementCount;
+	int NUM_PARTS;
+	int debug_mostRecentlyUpdated;
+	std::vector<Vec2<int>> emapActivation;
+};
+
 class Parts
 {
-	int pfree;
-
 public:
+	int pfree;
+	std::mutex pfreeMx;
+	int pfreeMxLockedTimes = 0;
+	int active;
+
 	std::array<Particle, NPART> data;
 	// initialized in clear_sim
-	int active;
 
 	operator const Particle *() const
 	{
@@ -58,7 +84,7 @@ public:
 		Reset();
 	}
 
-	Parts(const Parts &other) = default;
+	Parts(const Parts &other) = delete;
 
 	Parts &operator =(const Parts &other)
 	{
@@ -68,21 +94,15 @@ public:
 		return *this;
 	}
 
-	Parts(const Parts &&other) = delete;
-	Parts &operator =(const Parts &&other) = delete;
-
 	void Reset();
 	void Free(int i);
 	int Alloc();
 	void Flatten();
 
-	bool MaxPartsReached() const
-	{
-		return pfree == -1;
-	}
+	bool MaxPartsReached() const;
 };
 
-struct RenderableSimulation
+struct alignas(64) RenderableSimulation
 {
 	GravityInput gravIn;
 	GravityOutput gravOut; // invariant: when grav is empty, this is in its default-constructed state
@@ -96,36 +116,85 @@ struct RenderableSimulation
 	playerst player2;
 	playerst fighters[MAX_FIGHTERS]; //Defined in Stickman.h
 
-	float vx[YCELLS][XCELLS];
-	float vy[YCELLS][XCELLS];
-	float pv[YCELLS][XCELLS];
-	float hv[YCELLS][XCELLS];
+	alignas(64) float vx[YCELLS][XCELLS_ALIGNED];
+	alignas(64) float vy[YCELLS][XCELLS_ALIGNED];
+	alignas(64) float pv[YCELLS][XCELLS_ALIGNED];
+	alignas(64) float hv[YCELLS][XCELLS_ALIGNED];
 
-	unsigned char bmap[YCELLS][XCELLS];
-	unsigned char emap[YCELLS][XCELLS];
+	alignas(64) unsigned char bmap[YCELLS][XCELLS_ALIGNED];
+	alignas(64) unsigned char emap[YCELLS][XCELLS_ALIGNED];
 
 	Parts parts;
-	int pmap[YRES][XRES];
-	int photons[YRES][XRES];
+	alignas(64) int pmap[YRES][XRES_ALIGNED];
+	alignas(64) int photons[YRES][XRES_ALIGNED];
 
 	int aheat_enable = 0;
 
 	bool useLuaCallbacks = false;
 };
 
-class Simulation : public RenderableSimulation
+struct RNGMultiplexer
+{
+	RNG global;
+
+	RNG &Instance();
+	const RNG &Instance() const;
+
+	unsigned int operator()()
+	{
+		return Instance()();
+	}
+
+	unsigned int gen()
+	{
+		return Instance().gen();
+	}
+
+	int between(int lower, int upper)
+	{
+		return Instance().between(lower, upper);
+	}
+
+	bool chance(int numerator, unsigned int denominator)
+	{
+		return Instance().chance(numerator, denominator);
+	}
+
+	float uniform01()
+	{
+		return Instance().uniform01();
+	}
+
+	void seed(unsigned int sd)
+	{
+		Instance().seed(sd);
+	}
+
+	void state(RNG::State ns)
+	{
+		Instance().state(ns);
+	}
+
+	RNG::State state() const
+	{
+		return Instance().state();
+	}
+};
+
+class alignas(64) Simulation : public RenderableSimulation
 {
 public:
-	GravityPtr grav;
-	std::unique_ptr<Air> air;
+	alignas(64) GravityPtr grav;
+	alignas(64) std::unique_ptr<Air> air;
 
-	RNG rng;
+	alignas(64) bool useThreadContext = false;
+	alignas(64) RNGMultiplexer rng;
 
 	int replaceModeSelected = 0;
 	int replaceModeFlags = 0;
 	int debug_nextToUpdate = 0;
 	int debug_mostRecentlyUpdated = -1; // -1 when between full update loops
-	int elementCount[PT_NUM];
+	std::array<int, PT_NUM> elementCount;
 	int ISWIRE = 0;
 	bool force_stacking_check = false;
 	int emp_trigger_count = 0;
@@ -148,7 +217,7 @@ public:
 	int Element_PSTN_tempParts[std::max(XRES, YRES)];
 	int Element_PPIP_ppip_changed;
 
-	unsigned int pmap_count[YRES][XRES];
+	alignas(64) unsigned int pmap_count[YRES][XRES_ALIGNED];
 
 	int edgeMode = EDGE_VOID;
 	int gravityMode = GRAV_VERTICAL;
@@ -217,6 +286,7 @@ public:
 	void set_emap(int x, int y);
 	int parts_avg(int ci, int ni, int t);
 	void UpdateParticles(int start, int end); // Dispatches an update to the range [start, end).
+	std::vector<std::pair<ByteString, double>> updatePhaseTimes;
 	void SimulateGoL();
 	void RecalcFreeParticles(bool do_life_dec);
 	void CheckStacking();
@@ -268,6 +338,14 @@ public:
 
 	void EnableNewtonianGravity(bool enable);
 
+	void SetTileThreadCount(int newThreadCount);
+	int GetTileThreadCount() const
+	{
+		return tileThreadCount;
+	}
+
+	std::vector<ThreadContext> threadContexts;
+
 private:
 	CoordStack& getCoordStackSingleton();
 
@@ -286,4 +364,61 @@ private:
 	void MovementPhase(int i, Neighbourhood neighbourhood);
 	Neighbourhood GetNeighbourhood(int i) const;
 	bool TransitionPhase(int i, const Neighbourhood &neighbourhood);
+
+	struct alignas(64) TileInfo
+	{
+		struct alignas(64) PartsPerThread
+		{
+			std::vector<int> parts;
+		};
+		std::vector<PartsPerThread> partsPerThreads;
+		std::vector<int> partsDeferredMovement;
+		std::vector<int> partsDeferred;
+	};
+	struct alignas(64) TileRoundInfo
+	{
+		alignas(64) TilePlane<TileInfo> tiles;
+		Vec2<int> offset{ 0, 0 };
+		struct alignas(64) DeferredPerThread
+		{
+			std::vector<int> partsDeferred;
+		};
+		std::vector<DeferredPerThread> deferredPerThreads;
+	};
+	alignas(64) std::array<TileRoundInfo, TILE_ROUNDS> tileRounds;
+	void UpdateOne(int i, int deferTiledMovement);
+	bool EligibleForTiledUpdate(int i, int tileRoundIndex) const;
+
+	int tileThreadCount = 1;
+	ThreadPool tileThreads;
+
+	template<class Func>
+	void TilePartilces(Func func, int tileRoundIndex);
+
+	std::optional<std::chrono::high_resolution_clock::time_point> timingT0;
+
+public:
+	bool enableTiming = false;
 };
+
+inline RNG &RNGMultiplexer::Instance()
+{
+	auto *sim = ContainerOf<&Simulation::rng>(this);
+	return sim->useThreadContext ? sim->threadContexts[ThreadIndex()].rng : global;
+}
+
+inline const RNG &RNGMultiplexer::Instance() const
+{
+	auto *sim = ContainerOf<&Simulation::rng>(this);
+	return sim->useThreadContext ? sim->threadContexts[ThreadIndex()].rng : global;
+}
+
+inline bool Parts::MaxPartsReached() const
+{
+	auto *sim = static_cast<const Simulation *>(ContainerOf<&RenderableSimulation::parts>(this));
+	if (sim->useThreadContext)
+	{
+		return false;
+	}
+	return pfree == -1;
+}

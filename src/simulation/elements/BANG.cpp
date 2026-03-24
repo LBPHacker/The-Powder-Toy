@@ -43,6 +43,8 @@ void Element::Element_BANG()
 	HighTemperatureTransition = NT;
 
 	Update = &update;
+
+	Neighborhood = 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

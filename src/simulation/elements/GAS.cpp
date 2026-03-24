@@ -40,4 +40,6 @@ void Element::Element_GAS()
 	LowTemperatureTransition = NT;
 	HighTemperature = 573.0f;
 	HighTemperatureTransition = PT_FIRE;
+
+	Neighborhood = 1;
 }

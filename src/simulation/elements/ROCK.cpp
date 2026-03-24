@@ -45,6 +45,8 @@ void Element::Element_ROCK()
 
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = 1;
 }
 
 

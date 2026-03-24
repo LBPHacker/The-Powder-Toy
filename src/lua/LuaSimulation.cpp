@@ -1593,6 +1593,22 @@ static int golSpeedRatio(lua_State *L)
 	return 0;
 }
 
+static int threads(lua_State *L)
+{
+	auto *lsi = GetLSI();
+	lsi->AssertInterfaceEvent();
+	if (lua_gettop(L) == 0)
+	{
+		lua_pushinteger(L, lsi->sim->GetTileThreadCount());
+		return 1;
+	}
+	int threads = luaL_checkinteger(L, 1);
+	if (threads < 1 || threads > 100)
+		return luaL_error(L, "out of bounds");
+	lsi->sim->SetTileThreadCount(threads);
+	return 0;
+}
+
 static int takeSnapshot(lua_State *L)
 {
 	auto *lsi = GetLSI();
@@ -2119,6 +2135,7 @@ void LuaSimulation::Open(lua_State *L)
 		LFUNC(fanVelocityX),
 		LFUNC(fanVelocityY),
 		LFUNC(listDefaultGol),
+		LFUNC(threads),
 #undef LFUNC
 		{ nullptr, nullptr }
 	};

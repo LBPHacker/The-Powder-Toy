@@ -25,3 +25,5 @@ constexpr int PFLAG_COLOR_BLUE             = 0x000C0000;
 constexpr int PFLAG_COLORS                 = 0x000C0000;
 
 extern const std::array<Vec2<int>, 8> Element_PIPE_offsets;
+
+constexpr int Element_PIPE_neighborhood = INFINITE_NEIGHBORHOOD;

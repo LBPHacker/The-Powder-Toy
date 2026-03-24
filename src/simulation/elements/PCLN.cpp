@@ -48,6 +48,8 @@ void Element::Element_PCLN()
 	Update = &update;
 	Graphics = &graphics;
 	CtypeDraw = &Element_PCLN_ctypeDraw;
+
+	Neighborhood = 2;
 }
 
 static int update(UPDATE_FUNC_ARGS)

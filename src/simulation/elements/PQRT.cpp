@@ -46,6 +46,8 @@ void Element::Element_PQRT()
 	Update = &Element_QRTZ_update;
 	Graphics = &Element_QRTZ_graphics;
 	Create = &create;
+
+	Neighborhood = Element_QRTZ_neighborhood;
 }
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)

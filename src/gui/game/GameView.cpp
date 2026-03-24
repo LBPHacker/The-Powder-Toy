@@ -1677,6 +1677,7 @@ void GameView::OnKeyRelease(int key, int scan, bool repeat, bool shift, bool ctr
 
 void GameView::OnBlur()
 {
+	sim->enableTiming = false;
 	disableAltBehaviour();
 	disableCtrlBehaviour();
 	disableShiftBehaviour();
@@ -2580,6 +2581,29 @@ void GameView::OnDraw()
 				fpsInfo << std::get<FpsLimitExplicit>(simFpsLimit).value;
 			}
 		}
+		if (c->GetDebugFlags() & DEBUG_TIMING)
+		{
+			sim->enableTiming = true;
+			fpsInfo << "\nParallel tile stats:";
+			for (auto &[ key, value ] : sim->updatePhaseTimes)
+			{
+				auto it = std::find_if(updatePhaseTimes.begin(), updatePhaseTimes.end(), [&](auto &thing) {
+					return thing.first == key;
+				});
+				if (it == updatePhaseTimes.end())
+				{
+					updatePhaseTimes.push_back({ key, 0.0 });
+					it = updatePhaseTimes.end() - 1;
+				}
+				it->second += (value - it->second) * 0.05;
+				fpsInfo << "\n  " << key.FromUtf8() << ": " << Format::Precision(2) << (it->second / 1000.0) << "us";
+			}
+			fpsInfo << "\n  Free list mutex locked: " << sim->parts.pfreeMxLockedTimes << " times";
+		}
+		else
+		{
+			sim->enableTiming = false;
+		}
 		if (c->GetDebugFlags() & DEBUG_RENHUD)
 		{
 			fpsInfo << "\nRendering";
@@ -2630,9 +2654,10 @@ void GameView::OnDraw()
 			}
 		}
 
-		int textWidth = Graphics::TextSize(fpsInfo.Build()).X - 1;
+		auto textSize = Graphics::TextSize(fpsInfo.Build());
+		int textWidth = textSize.X - 1;
 		int alpha = 255-introText*5;
-		g->BlendFilledRect(RectSized(Vec2{ 12, 12 }, Vec2{ textWidth+8, 15 }), 0x000000_rgb .WithAlpha(int(alpha*0.5)));
+		g->BlendFilledRect(RectSized(Vec2{ 12, 12 }, Vec2{ textWidth+8, textSize.Y + 5 }), 0x000000_rgb .WithAlpha(int(alpha*0.5)));
 		g->BlendText({ 16, 16 }, fpsInfo.Build(), 0x20D8FF_rgb .WithAlpha(int(alpha*0.75)));
 	}
 

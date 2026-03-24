@@ -40,4 +40,6 @@ void Element::Element_LNTG()
 	LowTemperatureTransition = PT_NICE;
 	HighTemperature = 77.0f;
 	HighTemperatureTransition = PT_NONE;
+
+	Neighborhood = 1;
 }

@@ -46,6 +46,8 @@ void Element::Element_BOMB()
 
 	Update = &update;
 	Graphics = &graphics;
+
+	Neighborhood = 9;
 }
 
 static int update(UPDATE_FUNC_ARGS)

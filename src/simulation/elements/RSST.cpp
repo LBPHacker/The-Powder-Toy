@@ -45,6 +45,8 @@ void Element::Element_RSST()
 	HighTemperatureTransition = NT;
 
 	Update = &update;
+
+	Neighborhood = 1;
 }
 
 int update(UPDATE_FUNC_ARGS)

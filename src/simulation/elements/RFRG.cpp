@@ -42,6 +42,8 @@ void Element::Element_RFRG()
 	HighTemperatureTransition = NT;
 
 	Update = &Element_RFRG_update;
+
+	Neighborhood = Element_RFRG_neighborhood;
 }
 
 int Element_RFRG_update(UPDATE_FUNC_ARGS)

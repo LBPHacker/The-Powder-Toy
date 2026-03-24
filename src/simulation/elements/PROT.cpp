@@ -50,6 +50,8 @@ void Element::Element_PROT()
 	Update = &update;
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = SURF_RANGE + 1;
 }
 
 static int update(UPDATE_FUNC_ARGS)

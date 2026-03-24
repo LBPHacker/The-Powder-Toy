@@ -3,3 +3,5 @@
 
 int Element_BIZR_graphics(GRAPHICS_FUNC_ARGS);
 int Element_BIZR_update(UPDATE_FUNC_ARGS);
+
+constexpr int Element_BIZR_neighborhood = 2;

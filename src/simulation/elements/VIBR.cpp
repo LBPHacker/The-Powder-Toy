@@ -44,6 +44,8 @@ void Element::Element_VIBR()
 
 	Update = &Element_VIBR_update;
 	Graphics = &Element_VIBR_graphics;
+
+	Neighborhood = Element_VIBR_neighborhood;
 }
 
 constexpr int orbit_rx[8] = { -1,  0,  1,  1,  1,  0, -1, -1 };

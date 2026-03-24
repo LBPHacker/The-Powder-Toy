@@ -22,6 +22,7 @@ constexpr auto DEBUG_SURFNORM   = 0x0010;
 constexpr auto DEBUG_SIMHUD     = 0x0020;
 constexpr auto DEBUG_RENHUD     = 0x0040;
 constexpr auto DEBUG_AIRVEL     = 0x0080;
+constexpr auto DEBUG_TIMING     = 0x0100;
 
 class DebugInfo;
 class SaveFile;
@@ -215,4 +216,6 @@ public:
 
 	void SetToolIndex(ByteString identifier, std::optional<int> index);
 	void InitCommandInterface();
+
+	void SetTileThreadCount(int newThreadCount);
 };

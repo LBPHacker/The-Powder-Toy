@@ -289,4 +289,6 @@ public:
 	{
 		return simFpsLimit;
 	}
+
+	std::vector<std::pair<ByteString, double>> updatePhaseTimes;
 };

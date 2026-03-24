@@ -48,6 +48,8 @@ void Element::Element_PLSM()
 	Update = &Element_FIRE_update;
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = Element_FIRE_neighborhood;
 }
 
 static int graphics(GRAPHICS_FUNC_ARGS)

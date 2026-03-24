@@ -43,6 +43,8 @@ void Element::Element_SLTW()
 	HighTemperatureTransition = ST;
 
 	Update = &update;
+
+	Neighborhood = 2; // see Element::legacyUpdate
 }
 
 static int update(UPDATE_FUNC_ARGS)

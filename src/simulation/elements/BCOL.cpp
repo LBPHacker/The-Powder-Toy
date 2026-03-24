@@ -46,4 +46,6 @@ void Element::Element_BCOL()
 
 	Update = &Element_COAL_update;
 	Graphics = &Element_COAL_graphics;
+
+	Neighborhood = Element_COAL_neighborhood;
 }

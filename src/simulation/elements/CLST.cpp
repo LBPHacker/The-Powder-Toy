@@ -47,6 +47,8 @@ void Element::Element_CLST()
 	Update = &update;
 	Graphics = &graphics;
 	Create = &create;
+
+	Neighborhood = 2;
 }
 
 static int update(UPDATE_FUNC_ARGS)

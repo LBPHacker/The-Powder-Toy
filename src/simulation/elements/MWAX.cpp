@@ -40,4 +40,6 @@ void Element::Element_MWAX()
 	LowTemperatureTransition = PT_WAX;
 	HighTemperature = 673.0f;
 	HighTemperatureTransition = PT_FIRE;
+
+	Neighborhood = 1;
 }
