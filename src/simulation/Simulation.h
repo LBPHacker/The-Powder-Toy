@@ -9,6 +9,7 @@
 #include "AccessProperty.h"
 #include "CoordStack.h"
 #include "common/tpt-rand.h"
+#include "common/ContainerOf.h"
 #include "gravity/Gravity.h"
 #include "graphics/RendererFrame.h"
 #include "Element.h"
@@ -43,6 +44,17 @@ class Renderer;
 class Air;
 class GameSave;
 
+struct alignas(64) ThreadContext
+{
+	RNG rng;
+	int pfree;
+	int freeListLength;
+	std::array<int, PT_NUM> elementCount;
+	int NUM_PARTS;
+	int debug_mostRecentlyUpdated;
+	std::vector<Vec2<int>> emapActivation;
+};
+
 class Parts
 {
 public:
@@ -50,14 +62,6 @@ public:
 	std::mutex pfreeMx;
 	int pfreeMxLockedTimes = 0;
 	int active;
-	alignas(64) bool useThreadLocal = false;
-
-	struct alignas(64) PfreeThreadLocal
-	{
-		int pfree;
-		int freeListLength;
-	};
-	alignas(64) std::vector<PfreeThreadLocal> pfreesThreadLocal;
 
 	std::array<Particle, NPART> data;
 	// initialized in clear_sim
@@ -77,7 +81,7 @@ public:
 		Reset();
 	}
 
-	Parts(const Parts &other) = default;
+	Parts(const Parts &other) = delete;
 
 	Parts &operator =(const Parts &other)
 	{
@@ -87,9 +91,6 @@ public:
 		return *this;
 	}
 
-	Parts(const Parts &&other) = delete;
-	Parts &operator =(const Parts &&other) = delete;
-
 	void Reset();
 	void Free(int i);
 	int Alloc();
@@ -97,7 +98,7 @@ public:
 
 	bool MaxPartsReached() const
 	{
-		return false; // TODO-TILES
+		return false;
 	}
 };
 
@@ -135,23 +136,9 @@ struct alignas(64) RenderableSimulation
 struct RNGMultiplexer
 {
 	RNG global;
-	struct alignas(64) ThreadRng
-	{
-		RNG inner;
-	};
-	alignas(64) std::vector<ThreadRng> threadLocal;
 
-	alignas(64) bool useThreadLocal = false;
-
-	RNG &Instance()
-	{
-		return useThreadLocal ? threadLocal[ThreadIndex()].inner : global;
-	}
-
-	const RNG &Instance() const
-	{
-		return useThreadLocal ? threadLocal[ThreadIndex()].inner : global;
-	}
+	RNG &Instance();
+	const RNG &Instance() const;
 
 	unsigned int operator()()
 	{
@@ -200,13 +187,14 @@ public:
 	alignas(64) GravityPtr grav;
 	alignas(64) std::unique_ptr<Air> air;
 
+	alignas(64) bool useThreadContext = false;
 	alignas(64) RNGMultiplexer rng;
 
 	int replaceModeSelected = 0;
 	int replaceModeFlags = 0;
 	int debug_nextToUpdate = 0;
 	int debug_mostRecentlyUpdated = -1; // -1 when between full update loops
-	int elementCount[PT_NUM];
+	std::array<int, PT_NUM> elementCount;
 	int ISWIRE = 0;
 	bool force_stacking_check = false;
 	int emp_trigger_count = 0;
@@ -354,8 +342,10 @@ public:
 	void SetTileThreadCount(int newThreadCount);
 	int GetTileThreadCount() const
 	{
-		return tileThreads.GetThreadCount();
+		return tileThreadCount;
 	}
+
+	std::vector<ThreadContext> threadContexts;
 
 private:
 	CoordStack& getCoordStackSingleton();
@@ -378,13 +368,27 @@ private:
 
 	struct alignas(64) TileInfo
 	{
-		std::vector<int> parts;
-		std::vector<int> partsDeferred;
+		std::vector<int, AlignedAllocator<int>> parts;
+		std::vector<int, AlignedAllocator<int>> partsDeferredMovement;
+		std::vector<int, AlignedAllocator<int>> partsDeferred;
 	};
 	alignas(64) TilePlane<TileInfo> tiles;
 	std::vector<int> partsDeferred;
-	void UpdateOne(int i);
+	void UpdateOne(int i, bool deferTiledMovement);
 	bool EligibleForTiledUpdate(int i) const;
 
+	int tileThreadCount = 1;
 	ThreadPool tileThreads;
 };
+
+inline RNG &RNGMultiplexer::Instance()
+{
+	auto *sim = ContainerOf<&Simulation::rng>(this);
+	return sim->useThreadContext ? sim->threadContexts[ThreadIndex()].rng : global;
+}
+
+inline const RNG &RNGMultiplexer::Instance() const
+{
+	auto *sim = ContainerOf<&Simulation::rng>(this);
+	return sim->useThreadContext ? sim->threadContexts[ThreadIndex()].rng : global;
+}
