@@ -379,6 +379,9 @@ private:
 
 	int tileThreadCount = 1;
 	ThreadPool tileThreads;
+
+	template<class Func>
+	void TilePartilces(Func func);
 };
 
 inline RNG &RNGMultiplexer::Instance()

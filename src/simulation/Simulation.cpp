@@ -3389,13 +3389,6 @@ bool Simulation::EligibleForTiledUpdate(int i) const
 
 void Simulation::RecalcFreeParticles(bool do_life_dec)
 {
-	for (auto &tile : tiles.Base)
-	{
-		tile.parts.clear();
-		tile.partsDeferredMovement.clear();
-		tile.partsDeferred.clear();
-	}
-	partsDeferred.clear();
 	memset(pmap, 0, sizeof(pmap));
 	memset(pmap_count, 0, sizeof(pmap_count));
 	memset(photons, 0, sizeof(photons));
@@ -3429,15 +3422,6 @@ void Simulation::RecalcFreeParticles(bool do_life_dec)
 					pmap_count[y][x]++;
 			}
 			inBounds = true;
-
-			if (EligibleForTiledUpdate(i))
-			{
-				tiles[{ x / TILECELL, y / TILECELL }].parts.push_back(i);
-			}
-			else
-			{
-				partsDeferred.push_back(i);
-			}
 		}
 		NUM_PARTS ++;
 
@@ -4049,6 +4033,36 @@ void Simulation::SetTileThreadCount(int newThreadCount)
 	tileThreadCount = newThreadCount;
 }
 
+
+template<class Func>
+void Simulation::TilePartilces(Func func)
+{
+	for (auto &tile : tiles.Base)
+	{
+		tile.parts.clear();
+		tile.partsDeferredMovement.clear();
+		tile.partsDeferred.clear();
+	}
+	partsDeferred.clear();
+	for (int i = 0; i < parts.active; i++)
+	{
+		if (!parts[i].type)
+		{
+			continue;
+		}
+		auto x = int(parts[i].x+0.5f);
+		auto y = int(parts[i].y+0.5f);
+		if (func(i))
+		{
+			tiles[{ x / TILECELL, y / TILECELL }].parts.push_back(i);
+		}
+		else
+		{
+			partsDeferred.push_back(i);
+		}
+	}
+}
+
 void Simulation::UpdateParticles(int start, int end)
 {
 	if (water_equal_test || !(start == 0 && end == NPART))
@@ -4060,6 +4074,9 @@ void Simulation::UpdateParticles(int start, int end)
 		return;
 	}
 
+	TilePartilces([this](int i) {
+		return EligibleForTiledUpdate(i);
+	});
 	tileThreads.SetThreadCount(tileThreadCount);
 	threadContexts.resize(tileThreadCount);
 	parts.pfreeMxLockedTimes = 0;
