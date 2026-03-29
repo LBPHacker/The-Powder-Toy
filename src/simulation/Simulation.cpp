@@ -1785,7 +1785,7 @@ constexpr int freeListTargetLength = 64;
 void Parts::Free(int i)
 {
 	data[i].type = PT_NONE;
-	auto *sim = ContainerOf<&Simulation::rng>(this);
+	auto *sim = static_cast<Simulation *>(ContainerOf<&RenderableSimulation::parts>(this));
 	if (sim->useThreadContext)
 	{
 		auto &threadContext = sim->threadContexts[ThreadIndex()];
@@ -2003,7 +2003,7 @@ int Simulation::create_part(int p, int x, int y, int t, int v)
 
 int Parts::Alloc()
 {
-	auto *sim = ContainerOf<&Simulation::rng>(this);
+	auto *sim = static_cast<Simulation *>(ContainerOf<&RenderableSimulation::parts>(this));
 	if (sim->useThreadContext)
 	{
 		auto &threadContext = sim->threadContexts[ThreadIndex()];
@@ -2043,7 +2043,6 @@ int Parts::Alloc()
 			threadContext.pfree = data[i].life;
 			return i;
 		}
-		std::cerr << "OUT OF PARTS" << std::endl;
 		return -1;
 	}
 	if (pfree != -1)
