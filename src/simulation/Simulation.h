@@ -25,11 +25,13 @@
 #include <memory>
 #include <optional>
 
+constexpr int TILE_ROUNDS = 2;
+
 constexpr int TILE = 16; // in cells
 constexpr Vec2<int> TILES = { ceilDiv(CELLS.X, TILE).first, ceilDiv(CELLS.Y, TILE).first };
 
 template<class Item>
-using TilePlane = PlaneAdapter<std::array<Item, TILES.X * TILES.Y>, TILES.X, TILES.Y>;
+using TilePlane = PlaneAdapter<std::array<Item, (TILES.X + 1) * (TILES.Y + 1)>, TILES.X + 1, TILES.Y + 1>;
 
 constexpr int CHANNELS = int(MAX_TEMP - 73) / 100 + 2;
 
@@ -286,8 +288,7 @@ public:
 	void set_emap(int x, int y);
 	int parts_avg(int ci, int ni, int t);
 	void UpdateParticles(int start, int end); // Dispatches an update to the range [start, end).
-	double updateParticlesParallelTime = 0.0;
-	double updateParticlesSerialTime = 0.0;
+	std::vector<std::pair<ByteString, double>> updatePhaseTimes;
 	void SimulateGoL();
 	void RecalcFreeParticles(bool do_life_dec);
 	void CheckStacking();
@@ -372,16 +373,21 @@ private:
 		std::vector<int, AlignedAllocator<int>> partsDeferredMovement;
 		std::vector<int, AlignedAllocator<int>> partsDeferred;
 	};
-	alignas(64) TilePlane<TileInfo> tiles;
-	std::vector<int> partsDeferred;
-	void UpdateOne(int i, bool deferTiledMovement);
-	bool EligibleForTiledUpdate(int i) const;
+	struct alignas(64) TileRoundInfo
+	{
+		alignas(64) TilePlane<TileInfo> tiles;
+		Vec2<int> offset{ 0, 0 };
+		std::vector<int> partsDeferred;
+	};
+	alignas(64) std::array<TileRoundInfo, TILE_ROUNDS> tileRounds;
+	void UpdateOne(int i, int deferTiledMovement);
+	bool EligibleForTiledUpdate(int i, int tileRoundIndex) const;
 
 	int tileThreadCount = 1;
 	ThreadPool tileThreads;
 
 	template<class Func>
-	void TilePartilces(Func func);
+	void TilePartilces(Func func, int tileRoundIndex);
 };
 
 inline RNG &RNGMultiplexer::Instance()

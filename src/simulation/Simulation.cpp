@@ -2337,7 +2337,7 @@ Simulation::Neighbourhood Simulation::GetNeighbourhood(int i) const
 
 constexpr auto TILECELL = TILE * CELL;
 
-void Simulation::UpdateOne(int i, bool deferTiledMovement)
+void Simulation::UpdateOne(int i, int deferTiledMovement)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
@@ -2352,7 +2352,8 @@ void Simulation::UpdateOne(int i, bool deferTiledMovement)
 
 	auto x = int(parts[i].x+0.5f);
 	auto y = int(parts[i].y+0.5f);
-	Vec2<int> tileP{ x / TILECELL, y / TILECELL };
+	auto origX = x;
+	auto origY = y;
 
 	// Kill a particle off screen
 	if (x<CELL || y<CELL || x>=XRES-CELL || y>=YRES-CELL)
@@ -2452,9 +2453,11 @@ void Simulation::UpdateOne(int i, bool deferTiledMovement)
 	if (!parts[i].vx&&!parts[i].vy)//if its not moving, skip to next particle, movement code it next
 		return;
 
-	if (deferTiledMovement && !EligibleForTiledUpdate(i))
+	if (deferTiledMovement != -1 && !EligibleForTiledUpdate(i, deferTiledMovement))
 	{
-		tiles[tileP].partsDeferredMovement.push_back(i);
+		auto &round = tileRounds[deferTiledMovement];
+		Vec2<int> tileP{ (origX + round.offset.X) / TILECELL, (origY + round.offset.Y) / TILECELL };
+		round.tiles[tileP].partsDeferredMovement.push_back(i);
 		return;
 	}
 	MovementPhase(i, neighbourhood);
@@ -3362,7 +3365,7 @@ void Simulation::MovementPhase(int i, Neighbourhood neighbourhood)
 	}
 }
 
-bool Simulation::EligibleForTiledUpdate(int i) const
+bool Simulation::EligibleForTiledUpdate(int i, int tileRoundIndex) const
 {
 	auto t = parts[i].type;
 	auto x = int(parts[i].x+0.5f);
@@ -3374,12 +3377,13 @@ bool Simulation::EligibleForTiledUpdate(int i) const
 	auto maxVel = std::max(std::abs(vx), std::abs(vy));
 	if (elements[t].Neighborhood != INFINITE_NEIGHBORHOOD && maxVel <= TILECELL)
 	{
-		Vec2<int> tileP{ x / TILECELL, y / TILECELL };
+		auto tileOff = tileRounds[tileRoundIndex].offset;
+		Vec2<int> tileP{ floorDiv(x - tileOff.X, TILECELL).first, floorDiv(y - tileOff.Y, TILECELL).first };
 		auto nhood = std::max(elements[t].Neighborhood, int(std::ceil(maxVel)));
-		if ( tileP.X      * TILECELL <= x - nhood &&
-		     tileP.Y      * TILECELL <= y - nhood &&
-		    (tileP.X + 1) * TILECELL >  x + nhood &&
-		    (tileP.Y + 1) * TILECELL >  y + nhood)
+		if ( tileP.X      * TILECELL + tileOff.X <= x - nhood &&
+		     tileP.Y      * TILECELL + tileOff.Y <= y - nhood &&
+		    (tileP.X + 1) * TILECELL + tileOff.X >  x + nhood &&
+		    (tileP.Y + 1) * TILECELL + tileOff.Y >  y + nhood)
 		{
 			return true;
 		}
@@ -4035,48 +4039,68 @@ void Simulation::SetTileThreadCount(int newThreadCount)
 
 
 template<class Func>
-void Simulation::TilePartilces(Func func)
+void Simulation::TilePartilces(Func func, int tileRoundIndex)
 {
-	for (auto &tile : tiles.Base)
+	auto &round = tileRounds[tileRoundIndex];
+	for (auto &tile : round.tiles.Base)
 	{
 		tile.parts.clear();
 		tile.partsDeferredMovement.clear();
 		tile.partsDeferred.clear();
 	}
-	partsDeferred.clear();
-	for (int i = 0; i < parts.active; i++)
-	{
+	round.partsDeferred.clear();
+	auto handle = [&](int i) {
 		if (!parts[i].type)
 		{
-			continue;
+			return;
 		}
 		auto x = int(parts[i].x+0.5f);
 		auto y = int(parts[i].y+0.5f);
 		if (func(i))
 		{
-			tiles[{ x / TILECELL, y / TILECELL }].parts.push_back(i);
+			round.tiles[{ (x + round.offset.X) / TILECELL, (y + round.offset.Y) / TILECELL }].parts.push_back(i);
 		}
 		else
 		{
-			partsDeferred.push_back(i);
+			round.partsDeferred.push_back(i);
+		}
+	};
+	if (tileRoundIndex == 0)
+	{
+		for (int i = 0; i < parts.active; i++)
+		{
+			handle(i);
+		}
+	}
+	else
+	{
+		for (auto i : tileRounds[tileRoundIndex - 1].partsDeferred)
+		{
+			handle(i);
 		}
 	}
 }
 
+auto t0 = std::chrono::high_resolution_clock::now();
 void Simulation::UpdateParticles(int start, int end)
 {
 	if (water_equal_test || !(start == 0 && end == NPART))
 	{
 		for (int i = start; i < end && i < parts.active; i++)
 		{
-			UpdateOne(i, false);
+			UpdateOne(i, -1);
 		}
 		return;
 	}
+	updatePhaseTimes.clear();
 
-	TilePartilces([this](int i) {
-		return EligibleForTiledUpdate(i);
-	});
+	auto recordSpan = [&](ByteString s){
+		auto t1 = std::chrono::high_resolution_clock::now();
+		updatePhaseTimes.push_back({ std::move(s), double(std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count()) });
+		t0 = t1;
+	};
+	recordSpan("external");
+
 	tileThreads.SetThreadCount(tileThreadCount);
 	threadContexts.resize(tileThreadCount);
 	parts.pfreeMxLockedTimes = 0;
@@ -4092,68 +4116,89 @@ void Simulation::UpdateParticles(int start, int end)
 		threadContext.debug_mostRecentlyUpdated = -1;
 	}
 	RNG tileInitRng = rng.Instance();
-	auto t0 = std::chrono::high_resolution_clock::now();
-	useThreadContext = true;
-	for (auto &tile : tiles.Base)
+	tileRounds[0].offset.X = tileInitRng.between(0, TILECELL - 1);
+	tileRounds[0].offset.Y = tileInitRng.between(0, TILECELL - 1);
+	tileRounds[1].offset.X = tileRounds[0].offset.X ^ (TILECELL / 2);
+	tileRounds[1].offset.Y = tileRounds[0].offset.Y ^ (TILECELL / 2);
+	recordSpan("init");
+
+	for (int tileRoundIndex = 0; tileRoundIndex < TILE_ROUNDS; ++tileRoundIndex)
 	{
-		if (tile.parts.empty())
+		TilePartilces([this, tileRoundIndex](int i) {
+			return EligibleForTiledUpdate(i, tileRoundIndex);
+		}, tileRoundIndex);
+		recordSpan(ByteString::Build("tile", tileRoundIndex + 1));
+		useThreadContext = true;
+		for (auto &tile : tileRounds[tileRoundIndex].tiles.Base)
 		{
-			continue;
-		}
-		auto seed = tileInitRng();
-		tileThreads.PushWorkItem([this, &tile, seed]() {
-			auto &threadContext = threadContexts[ThreadIndex()];
-			threadContext.rng.seed(seed);
-			for (auto i : tile.parts)
+			if (tile.parts.empty())
 			{
-				if (!parts[i].type)
-				{
-					continue;
-				}
-				if (!EligibleForTiledUpdate(i))
-				{
-					tile.partsDeferred.push_back(i);
-					continue;
-				}
-				UpdateOne(i, true);
+				continue;
 			}
-		});
+			auto seed = tileInitRng();
+			tileThreads.PushWorkItem([this, &tile, seed, tileRoundIndex]() {
+				auto &threadContext = threadContexts[ThreadIndex()];
+				threadContext.rng.seed(seed);
+				for (auto i : tile.parts)
+				{
+					if (!parts[i].type)
+					{
+						continue;
+					}
+					if (!EligibleForTiledUpdate(i, tileRoundIndex))
+					{
+						tile.partsDeferred.push_back(i);
+						continue;
+					}
+					UpdateOne(i, tileRoundIndex);
+				}
+			});
+		}
+		tileThreads.Flush();
+		useThreadContext = false;
+		recordSpan(ByteString::Build("parallel", tileRoundIndex));
 	}
-	tileThreads.Flush();
-	useThreadContext = false;
-	for (auto &threadContext : threadContexts)
 	{
-		for (int j = 0; j < PT_NUM; ++j)
+		for (auto &threadContext : threadContexts)
 		{
-			elementCount[j] += threadContext.elementCount[j];
+			for (int j = 0; j < PT_NUM; ++j)
+			{
+				elementCount[j] += threadContext.elementCount[j];
+			}
+			NUM_PARTS += threadContext.NUM_PARTS;
+			debug_mostRecentlyUpdated = std::max(debug_mostRecentlyUpdated, threadContext.debug_mostRecentlyUpdated);
+			for (auto p : threadContext.emapActivation)
+			{
+				set_emap(p.X, p.Y);
+			}
+			threadContext.emapActivation.clear();
 		}
-		NUM_PARTS += threadContext.NUM_PARTS;
-		debug_mostRecentlyUpdated = std::max(debug_mostRecentlyUpdated, threadContext.debug_mostRecentlyUpdated);
-		for (auto p : threadContext.emapActivation)
+		recordSpan("merge");
+		for (int tileRoundIndex = 0; tileRoundIndex < TILE_ROUNDS; ++tileRoundIndex)
 		{
-			set_emap(p.X, p.Y);
+			for (auto &tile : tileRounds[tileRoundIndex].tiles.Base)
+			{
+				for (auto i : tile.partsDeferredMovement)
+				{
+					MovementPhase(i, GetNeighbourhood(i));
+				}
+			}
+			recordSpan(ByteString::Build("deferredLateMovement", tileRoundIndex));
+			for (auto &tile : tileRounds[tileRoundIndex].tiles.Base)
+			{
+				for (auto i : tile.partsDeferred)
+				{
+					UpdateOne(i, -1);
+				}
+			}
+			recordSpan(ByteString::Build("deferredLateUpdateMovement", tileRoundIndex));
 		}
-		threadContext.emapActivation.clear();
+		for (auto i : tileRounds[TILE_ROUNDS - 1].partsDeferred)
+		{
+			UpdateOne(i, -1);
+		}
+		recordSpan("deferredLeftover");
 	}
-	auto t1 = std::chrono::high_resolution_clock::now();
-	for (auto &tile : tiles.Base)
-	{
-		for (auto i : tile.partsDeferredMovement)
-		{
-			MovementPhase(i, GetNeighbourhood(i));
-		}
-		for (auto i : tile.partsDeferred)
-		{
-			UpdateOne(i, false);
-		}
-	}
-	for (auto i : partsDeferred)
-	{
-		UpdateOne(i, false);
-	}
-	auto t2 = std::chrono::high_resolution_clock::now();
-	updateParticlesParallelTime = double(std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count());
-	updateParticlesSerialTime   = double(std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t0).count());
 }
 
 // we want XRES * YRES <= (1 << (31 - PMAPBITS)), but we do a division because multiplication could silently overflow
