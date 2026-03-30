@@ -1,3 +1,10 @@
-# This file is used by the starcatcher.us update server to pull changelogs for mod releases
-# Erase and replace the changelog for every release, do not just append changes to the end
-# Lines starting with # and empty lines are ignored
+The Parallel Toy (up to date with and slightly more recent than The Powder Toy 99.5)
+
+Build 5
+	Rewrite from scratch, should be much more stable, but see below
+	sim.threads(0) is now equivalent to single-threaded TPT
+	sim.threads(1) is multi-threading-capable TPT but with only 1 thread enabled; useful for establishing a reference
+	Subframe is broken; this is by design and will not be fixed
+	Water equalization hinders multi-threading
+	Partial frame steps hinder multi-threading and are no longer a useful debug tool
+	Lua scripts are expected to crash the game, please do not report such issues
