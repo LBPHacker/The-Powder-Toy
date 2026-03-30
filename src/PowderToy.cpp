@@ -497,8 +497,8 @@ int Main(int argc, char *argv[])
 	explicitSingletons->gameController = std::make_unique<GameController>();
 	auto *gameController = explicitSingletons->gameController.get();
 	engine.ShowWindow(gameController->GetView());
-	gameController->InitCommandInterface();
 	gameController->SetTileThreadCount(threads);
+	gameController->InitCommandInterface();
 
 	auto openArg = arguments["open"];
 	if (openArg.has_value())

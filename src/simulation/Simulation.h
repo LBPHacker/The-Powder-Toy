@@ -24,6 +24,7 @@
 #include <array>
 #include <memory>
 #include <optional>
+#include <chrono>
 
 constexpr int TILE_ROUNDS = 2;
 
@@ -396,6 +397,11 @@ private:
 
 	template<class Func>
 	void TilePartilces(Func func, int tileRoundIndex);
+
+	std::optional<std::chrono::high_resolution_clock::time_point> timingT0;
+
+public:
+	bool enableTiming = false;
 };
 
 inline RNG &RNGMultiplexer::Instance()

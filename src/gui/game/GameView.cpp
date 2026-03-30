@@ -1677,6 +1677,7 @@ void GameView::OnKeyRelease(int key, int scan, bool repeat, bool shift, bool ctr
 
 void GameView::OnBlur()
 {
+	sim->enableTiming = false;
 	disableAltBehaviour();
 	disableCtrlBehaviour();
 	disableShiftBehaviour();
@@ -2582,6 +2583,7 @@ void GameView::OnDraw()
 		}
 		if (c->GetDebugFlags() & DEBUG_TILES)
 		{
+			sim->enableTiming = true;
 			fpsInfo << "\nParallel tile stats:";
 			for (auto &[ key, value ] : sim->updatePhaseTimes)
 			{
@@ -2597,6 +2599,10 @@ void GameView::OnDraw()
 				fpsInfo << "\n  " << key.FromUtf8() << ": " << Format::Precision(2) << (it->second / 1000.0) << "us";
 			}
 			fpsInfo << "\n  Free list mutex locked: " << sim->parts.pfreeMxLockedTimes << " times";
+		}
+		else
+		{
+			sim->enableTiming = false;
 		}
 		if (c->GetDebugFlags() & DEBUG_RENHUD)
 		{

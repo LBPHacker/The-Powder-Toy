@@ -4108,7 +4108,6 @@ void Simulation::TilePartilces(Func func, int tileRoundIndex)
 	tileThreads.Flush();
 }
 
-auto t0 = std::chrono::high_resolution_clock::now();
 void Simulation::UpdateParticles(int start, int end)
 {
 	if (water_equal_test || !(start == 0 && end == NPART))
@@ -4121,10 +4120,25 @@ void Simulation::UpdateParticles(int start, int end)
 	}
 	updatePhaseTimes.clear();
 
+	if (enableTiming)
+	{
+		if (!timingT0)
+		{
+			timingT0 = std::chrono::high_resolution_clock::now();
+		}
+	}
+	else
+	{
+		timingT0.reset();
+	}
 	auto recordSpan = [&](ByteString s){
+		if (!enableTiming)
+		{
+			return;
+		}
 		auto t1 = std::chrono::high_resolution_clock::now();
-		updatePhaseTimes.push_back({ std::move(s), double(std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count()) });
-		t0 = t1;
+		updatePhaseTimes.push_back({ std::move(s), double(std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - *timingT0).count()) });
+		*timingT0 = t1;
 	};
 	recordSpan("external");
 
