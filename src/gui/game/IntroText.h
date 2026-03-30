@@ -42,8 +42,12 @@ inline ByteString VersionInfo()
 inline ByteString IntroText()
 {
 	ByteStringBuilder sb;
-	sb << "\bl\bU" << APPNAME << "\bU - Version " << DISPLAY_VERSION[0] << "." << DISPLAY_VERSION[1] << " - https://powdertoy.co.uk, irc.libera.chat #powder, https://tpt.io/discord\n"
+	sb << "\bu\bU" << APPNAME << "\bU\bl - Version " << DISPLAY_VERSION[0] << "." << DISPLAY_VERSION[1] << " - https://powdertoy.co.uk, irc.libera.chat #powder, https://tpt.io/discord\n"
 	      "\n"
+	      "\buYou can use sim.threads(N) in the console to allow the simulation to use N threads.\n"
+	      "You will often hit the default FPS cap of 60 with this mod; use tpt.fpsCap(2) in the console to remove the cap.\n"
+	      "You can also use tpt.debug(0x100) in the console to get timing information, if you know what you are doing.\n"
+	      "Note: This mod is an experiment; expect and please report simulation weirdness and crashes.\n"
 	      "\n"
 	      "\bgControl+C/V/X are Copy, Paste and cut respectively.\n"
 	      "\bgTo choose a material, hover over one of the icons on the right, it will show a selection of elements in that group.\n"
