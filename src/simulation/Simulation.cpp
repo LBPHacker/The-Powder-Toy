@@ -4044,11 +4044,19 @@ void Simulation::TilePartilces(Func func, int tileRoundIndex)
 	auto &round = tileRounds[tileRoundIndex];
 	for (auto &tile : round.tiles.Base)
 	{
-		tile.parts.clear();
+		tile.partsPerThreads.resize(GetTileThreadCount());
+		for (auto &partsPerThread : tile.partsPerThreads)
+		{
+			partsPerThread.parts.clear();
+		}
 		tile.partsDeferredMovement.clear();
 		tile.partsDeferred.clear();
 	}
-	round.partsDeferred.clear();
+	round.deferredPerThreads.resize(GetTileThreadCount());
+	for (auto &deferredPerThread : round.deferredPerThreads)
+	{
+		deferredPerThread.partsDeferred.clear();
+	}
 	auto handle = [&](int i) {
 		if (!parts[i].type)
 		{
@@ -4058,27 +4066,46 @@ void Simulation::TilePartilces(Func func, int tileRoundIndex)
 		auto y = int(parts[i].y+0.5f);
 		if (func(i))
 		{
-			round.tiles[{ (x + round.offset.X) / TILECELL, (y + round.offset.Y) / TILECELL }].parts.push_back(i);
+			round.tiles[{ (x + round.offset.X) / TILECELL, (y + round.offset.Y) / TILECELL }].partsPerThreads[ThreadIndex()].parts.push_back(i);
 		}
 		else
 		{
-			round.partsDeferred.push_back(i);
+			round.deferredPerThreads[ThreadIndex()].partsDeferred.push_back(i);
 		}
 	};
+	constexpr int chunkSize = 10000;
 	if (tileRoundIndex == 0)
 	{
-		for (int i = 0; i < parts.active; i++)
+		for (int begin = 0; begin < parts.active; begin += chunkSize)
 		{
-			handle(i);
+			auto end = std::min(begin + chunkSize, parts.active);
+			tileThreads.PushWorkItem([&, begin, end]() {
+				for (int i = begin; i < end; i++)
+				{
+					handle(i);
+				}
+			});
 		}
 	}
 	else
 	{
-		for (auto i : tileRounds[tileRoundIndex - 1].partsDeferred)
+		for (auto &deferredPerThread : tileRounds[tileRoundIndex - 1].deferredPerThreads)
 		{
-			handle(i);
+			auto &prevDeferred = deferredPerThread.partsDeferred;
+			auto count = int(prevDeferred.size());
+			for (int begin = 0; begin < count; begin += chunkSize)
+			{
+				auto end = std::min(begin + chunkSize, count);
+				tileThreads.PushWorkItem([&, begin, end]() {
+					for (int i = begin; i < end; i++)
+					{
+						handle(prevDeferred[i]);
+					}
+				});
+			}
 		}
 	}
+	tileThreads.Flush();
 }
 
 auto t0 = std::chrono::high_resolution_clock::now();
@@ -4131,7 +4158,15 @@ void Simulation::UpdateParticles(int start, int end)
 		useThreadContext = true;
 		for (auto &tile : tileRounds[tileRoundIndex].tiles.Base)
 		{
-			if (tile.parts.empty())
+			bool empty = true;
+			for (auto &partsPerThread : tile.partsPerThreads)
+			{
+				if (!partsPerThread.parts.empty())
+				{
+					empty = false;
+				}
+			}
+			if (empty)
 			{
 				continue;
 			}
@@ -4139,18 +4174,21 @@ void Simulation::UpdateParticles(int start, int end)
 			tileThreads.PushWorkItem([this, &tile, seed, tileRoundIndex]() {
 				auto &threadContext = threadContexts[ThreadIndex()];
 				threadContext.rng.seed(seed);
-				for (auto i : tile.parts)
+				for (auto &partsPerThread : tile.partsPerThreads)
 				{
-					if (!parts[i].type)
+					for (auto i : partsPerThread.parts)
 					{
-						continue;
+						if (!parts[i].type)
+						{
+							continue;
+						}
+						if (!EligibleForTiledUpdate(i, tileRoundIndex))
+						{
+							tile.partsDeferred.push_back(i);
+							continue;
+						}
+						UpdateOne(i, tileRoundIndex);
 					}
-					if (!EligibleForTiledUpdate(i, tileRoundIndex))
-					{
-						tile.partsDeferred.push_back(i);
-						continue;
-					}
-					UpdateOne(i, tileRoundIndex);
 				}
 			});
 		}
@@ -4193,9 +4231,12 @@ void Simulation::UpdateParticles(int start, int end)
 			}
 			recordSpan(ByteString::Build("deferredLateUpdateMovement", tileRoundIndex));
 		}
-		for (auto i : tileRounds[TILE_ROUNDS - 1].partsDeferred)
+		for (auto &deferredPerThread : tileRounds[TILE_ROUNDS - 1].deferredPerThreads)
 		{
-			UpdateOne(i, -1);
+			for (auto i : deferredPerThread.partsDeferred)
+			{
+				UpdateOne(i, -1);
+			}
 		}
 		recordSpan("deferredLeftover");
 	}

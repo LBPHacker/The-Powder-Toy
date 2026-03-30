@@ -369,15 +369,23 @@ private:
 
 	struct alignas(64) TileInfo
 	{
-		std::vector<int, AlignedAllocator<int>> parts;
-		std::vector<int, AlignedAllocator<int>> partsDeferredMovement;
-		std::vector<int, AlignedAllocator<int>> partsDeferred;
+		struct alignas(64) PartsPerThread
+		{
+			std::vector<int> parts;
+		};
+		std::vector<PartsPerThread> partsPerThreads;
+		std::vector<int> partsDeferredMovement;
+		std::vector<int> partsDeferred;
 	};
 	struct alignas(64) TileRoundInfo
 	{
 		alignas(64) TilePlane<TileInfo> tiles;
 		Vec2<int> offset{ 0, 0 };
-		std::vector<int> partsDeferred;
+		struct alignas(64) DeferredPerThread
+		{
+			std::vector<int> partsDeferred;
+		};
+		std::vector<DeferredPerThread> deferredPerThreads;
 	};
 	alignas(64) std::array<TileRoundInfo, TILE_ROUNDS> tileRounds;
 	void UpdateOne(int i, int deferTiledMovement);
