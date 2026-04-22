@@ -12,7 +12,6 @@
 
 OptionsModel::OptionsModel(GameModel * gModel_) {
 	gModel = gModel_;
-	sim = gModel->GetSimulation();
 }
 
 void OptionsModel::AddObserver(OptionsView* view)
@@ -23,55 +22,55 @@ void OptionsModel::AddObserver(OptionsView* view)
 
 bool OptionsModel::GetHeatSimulation()
 {
-	return sim->legacy_enable?false:true;
+	return gModel->GetSimulation()->legacy_enable?false:true;
 }
 
 void OptionsModel::SetHeatSimulation(bool state)
 {
-	sim->legacy_enable = state?0:1;
+	gModel->GetSimulation()->legacy_enable = state?0:1;
 	notifySettingsChanged();
 }
 
 bool OptionsModel::GetAmbientHeatSimulation()
 {
-	return sim->aheat_enable?true:false;
+	return gModel->GetSimulation()->aheat_enable?true:false;
 }
 
 void OptionsModel::SetAmbientHeatSimulation(bool state)
 {
-	sim->aheat_enable = state?1:0;
+	gModel->GetSimulation()->aheat_enable = state?1:0;
 	notifySettingsChanged();
 }
 
 bool OptionsModel::GetNewtonianGravity()
 {
-	return bool(sim->grav);
+	return bool(gModel->GetSimulation()->grav);
 }
 
 void OptionsModel::SetNewtonianGravity(bool state)
 {
-	sim->EnableNewtonianGravity(state);
+	gModel->GetSimulation()->EnableNewtonianGravity(state);
 	notifySettingsChanged();
 }
 
 bool OptionsModel::GetWaterEqualisation()
 {
-	return sim->water_equal_test?true:false;
+	return gModel->GetSimulation()->water_equal_test?true:false;
 }
 
 void OptionsModel::SetWaterEqualisation(bool state)
 {
-	sim->water_equal_test = state?1:0;
+	gModel->GetSimulation()->water_equal_test = state?1:0;
 	notifySettingsChanged();
 }
 
 int OptionsModel::GetAirMode()
 {
-	return sim->air->airMode;
+	return gModel->GetSimulation()->air->airMode;
 }
 void OptionsModel::SetAirMode(int airMode)
 {
-	sim->air->airMode = airMode;
+	gModel->GetSimulation()->air->airMode = airMode;
 	notifySettingsChanged();
 }
 
@@ -177,33 +176,33 @@ void OptionsModel::SetConvectionMode(int convMode)
 
 int OptionsModel::GetGravityMode()
 {
-	return sim->gravityMode;
+	return gModel->GetSimulation()->gravityMode;
 }
 void OptionsModel::SetGravityMode(int gravityMode)
 {
-	sim->gravityMode = gravityMode;
+	gModel->GetSimulation()->gravityMode = gravityMode;
 	notifySettingsChanged();
 }
 
 float OptionsModel::GetCustomGravityX()
 {
-	return sim->customGravityX;
+	return gModel->GetSimulation()->customGravityX;
 }
 
 void OptionsModel::SetCustomGravityX(float x)
 {
-	sim->customGravityX = x;
+	gModel->GetSimulation()->customGravityX = x;
 	notifySettingsChanged();
 }
 
 float OptionsModel::GetCustomGravityY()
 {
-	return sim->customGravityY;
+	return gModel->GetSimulation()->customGravityY;
 }
 
 void OptionsModel::SetCustomGravityY(float y)
 {
-	sim->customGravityY = y;
+	gModel->GetSimulation()->customGravityY = y;
 	notifySettingsChanged();
 }
 
