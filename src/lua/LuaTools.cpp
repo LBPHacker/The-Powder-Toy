@@ -80,7 +80,7 @@ static int luaPerformWrapper(SimTool *tool, Simulation *sim, Particle *cpart, in
 		lua_rawgeti(L, LUA_REGISTRYINDEX, customTools[index].perform);
 		if (cpart)
 		{
-			lua_pushinteger(L, cpart - &lsi->sim->parts[0]);
+			lua_pushinteger(L, cpart - &lsi->gameModel->GetSimulation()->parts[0]);
 		}
 		else
 		{

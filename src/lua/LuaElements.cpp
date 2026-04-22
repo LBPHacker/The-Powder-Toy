@@ -137,7 +137,7 @@ static int luaGraphicsWrapper(GRAPHICS_FUNC_ARGS)
 	}
 	auto *lsi = GetLSI();
 	auto &customElements = lsi->customElements;
-	auto *sim = lsi->sim;
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (customElements[cpart->type].graphics)
 	{
 		auto *pipeSubcallWcpart = gfctx.pipeSubcallCpart ? sim->parts + (gfctx.pipeSubcallCpart - gfctx.sim->parts) : nullptr;
