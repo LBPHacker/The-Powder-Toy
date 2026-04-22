@@ -1,12 +1,13 @@
 #include "ElementPopulation.h"
 #include "gui/interface/Engine.h"
+#include "gui/game/GameModel.h"
 #include "simulation/Simulation.h"
 #include "simulation/SimulationData.h"
 #include "graphics/Graphics.h"
 
-ElementPopulationDebug::ElementPopulationDebug(unsigned int id, Simulation * sim):
+ElementPopulationDebug::ElementPopulationDebug(unsigned int id, GameModel * model):
 	DebugInfo(id),
-	sim(sim),
+	model(model),
 	maxAverage(255.0f)
 {
 
@@ -25,6 +26,7 @@ void ElementPopulationDebug::Draw()
 	String halfValString;
 
 
+	auto *sim = model->GetSimulation();
 	float maxVal = 255;
 	float scale = 1.0f;
 	int bars = 0;

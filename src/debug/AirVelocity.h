@@ -1,17 +1,17 @@
 #pragma once
 #include "DebugInfo.h"
 
-class Simulation;
+class GameModel;
 class GameView;
 class GameController;
 class AirVelocity : public DebugInfo
 {
-	const Simulation *sim;
+	GameModel *model;
 	GameView *view;
 	GameController *controller;
 
 public:
-	AirVelocity(unsigned int id, const Simulation *newSim, GameView *newView, GameController *newController);
+	AirVelocity(unsigned int id, GameModel *model, GameView *newView, GameController *newController);
 
 	void Draw() override;
 };

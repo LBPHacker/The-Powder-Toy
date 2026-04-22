@@ -29,7 +29,7 @@ static int mathRandom(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	// only thing that matters is that the rng not be sim->rng when !(eventTraits & eventTraitSimRng)
-	auto &rng = (lsi->eventTraits & eventTraitSimRng) ? lsi->sim->rng : interfaceRng;
+	auto &rng = (lsi->eventTraits & eventTraitSimRng) ? lsi->gameModel->GetSimulation()->rng : interfaceRng;
 	double lower, upper;
 	switch (lua_gettop(L))
 	{
@@ -131,7 +131,6 @@ LuaScriptInterface::LuaScriptInterface(GameController *newGameController, GameMo
 	gameModel(newGameModel),
 	gameController(newGameController),
 	window(gameController->GetView()),
-	sim(gameModel->GetSimulation()),
 	g(ui::Engine::Ref().g),
 	customElements(PT_NUM),
 	gameControllerEventHandlers(std::variant_size_v<GameControllerEvent>)
@@ -327,7 +326,7 @@ void LuaSetProperty(lua_State *L, StructProperty property, intptr_t propertyAddr
 void LuaSetParticleProperty(lua_State *L, int particleID, StructProperty property, intptr_t propertyAddress, int stackPos)
 {
 	auto *lsi = GetLSI();
-	auto *sim = lsi->sim;
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (property.Name == "type")
 	{
 		lsi->AssertMonopartAccessEvent(-1);
@@ -517,7 +516,7 @@ bool CommandInterface::HaveSimGraphicsEventHandlers()
 	auto *lsi = static_cast<LuaScriptInterface *>(this);
 	for (int i = 0; i < int(lsi->customElements.size()); ++i)
 	{
-		if (lsi->customElements[i].graphics && !sd.graphicscache[i].isready && lsi->sim->elementCount[i])
+		if (lsi->customElements[i].graphics && !sd.graphicscache[i].isready && lsi->gameModel->GetSimulation()->elementCount[i])
 		{
 			return true;
 		}

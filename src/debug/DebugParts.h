@@ -2,12 +2,12 @@
 
 #include "DebugInfo.h"
 
-class Simulation;
+class GameModel;
 class DebugParts : public DebugInfo
 {
-	Simulation * sim;
+	GameModel * model;
 public:
-	DebugParts(unsigned int id, Simulation * sim);
+	DebugParts(unsigned int id, GameModel * model);
 	void Draw() override;
 	virtual ~DebugParts();
 };

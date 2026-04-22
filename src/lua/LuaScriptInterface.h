@@ -107,7 +107,6 @@ public:
 	GameModel *gameModel;
 	GameController *gameController;
 	GameView *window;
-	Simulation *sim;
 	Graphics *g;
 
 	NonGraphicsContext ngc;
