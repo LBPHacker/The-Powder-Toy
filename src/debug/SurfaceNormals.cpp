@@ -1,13 +1,14 @@
 #include "SurfaceNormals.h"
 #include "gui/game/GameView.h"
 #include "gui/game/GameController.h"
+#include "gui/game/GameModel.h"
 #include "gui/interface/Engine.h"
 #include "simulation/Simulation.h"
 #include "simulation/ElementClasses.h"
 #include "graphics/Graphics.h"
 
-SurfaceNormals::SurfaceNormals(unsigned int id, const Simulation *newSim, GameView *newView, GameController *newController) :
-	DebugInfo(id), sim(newSim), view(newView), controller(newController)
+SurfaceNormals::SurfaceNormals(unsigned int id, GameModel *model, GameView *newView, GameController *newController) :
+	DebugInfo(id), model(model), view(newView), controller(newController)
 {
 }
 
@@ -15,6 +16,7 @@ void SurfaceNormals::Draw()
 {
 	auto *g = ui::Engine::Ref().g;
 	ui::Point pos = controller->PointTranslate(view->GetCurrentMouse());
+	const auto *sim = model->GetSimulation();
 	auto p = sim->photons[pos.Y][pos.X];
 	if (!p)
 	{

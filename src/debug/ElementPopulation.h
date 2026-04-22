@@ -2,13 +2,13 @@
 
 #include "DebugInfo.h"
 
-class Simulation;
+class GameModel;
 class ElementPopulationDebug : public DebugInfo
 {
-	Simulation * sim;
+	GameModel * model;
 	float maxAverage;
 public:
-	ElementPopulationDebug(unsigned int id, Simulation * sim);
+	ElementPopulationDebug(unsigned int id, GameModel * model);
 	void Draw() override;
 	virtual ~ElementPopulationDebug();
 };

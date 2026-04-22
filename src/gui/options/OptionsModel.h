@@ -8,7 +8,6 @@ class OptionsView;
 class OptionsModel
 {
 	GameModel * gModel;
-	Simulation * sim;
 	std::vector<OptionsView*> observers;
 	void notifySettingsChanged();
 public:

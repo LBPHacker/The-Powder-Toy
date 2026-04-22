@@ -70,7 +70,7 @@ GameModel::GameModel(GameView *newView):
 {
 	sim = Simulation::Factory();
 	sim->useLuaCallbacks = true;
-	ren = new Renderer();
+	ren = std::make_unique<Renderer>();
 
 	activeTools = regularToolset.data();
 
@@ -236,7 +236,7 @@ GameModel::~GameModel()
 	}
 
 	sim.reset();
-	delete ren;
+	ren.reset();
 	//if(activeTools)
 	//	delete[] activeTools;
 }
@@ -934,7 +934,7 @@ Simulation * GameModel::GetSimulation()
 
 Renderer * GameModel::GetRenderer()
 {
-	return ren;
+	return ren.get();
 }
 
 const std::optional<User> &GameModel::GetUser() const
