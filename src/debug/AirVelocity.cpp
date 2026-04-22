@@ -1,13 +1,14 @@
 #include "AirVelocity.h"
 #include "gui/game/GameView.h"
 #include "gui/game/GameController.h"
+#include "gui/game/GameModel.h"
 #include "gui/interface/Engine.h"
 #include "simulation/Simulation.h"
 #include "simulation/ElementClasses.h"
 #include "graphics/Graphics.h"
 
-AirVelocity::AirVelocity(unsigned int id, const Simulation *newSim, GameView *newView, GameController *newController) :
-	DebugInfo(id), sim(newSim), view(newView), controller(newController)
+AirVelocity::AirVelocity(unsigned int id, GameModel *model, GameView *newView, GameController *newController) :
+	DebugInfo(id), model(model), view(newView), controller(newController)
 {
 }
 
@@ -16,6 +17,7 @@ void AirVelocity::Draw()
 	auto *g = ui::Engine::Ref().g;
 	ui::Point pos = controller->PointTranslate(view->GetCurrentMouse());
 
+	auto *sim = model->GetSimulation();
 	float velx = sim->vx[pos.Y/CELL][pos.X/CELL];
 	float vely = sim->vy[pos.Y/CELL][pos.X/CELL];
 	int endx = pos.X + (int)(10.0f*velx);

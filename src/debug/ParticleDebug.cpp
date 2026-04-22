@@ -1,12 +1,9 @@
 #include "ParticleDebug.h"
-
 #include "gui/game/GameModel.h"
-
 #include "simulation/Simulation.h"
 
-ParticleDebug::ParticleDebug(unsigned int id, Simulation * sim, GameModel * model):
+ParticleDebug::ParticleDebug(unsigned int id, GameModel * model):
 	DebugInfo(id),
-	sim(sim),
 	model(model)
 {
 
@@ -17,6 +14,7 @@ void ParticleDebug::Debug(int mode, int x, int y)
 	int i = 0;
 	String logmessage;
 
+	auto *sim = model->GetSimulation();
 	if (mode == 0)
 	{
 		if (!sim->NUM_PARTS)
@@ -86,6 +84,7 @@ bool ParticleDebug::KeyPress(int key, int scan, bool shift, bool ctrl, bool alt,
 		{
 			if (ctrl)
 				return true;
+			auto *sim = model->GetSimulation();
 			if (sim->debug_nextToUpdate > 0)
 			{
 				String logmessage = String::Build("Updated particles from #", sim->debug_nextToUpdate, " to end due to frame step");

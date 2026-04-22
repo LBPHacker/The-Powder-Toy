@@ -1,14 +1,12 @@
 #include "DebugParts.h"
-
 #include "gui/interface/Engine.h"
-
+#include "gui/game/GameModel.h"
 #include "simulation/Simulation.h"
-
 #include "graphics/Graphics.h"
 
-DebugParts::DebugParts(unsigned int id, Simulation * sim):
+DebugParts::DebugParts(unsigned int id, GameModel * model):
 	DebugInfo(id),
-	sim(sim)
+	model(model)
 {
 
 }
@@ -17,6 +15,7 @@ void DebugParts::Draw()
 {
 	Graphics * g = ui::Engine::Ref().g;
 
+	auto *sim = model->GetSimulation();
 	int x = 0, y = 0, lpx = 0, lpy = 0;
 	String info = String::Build(sim->parts.active, "/", NPART, " (", Format::Precision((float)sim->parts.active/(NPART)*100.0f, 2), "%)");
 	for (int i = 0; i < NPART; i++)

@@ -22,14 +22,15 @@ static int ambientHeatSim(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	int acount = lua_gettop(L);
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (acount == 0)
 	{
-		lua_pushboolean(L, lsi->sim->aheat_enable);
+		lua_pushboolean(L, sim->aheat_enable);
 		return 1;
 	}
 	lsi->AssertInterfaceEvent();
 	auto aheatstate = lua_toboolean(L, 1);
-	lsi->sim->aheat_enable = aheatstate;
+	sim->aheat_enable = aheatstate;
 	lsi->gameModel->UpdateQuickOptions();
 
 	return 0;
@@ -39,14 +40,15 @@ static int heatSim(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	int acount = lua_gettop(L);
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (acount == 0)
 	{
-		lua_pushboolean(L, !lsi->sim->legacy_enable);
+		lua_pushboolean(L, !sim->legacy_enable);
 		return 1;
 	}
 	lsi->AssertInterfaceEvent();
 	auto heatstate = lua_toboolean(L, 1);
-	lsi->sim->legacy_enable = !heatstate;
+	sim->legacy_enable = !heatstate;
 	return 0;
 }
 
@@ -54,13 +56,14 @@ static int newtonianGravity(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	int acount = lua_gettop(L);
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (acount == 0)
 	{
-		lua_pushboolean(L, bool(lsi->sim->grav));
+		lua_pushboolean(L, bool(sim->grav));
 		return 1;
 	}
 	lsi->AssertInterfaceEvent();
-	lsi->sim->EnableNewtonianGravity(lua_toboolean(L, 1));
+	sim->EnableNewtonianGravity(lua_toboolean(L, 1));
 	lsi->gameModel->UpdateQuickOptions();
 	return 0;
 }
@@ -83,7 +86,8 @@ static int paused(lua_State *L)
 static int partCount(lua_State *L)
 {
 	auto *lsi = GetLSI();
-	lua_pushinteger(L, lsi->sim->NUM_PARTS);
+	auto *sim = lsi->gameModel->GetSimulation();
+	lua_pushinteger(L, sim->NUM_PARTS);
 	return 1;
 }
 
@@ -176,49 +180,49 @@ static int LuaBlockMap(lua_State *L, Accessor accessor)
 
 static int velocityX(lua_State *L)
 {
-	auto *lsi = GetLSI();
-	return LuaBlockMap(L, MIN_PRESSURE, MAX_PRESSURE, [lsi](Vec2<int> p) -> float & {
-		return lsi->sim->vx[p.Y][p.X];
+	auto *sim = GetLSI()->gameModel->GetSimulation();
+	return LuaBlockMap(L, MIN_PRESSURE, MAX_PRESSURE, [sim](Vec2<int> p) -> float & {
+		return sim->vx[p.Y][p.X];
 	});
 }
 
 static int velocityY(lua_State *L)
 {
-	auto *lsi = GetLSI();
-	return LuaBlockMap(L, MIN_PRESSURE, MAX_PRESSURE, [lsi](Vec2<int> p) -> float & {
-		return lsi->sim->vy[p.Y][p.X];
+	auto *sim = GetLSI()->gameModel->GetSimulation();
+	return LuaBlockMap(L, MIN_PRESSURE, MAX_PRESSURE, [sim](Vec2<int> p) -> float & {
+		return sim->vy[p.Y][p.X];
 	});
 }
 
 static int ambientHeat(lua_State *L)
 {
-	auto *lsi = GetLSI();
-	return LuaBlockMap(L, MIN_TEMP, MAX_TEMP, [lsi](Vec2<int> p) -> float & {
-		return lsi->sim->hv[p.Y][p.X];
+	auto *sim = GetLSI()->gameModel->GetSimulation();
+	return LuaBlockMap(L, MIN_TEMP, MAX_TEMP, [sim](Vec2<int> p) -> float & {
+		return sim->hv[p.Y][p.X];
 	});
 }
 
 static int pressure(lua_State *L)
 {
-	auto *lsi = GetLSI();
-	return LuaBlockMap(L, MIN_PRESSURE, MAX_PRESSURE, [lsi](Vec2<int> p) -> float & {
-		return lsi->sim->pv[p.Y][p.X];
+	auto *sim = GetLSI()->gameModel->GetSimulation();;
+	return LuaBlockMap(L, MIN_PRESSURE, MAX_PRESSURE, [sim](Vec2<int> p) -> float & {
+		return sim->pv[p.Y][p.X];
 	});
 }
 
 static int gravityMass(lua_State *L)
 {
-	auto *lsi = GetLSI();
-	return LuaBlockMap(L, [lsi](Vec2<int> p) -> float & {
-		return lsi->sim->gravIn.mass[p];
+	auto *sim = GetLSI()->gameModel->GetSimulation();;
+	return LuaBlockMap(L, [sim](Vec2<int> p) -> float & {
+		return sim->gravIn.mass[p];
 	});
 }
 
 static int gravityMask(lua_State *L)
 {
-	auto *lsi = GetLSI();
-	return LuaBlockMap(L, [lsi](Vec2<int> p) -> uint32_t & {
-		return lsi->sim->gravIn.mask[p];
+	auto *sim = GetLSI()->gameModel->GetSimulation();;
+	return LuaBlockMap(L, [sim](Vec2<int> p) -> uint32_t & {
+		return sim->gravIn.mask[p];
 	});
 }
 
@@ -230,46 +234,48 @@ static int gravityField(lua_State *L)
 	{
 		return luaL_error(L, "Coordinates (%i, %i) out of range", pos.X, pos.Y);
 	}
-	lua_pushnumber(L, lsi->sim->gravOut.forceX[pos]);
-	lua_pushnumber(L, lsi->sim->gravOut.forceY[pos]);
+	auto *sim = lsi->gameModel->GetSimulation();
+	lua_pushnumber(L, sim->gravOut.forceX[pos]);
+	lua_pushnumber(L, sim->gravOut.forceY[pos]);
 	return 2;
 }
 
 static int elecMap(lua_State *L)
 {
-	auto *lsi = GetLSI();
-	return LuaBlockMap(L, [lsi](Vec2<int> p) -> unsigned char & {
-		return lsi->sim->emap[p.Y][p.X];
+	auto *sim = GetLSI()->gameModel->GetSimulation();
+	return LuaBlockMap(L, [sim](Vec2<int> p) -> unsigned char & {
+		return sim->emap[p.Y][p.X];
 	});
 }
 
 static int wallMap(lua_State *L)
 {
-	auto *lsi = GetLSI();
-	return LuaBlockMap(L, 0, UI_WALLCOUNT - 1, [lsi](Vec2<int> p) -> unsigned char & {
-		return lsi->sim->bmap[p.Y][p.X];
+	auto *sim = GetLSI()->gameModel->GetSimulation();
+	return LuaBlockMap(L, 0, UI_WALLCOUNT - 1, [sim](Vec2<int> p) -> unsigned char & {
+		return sim->bmap[p.Y][p.X];
 	});
 }
 
 static int fanVelocityX(lua_State *L)
 {
-	auto *lsi = GetLSI();
-	return LuaBlockMap(L, [lsi](Vec2<int> p) -> float & {
-		return lsi->sim->fvx[p.Y][p.X];
+	auto *sim = GetLSI()->gameModel->GetSimulation();
+	return LuaBlockMap(L, [sim](Vec2<int> p) -> float & {
+		return sim->fvx[p.Y][p.X];
 	});
 }
 
 static int fanVelocityY(lua_State *L)
-{	auto *lsi = GetLSI();
-	return LuaBlockMap(L, [lsi](Vec2<int> p) -> float & {
-		return lsi->sim->fvy[p.Y][p.X];
+{
+	auto *sim = GetLSI()->gameModel->GetSimulation();
+	return LuaBlockMap(L, [sim](Vec2<int> p) -> float & {
+		return sim->fvy[p.Y][p.X];
 	});
 }
 
 static int partNeighbors(lua_State *L)
 {
 	auto *lsi = GetLSI();
-	auto *sim = lsi->sim;
+	auto *sim = lsi->gameModel->GetSimulation();
 	lua_newtable(L);
 	int id = 1;
 	int x = lua_tointeger(L, 1), y = lua_tointeger(L, 2), r = lua_tointeger(L, 3), rx, ry, n;
@@ -315,9 +321,10 @@ static int partChangeType(lua_State *L)
 	auto *lsi = GetLSI();
 	lsi->AssertMonopartAccessEvent(-1);
 	int partIndex = lua_tointeger(L, 1);
-	if(partIndex < 0 || partIndex >= NPART || !lsi->sim->parts[partIndex].type)
+	auto *sim = lsi->gameModel->GetSimulation();
+	if(partIndex < 0 || partIndex >= NPART || !sim->parts[partIndex].type)
 		return 0;
-	lsi->sim->part_change_type(partIndex, int(lsi->sim->parts[partIndex].x+0.5f), int(lsi->sim->parts[partIndex].y+0.5f), lua_tointeger(L, 2));
+	sim->part_change_type(partIndex, int(sim->parts[partIndex].x+0.5f), int(sim->parts[partIndex].y+0.5f), lua_tointeger(L, 2));
 	return 0;
 }
 
@@ -331,7 +338,8 @@ static int partCreate(lua_State *L)
 		lua_pushinteger(L, -1);
 		return 1;
 	}
-	if (newID >= 0 && !lsi->sim->parts[newID].type)
+	auto *sim = lsi->gameModel->GetSimulation();
+	if (newID >= 0 && !sim->parts[newID].type)
 	{
 		lua_pushinteger(L, -1);
 		return 1;
@@ -351,7 +359,7 @@ static int partCreate(lua_State *L)
 		v = ID(type);
 		type = TYP(type);
 	}
-	lua_pushinteger(L, lsi->sim->create_part(newID, lua_tointeger(L, 2), lua_tointeger(L, 3), type, v));
+	lua_pushinteger(L, sim->create_part(newID, lua_tointeger(L, 2), lua_tointeger(L, 3), type, v));
 	return 1;
 }
 
@@ -367,9 +375,10 @@ static int partID(lua_State *L)
 		return 1;
 	}
 
-	int amalgam = lsi->sim->pmap[y][x];
+	auto *sim = lsi->gameModel->GetSimulation();
+	int amalgam = sim->pmap[y][x];
 	if(!amalgam)
-		amalgam = lsi->sim->photons[y][x];
+		amalgam = sim->photons[y][x];
 	if (!amalgam)
 		lua_pushnil(L);
 	else
@@ -380,7 +389,7 @@ static int partID(lua_State *L)
 static int partPosition(lua_State *L)
 {
 	auto *lsi = GetLSI();
-	auto *sim = lsi->sim;
+	auto *sim = lsi->gameModel->GetSimulation();
 	int particleID = lua_tointeger(L, 1);
 	int argCount = lua_gettop(L);
 	if (particleID < 0 || particleID >= NPART || !sim->parts[particleID].type)
@@ -420,7 +429,8 @@ static int partProperty(lua_State *L)
 	int particleID = luaL_checkinteger(L, 1);
 	StructProperty property;
 
-	if (particleID < 0 || particleID >= NPART || !lsi->sim->parts[particleID].type)
+	auto *sim = lsi->gameModel->GetSimulation();
+	if (particleID < 0 || particleID >= NPART || !sim->parts[particleID].type)
 	{
 		if (argCount == 3)
 		{
@@ -464,7 +474,7 @@ static int partProperty(lua_State *L)
 	}
 
 	//Calculate memory address of property
-	intptr_t propertyAddress = (intptr_t)(((unsigned char*)&lsi->sim->parts[particleID]) + prop->Offset);
+	intptr_t propertyAddress = (intptr_t)(((unsigned char*)&sim->parts[particleID]) + prop->Offset);
 
 	if (argCount == 3)
 	{
@@ -478,14 +488,15 @@ static int partProperty(lua_State *L)
 static int partKill(lua_State *L)
 {
 	auto *lsi = GetLSI();
+	auto *sim = lsi->gameModel->GetSimulation();
 	lsi->AssertMonopartAccessEvent(-1);
 	if(lua_gettop(L)==2)
-		lsi->sim->delete_part(lua_tointeger(L, 1), lua_tointeger(L, 2));
+		sim->delete_part(lua_tointeger(L, 1), lua_tointeger(L, 2));
 	else
 	{
 		int i = lua_tointeger(L, 1);
 		if (i>=0 && i<NPART)
-			lsi->sim->kill_part(i);
+			sim->kill_part(i);
 	}
 	return 0;
 }
@@ -494,7 +505,8 @@ static int partExists(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	int i = luaL_checkinteger(L, 1);
-	lua_pushboolean(L, i >= 0 && i < NPART && lsi->sim->parts[i].type);
+	auto *sim = lsi->gameModel->GetSimulation();
+	lua_pushboolean(L, i >= 0 && i < NPART && sim->parts[i].type);
 	return 1;
 }
 
@@ -506,16 +518,17 @@ static int createParts(lua_State *L)
 	int rx = luaL_optint(L,3,5);
 	int ry = luaL_optint(L,4,5);
 	int brushID = luaL_optint(L,6,BRUSH_CIRCLE);
-	int flags = luaL_optint(L, 7, 0); // note: weird: the default is 0 in a sim context but lsi->sim->replaceModeFlags in a ui context
+	int flags = luaL_optint(L, 7, 0); // note: weird: the default is 0 in a sim context but sim->replaceModeFlags in a ui context
 	                                  // note: weird: has to be 0 in a sim context
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (!(lsi->eventTraits & eventTraitInterface) && !lua_isnoneornil(L, 5) && brushID == BRUSH_CIRCLE && flags == 0)
 	{
 		int c = luaL_checkint(L, 5); // note: weird: has to be specified in a sim context but not in a ui context
 		auto center = Vec2(x, y);
-		RasterizeEllipseRows(Vec2<float>(float(rx * rx), float(ry * ry)), [lsi, c, center](int xLim, int dy) {
+		RasterizeEllipseRows(Vec2<float>(float(rx * rx), float(ry * ry)), [sim, c, center](int xLim, int dy) {
 			for (auto pos : RectBetween(center + Vec2(-xLim, dy), center + Vec2(xLim, dy)))
 			{
-				lsi->sim->CreateParts(-1, pos.X, pos.Y, 0, 0, c, 0);
+				sim->CreateParts(-1, pos.X, pos.Y, 0, 0, c, 0);
 			}
 		});
 		lua_pushinteger(L, 0); // return value doesn't make sense anyway
@@ -523,7 +536,7 @@ static int createParts(lua_State *L)
 	}
 
 	lsi->AssertToolEvent();
-	int uiFlags = luaL_optint(L,7,lsi->sim->replaceModeFlags);
+	int uiFlags = luaL_optint(L,7,sim->replaceModeFlags);
 	Brush *brush = lsi->gameModel->GetBrushByID(brushID);
 	if (!brush)
 		return luaL_error(L, "Invalid brush id '%d'", brushID);
@@ -531,7 +544,7 @@ static int createParts(lua_State *L)
 	newBrush->SetRadius(ui::Point(rx, ry));
 
 	int c = luaL_optint(L,5,lsi->gameModel->GetActiveTool(0)->ToolID);
-	int ret = lsi->sim->CreateParts(-2, x, y, c, *newBrush, uiFlags);
+	int ret = sim->CreateParts(-2, x, y, c, *newBrush, uiFlags);
 	lua_pushinteger(L, ret);
 	return 1;
 }
@@ -546,25 +559,26 @@ static int createLine(lua_State *L)
 	int rx = luaL_optint(L,5,5);
 	int ry = luaL_optint(L,6,5);
 	int brushID = luaL_optint(L,8,BRUSH_CIRCLE);
-	int flags = luaL_optint(L, 9, 0); // note: weird: the default is 0 in a sim context but lsi->sim->replaceModeFlags in a ui context
+	int flags = luaL_optint(L, 9, 0); // note: weird: the default is 0 in a sim context but sim->replaceModeFlags in a ui context
 	                                  // note: weird: has to be 0 in a sim context
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (!(lsi->eventTraits & eventTraitInterface) && rx == 0 && ry == 0 && !lua_isnoneornil(L, 7) && brushID == BRUSH_CIRCLE && flags == 0)
 	{
 		int c = luaL_checkint(L, 7); // note: weird: has to be specified in a sim context but not in a ui context
-		lsi->sim->CreateLine(x1, y1, x2, y2, c);
+		sim->CreateLine(x1, y1, x2, y2, c);
 		return 0;
 	}
 
 	lsi->AssertToolEvent();
 	int c = luaL_optint(L,7,lsi->gameModel->GetActiveTool(0)->ToolID);
-	int uiFlags = luaL_optint(L,9,lsi->sim->replaceModeFlags);
+	int uiFlags = luaL_optint(L,9,sim->replaceModeFlags);
 	Brush *brush = lsi->gameModel->GetBrushByID(brushID);
 	if (!brush)
 		return luaL_error(L, "Invalid brush id '%d'", brushID);
 	auto newBrush = brush->Clone();
 	newBrush->SetRadius(ui::Point(rx, ry));
 
-	lsi->sim->CreateLine(x1, y1, x2, y2, c, *newBrush, uiFlags);
+	sim->CreateLine(x1, y1, x2, y2, c, *newBrush, uiFlags);
 	return 0;
 }
 
@@ -575,20 +589,21 @@ static int createBox(lua_State *L)
 	int y1 = luaL_optint(L,2,-1);
 	int x2 = luaL_optint(L,3,-1);
 	int y2 = luaL_optint(L,4,-1);
-	int flags = luaL_optint(L, 6, 0); // note: weird: the default is 0 in a sim context but lsi->sim->replaceModeFlags in a ui context
+	int flags = luaL_optint(L, 6, 0); // note: weird: the default is 0 in a sim context but sim->replaceModeFlags in a ui context
 	                                  // note: weird: has to be 0 in a sim context
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (!(lsi->eventTraits & eventTraitInterface) && !lua_isnoneornil(L, 5) && flags == 0)
 	{
 		int c = luaL_checkint(L, 5); // note: weird: has to be specified in a sim context but not in a ui context
-		lsi->sim->CreateBox(-1, x1, y1, x2, y2, c, 0);
+		sim->CreateBox(-1, x1, y1, x2, y2, c, 0);
 		return 0;
 	}
 
 	lsi->AssertToolEvent();
 	int c = luaL_optint(L,5,lsi->gameModel->GetActiveTool(0)->ToolID);
-	int uiFlags = luaL_optint(L,6,lsi->sim->replaceModeFlags);
+	int uiFlags = luaL_optint(L,6,sim->replaceModeFlags);
 
-	lsi->sim->CreateBox(-2, x1, y1, x2, y2, c, uiFlags);
+	sim->CreateBox(-2, x1, y1, x2, y2, c, uiFlags);
 	return 0;
 }
 
@@ -600,12 +615,13 @@ static int floodParts(lua_State *L)
 	int y = luaL_optint(L,2,-1);
 	int c = luaL_optint(L,3,lsi->gameModel->GetActiveTool(0)->ToolID);
 	int cm = luaL_optint(L,4,-1);
-	int flags = luaL_optint(L,5,lsi->sim->replaceModeFlags);
+	auto *sim = lsi->gameModel->GetSimulation();
+	int flags = luaL_optint(L,5,sim->replaceModeFlags);
 
 	if (x < 0 || x >= XRES || y < 0 || y >= YRES)
 		return luaL_error(L, "coordinates out of range (%d,%d)", x, y);
 
-	int ret = lsi->sim->FloodParts(x, y, c, cm, flags);
+	int ret = sim->FloodParts(x, y, c, cm, flags);
 	lua_pushinteger(L, ret);
 	return 1;
 }
@@ -625,7 +641,8 @@ static int createWalls(lua_State *L)
 	if (c < 0 || c >= UI_WALLCOUNT)
 		return luaL_error(L, "Unrecognised wall id '%d'", c);
 
-	int ret = lsi->sim->CreateWalls(x, y, rx, ry, c, nullptr);
+	auto *sim = lsi->gameModel->GetSimulation();
+	int ret = sim->CreateWalls(x, y, rx, ry, c, nullptr);
 	lua_pushinteger(L, ret);
 	return 1;
 }
@@ -647,7 +664,8 @@ static int createWallLine(lua_State *L)
 	if (c < 0 || c >= UI_WALLCOUNT)
 		return luaL_error(L, "Unrecognised wall id '%d'", c);
 
-	lsi->sim->CreateWallLine(x1, y1, x2, y2, rx, ry, c, nullptr);
+	auto *sim = lsi->gameModel->GetSimulation();
+	sim->CreateWallLine(x1, y1, x2, y2, rx, ry, c, nullptr);
 	return 0;
 }
 
@@ -666,7 +684,8 @@ static int createWallBox(lua_State *L)
 	if (c < 0 || c >= UI_WALLCOUNT)
 		return luaL_error(L, "Unrecognised wall id '%d'", c);
 
-	lsi->sim->CreateWallBox(x1, y1, x2, y2, c);
+	auto *sim = lsi->gameModel->GetSimulation();
+	sim->CreateWallBox(x1, y1, x2, y2, c);
 	return 0;
 }
 
@@ -687,7 +706,8 @@ static int floodWalls(lua_State *L)
 		lua_pushinteger(L, 0);
 		return 1;
 	}
-	int ret = lsi->sim->FloodWalls(x, y, c, bm);
+	auto *sim = lsi->gameModel->GetSimulation();
+	int ret = sim->FloodWalls(x, y, c, bm);
 	lua_pushinteger(L, ret);
 	return 1;
 }
@@ -715,8 +735,9 @@ static int toolBrush(lua_State *L)
 	auto newBrush = brush->Clone();
 	newBrush->SetRadius(ui::Point(rx, ry));
 
+	auto *sim = lsi->gameModel->GetSimulation();
 	toolPtr->Strength = strength;
-	toolPtr->Draw(lsi->sim, *newBrush, { x, y });
+	toolPtr->Draw(sim, *newBrush, { x, y });
 	return 0;
 }
 
@@ -748,7 +769,8 @@ static int toolLine(lua_State *L)
 	auto newBrush = brush->Clone();
 	newBrush->SetRadius(ui::Point(rx, ry));
 	toolPtr->Strength = strength;
-	toolPtr->DrawLine(lsi->sim, *newBrush, { x1, y1 }, { x2, y2 }, false);
+	auto *sim = lsi->gameModel->GetSimulation();
+	toolPtr->DrawLine(sim, *newBrush, { x1, y1 }, { x2, y2 }, false);
 	return 0;
 }
 
@@ -780,7 +802,8 @@ static int toolBox(lua_State *L)
 	auto newBrush = brush->Clone();
 	newBrush->SetRadius(ui::Point(rx, ry));
 	toolPtr->Strength = strength;
-	toolPtr->DrawRect(lsi->sim, *newBrush, { x1, y1 }, { x2, y2 });
+	auto *sim = lsi->gameModel->GetSimulation();
+	toolPtr->DrawRect(sim, *newBrush, { x1, y1 }, { x2, y2 });
 	return 0;
 }
 
@@ -805,7 +828,8 @@ static int decoBrush(lua_State *L)
 	auto newBrush = brush->Clone();
 	newBrush->SetRadius(ui::Point(rx, ry));
 
-	lsi->sim->ApplyDecorationPoint(x, y, r, g, b, a, tool, *newBrush);
+	auto *sim = lsi->gameModel->GetSimulation();
+	sim->ApplyDecorationPoint(x, y, r, g, b, a, tool, *newBrush);
 	return 0;
 }
 
@@ -835,7 +859,8 @@ static int decoLine(lua_State *L)
 	auto newBrush = brush->Clone();
 	newBrush->SetRadius(ui::Point(rx, ry));
 
-	lsi->sim->ApplyDecorationLine(x1, y1, x2, y2, r, g, b, a, tool, *newBrush);
+	auto *sim = lsi->gameModel->GetSimulation();
+	sim->ApplyDecorationLine(x1, y1, x2, y2, r, g, b, a, tool, *newBrush);
 	return 0;
 }
 
@@ -856,7 +881,8 @@ static int decoBox(lua_State *L)
 	if (x1 < 0 || x2 < 0 || x1 >= XRES || x2 >= XRES || y1 < 0 || y2 < 0 || y1 >= YRES || y2 >= YRES)
 		return luaL_error(L, "coordinates out of range (%d,%d),(%d,%d)", x1, y1, x2, y2);
 
-	lsi->sim->ApplyDecorationBox(x1, y1, x2, y2, r, g, b, a, tool);
+	auto *sim = lsi->gameModel->GetSimulation();
+	sim->ApplyDecorationBox(x1, y1, x2, y2, r, g, b, a, tool);
 	return 0;
 }
 
@@ -900,9 +926,10 @@ static int floodDeco(lua_State *L)
 		return luaL_error(L, "coordinates out of range (%d,%d)", x, y);
 
 	// hilariously broken, intersects with console and all Lua graphics
+	auto *sim = lsi->gameModel->GetSimulation();
 	auto &rendererFrame = lsi->gameModel->GetView()->GetRendererFrame();
 	auto loc = RGB::Unpack(rendererFrame[{ x, y }]);
-	lsi->sim->ApplyDecorationFill(rendererFrame, x, y, r, g, b, a, loc.Red, loc.Green, loc.Blue);
+	sim->ApplyDecorationFill(rendererFrame, x, y, r, g, b, a, loc.Red, loc.Green, loc.Blue);
 	return 0;
 }
 
@@ -922,7 +949,8 @@ static int clearRect(lua_State *L)
 	int y = luaL_checkint(L,2);
 	int w = luaL_checkint(L,3)-1;
 	int h = luaL_checkint(L,4)-1;
-	lsi->sim->clear_area(x, y, w, h);
+	auto *sim = lsi->gameModel->GetSimulation();
+	sim->clear_area(x, y, w, h);
 	return 0;
 }
 
@@ -930,7 +958,7 @@ static int resetTemp(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertToolEvent();
-	auto *sim = lsi->sim;
+	auto *sim = lsi->gameModel->GetSimulation();
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
 	bool onlyConductors = luaL_optint(L, 1, 0);
@@ -969,10 +997,11 @@ static int resetPressure(lua_State *L)
 		width = XCELLS-x1;
 	if(y1+height > YCELLS-1)
 		height = YCELLS-y1;
+	auto *sim = lsi->gameModel->GetSimulation();
 	for (int nx = x1; nx<x1+width; nx++)
 		for (int ny = y1; ny<y1+height; ny++)
 		{
-			lsi->sim->pv[ny][nx] = lsi->sim->air->edgePressure;
+			sim->pv[ny][nx] = sim->air->edgePressure;
 		}
 	return 0;
 }
@@ -1038,7 +1067,8 @@ static int loadStamp(lua_State *L)
 			}
 			gameSave->Transform(transform, { remX, remY });
 		}
-		lsi->sim->Load(gameSave.get(), includePressure, { quoX, quoY });
+		auto *sim = lsi->gameModel->GetSimulation();
+		sim->Load(gameSave.get(), includePressure, { quoX, quoY });
 		lua_pushinteger(L, 1);
 
 		if (gameSave->authors.GetSize())
@@ -1151,14 +1181,15 @@ static int prettyPowders(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	int acount = lua_gettop(L);
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (acount == 0)
 	{
-		lua_pushnumber(L, lsi->sim->pretty_powder);
+		lua_pushnumber(L, sim->pretty_powder);
 		return 1;
 	}
 	lsi->AssertInterfaceEvent();
 	int prettyPowder = luaL_optint(L, 1, 0);
-	lsi->sim->pretty_powder = prettyPowder;
+	sim->pretty_powder = prettyPowder;
 	lsi->gameModel->UpdateQuickOptions();
 	return 0;
 }
@@ -1213,21 +1244,22 @@ static int gravityMode(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	int acount = lua_gettop(L);
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (acount == 0)
 	{
-		lua_pushnumber(L, lsi->sim->gravityMode);
+		lua_pushnumber(L, sim->gravityMode);
 		return 1;
 	}
 	lsi->AssertInterfaceEvent();
 	int gravityMode = luaL_optint(L, 1, GRAV_VERTICAL);
-	lsi->sim->gravityMode = gravityMode;
+	sim->gravityMode = gravityMode;
 	return 0;
 }
 
 static int customGravity(lua_State *L)
 {
 	auto *lsi = GetLSI();
-	auto *sim = lsi->sim;
+	auto *sim = lsi->gameModel->GetSimulation();
 	int acount = lua_gettop(L);
 	if (acount == 0)
 	{
@@ -1251,39 +1283,42 @@ static int airMode(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	int acount = lua_gettop(L);
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (acount == 0)
 	{
-		lua_pushnumber(L, lsi->sim->air->airMode);
+		lua_pushnumber(L, sim->air->airMode);
 		return 1;
 	}
 	lsi->AssertInterfaceEvent();
 	int airMode = luaL_optint(L, 1, AIR_ON);
-	lsi->sim->air->airMode = airMode;
+	sim->air->airMode = airMode;
 	return 0;
 }
 
 static int waterEqualization(lua_State *L)
 {
 	auto *lsi = GetLSI();
+	auto *sim = lsi->gameModel->GetSimulation();
 	int acount = lua_gettop(L);
 	if (acount == 0)
 	{
-		lua_pushnumber(L, lsi->sim->water_equal_test);
+		lua_pushnumber(L, sim->water_equal_test);
 		return 1;
 	}
 	lsi->AssertInterfaceEvent();
 	int waterMode = luaL_optint(L, 1, 0);
-	lsi->sim->water_equal_test = waterMode;
+	sim->water_equal_test = waterMode;
 	return 0;
 }
 
 static int ambientAirTemp(lua_State *L)
 {
 	auto *lsi = GetLSI();
+	auto *sim = lsi->gameModel->GetSimulation();
 	int acount = lua_gettop(L);
 	if (acount == 0)
 	{
-		lua_pushnumber(L, lsi->sim->air->ambientAirTemp);
+		lua_pushnumber(L, sim->air->ambientAirTemp);
 		return 1;
 	}
 	lsi->AssertInterfaceEvent();
@@ -1295,10 +1330,11 @@ static int ambientAirTemp(lua_State *L)
 static int edgePressure(lua_State *L)
 {
 	auto *lsi = GetLSI();
+	auto *sim = lsi->gameModel->GetSimulation();
 	int acount = lua_gettop(L);
 	if (acount == 0)
 	{
-		lua_pushnumber(L, lsi->sim->air->edgePressure);
+		lua_pushnumber(L, sim->air->edgePressure);
 		return 1;
 	}
 	lsi->AssertInterfaceEvent();
@@ -1310,11 +1346,12 @@ static int edgePressure(lua_State *L)
 static int edgeVelocity(lua_State *L)
 {
 	auto *lsi = GetLSI();
+	auto *sim = lsi->gameModel->GetSimulation();
 	int acount = lua_gettop(L);
 	if (acount == 0)
 	{
-		lua_pushnumber(L, lsi->sim->air->edgeVelocityX);
-		lua_pushnumber(L, lsi->sim->air->edgeVelocityY);
+		lua_pushnumber(L, sim->air->edgeVelocityX);
+		lua_pushnumber(L, sim->air->edgeVelocityY);
 		return 2;
 	}
 	lsi->AssertInterfaceEvent();
@@ -1328,10 +1365,11 @@ static int edgeVelocity(lua_State *L)
 static int vorticityCoeff(lua_State *L)
 {
 	auto *lsi = GetLSI();
+	auto *sim = lsi->gameModel->GetSimulation();
 	int acount = lua_gettop(L);
 	if (acount == 0)
 	{
-		lua_pushnumber(L, lsi->sim->air->vorticityCoeff);
+		lua_pushnumber(L, sim->air->vorticityCoeff);
 		return 1;
 	}
 	lsi->AssertInterfaceEvent();
@@ -1366,7 +1404,8 @@ static int elementCount(lua_State *L)
 		return luaL_error(L, "Invalid element ID (%d)", element);
 
 	auto *lsi = GetLSI();
-	lua_pushnumber(L, lsi->sim->elementCount[element]);
+	auto *sim = lsi->gameModel->GetSimulation();
+	lua_pushnumber(L, sim->elementCount[element]);
 	return 1;
 }
 
@@ -1456,9 +1495,10 @@ static int brush(lua_State *L)
 static int partsClosure(lua_State *L)
 {
 	auto *lsi = GetLSI();
-	for (int i = lua_tointeger(L, lua_upvalueindex(1)); i < lsi->sim->parts.active; ++i)
+	auto *sim = lsi->gameModel->GetSimulation();
+	for (int i = lua_tointeger(L, lua_upvalueindex(1)); i < sim->parts.active; ++i)
 	{
-		if (lsi->sim->parts[i].type)
+		if (sim->parts[i].type)
 		{
 			lua_pushnumber(L, i + 1);
 			lua_replace(L, lua_upvalueindex(1));
@@ -1479,6 +1519,7 @@ static int neighboursClosure(lua_State *L)
 	int t = lua_tointeger(L, lua_upvalueindex(5));
 	int x = lua_tointeger(L, lua_upvalueindex(6));
 	int y = lua_tointeger(L, lua_upvalueindex(7));
+	auto *sim = lsi->gameModel->GetSimulation();
 	while (y <= cy + ry)
 	{
 		int px = x;
@@ -1489,14 +1530,14 @@ static int neighboursClosure(lua_State *L)
 			x = cx - rx;
 			y += 1;
 		}
-		int r = lsi->sim->pmap[py][px];
+		int r = sim->pmap[py][px];
 		if (!(r && (!t || TYP(r) == t))) // * If not [exists and is of the correct type]
 		{
 			r = 0;
 		}
 		if (!r)
 		{
-			r = lsi->sim->photons[py][px];
+			r = sim->photons[py][px];
 			if (!(r && (!t || TYP(r) == t))) // * If not [exists and is of the correct type]
 			{
 				r = 0;
@@ -1557,7 +1598,8 @@ static int pmap(lua_State *L)
 	int y = luaL_checkint(L, 2);
 	if (x < 0 || x >= XRES || y < 0 || y >= YRES)
 		return luaL_error(L, "coordinates out of range (%d,%d)", x, y);
-	int r = lsi->sim->pmap[y][x];
+	auto *sim = lsi->gameModel->GetSimulation();
+	int r = sim->pmap[y][x];
 	if (!TYP(r))
 		return 0;
 	lua_pushnumber(L, ID(r));
@@ -1571,7 +1613,8 @@ static int photons(lua_State *L)
 	int y = luaL_checkint(L, 2);
 	if (x < 0 || x >= XRES || y < 0 || y >= YRES)
 		return luaL_error(L, "coordinates out of range (%d,%d)", x, y);
-	int r = lsi->sim->photons[y][x];
+	auto *sim = lsi->gameModel->GetSimulation();
+	int r = sim->photons[y][x];
 	if (!TYP(r))
 		return 0;
 	lua_pushnumber(L, ID(r));
@@ -1598,15 +1641,16 @@ static int golSpeedRatio(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (lua_gettop(L) == 0)
 	{
-		lua_pushinteger(L, lsi->sim->GSPEED);
+		lua_pushinteger(L, sim->GSPEED);
 		return 1;
 	}
 	int gspeed = luaL_checkinteger(L, 1);
 	if (gspeed < 1)
 		return luaL_error(L, "GSPEED must be at least 1");
-	lsi->sim->GSPEED = gspeed;
+	sim->GSPEED = gspeed;
 	return 0;
 }
 
@@ -1749,9 +1793,10 @@ static int lastUpdatedID(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
-	if (lsi->sim->debug_mostRecentlyUpdated != -1)
+	auto *sim = lsi->gameModel->GetSimulation();
+	if (sim->debug_mostRecentlyUpdated != -1)
 	{
-		lua_pushinteger(L, lsi->sim->debug_mostRecentlyUpdated);
+		lua_pushinteger(L, sim->debug_mostRecentlyUpdated);
 	}
 	else
 	{
@@ -1812,7 +1857,7 @@ static int signsIndex(lua_State *L)
 		luaL_error(L, "Invalid sign ID (stop messing with things): %i", id);
 		return 0;
 	}
-	auto *sim = lsi->sim;
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (id >= (int)sim->signs.size())
 	{
 		return lua_pushnil(L), 1;
@@ -1861,7 +1906,7 @@ static int signsNewIndex(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
-	auto *sim = lsi->sim;
+	auto *sim = lsi->gameModel->GetSimulation();
 	ByteString key = tpt_lua_checkByteString(L, 2);
 
 	//Get Raw Index value for element. Maybe there is a way to get the sign index some other way?
@@ -1932,7 +1977,8 @@ static int Sign_new(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
-	if (lsi->sim->signs.size() >= MAXSIGNS)
+	auto *sim = lsi->gameModel->GetSimulation();
+	if (sim->signs.size() >= MAXSIGNS)
 		return lua_pushnil(L), 1;
 
 	String text = format::CleanString(tpt_lua_checkString(L, 1), false, true, true).Substr(0, 45);
@@ -1946,9 +1992,9 @@ static int Sign_new(lua_State *L)
 	if (y < 0 || y >= YRES)
 		return luaL_error(L, "Invalid Y coordinate");
 
-	lsi->sim->signs.push_back(sign(text, x, y, (sign::Justification)ju));
+	sim->signs.push_back(sign(text, x, y, (sign::Justification)ju));
 
-	lua_pushinteger(L, lsi->sim->signs.size());
+	lua_pushinteger(L, sim->signs.size());
 	return 1;
 }
 
@@ -1958,10 +2004,11 @@ static int Sign_delete(lua_State *L)
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
 	int signID = luaL_checkinteger(L, 1);
-	if (signID <= 0 || signID > (int)lsi->sim->signs.size())
+	auto *sim = lsi->gameModel->GetSimulation();
+	if (signID <= 0 || signID > (int)sim->signs.size())
 		return luaL_error(L, "Sign doesn't exist");
 
-	lsi->sim->signs.erase(lsi->sim->signs.begin()+signID-1);
+	sim->signs.erase(sim->signs.begin()+signID-1);
 	return 1;
 }
 
@@ -1983,11 +2030,12 @@ static int resetVelocity(lua_State *L)
 		width = XCELLS-x1;
 	if(y1+height > YCELLS-1)
 		height = YCELLS-y1;
+	auto *sim = lsi->gameModel->GetSimulation();
 	for (nx = x1; nx<x1+width; nx++)
 		for (ny = y1; ny<y1+height; ny++)
 		{
-			lsi->sim->vx[ny][nx] = 0;
-			lsi->sim->vy[ny][nx] = 0;
+			sim->vx[ny][nx] = 0;
+			sim->vy[ny][nx] = 0;
 		}
 	return 0;
 }
@@ -2004,15 +2052,16 @@ static int randomSeed(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (lua_gettop(L))
 	{
-		lsi->sim->rng.state({
+		sim->rng.state({
 			uint32_t(luaL_checkinteger(L, 1)) | (uint64_t(uint32_t(luaL_checkinteger(L, 2))) << 32),
 			uint32_t(luaL_checkinteger(L, 3)) | (uint64_t(uint32_t(luaL_checkinteger(L, 4))) << 32),
 		});
 		return 0;
 	}
-	auto s = lsi->sim->rng.state();
+	auto s = sim->rng.state();
 	lua_pushinteger(L,  s[0]        & UINT32_C(0xFFFFFFFF));
 	lua_pushinteger(L, (s[0] >> 32) & UINT32_C(0xFFFFFFFF));
 	lua_pushinteger(L,  s[1]        & UINT32_C(0xFFFFFFFF));
@@ -2024,7 +2073,8 @@ static int hash(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
-	lua_pushinteger(L, lsi->sim->CreateSnapshot()->Hash());
+	auto *sim = lsi->gameModel->GetSimulation();
+	lua_pushinteger(L, sim->CreateSnapshot()->Hash());
 	return 1;
 }
 
@@ -2032,12 +2082,13 @@ static int ensureDeterminism(lua_State *L)
 {
 	auto *lsi = GetLSI();
 	lsi->AssertInterfaceEvent();
+	auto *sim = lsi->gameModel->GetSimulation();
 	if (lua_gettop(L))
 	{
-		lsi->sim->ensureDeterminism = lua_toboolean(L, 1);
+		sim->ensureDeterminism = lua_toboolean(L, 1);
 		return 0;
 	}
-	lua_pushboolean(L, lsi->sim->ensureDeterminism);
+	lua_pushboolean(L, sim->ensureDeterminism);
 	return 1;
 }
 
