@@ -376,6 +376,7 @@ static int allocate(lua_State *L)
 			elements[newID] = Element();
 			elements[newID].Enabled = true;
 			elements[newID].Identifier = identifier;
+			elements[newID].InfiniteNeighborhood = true;
 		}
 
 		lua_getglobal(L, "elements");

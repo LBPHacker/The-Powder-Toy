@@ -45,6 +45,8 @@ void Element::Element_SPAWN2()
 
 	CreateAllowed = &createAllowed;
 	ChangeType = &changeType;
+
+	InfiniteNeighborhood = true;
 }
 
 static bool createAllowed(ELEMENT_CREATE_ALLOWED_FUNC_ARGS)

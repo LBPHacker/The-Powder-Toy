@@ -49,6 +49,8 @@ void Element::Element_STOR()
 	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 	CtypeDraw = &ctypeDraw;
+
+	InfiniteNeighborhood = true;
 }
 
 static int update(UPDATE_FUNC_ARGS)
