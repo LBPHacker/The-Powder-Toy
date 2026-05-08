@@ -219,4 +219,5 @@ public:
 	void InitCommandInterface();
 
 	FrameTime *GetFrameTime() const;
+	void SetSimThreadCount(int newThreadCount);
 };

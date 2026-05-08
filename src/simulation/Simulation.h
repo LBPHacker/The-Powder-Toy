@@ -150,6 +150,7 @@ struct CopiableSimulation : public RenderableSimulation
 	int sandcolour_interface;
 
 	FrameTime *frameTime = nullptr;
+	int threadCount = 1;
 };
 
 class Simulation : public CopiableSimulation
@@ -239,6 +240,7 @@ public:
 	void EnableNewtonianGravity(bool enable);
 
 	static std::unique_ptr<Simulation> LegacyFactory();
+	static std::unique_ptr<Simulation> ParallelFactory();
 
 	virtual bool CreateAllowedOuter(int i, int x, int y, int t) = 0;
 
@@ -273,4 +275,10 @@ template<>
 inline bool SimVariant<LegacyVariant>::MaxPartsReached() const
 {
 	return parts.pfree == -1 && parts.active >= NPART;
+}
+
+template<>
+inline bool SimVariant<ParallelVariant>::MaxPartsReached() const
+{
+	return false;
 }
