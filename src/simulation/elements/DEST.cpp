@@ -51,8 +51,8 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	int rx = sim->rng.between(-2, 2);
-	int ry = sim->rng.between(-2, 2);
+	int rx = rng.between(-2, 2);
+	int ry = rng.between(-2, 2);
 	int r = pmap[y+ry][x+rx];
 	if (!r)
 		return 0;
@@ -62,13 +62,13 @@ static int update(UPDATE_FUNC_ARGS)
 
 	if (parts[i].life<=0 || parts[i].life>37)
 	{
-		parts[i].life = sim->rng.between(30, 49);
+		parts[i].life = rng.between(30, 49);
 		sim->pv[y/CELL][x/CELL]+=60.0f;
 	}
 	if (rt == PT_PLUT || rt == PT_DEUT)
 	{
 		sim->pv[y/CELL][x/CELL]+=20.0f;
-		if (sim->rng.chance(1, 2))
+		if (rng.chance(1, 2))
 		{
 			//@ DEST + PLUT/DEUT -> DEST + NEUT
 			sim->create_part(ID(r), x+rx, y+ry, PT_NEUT);
@@ -82,7 +82,7 @@ static int update(UPDATE_FUNC_ARGS)
 		//@ DEST + INSL -> DEST + PLSM
 		sim->create_part(ID(r), x+rx, y+ry, PT_PLSM);
 	}
-	else if (sim->rng.chance(1, 3))
+	else if (rng.chance(1, 3))
 	{
 		sim->kill_part(ID(r));
 		parts[i].life -= 4*((elements[rt].Properties&TYPE_SOLID)?3:1);

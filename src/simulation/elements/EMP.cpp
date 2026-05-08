@@ -65,13 +65,13 @@ public:
 		// randFloat should be a random float between 0 and 1
 		return binom.calc(randFloat) * stepSize;
 	}
-	void apply(Simulation *sim, Particle &p)
+	void apply(RNG &rng, Particle &p)
 	{
-		p.temp = restrict_flt(p.temp+getDelta(sim->rng.uniform01()), MIN_TEMP, MAX_TEMP);
+		p.temp = restrict_flt(p.temp+getDelta(rng.uniform01()), MIN_TEMP, MAX_TEMP);
 	}
 };
 
-void Element_EMP_Trigger(auto *sim, int triggerCount)
+void Element_EMP_Trigger(auto *sim, RNG &rng, int triggerCount)
 {
 	/* Known differences from original one-particle-at-a-time version:
 	 * - SPRK that disappears during a frame (such as SPRK with life==0 on that frame) will not cause destruction around it.
@@ -118,11 +118,11 @@ void Element_EMP_Trigger(auto *sim, int triggerCount)
 			    parts[r].ctype==PT_NTCT || parts[r].ctype==PT_INST || parts[r].ctype==PT_SWCH || t==PT_WIRE || t==PT_SWCH)
 			{
 				is_elec = true;
-				temp_center.apply(sim, parts[r]);
+				temp_center.apply(rng, parts[r]);
 				//@ EMP + PSCN/NSCN/PTCT/NTCT/INST/SWCH/WIRE -> EMP + BREC/NTCT
-				if (sim->rng.uniform01() < prob_changeCenter)
+				if (rng.uniform01() < prob_changeCenter)
 				{
-					if (sim->rng.chance(2, 5))
+					if (rng.chance(2, 5))
 						sim->part_change_type(r, rx, ry, PT_BREC);
 					else
 						sim->part_change_type(r, rx, ry, PT_NTCT);
@@ -144,12 +144,12 @@ void Element_EMP_Trigger(auto *sim, int triggerCount)
 							switch (ntype)
 							{
 							case PT_METL:
-								temp_metal.apply(sim, parts[n]);
-								if (sim->rng.uniform01() < prob_breakMETL)
+								temp_metal.apply(rng, parts[n]);
+								if (rng.uniform01() < prob_breakMETL)
 								{
 									//@ EMP + METL -> EMP + BMTL/BRMT
 									sim->part_change_type(n, rx+nx, ry+ny, PT_BMTL);
-									if (sim->rng.uniform01() < prob_breakMETLMore)
+									if (rng.uniform01() < prob_breakMETLMore)
 									{
 										sim->part_change_type(n, rx+nx, ry+ny, PT_BRMT);
 										parts[n].temp = restrict_flt(parts[n].temp+1000.0f, MIN_TEMP, MAX_TEMP);
@@ -158,21 +158,21 @@ void Element_EMP_Trigger(auto *sim, int triggerCount)
 								break;
 							case PT_BMTL:
 								//@ EMP + BMTL -> EMP + BRMT
-								temp_metal.apply(sim, parts[n]);
-								if (sim->rng.uniform01() < prob_breakBMTL)
+								temp_metal.apply(rng, parts[n]);
+								if (rng.uniform01() < prob_breakBMTL)
 								{
 									sim->part_change_type(n, rx+nx, ry+ny, PT_BRMT);
 									parts[n].temp = restrict_flt(parts[n].temp+1000.0f, MIN_TEMP, MAX_TEMP);
 								}
 								break;
 							case PT_WIFI:
-								if (sim->rng.uniform01() < prob_randWIFI)
+								if (rng.uniform01() < prob_randWIFI)
 								{
 									// Randomize channel
-									parts[n].temp = float(sim->rng.between(0, int(MAX_TEMP)-1));
+									parts[n].temp = float(rng.between(0, int(MAX_TEMP)-1));
 								}
 								//@ EMP + WIFI -> EMP + BREC
-								if (sim->rng.uniform01() < prob_breakWIFI)
+								if (rng.uniform01() < prob_breakWIFI)
 								{
 									sim->create_part(n, rx+nx, ry+ny, PT_BREC);
 									parts[n].temp = restrict_flt(parts[n].temp+1000.0f, MIN_TEMP, MAX_TEMP);
@@ -186,23 +186,23 @@ void Element_EMP_Trigger(auto *sim, int triggerCount)
 						{
 						case PT_SWCH:
 							//@ EMP + SWCH -> EMP + BREC
-							if (sim->rng.uniform01() < prob_breakSWCH)
+							if (rng.uniform01() < prob_breakSWCH)
 								sim->part_change_type(n, rx+nx, ry+ny, PT_BREC);
-							temp_SWCH.apply(sim, parts[n]);
+							temp_SWCH.apply(rng, parts[n]);
 							break;
 						case PT_ARAY:
 							//@ EMP + ARAY -> EMP + BREC
-							if (sim->rng.uniform01() < prob_breakARAY)
+							if (rng.uniform01() < prob_breakARAY)
 							{
 								sim->create_part(n, rx+nx, ry+ny, PT_BREC);
 								parts[n].temp = restrict_flt(parts[n].temp+1000.0f, MIN_TEMP, MAX_TEMP);
 							}
 							break;
 						case PT_DLAY:
-							if (sim->rng.uniform01() < prob_randDLAY)
+							if (rng.uniform01() < prob_randDLAY)
 							{
 								// Randomize delay
-								parts[n].temp = sim->rng.between(0, 255) + 273.15f;
+								parts[n].temp = rng.between(0, 255) + 273.15f;
 							}
 							break;
 						default:
@@ -213,7 +213,7 @@ void Element_EMP_Trigger(auto *sim, int triggerCount)
 	}
 }
 
-#define DEFINE_TRIGGER(Var) template void Element_EMP_Trigger(SimVariant<Var> *sim, int triggerCount);
+#define DEFINE_TRIGGER(Var) template void Element_EMP_Trigger(SimVariant<Var> *sim, RNG &rng, int triggerCount);
 ALL_SIM_IMPLS(DEFINE_TRIGGER)
 #undef DEFINE_TRIGGER
 

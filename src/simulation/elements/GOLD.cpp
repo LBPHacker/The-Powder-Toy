@@ -56,7 +56,7 @@ static int update(UPDATE_FUNC_ARGS)
 	//Find nearby rusted iron (BMTL with tmp 1+)
 	for(int j = 0; j < 8; j++)
 	{
-		auto rndstore = sim->rng.gen();
+		auto rndstore = rng.gen();
 		auto rx = (rndstore % 9)-4;
 		rndstore >>= 4;
 		auto ry = (rndstore % 9)-4;
@@ -90,7 +90,7 @@ static int update(UPDATE_FUNC_ARGS)
 	}
 	if (TYP(sim->photons[y][x]) == PT_NEUT)
 	{
-		if (sim->rng.chance(1, 7))
+		if (rng.chance(1, 7))
 		{
 			sim->kill_part(ID(sim->photons[y][x]));
 		}

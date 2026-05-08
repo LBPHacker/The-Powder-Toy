@@ -55,7 +55,7 @@ int Element_VIRS_update(UPDATE_FUNC_ARGS)
 {
 	//tmp3 measures how many frames until it is cured (0 if still actively spreading and not being cured)
 	//tmp4 measures how many frames until it dies
-	int rndstore = sim->rng.gen();
+	int rndstore = rng.gen();
 	if (parts[i].tmp3)
 	{
 		parts[i].tmp3 -= (rndstore & 0x1) ? 0:1;
@@ -107,7 +107,7 @@ int Element_VIRS_update(UPDATE_FUNC_ARGS)
 				}
 				else if (TYP(r) == PT_PLSM)
 				{
-					if (surround_space && sim->rng.chance(10 + int(sim->pv[(y+ry)/CELL][(x+rx)/CELL]), 100))
+					if (surround_space && rng.chance(10 + int(sim->pv[(y+ry)/CELL][(x+rx)/CELL]), 100))
 					{
 						//@ VIRS/VRSS/VRSG + PLSM -> 2xPLSM
 						sim->create_part(i, x, y, PT_PLSM);
@@ -142,7 +142,7 @@ int Element_VIRS_update(UPDATE_FUNC_ARGS)
 			}
 			//reset rndstore only once, halfway through
 			else if (!rx && !ry)
-				rndstore = sim->rng.gen();
+				rndstore = rng.gen();
 		}
 	}
 	return 0;

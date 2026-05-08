@@ -82,7 +82,7 @@ static int update(UPDATE_FUNC_ARGS)
 						parts[ID(r)].tmp |= 1;
 						//@ H2 + FIRE -> 2xFIRE
 						sim->create_part(i,x,y,PT_FIRE);
-						parts[i].temp += sim->rng.between(0, 99);
+						parts[i].temp += rng.between(0, 99);
 						parts[i].tmp |= 1;
 						return 1;
 					}
@@ -90,7 +90,7 @@ static int update(UPDATE_FUNC_ARGS)
 					{
 						//@ H2 + PLSM/LAVA -> FIRE + PLSM/LAVA
 						sim->create_part(i,x,y,PT_FIRE);
-						parts[i].temp += sim->rng.between(0, 99);
+						parts[i].temp += rng.between(0, 99);
 						parts[i].tmp |= 1;
 						return 1;
 					}
@@ -100,7 +100,7 @@ static int update(UPDATE_FUNC_ARGS)
 	}
 	if (parts[i].temp > 2273.15 && sim->pv[y/CELL][x/CELL] > 50.0f)
 	{
-		if (sim->rng.chance(1, 5))
+		if (rng.chance(1, 5))
 		{
 			int j;
 			float temp = parts[i].temp;
@@ -111,7 +111,7 @@ static int update(UPDATE_FUNC_ARGS)
 			j = sim->create_part(-3,x,y,PT_NEUT);
 			if (j>-1)
 				parts[j].temp = temp;
-			if (sim->rng.chance(1, 10))
+			if (rng.chance(1, 10))
 			{
 				//@ H2 -> NBLE + NEUT + PHOT + ELEC
 				j = sim->create_part(-3,x,y,PT_ELEC);
@@ -125,7 +125,7 @@ static int update(UPDATE_FUNC_ARGS)
 				parts[j].temp = temp;
 				parts[j].tmp = 0x1;
 			}
-			auto rx = x + sim->rng.between(-1, 1), ry = y + sim->rng.between(-1, 1), rt = TYP(pmap[ry][rx]);
+			auto rx = x + rng.between(-1, 1), ry = y + rng.between(-1, 1), rt = TYP(pmap[ry][rx]);
 			if (can_move[PT_PLSM][rt] || rt == PT_H2)
 			{
 				//@ H2 -> NBLE + NEUT + PHOT + ELEC + PLSM
@@ -136,7 +136,7 @@ static int update(UPDATE_FUNC_ARGS)
 					parts[j].tmp |= 4;
 				}
 			}
-			parts[i].temp = temp + sim->rng.between(750, 1249);
+			parts[i].temp = temp + rng.between(750, 1249);
 			sim->pv[y/CELL][x/CELL] += 30;
 			return 1;
 		}

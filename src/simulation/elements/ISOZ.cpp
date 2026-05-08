@@ -49,12 +49,12 @@ void Element::Element_ISOZ()
 static int update(UPDATE_FUNC_ARGS)
 {
 	float rr, rrr;
-	if (sim->rng.chance(1, 200) && sim->rng.chance(int(-4.0f * sim->pv[y/CELL][x/CELL]), 1000))
+	if (rng.chance(1, 200) && rng.chance(int(-4.0f * sim->pv[y/CELL][x/CELL]), 1000))
 	{
 		//@ ISOZ -> PHOT
 		sim->create_part(i, x, y, PT_PHOT);
-		rr = sim->rng.between(128, 355) / 127.0f;
-		rrr = sim->rng.between(0, 359) * std::numbers::pi_v<float> / 180.0f;
+		rr = rng.between(128, 355) / 127.0f;
+		rrr = rng.between(0, 359) * std::numbers::pi_v<float> / 180.0f;
 		parts[i].vx = rr*cosf(rrr);
 		parts[i].vy = rr*sinf(rrr);
 	}

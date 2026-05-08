@@ -61,7 +61,7 @@ static int update(UPDATE_FUNC_ARGS)
 	auto temp = parts[i].temp;
 
 	// Turn into liquid wax under high temperature and pressure
-	if (temp > 320.0f && sim->pv[y/CELL][x/CELL] > 50.0f && sim->rng.chance(1, 150))
+	if (temp > 320.0f && sim->pv[y/CELL][x/CELL] > 50.0f && rng.chance(1, 150))
 	{
 		//@ SEED -> MWAX
 		sim->create_part(i, x, y, PT_MWAX);
@@ -162,7 +162,7 @@ static int update(UPDATE_FUNC_ARGS)
 						}
 						break;
 					case PT_SEED: // Breed with another seed
-						if (water > 0 && !(parts[i].ctype & 1) && !(parts[ID(r)].ctype & 1) && sim->rng.chance(1, 10))
+						if (water > 0 && !(parts[i].ctype & 1) && !(parts[ID(r)].ctype & 1) && rng.chance(1, 10))
 						{
 							auto ac = parts[i].ctype;
 							auto bc = parts[ID(r)].ctype;
@@ -184,13 +184,13 @@ static int update(UPDATE_FUNC_ARGS)
 								for(int kid = 0; kid < 2; kid++)
 								{
 									// Decide which allele is chosen from the first parent
-									if (sim->rng.chance(1, 2))
+									if (rng.chance(1, 2))
 										bits[kid][0] = (ac & (1 << (2*ind + PLNT_COLOUR))) != 0;
 									else
 										bits[kid][0] = (ac & (1 << (1 + 2*ind + PLNT_COLOUR))) != 0;
 
 									// ... from the second parent
-									if (sim->rng.chance(1, 2))
+									if (rng.chance(1, 2))
 										bits[kid][1] = (bc & (1 << (2*ind + PLNT_COLOUR))) != 0;
 									else
 										bits[kid][1] = (bc & (1 << (1 + 2*ind + PLNT_COLOUR))) != 0;
@@ -210,9 +210,9 @@ static int update(UPDATE_FUNC_ARGS)
 								// Loop over tmp - tmp4
 								for(int field = 0; field < 4; field++)
 								{
-									*(new_tmpsi[field]) |= sim->rng.chance(1, 2) ?
+									*(new_tmpsi[field]) |= rng.chance(1, 2) ?
 										(old_tmpsi[field] & (1 << ind)) : (old_tmpsr[field] & (1 << ind));
-									*(new_tmpsr[field]) |= sim->rng.chance(1, 2) ?
+									*(new_tmpsr[field]) |= rng.chance(1, 2) ?
 										(old_tmpsi[field] & (1 << ind)) : (old_tmpsr[field] & (1 << ind));
 								}
 							}
@@ -223,9 +223,9 @@ static int update(UPDATE_FUNC_ARGS)
 								// Loop over tmp - tmp4
 								for(int field = 0; field < 4; field++)
 								{
-									*(new_tmpsi[field]) |= sim->rng.chance(1, 2) ?
+									*(new_tmpsi[field]) |= rng.chance(1, 2) ?
 										(old_tmpsi[field] & (3 << ind)) : (old_tmpsr[field] & (3 << ind));
-									*(new_tmpsr[field]) |= sim->rng.chance(1, 2) ?
+									*(new_tmpsr[field]) |= rng.chance(1, 2) ?
 										(old_tmpsi[field] & (3 << ind)) : (old_tmpsr[field] & (3 << ind));
 								}
 							}
@@ -251,7 +251,7 @@ static void create(ELEMENT_CREATE_FUNC_ARGS)
 
 	// Use random down direction if can't decide using gravity
 	if (down < 0 || down > 7)
-		down = sim->rng.between(0, 7);
+		down = rng.between(0, 7);
 
 	int up = (down+4)%8; // Up gravity direction
 
@@ -263,13 +263,13 @@ static void create(ELEMENT_CREATE_FUNC_ARGS)
 
 	for(int ind = 0; ind < PLNT_TOTAL_TMP; ind++)
 	{
-		if(sim->rng.chance(1, 2))
+		if(rng.chance(1, 2))
 			sim->parts[i].tmp |= (1<<ind);
-		if(sim->rng.chance(1, 2))
+		if(rng.chance(1, 2))
 			sim->parts[i].tmp2 |= (1<<ind);
-		if(sim->rng.chance(1, 2))
+		if(rng.chance(1, 2))
 			sim->parts[i].tmp3 |= (1<<ind);
-		if(sim->rng.chance(1, 2))
+		if(rng.chance(1, 2))
 			sim->parts[i].tmp4 |= (1<<ind);
 	}
 }

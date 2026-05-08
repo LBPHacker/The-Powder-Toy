@@ -22,7 +22,7 @@ static int perform(SimTool *tool, Simulation * sim, Particle * cpart, int x, int
 	if(!thisPart)
 		return 0;
 
-	if(sim->rng() % 100 != 0)
+	if(sim->sharedRng() % 100 != 0)
 		return 0;
 
 	int distance = (int)(std::pow(strength, .5f) * 10);
@@ -30,8 +30,8 @@ static int perform(SimTool *tool, Simulation * sim, Particle * cpart, int x, int
 	if(!(elements[TYP(thisPart)].Properties & (TYPE_PART | TYPE_LIQUID | TYPE_GAS)))
 		return 0;
 
-	int newX = x + (sim->rng() % distance) - (distance/2);
-	int newY = y + (sim->rng() % distance) - (distance/2);
+	int newX = x + (sim->sharedRng() % distance) - (distance/2);
+	int newY = y + (sim->sharedRng() % distance) - (distance/2);
 
 	if(newX < 0 || newY < 0 || newX >= XRES || newY >= YRES)
 		return 0;

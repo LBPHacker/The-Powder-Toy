@@ -36,7 +36,7 @@ std::unique_ptr<Snapshot> Simulation::CreateSnapshot() const
 	snap->GravForceY.insert(snap->GravForceY.begin(), &gravOut.forceY[{ 0, 0 }], &gravOut.forceY[{ 0, 0 }] + NCELL);
 	snap->signs = signs;
 	snap->FrameCount = frameCount;
-	snap->RngState = rng.state();
+	snap->RngState = sharedRng.state();
 	return snap;
 }
 
@@ -78,7 +78,7 @@ void Simulation::Restore(const Snapshot &snap)
 	}
 	signs = snap.signs;
 	frameCount = snap.FrameCount;
-	rng.state(snap.RngState);
+	sharedRng.state(snap.RngState);
 	parts.active = NPART;
 	RecalcFreeParticlesOuter(false);
 }
