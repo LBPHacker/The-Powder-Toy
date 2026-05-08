@@ -684,7 +684,7 @@ void Simulation::ApplyDecorationFill(const RendererFrame &frame, int x, int y, i
 
 	try
 	{
-		CoordStack& cs = getCoordStackSingleton();
+		CoordStack& cs = *coordStack;
 		cs.clear();
 		
 		cs.push(x, y);
