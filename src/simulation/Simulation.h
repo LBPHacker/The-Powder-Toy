@@ -255,7 +255,7 @@ public:
 	static std::unique_ptr<Simulation> ParallelFactory();
 
 protected:
-	CoordStack& getCoordStackSingleton();
+	std::unique_ptr<CoordStack> coordStack;
 
 	void ResetNewtonianGravity(GravityInput newGravIn, GravityOutput newGravOut);
 	void DispatchNewtonianGravity();
