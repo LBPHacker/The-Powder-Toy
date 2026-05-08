@@ -1,6 +1,7 @@
 common_files += files(
 	'Bson.cpp',
 	'String.cpp',
+	'ThreadPool.cpp',
 	'tpt-rand.cpp',
 )
 

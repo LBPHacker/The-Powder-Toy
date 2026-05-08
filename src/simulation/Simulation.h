@@ -9,6 +9,7 @@
 #include "AccessProperty.h"
 #include "CoordStack.h"
 #include "common/tpt-rand.h"
+#include "common/RoundDiv.h"
 #include "gravity/Gravity.h"
 #include "graphics/RendererFrame.h"
 #include "SimulationConfig.h"
@@ -22,6 +23,12 @@
 #include <optional>
 
 constexpr int CHANNELS = int(MAX_TEMP - 73) / 100 + 2;
+
+constexpr int TILE_SIZE = 16; // in cells
+constexpr Vec2<int> TILES = { ceilDiv(CELLS.X, TILE_SIZE).first, ceilDiv(CELLS.Y, TILE_SIZE).first };
+
+template<class Item>
+using TilePlane = PlaneAdapter<std::array<Item, (TILES.X + 1) * (TILES.Y + 1)>, TILES.X + 1, TILES.Y + 1>;
 
 class FrameTime;
 class Snapshot;
