@@ -52,6 +52,8 @@ void Element::Element_PIPE()
 
 	ASSIGN_SIM_CALLBACK(Update, Element_PIPE_update)
 	Graphics = &Element_PIPE_graphics;
+
+	InfiniteNeighborhood = true;
 }
 
 constexpr int PPIP_TMPFLAG_REVERSED        = 0x01000000;

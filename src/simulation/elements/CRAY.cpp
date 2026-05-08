@@ -48,6 +48,8 @@ void Element::Element_CRAY()
 
 	ASSIGN_SIM_CALLBACK(Update, update)
 	CtypeDraw = &ctypeDraw;
+
+	InfiniteNeighborhood = true;
 }
 
 static int update(UPDATE_FUNC_ARGS)

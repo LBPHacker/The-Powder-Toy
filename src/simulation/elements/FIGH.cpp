@@ -55,6 +55,8 @@ void Element::Element_FIGH()
 	Graphics = &Element_STKM_graphics;
 	ASSIGN_SIM_CALLBACK(CreateAllowed, createAllowed)
 	ASSIGN_SIM_CALLBACK(ChangeType, changeType)
+
+	InfiniteNeighborhood = true;
 }
 
 static int update(UPDATE_FUNC_ARGS)
