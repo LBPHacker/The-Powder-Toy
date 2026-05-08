@@ -175,7 +175,7 @@ namespace
 		using Simulation::air;
 		using Simulation::IsWallBlocking;
 		using Simulation::GetGravityField;
-		using Simulation::getCoordStackSingleton;
+		using Simulation::coordStack;
 		using Simulation::DispatchNewtonianGravity;
 		using Simulation::UpdateGravityMask;
 		using PlanMoveResult = Simulation::PlanMoveResult;
@@ -802,13 +802,6 @@ bool Simulation::FloodFillPmapCheck(int x, int y, int type) const
 		return TYP(pmap[y][x]) == type;
 }
 
-CoordStack& Simulation::getCoordStackSingleton()
-{
-	// Future-proofing in case Simulation is later multithreaded
-	thread_local CoordStack cs;
-	return cs;
-}
-
 int Simulation::flood_prop(int x, int y, const AccessProperty &changeProperty)
 {
 	int i, x1, x2, dy = 1;
@@ -824,7 +817,7 @@ int Simulation::flood_prop(int x, int y, const AccessProperty &changeProperty)
 	memset(bitmap, 0, XRES*YRES);
 	try
 	{
-		CoordStack& cs = getCoordStackSingleton();
+		CoordStack& cs = *coordStack;
 		cs.clear();
 
 		cs.push(x, y);
@@ -892,7 +885,7 @@ int SimVariantImpl<Variant>::FloodINST(int x, int y)
 	if (!isSparkableInst(x,y))
 		return 1;
 
-	CoordStack& cs = getCoordStackSingleton();
+	CoordStack& cs = *coordStack;
 	cs.clear();
 
 	cs.push(x, y);
@@ -1000,7 +993,7 @@ bool SimVariantImpl<Variant>::flood_water(RNG &rng, int x, int y, int i)
 	auto &elements = sd.elements;
 	try
 	{
-		CoordStack& cs = getCoordStackSingleton();
+		CoordStack& cs = *coordStack;
 		cs.clear();
 
 		cs.push(x, y);
@@ -4691,6 +4684,8 @@ Simulation::~Simulation() = default;
 
 Simulation::Simulation()
 {
+	coordStack = std::make_unique<CoordStack>();
+
 	std::fill(elementCount, elementCount+PT_NUM, 0);
 	elementRecount = true;
 
