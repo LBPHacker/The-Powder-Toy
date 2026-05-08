@@ -44,7 +44,7 @@ class Simulation;
 struct GraphicsFuncContext;
 struct Particle;
 
-#define UPDATE_FUNC_ARGS_TAIL RNG &rng, int i, int x, int y, int surround_space, int nt, Parts &parts, int pmap[YRES][XRES]
+#define UPDATE_FUNC_ARGS_TAIL RNG &rng, int i, int x, int y, int surround_space, int nt, Parts &parts, int pmap[YRES][XRES_ALIGNED]
 #define UPDATE_FUNC_ARGS auto *sim, UPDATE_FUNC_ARGS_TAIL
 #define UPDATE_FUNC_SUBCALL_ARGS sim, rng, i, x, y, surround_space, nt, parts, pmap
 

@@ -38,7 +38,7 @@ namespace
 		When when;
 	};
 
-	struct ThreadContext
+	struct alignas(64) ThreadContext
 	{
 		RNG rng;
 		int pfree;
@@ -97,9 +97,9 @@ namespace
 	{
 		ThreadPool threadPool;
 
-		struct Tile
+		struct alignas(64) Tile
 		{
-			struct ToUpdatePerThread
+			struct alignas(64) ToUpdatePerThread
 			{
 				std::vector<int> ids;
 			};
@@ -122,7 +122,7 @@ namespace
 		unsigned int gol[YRES][XRES][5];
 		int Element_LOLZ_lolz[XRES/9][YRES/9];
 		int Element_LOVE_love[XRES/9][YRES/9];
-		unsigned int pmap_count[YRES][XRES];
+		alignas(64) unsigned int pmap_count[YRES][XRES_ALIGNED];
 
 		SimVariantImpl();
 
