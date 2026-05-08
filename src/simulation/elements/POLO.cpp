@@ -57,7 +57,7 @@ static int update(UPDATE_FUNC_ARGS)
 	int r = sim->photons[y][x];
 	if (parts[i].tmp < LIMIT && !parts[i].life)
 	{
-		if (sim->rng.chance(1, 10000) && !parts[i].tmp)
+		if (rng.chance(1, 10000) && !parts[i].tmp)
 		{
 			//@ POLO -> POLO + NEUT
 			int s = sim->create_part(-3, x, y, PT_NEUT);
@@ -71,7 +71,7 @@ static int update(UPDATE_FUNC_ARGS)
 			}
 		}
 
-		if (r && sim->rng.chance(1, 100))
+		if (r && rng.chance(1, 100))
 		{
 			//@ POLO -> POLO + NEUT
 			int s = sim->create_part(-3, x, y, PT_NEUT);

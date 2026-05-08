@@ -81,7 +81,7 @@ static int update(UPDATE_FUNC_ARGS)
 		for (int j = 0;j < spawncount; j++)
 		{
 			auto nb = -1;
-			switch (sim->rng.gen() % 3)
+			switch (rng.gen() % 3)
 			{
 				case 0:
 					//@ SING -> PHOT
@@ -97,10 +97,10 @@ static int update(UPDATE_FUNC_ARGS)
 					break;
 			}
 			if (nb!=-1) {
-				parts[nb].life = sim->rng.between(0, 299);
+				parts[nb].life = rng.between(0, 299);
 				parts[nb].temp = MAX_TEMP / 2;
-				auto angle = sim->rng.uniform01() * 2.0f * std::numbers::pi_v<float>;
-				auto v = sim->rng.uniform01() * 5.0f;
+				auto angle = rng.uniform01() * 2.0f * std::numbers::pi_v<float>;
+				auto v = rng.uniform01() * 5.0f;
 				parts[nb].vx = v * cosf(angle);
 				parts[nb].vy = v * sinf(angle);
 			}
@@ -119,7 +119,7 @@ static int update(UPDATE_FUNC_ARGS)
 				auto r = pmap[y+ry][x+rx];
 				if (!r)
 					continue;
-				if (TYP(r)!=PT_DMND&& sim->rng.chance(1, 3))
+				if (TYP(r)!=PT_DMND&& rng.chance(1, 3))
 				{
 					if (TYP(r)==PT_SING && parts[ID(r)].life >10)
 					{
@@ -131,11 +131,11 @@ static int update(UPDATE_FUNC_ARGS)
 					{
 						if (parts[i].life+3 > 255)
 						{
-							if (parts[ID(r)].type!=PT_SING && sim->rng.chance(1, 1000))
+							if (parts[ID(r)].type!=PT_SING && rng.chance(1, 1000))
 							{
 								int np;
 								np = sim->create_part(ID(r),x+rx,y+ry,PT_SING);
-								parts[np].life = sim->rng.between(60, 109);
+								parts[np].life = rng.between(60, 109);
 							}
 							continue;
 						}
@@ -153,5 +153,5 @@ static int update(UPDATE_FUNC_ARGS)
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
-	sim->parts[i].life = sim->rng.between(60, 109);
+	sim->parts[i].life = rng.between(60, 109);
 }

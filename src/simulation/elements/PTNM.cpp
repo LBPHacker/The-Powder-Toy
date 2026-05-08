@@ -109,7 +109,7 @@ static void hygn_reactions(int hygn1_id, UPDATE_FUNC_ARGS)
 				}
 
 				// Cold fusion: 2 hydrogen > 500 C has a chance to fuse
-				if (rt == PT_H2 && sim->rng.chance(1, 1000) && parts[ID(r)].temp > 500.0f + 273.15f && parts[hygn1_id].temp > 500.0f + 273.15f)
+				if (rt == PT_H2 && rng.chance(1, 1000) && parts[ID(r)].temp > 500.0f + 273.15f && parts[hygn1_id].temp > 500.0f + 273.15f)
 				{
 					//@ PTNM + 2xH2 -> PTNM + NBLE + NEUT + PHOT + maybe ELEC
 					sim->part_change_type(ID(r), x + rx, y + ry, PT_NBLE);
@@ -126,7 +126,7 @@ static void hygn_reactions(int hygn1_id, UPDATE_FUNC_ARGS)
 						parts[j].temp = parts[ID(r)].temp;
 						parts[j].tmp = 0x1;
 					}
-					if (sim->rng.chance(1, 10))
+					if (rng.chance(1, 10))
 					{
 						int j = sim->create_part(-3, x + rx, y + ry, PT_ELEC);
 						if (j > -1)
@@ -213,7 +213,7 @@ static int update(UPDATE_FUNC_ARGS)
 				float prob = std::min(1.0f, parts[i].temp / (273.15f + 1500.0f));
 				prob *= prob;
 
-				if (sim->rng.uniform01() <= prob)
+				if (rng.uniform01() <= prob)
 				{
 					switch (rt)
 					{
@@ -273,6 +273,6 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
-	if (sim->rng.chance(1, 15))
+	if (rng.chance(1, 15))
 		sim->parts[i].tmp = 1;
 }

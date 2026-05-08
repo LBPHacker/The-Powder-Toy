@@ -846,11 +846,11 @@ void GameModel::SaveToSimParameters(const GameSave &saveData)
 	sim->frameCount = saveData.frameCount;
 	if (saveData.hasRngState)
 	{
-		sim->rng.state(saveData.rngState);
+		sim->sharedRng.state(saveData.rngState);
 	}
 	else
 	{
-		sim->rng = RNG();
+		sim->sharedRng = RNG();
 	}
 	sim->ensureDeterminism = saveData.ensureDeterminism;
 }

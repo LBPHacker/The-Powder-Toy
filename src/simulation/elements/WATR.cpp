@@ -57,15 +57,15 @@ static int update(UPDATE_FUNC_ARGS)
 				auto r = pmap[y+ry][x+rx];
 				if (!r)
 					continue;
-				if (TYP(r)==PT_SALT && sim->rng.chance(1, 50))
+				if (TYP(r)==PT_SALT && rng.chance(1, 50))
 				{
 					//@ WATR + SALT -> SLTW + SALT
 					sim->part_change_type(i,x,y,PT_SLTW);
 					// on average, convert 3 WATR to SLTW before SALT turns into SLTW
-					if (sim->rng.chance(1, 3))
+					if (rng.chance(1, 3))
 						sim->part_change_type(ID(r),x+rx,y+ry,PT_SLTW);
 				}
-				else if ((TYP(r)==PT_RBDM||TYP(r)==PT_LRBD) && (sim->legacy_enable||parts[i].temp>(273.15f+12.0f)) && sim->rng.chance(1, 100))
+				else if ((TYP(r)==PT_RBDM||TYP(r)==PT_LRBD) && (sim->legacy_enable||parts[i].temp>(273.15f+12.0f)) && rng.chance(1, 100))
 				{
 					//@ WATR + RBDM/LRBD -> FIRE + RBDM/LRBD
 					sim->part_change_type(i,x,y,PT_FIRE);
@@ -75,21 +75,21 @@ static int update(UPDATE_FUNC_ARGS)
 				else if (TYP(r)==PT_FIRE && parts[ID(r)].ctype!=PT_WATR)
 				{
 					sim->kill_part(ID(r));
-					if (sim->rng.chance(1, 30))
+					if (rng.chance(1, 30))
 					{
 						sim->kill_part(i);
 						return 1;
 					}
 				}
-				else if (TYP(r)==PT_SLTW && sim->rng.chance(1, 2000))
+				else if (TYP(r)==PT_SLTW && rng.chance(1, 2000))
 				{
 					//@ WATR + SLTW -> 2xSLTW
 					sim->part_change_type(i,x,y,PT_SLTW);
 				}
-				else if (TYP(r)==PT_ROCK && fabs(parts[i].vx)+fabs(parts[i].vy) >= 0.5 && sim->rng.chance(1, 1000)) // ROCK erosion
+				else if (TYP(r)==PT_ROCK && fabs(parts[i].vx)+fabs(parts[i].vy) >= 0.5 && rng.chance(1, 1000)) // ROCK erosion
 				{
 					//@ WATR + ROCK -> WATR + SAND/STNE
-					if (sim->rng.chance(1,3))
+					if (rng.chance(1,3))
 						sim->part_change_type(ID(r),x+rx,y+ry,PT_SAND);
 					else
 						sim->part_change_type(ID(r),x+rx,y+ry,PT_STNE);

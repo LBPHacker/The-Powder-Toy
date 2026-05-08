@@ -85,7 +85,7 @@ int Element_VIBR_update(UPDATE_FUNC_ARGS)
 	else //if it is exploding
 	{
 		//Release sparks before explode
-		rndstore = sim->rng.gen();
+		rndstore = rng.gen();
 		if (parts[i].life < 300)
 		{
 			auto rx = orbit_rx[rndstore & 7];
@@ -117,7 +117,7 @@ int Element_VIBR_update(UPDATE_FUNC_ARGS)
 			if (!parts[i].tmp2)
 			{
 				//@ VIBR/BVBR -> EXOT + ELEC + PHOT + BREC
-				rndstore = sim->rng.gen();
+				rndstore = rng.gen();
 				int index = sim->create_part(-3, x + (orbit_rx[rndstore & 7]), y + (orbit_ry[rndstore & 7]), PT_ELEC);
 				if (index != -1)
 					parts[index].temp = 7000;
@@ -159,7 +159,7 @@ int Element_VIBR_update(UPDATE_FUNC_ARGS)
 					{
 						if (!parts[ID(r)].life)
 							parts[ID(r)].tmp += 45;
-						else if (parts[i].tmp2 && parts[i].life > 75 && sim->rng.chance(1, 2))
+						else if (parts[i].tmp2 && parts[i].life > 75 && rng.chance(1, 2))
 						{
 							parts[ID(r)].tmp2 = 1;
 							parts[i].tmp = 0;
@@ -174,7 +174,7 @@ int Element_VIBR_update(UPDATE_FUNC_ARGS)
 				else
 				{
 					//Melts into EXOT
-					if (TYP(r) == PT_EXOT && sim->rng.chance(1, 25))
+					if (TYP(r) == PT_EXOT && rng.chance(1, 25))
 					{
 						//@ VIBR/BVBR + EXOT -> 2xEXOT
 						sim->part_change_type(i, x, y, PT_EXOT);
@@ -193,7 +193,7 @@ int Element_VIBR_update(UPDATE_FUNC_ARGS)
 	for (auto trade = 0; trade < 9; trade++)
 	{
 		if (!(trade%2))
-			rndstore = sim->rng.gen();
+			rndstore = rng.gen();
 		auto rx = rndstore%7-3;
 		rndstore >>= 3;
 		auto ry = rndstore%7-3;

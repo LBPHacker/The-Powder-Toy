@@ -65,24 +65,24 @@ static int update(UPDATE_FUNC_ARGS)
 					case PT_WATR:
 					case PT_DSTW:
 					case PT_FRZW:
-						if (parts[i].life<limit && sim->rng.chance(500, absorbChanceDenom))
+						if (parts[i].life<limit && rng.chance(500, absorbChanceDenom))
 						{
 							parts[i].life++;
 							sim->kill_part(ID(r));
 						}
 						break;
 					case PT_SLTW:
-						if (parts[i].life<limit && sim->rng.chance(50, absorbChanceDenom))
+						if (parts[i].life<limit && rng.chance(50, absorbChanceDenom))
 						{
 							parts[i].life++;
-							if (sim->rng.chance(3, 4))
+							if (rng.chance(3, 4))
 								sim->kill_part(ID(r));
 							else //@ SPNG + SLTW -> SPNG + SALT
 								sim->part_change_type(ID(r), x+rx, y+ry, PT_SALT);
 						}
 						break;
 					case PT_CBNW:
-						if (parts[i].life<limit && sim->rng.chance(100, absorbChanceDenom))
+						if (parts[i].life<limit && rng.chance(100, absorbChanceDenom))
 						{
 							parts[i].life++;
 							//@ SPNG + CBNW -> SPNG + CO2
@@ -90,7 +90,7 @@ static int update(UPDATE_FUNC_ARGS)
 						}
 						break;
 					case PT_PSTE:
-						if (parts[i].life<limit && sim->rng.chance(20, absorbChanceDenom))
+						if (parts[i].life<limit && rng.chance(20, absorbChanceDenom))
 						{
 							parts[i].life++;
 							//@ SPNG + PSTE -> SPNG + CLST
@@ -125,8 +125,8 @@ static int update(UPDATE_FUNC_ARGS)
 	}
 	for (auto trade = 0; trade<9; trade ++)
 	{
-		auto rx = sim->rng.between(-2, 2);
-		auto ry = sim->rng.between(-2, 2);
+		auto rx = rng.between(-2, 2);
+		auto ry = rng.between(-2, 2);
 		if (rx || ry)
 		{
 			auto r = pmap[y+ry][x+rx];
