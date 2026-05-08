@@ -2561,11 +2561,11 @@ void SimVariantImpl<Variant>::UpdateOne(RNG &rng, int i)
 			if (t==PT_GAS||t==PT_NBLE)
 			{
 				if (pv[y/CELL][x/CELL]<3.5f)
-					pv[y/CELL][x/CELL] += 4.0f*elements[t].HotAir*(3.5f-pv[y/CELL][x/CELL]);
+					pv[y/CELL][x/CELL] += elements[t].HotAir * 4.f * (3.5f-pv[y/CELL][x/CELL]);
 			}
 			else//add the hotair variable to the pressure map, like black hole, or white hole.
 			{
-				pv[y/CELL][x/CELL] += 4.0f*elements[t].HotAir;
+				pv[y/CELL][x/CELL] += elements[t].HotAir * 4.f;
 			}
 		}
 
