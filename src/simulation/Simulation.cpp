@@ -38,7 +38,7 @@ namespace
 		When when;
 	};
 
-	struct ThreadContext
+	struct alignas(64) ThreadContext
 	{
 		RNG rng;
 		int pfree;
@@ -97,9 +97,9 @@ namespace
 	{
 		ThreadPool threadPool;
 
-		struct Tile
+		struct alignas(64) Tile
 		{
-			struct ToUpdatePerThread
+			struct alignas(64) ToUpdatePerThread
 			{
 				std::vector<int> ids;
 			};

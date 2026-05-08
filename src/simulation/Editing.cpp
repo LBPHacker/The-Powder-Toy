@@ -14,14 +14,14 @@
 std::unique_ptr<Snapshot> Simulation::CreateSnapshot() const
 {
 	auto snap = std::make_unique<Snapshot>();
-	snap->AirPressure    .insert   (snap->AirPressure    .begin(), &pv  [0][0]      , &pv  [0][0] + NCELL);
-	snap->AirVelocityX   .insert   (snap->AirVelocityX   .begin(), &vx  [0][0]      , &vx  [0][0] + NCELL);
-	snap->AirVelocityY   .insert   (snap->AirVelocityY   .begin(), &vy  [0][0]      , &vy  [0][0] + NCELL);
-	snap->AmbientHeat    .insert   (snap->AmbientHeat    .begin(), &hv  [0][0]      , &hv  [0][0] + NCELL);
-	snap->BlockMap       .insert   (snap->BlockMap       .begin(), &bmap[0][0]      , &bmap[0][0] + NCELL);
-	snap->ElecMap        .insert   (snap->ElecMap        .begin(), &emap[0][0]      , &emap[0][0] + NCELL);
-	snap->BlockAir       .insert   (snap->BlockAir       .begin(), &air->bmap_blockair[0][0] , &air->bmap_blockair[0][0]  + NCELL);
-	snap->BlockAirH      .insert   (snap->BlockAirH      .begin(), &air->bmap_blockairh[0][0], &air->bmap_blockairh[0][0] + NCELL);
+	snap->AirPressure    .insert   (snap->AirPressure    .begin(), &pv  [0][0]      , &pv  [0][0] + NCELL_ALIGNED);
+	snap->AirVelocityX   .insert   (snap->AirVelocityX   .begin(), &vx  [0][0]      , &vx  [0][0] + NCELL_ALIGNED);
+	snap->AirVelocityY   .insert   (snap->AirVelocityY   .begin(), &vy  [0][0]      , &vy  [0][0] + NCELL_ALIGNED);
+	snap->AmbientHeat    .insert   (snap->AmbientHeat    .begin(), &hv  [0][0]      , &hv  [0][0] + NCELL_ALIGNED);
+	snap->BlockMap       .insert   (snap->BlockMap       .begin(), &bmap[0][0]      , &bmap[0][0] + NCELL_ALIGNED);
+	snap->ElecMap        .insert   (snap->ElecMap        .begin(), &emap[0][0]      , &emap[0][0] + NCELL_ALIGNED);
+	snap->BlockAir       .insert   (snap->BlockAir       .begin(), &air->bmap_blockair[0][0] , &air->bmap_blockair[0][0]  + NCELL_ALIGNED);
+	snap->BlockAirH      .insert   (snap->BlockAirH      .begin(), &air->bmap_blockairh[0][0], &air->bmap_blockairh[0][0] + NCELL_ALIGNED);
 	snap->FanVelocityX   .insert   (snap->FanVelocityX   .begin(), &fvx [0][0]      , &fvx [0][0] + NCELL);
 	snap->FanVelocityY   .insert   (snap->FanVelocityY   .begin(), &fvy [0][0]      , &fvy [0][0] + NCELL);
 	snap->Particles      .insert   (snap->Particles      .begin(), &parts  [0]      , &parts  [0] + parts.active);
@@ -30,10 +30,10 @@ std::unique_ptr<Snapshot> Simulation::CreateSnapshot() const
 	snap->stickmen       .insert   (snap->stickmen       .begin(), &fighters[0]     , &fighters[0] + MAX_FIGHTERS);
 	snap->stickmen       .push_back(player2);
 	snap->stickmen       .push_back(player);
-	snap->GravMass  .insert(snap->GravMass  .begin(), &gravIn.mass[{ 0, 0 }]   , &gravIn.mass[{ 0, 0 }]    + NCELL);
-	snap->GravMask  .insert(snap->GravMask  .begin(), &gravIn.mask[{ 0, 0 }]   , &gravIn.mask[{ 0, 0 }]    + NCELL);
-	snap->GravForceX.insert(snap->GravForceX.begin(), &gravOut.forceX[{ 0, 0 }], &gravOut.forceX[{ 0, 0 }] + NCELL);
-	snap->GravForceY.insert(snap->GravForceY.begin(), &gravOut.forceY[{ 0, 0 }], &gravOut.forceY[{ 0, 0 }] + NCELL);
+	snap->GravMass  .insert(snap->GravMass  .begin(), &gravIn.mass[{ 0, 0 }]   , &gravIn.mass[{ 0, 0 }]    + NCELL_ALIGNED);
+	snap->GravMask  .insert(snap->GravMask  .begin(), &gravIn.mask[{ 0, 0 }]   , &gravIn.mask[{ 0, 0 }]    + NCELL_ALIGNED);
+	snap->GravForceX.insert(snap->GravForceX.begin(), &gravOut.forceX[{ 0, 0 }], &gravOut.forceX[{ 0, 0 }] + NCELL_ALIGNED);
+	snap->GravForceY.insert(snap->GravForceY.begin(), &gravOut.forceY[{ 0, 0 }], &gravOut.forceY[{ 0, 0 }] + NCELL_ALIGNED);
 	snap->signs = signs;
 	snap->FrameCount = frameCount;
 	snap->RngState = sharedRng.state();

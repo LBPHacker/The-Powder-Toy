@@ -47,7 +47,7 @@ class Parts
 public:
 	int pfree;
 
-	std::array<Particle, NPART> data;
+	alignas(64) std::array<Particle, NPART> data;
 	// initialized in clear_sim
 	int active;
 
@@ -90,17 +90,17 @@ struct RenderableSimulation
 	playerst player2;
 	playerst fighters[MAX_FIGHTERS]; //Defined in Stickman.h
 
-	float vx[YCELLS][XCELLS];
-	float vy[YCELLS][XCELLS];
-	float pv[YCELLS][XCELLS];
-	float hv[YCELLS][XCELLS];
+	alignas(64) float vx[YCELLS][XCELLS_ALIGNED];
+	alignas(64) float vy[YCELLS][XCELLS_ALIGNED];
+	alignas(64) float pv[YCELLS][XCELLS_ALIGNED];
+	alignas(64) float hv[YCELLS][XCELLS_ALIGNED];
 
-	unsigned char bmap[YCELLS][XCELLS];
-	unsigned char emap[YCELLS][XCELLS];
+	alignas(64) unsigned char bmap[YCELLS][XCELLS_ALIGNED];
+	alignas(64) unsigned char emap[YCELLS][XCELLS_ALIGNED];
 
 	Parts parts;
-	int pmap[YRES][XRES];
-	int photons[YRES][XRES];
+	alignas(64) int pmap[YRES][XRES_ALIGNED];
+	alignas(64) int photons[YRES][XRES_ALIGNED];
 
 	int aheat_enable = 0;
 
@@ -138,7 +138,7 @@ struct CopiableSimulation : public RenderableSimulation
 	int Element_PSTN_tempParts[std::max(XRES, YRES)];
 	int Element_PPIP_ppip_changed;
 
-	unsigned int pmap_count[YRES][XRES];
+	alignas(64) unsigned int pmap_count[YRES][XRES_ALIGNED];
 
 	int edgeMode = EDGE_VOID;
 	int gravityMode = GRAV_VERTICAL;
