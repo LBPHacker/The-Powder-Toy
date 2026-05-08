@@ -43,7 +43,7 @@ void Element::Element_GOO()
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 constexpr float ADVECTION = 0.1f;

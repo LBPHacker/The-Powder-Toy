@@ -44,7 +44,7 @@ void Element::Element_MERC()
 
 	DefaultProperties.tmp = 10;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

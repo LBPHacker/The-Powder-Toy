@@ -3,7 +3,7 @@
 static int update(UPDATE_FUNC_ARGS);
 static int graphics(GRAPHICS_FUNC_ARGS);
 static void create(ELEMENT_CREATE_FUNC_ARGS);
-static int DeutImplosion(Simulation * sim, int n, int x, int y, float temp, int t);
+static int DeutImplosion(auto *sim, int n, int x, int y, float temp, int t);
 
 void Element::Element_PROT()
 {
@@ -47,9 +47,9 @@ void Element::Element_PROT()
 
 	DefaultProperties.life = 75;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 static int update(UPDATE_FUNC_ARGS)
@@ -208,7 +208,7 @@ static int update(UPDATE_FUNC_ARGS)
 	return 0;
 }
 
-static int DeutImplosion(Simulation * sim, int n, int x, int y, float temp, int t)
+static int DeutImplosion(auto *sim, int n, int x, int y, float temp, int t)
 {
 	int i;
 	n = (n/50);
@@ -222,7 +222,7 @@ static int DeutImplosion(Simulation * sim, int n, int x, int y, float temp, int 
 		i = sim->create_part(-3, x, y, t);
 		if (i >= 0)
 			sim->parts[i].temp = temp;
-		else if (sim->parts.MaxPartsReached())
+		else if (sim->MaxPartsReached())
 			break;
 	}
 	sim->pv[y/CELL][x/CELL] -= (6.0f * CFDS)*n;

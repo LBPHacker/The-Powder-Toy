@@ -43,9 +43,9 @@ void Element::Element_QRTZ()
 	HighTemperature = 2573.15f;
 	HighTemperatureTransition = PT_LAVA; //@ QRTZ -> LAVA(QRTZ)
 
-	Update = &Element_QRTZ_update;
+	ASSIGN_SIM_CALLBACK(Update, Element_QRTZ_update)
 	Graphics = &Element_QRTZ_graphics;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 int Element_QRTZ_update(UPDATE_FUNC_ARGS)

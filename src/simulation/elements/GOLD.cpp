@@ -45,7 +45,7 @@ void Element::Element_GOLD()
 	HighTemperature = 1337.0f;
 	HighTemperatureTransition = PT_LAVA; //@ GOLD -> LAVA(GOLD)
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 }
 

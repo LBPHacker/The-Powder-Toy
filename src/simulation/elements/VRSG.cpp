@@ -47,7 +47,7 @@ void Element::Element_VRSG()
 
 	DefaultProperties.tmp4 = 250;
 
-	Update = &Element_VIRS_update;
+	ASSIGN_SIM_CALLBACK(Update, Element_VIRS_update)
 	Graphics = &graphics;
 }
 

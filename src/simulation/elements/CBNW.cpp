@@ -44,7 +44,7 @@ void Element::Element_CBNW()
 	HighTemperature = 373.0f;
 	HighTemperatureTransition = PT_WTRV; //@ CBNW -> WTRV
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 }
 

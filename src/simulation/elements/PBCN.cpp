@@ -45,7 +45,7 @@ void Element::Element_PBCN()
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 	CtypeDraw = &Element_PCLN_ctypeDraw;
 }

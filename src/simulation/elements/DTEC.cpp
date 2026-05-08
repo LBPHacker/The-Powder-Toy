@@ -45,7 +45,7 @@ void Element::Element_DTEC()
 
 	DefaultProperties.tmp2 = 2;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	CtypeDraw = &Element::ctypeDrawVInTmp;
 }
 

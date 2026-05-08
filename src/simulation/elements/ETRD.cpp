@@ -44,7 +44,7 @@ void Element::Element_ETRD()
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
 
-	ChangeType = &changeType;
+	ASSIGN_SIM_CALLBACK(ChangeType, changeType)
 }
 
 static void changeType(ELEMENT_CHANGETYPE_FUNC_ARGS)

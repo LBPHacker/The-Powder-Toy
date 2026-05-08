@@ -44,7 +44,7 @@ void Element::Element_PVOD()
 	HighTemperatureTransition = NT;
 	CtypeDraw = &Element::basicCtypeDraw;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 }
 

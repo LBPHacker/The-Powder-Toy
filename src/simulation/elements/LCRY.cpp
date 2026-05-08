@@ -43,7 +43,7 @@ void Element::Element_LCRY()
 	HighTemperature = 1273.0f;
 	HighTemperatureTransition = PT_BGLA; //@ LCRY -> BGLA
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 }
 

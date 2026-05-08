@@ -1,4 +1,4 @@
 #pragma once
 #include "simulation/ElementDefs.h"
 
-void Element_EMP_Trigger(Simulation *sim, int triggerCount);
+void Element_EMP_Trigger(auto *sim, int triggerCount);

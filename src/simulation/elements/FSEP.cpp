@@ -44,7 +44,7 @@ void Element::Element_FSEP()
 
 	DefaultProperties.life = 50;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

@@ -46,7 +46,7 @@ void Element::Element_MORT()
 	// CHOO CHOO
 	DefaultProperties.vx = 2.0f;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

@@ -44,7 +44,7 @@ void Element::Element_RSST()
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 int update(UPDATE_FUNC_ARGS)

@@ -5,7 +5,7 @@
 static int update(UPDATE_FUNC_ARGS);
 static int graphics(GRAPHICS_FUNC_ARGS);
 static void create(ELEMENT_CREATE_FUNC_ARGS);
-static void create_line_par(Simulation * sim, int x1, int y1, int x2, int y2, int c, float temp, int life, int tmp, int tmp2, int i);
+static void create_line_par(auto *sim, int x1, int y1, int x2, int y2, int c, float temp, int life, int tmp, int tmp2, int i);
 
 void Element::Element_LIGH()
 {
@@ -47,9 +47,9 @@ void Element::Element_LIGH()
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 constexpr float LIGHTING_POWER = 0.65f;
@@ -193,7 +193,7 @@ static int update(UPDATE_FUNC_ARGS)
 	return 0;
 }
 
-static bool create_LIGH(Simulation * sim, int x, int y, int c, float temp, int life, int tmp, int tmp2, bool last, int i)
+static bool create_LIGH(auto *sim, int x, int y, int c, float temp, int life, int tmp, int tmp2, bool last, int i)
 {
 	int p = sim->create_part(-1, x, y,c);
 	if (p != -1)
@@ -233,7 +233,7 @@ static bool create_LIGH(Simulation * sim, int x, int y, int c, float temp, int l
 	return false;
 }
 
-static void create_line_par(Simulation * sim, int x1, int y1, int x2, int y2, int c, float temp, int life, int tmp, int tmp2, int i)
+static void create_line_par(auto *sim, int x1, int y1, int x2, int y2, int c, float temp, int life, int tmp, int tmp2, int i)
 {
 	bool reverseXY = abs(y2-y1) > abs(x2-x1), back = false;
 	int x, y, dx, dy, Ystep;

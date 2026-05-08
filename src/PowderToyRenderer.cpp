@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 			throw e;
 	}
 
-	auto sim = Simulation::Factory();
+	auto sim = Simulation::LegacyFactory();
 	Renderer * ren = new Renderer();
 	ren->sim = sim.get();
 

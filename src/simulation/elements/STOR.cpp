@@ -46,7 +46,7 @@ void Element::Element_STOR()
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 	CtypeDraw = &ctypeDraw;
 }

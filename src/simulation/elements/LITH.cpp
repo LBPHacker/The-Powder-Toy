@@ -43,7 +43,7 @@ void Element::Element_LITH()
 	HighTemperature = 453.65f;
 	HighTemperatureTransition = PT_LAVA; //@ LITH -> LAVA(LITH/GLAS)
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 }
 

@@ -45,11 +45,14 @@ Element::Element():
 	HighTemperature(ITH),
 	HighTemperatureTransition(NT),
 
-	Update(nullptr),
 	Graphics(&Element::defaultGraphics),
 	CtypeDraw(nullptr),
 	IconGenerator(nullptr)
 {
+	ASSIGN_SIM_CALLBACK(Update, nullptr)
+	ASSIGN_SIM_CALLBACK(Create, nullptr)
+	ASSIGN_SIM_CALLBACK(CreateAllowed, nullptr)
+	ASSIGN_SIM_CALLBACK(ChangeType, nullptr)
 	memset(&DefaultProperties, 0, sizeof(Particle));
 	DefaultProperties.temp = R_TEMP + 273.15f;
 }
@@ -226,6 +229,10 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 	}
 	return 0;
 }
+
+#define DEFINE_LEGACYUPDATE(Var) template int Element::legacyUpdate(SimVariant<Var> *sim, UPDATE_FUNC_ARGS_TAIL);
+ALL_SIM_IMPLS(DEFINE_LEGACYUPDATE)
+#undef DEFINE_LEGACYUPDATE
 
 int Element::defaultGraphics(GRAPHICS_FUNC_ARGS)
 {

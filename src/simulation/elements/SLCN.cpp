@@ -44,9 +44,9 @@ void Element::Element_SLCN()
 	HighTemperature = 3538.15f;
 	HighTemperatureTransition = PT_LAVA; //@ SLCN -> LAVA(SLCN)
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 static const RGB SLCN_COLOUR[16] = {

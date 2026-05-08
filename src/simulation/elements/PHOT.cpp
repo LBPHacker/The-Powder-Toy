@@ -50,9 +50,9 @@ void Element::Element_PHOT()
 	DefaultProperties.life = 680;
 	DefaultProperties.ctype = 0x3FFFFFFF;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 static int update(UPDATE_FUNC_ARGS)

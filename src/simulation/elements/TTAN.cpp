@@ -43,7 +43,7 @@ void Element::Element_TTAN()
 	HighTemperature = 1941.0f;
 	HighTemperatureTransition = PT_LAVA; //@ TTAN -> LAVA(TTAN)
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

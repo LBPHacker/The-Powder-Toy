@@ -43,8 +43,8 @@ void Element::Element_SING()
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
 
-	Update = &update;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Update, update)
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 static int update(UPDATE_FUNC_ARGS)
@@ -104,7 +104,7 @@ static int update(UPDATE_FUNC_ARGS)
 				parts[nb].vx = v * cosf(angle);
 				parts[nb].vy = v * sinf(angle);
 			}
-			else if (sim->parts.MaxPartsReached())
+			else if (sim->MaxPartsReached())
 				break;//if we've run out of particles, stop trying to create them - saves a lot of lag on "sing bomb" saves
 		}
 		sim->kill_part(i);

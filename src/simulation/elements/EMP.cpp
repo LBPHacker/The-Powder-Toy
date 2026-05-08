@@ -71,7 +71,7 @@ public:
 	}
 };
 
-void Element_EMP_Trigger(Simulation *sim, int triggerCount)
+void Element_EMP_Trigger(auto *sim, int triggerCount)
 {
 	/* Known differences from original one-particle-at-a-time version:
 	 * - SPRK that disappears during a frame (such as SPRK with life==0 on that frame) will not cause destruction around it.
@@ -212,6 +212,10 @@ void Element_EMP_Trigger(Simulation *sim, int triggerCount)
 		}
 	}
 }
+
+#define DEFINE_TRIGGER(Var) template void Element_EMP_Trigger(SimVariant<Var> *sim, int triggerCount);
+ALL_SIM_IMPLS(DEFINE_TRIGGER)
+#undef DEFINE_TRIGGER
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {

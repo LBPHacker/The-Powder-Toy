@@ -45,7 +45,7 @@ void Element::Element_FUSE()
 	DefaultProperties.life = 50;
 	DefaultProperties.tmp = 50;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

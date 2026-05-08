@@ -46,8 +46,8 @@ void Element::Element_SEED()
 	HighTemperature = 673.15f;
 	HighTemperatureTransition = PT_FIRE; //@ SEED -> FIRE
 
-	Update = &update;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Update, update)
+	ASSIGN_SIM_CALLBACK(Create, create)
 	Graphics = &graphics;
 }
 

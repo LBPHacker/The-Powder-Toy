@@ -48,9 +48,9 @@ void Element::Element_FIRE()
 	HighTemperature = 2773.0f;
 	HighTemperatureTransition = PT_PLSM; //@ FIRE -> PLSM
 
-	Update = &Element_FIRE_update;
+	ASSIGN_SIM_CALLBACK(Update, Element_FIRE_update)
 	Graphics = &graphics;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 int Element_FIRE_update(UPDATE_FUNC_ARGS)

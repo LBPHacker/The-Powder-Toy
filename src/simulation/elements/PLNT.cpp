@@ -46,7 +46,7 @@ void Element::Element_PLNT()
 	HighTemperature = 573.0f;
 	HighTemperatureTransition = PT_FIRE; //@ PLNT -> FIRE
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 }
 

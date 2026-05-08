@@ -44,7 +44,7 @@ void Element::Element_HEAC()
 	HighTemperature = 1887.15f;
 	HighTemperatureTransition = NT;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 // If this is used elsewhere (GOLD), it should be moved into Simulation.h

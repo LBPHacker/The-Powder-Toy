@@ -45,7 +45,7 @@ void Element::Element_PPIP()
 
 	DefaultProperties.life = 60;
 
-	Update = &Element_PIPE_update;
+	ASSIGN_SIM_CALLBACK(Update, Element_PIPE_update)
 	Graphics = &Element_PIPE_graphics;
 }
 

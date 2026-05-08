@@ -10,7 +10,7 @@
 
 SaveRenderer::SaveRenderer()
 {
-	sim = Simulation::Factory();
+	sim = Simulation::LegacyFactory();
 	ren = std::make_unique<Renderer>();
 	ren->sim = sim.get();
 }

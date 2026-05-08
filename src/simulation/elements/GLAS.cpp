@@ -43,8 +43,8 @@ void Element::Element_GLAS()
 	HighTemperature = 1973.0f;
 	HighTemperatureTransition = PT_LAVA; //@ GLAS -> LAVA(GLAS)
 
-	Update = &update;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Update, update)
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 static int update(UPDATE_FUNC_ARGS)

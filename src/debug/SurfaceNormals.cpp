@@ -31,14 +31,14 @@ void SurfaceNormals::Draw()
 	auto &parts = sim->parts;
 	auto x = int(parts[i].x + 0.5f);
 	auto y = int(parts[i].y + 0.5f);
-	auto mr = Simulation::PlanMove<false>(*sim, i, x, y);
+	auto mr = sim->PlanMoveOuter(i, x, y);
 	if (t == PT_PHOT)
 	{
 		if (parts[i].flags & FLAG_SKIPMOVE)
 		{
 			return;
 		}
-		if (sim->eval_move(PT_PHOT, mr.fin_x, mr.fin_y, nullptr))
+		if (sim->eval_move_outer(PT_PHOT, mr.fin_x, mr.fin_y, nullptr))
 		{
 			int rt = TYP(sim->pmap[mr.fin_y][mr.fin_x]);
 			int lt = TYP(sim->pmap[y][x]);
@@ -50,7 +50,7 @@ void SurfaceNormals::Draw()
 			}
 		}
 	}
-	auto gn = sim->get_normal_interp<false>(*sim, t, parts[i].x, parts[i].y, mr.vx, mr.vy);
+	auto gn = sim->get_normal_interp_outer(t, parts[i].x, parts[i].y, mr.vx, mr.vy);
 	if (!gn.success)
 	{
 		return;

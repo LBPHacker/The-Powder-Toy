@@ -42,7 +42,7 @@ void Element::Element_YEST()
 	HighTemperature = 373.0f;
 	HighTemperatureTransition = PT_DYST; //@ YEST -> DYST
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

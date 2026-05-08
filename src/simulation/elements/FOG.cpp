@@ -44,7 +44,7 @@ void Element::Element_FOG()
 	HighTemperature = 373.15f;
 	HighTemperatureTransition = PT_WTRV; //@ FOG -> WTRV
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

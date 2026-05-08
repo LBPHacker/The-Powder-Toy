@@ -581,7 +581,7 @@ bool GameController::MouseUp(int x, int y, unsigned button, MouseupReason reason
 						OpenSearch(str.Substr(3, si.first - 3));
 						break;
 					case sign::Type::Button:
-						gameModel->GetSimulation()->create_part(-1, foundSign.x, foundSign.y, PT_SPRK);
+						gameModel->GetSimulation()->create_part_outer(-1, foundSign.x, foundSign.y, PT_SPRK);
 						break;
 					default: break;
 					}
@@ -808,7 +808,7 @@ void GameController::ResetSpark()
 			}
 			else
 			{
-				sim->kill_part(i);
+				sim->kill_part_outer(i);
 			}
 		}
 		else if (sim->parts[i].type == PT_WIRE)

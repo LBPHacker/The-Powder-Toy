@@ -4,7 +4,7 @@
 
 static void props_pipe_to_part(const Particle *pipe, Particle *part, bool STOR);
 static void transfer_pipe_to_pipe(Particle *src, Particle *dest, bool STOR);
-static void pushParticle(Simulation * sim, int i, int count, int original);
+static void pushParticle(auto *sim, int i, int count, int original);
 
 void Element::Element_PIPE()
 {
@@ -50,7 +50,7 @@ void Element::Element_PIPE()
 
 	DefaultProperties.life = 60;
 
-	Update = &Element_PIPE_update;
+	ASSIGN_SIM_CALLBACK(Update, Element_PIPE_update)
 	Graphics = &Element_PIPE_graphics;
 }
 
@@ -538,7 +538,7 @@ static void transfer_pipe_to_pipe(Particle *src, Particle *dest, bool STOR)
 	dest->tmp4 = src->tmp4;
 }
 
-static void pushParticle(Simulation * sim, int i, int count, int original)
+static void pushParticle(auto *sim, int i, int count, int original)
 {
 	unsigned int notctype = nextColor(sim->parts[i].tmp);
 	if (!TYP(sim->parts[i].ctype) || count >= 2)//don't push if there is nothing there, max speed of 2 per frame
