@@ -1,4 +1,5 @@
 #include "LuaScriptInterface.h"
+#include "common/VariantIndex.h"
 #include "gui/game/GameModel.h"
 #include "simulation/ElementClasses.h"
 #include "simulation/ElementCommon.h"
@@ -79,7 +80,8 @@ static void manageElementIdentifier(lua_State *L, int id, bool add)
 	}
 }
 
-static int luaUpdateWrapper(UPDATE_FUNC_ARGS)
+template<class SimVariant>
+static int luaUpdateWrapper(SimVariant *sim, UPDATE_FUNC_ARGS_TAIL)
 {
 	if (!sim->useLuaCallbacks)
 	{
@@ -87,7 +89,7 @@ static int luaUpdateWrapper(UPDATE_FUNC_ARGS)
 	}
 	auto *lsi = GetLSI();
 	auto &builtinElements = GetElements();
-	auto *builtinUpdate = builtinElements[parts[i].type].Update;
+	auto *builtinUpdate = std::get<VariantIndex<SimImpls, typename SimVariant::Variant>()>(builtinElements[parts[i].type].Update);
 	auto &customElements = lsi->customElements;
 	if (builtinUpdate && customElements[parts[i].type].updateMode == UPDATE_AFTER)
 	{
@@ -435,7 +437,11 @@ static int element(lua_State *L)
 			{
 				customElements[id].update.Assign(L, -1);
 				customElements[id].updateMode = UPDATE_AFTER;
-				elements[id].Update = luaUpdateWrapper;
+				elements[id].Update = {
+#define WRAPPER(Var) luaUpdateWrapper<SimVariant<Var>>,
+ALL_SIM_IMPLS(WRAPPER)
+#undef WRAPPER
+				};
 			}
 			else if (lua_type(L, -1) == LUA_TBOOLEAN && !lua_toboolean(L, -1))
 			{
@@ -462,7 +468,11 @@ static int element(lua_State *L)
 			if (lua_type(L, -1) == LUA_TFUNCTION)
 			{
 				customElements[id].create.Assign(L, -1);
-				elements[id].Create = luaCreateWrapper;
+				elements[id].Create = {
+#define WRAPPER(Var) luaCreateWrapper<SimVariant<Var>>,
+ALL_SIM_IMPLS(WRAPPER)
+#undef WRAPPER
+				};
 			}
 			else if (lua_type(L, -1) == LUA_TBOOLEAN && !lua_toboolean(L, -1))
 			{
@@ -607,7 +617,11 @@ static int property(lua_State *L)
 					break;
 				}
 				customElements[id].update.Assign(L, 3);
-				elements[id].Update = luaUpdateWrapper;
+				elements[id].Update = {
+#define WRAPPER(Var) luaUpdateWrapper<SimVariant<Var>>,
+ALL_SIM_IMPLS(WRAPPER)
+#undef WRAPPER
+				};
 			}
 			else if (lua_type(L, 3) == LUA_TBOOLEAN && !lua_toboolean(L, 3))
 			{
@@ -635,7 +649,11 @@ static int property(lua_State *L)
 			if (lua_type(L, 3) == LUA_TFUNCTION)
 			{
 				customElements[id].create.Assign(L, 3);
-				elements[id].Create = luaCreateWrapper;
+				elements[id].Create = {
+#define WRAPPER(Var) luaCreateWrapper<SimVariant<Var>>,
+ALL_SIM_IMPLS(WRAPPER)
+#undef WRAPPER
+				};
 			}
 			else if (lua_type(L, 3) == LUA_TBOOLEAN && !lua_toboolean(L, 3))
 			{

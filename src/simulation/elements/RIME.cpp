@@ -43,7 +43,7 @@ void Element::Element_RIME()
 	HighTemperature = 273.15f;
 	HighTemperatureTransition = ST;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

@@ -45,7 +45,7 @@ void Element::Element_LIFE()
 	HighTemperatureTransition = NT;
 
 	Graphics = &graphics;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 static int graphics(GRAPHICS_FUNC_ARGS)

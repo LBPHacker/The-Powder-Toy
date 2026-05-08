@@ -44,7 +44,7 @@ void Element::Element_ROCK()
 	HighTemperatureTransition = PT_LAVA; //@ ROCK -> LAVA(ROCK)
 
 	Graphics = &graphics;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 

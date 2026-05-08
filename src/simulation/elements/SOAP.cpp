@@ -49,9 +49,9 @@ void Element::Element_SOAP()
 	DefaultProperties.tmp = -1;
 	DefaultProperties.tmp2 = -1;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
-	ChangeType = &changeType;
+	ASSIGN_SIM_CALLBACK(ChangeType, changeType)
 }
 
 static bool validIndex(int i)

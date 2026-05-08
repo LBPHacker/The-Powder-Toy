@@ -270,6 +270,7 @@ endif
 
 lto = get_option('lto')
 if cpp_compiler.get_argument_syntax() == 'msvc'
+	project_cpp_args += [ '/Zc:preprocessor' ]
 	if lto
 		# apparently meson doesn't know how to tell msvc to use lto: b_lto doesn't even exist when using msvc
 		# https://github.com/mesonbuild/meson/blob/1.4.2/mesonbuild/compilers/mixins/visualstudio.py#L113
@@ -406,6 +407,7 @@ if cpp_compiler.get_argument_syntax() == 'msvc' and cpp_compiler.get_id() not in
 	project_cpp_args += [
 		'/wd4834',
 		'/wd4100',
+		'/wd4250',
 	]
 else
 	project_cpp_args += [

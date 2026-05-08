@@ -45,7 +45,7 @@ void Element::Element_FRZW()
 
 	DefaultProperties.life = 100;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

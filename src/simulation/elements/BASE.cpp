@@ -46,7 +46,7 @@ void Element::Element_BASE()
 
 	DefaultProperties.life = 76;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 }
 

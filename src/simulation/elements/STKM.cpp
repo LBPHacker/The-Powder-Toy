@@ -51,11 +51,11 @@ void Element::Element_STKM()
 
 	DefaultProperties.life = 100;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &Element_STKM_graphics;
-	Create = &create;
-	CreateAllowed = &createAllowed;
-	ChangeType = &changeType;
+	ASSIGN_SIM_CALLBACK(Create, create)
+	ASSIGN_SIM_CALLBACK(CreateAllowed, createAllowed)
+	ASSIGN_SIM_CALLBACK(ChangeType, changeType)
 }
 
 static int update(UPDATE_FUNC_ARGS)
@@ -94,7 +94,7 @@ static void changeType(ELEMENT_CHANGETYPE_FUNC_ARGS)
 		sim->player.spwn = 0;
 }
 
-void die(Simulation *sim, playerst *playerp, int i)
+void die(auto *sim, playerst *playerp, int i)
 {
 	int x = (int)(sim->parts[i].x + 0.5f);
 	int y = (int)(sim->parts[i].y + 0.5f);
@@ -623,7 +623,11 @@ int Element_STKM_run_stickman(playerst *playerp, UPDATE_FUNC_ARGS)
 	return 0;
 }
 
-void Element_STKM_interact(Simulation *sim, playerst *playerp, int i, int x, int y)
+#define DEFINE_RUNSTICKMAN(Var) template int Element_STKM_run_stickman(playerst *playerp, SimVariant<Var> *sim, UPDATE_FUNC_ARGS_TAIL);
+ALL_SIM_IMPLS(DEFINE_RUNSTICKMAN)
+#undef DEFINE_RUNSTICKMAN
+
+void Element_STKM_interact(auto *sim, playerst *playerp, int i, int x, int y)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;

@@ -508,7 +508,7 @@ AnyType CommandInterface::tptS_create(std::deque<String> * words)
 		v = ID(type);
 		type = TYP(type);
 	}
-	int returnValue = sim->create_part(-1, tempPoint.X, tempPoint.Y, type, v);
+	int returnValue = sim->create_part_outer(-1, tempPoint.X, tempPoint.Y, type, v);
 
 	return NumberType(returnValue);
 }
@@ -532,7 +532,7 @@ AnyType CommandInterface::tptS_delete(std::deque<String> * words)
 		int partIndex = ((NumberType)partRef).Value();
 		if(partIndex < 0 || partIndex >= NPART)
 			throw GeneralException("Invalid particle index");
-		sim->kill_part(partIndex);
+		sim->kill_part_outer(partIndex);
 	}
 	else
 		throw GeneralException("Invalid particle reference");
@@ -567,12 +567,12 @@ AnyType CommandInterface::tptS_bubble(std::deque<String> * words)
 
 	int first, rem1, rem2;
 
-	first = sim->create_part(-1, bubblePos.X+18, bubblePos.Y, PT_SOAP);
+	first = sim->create_part_outer(-1, bubblePos.X+18, bubblePos.Y, PT_SOAP);
 	rem1 = first;
 
 	for (int i = 1; i<=30; i++)
 	{
-		rem2 = sim->create_part(-1, int(bubblePos.X+18*cosf(i/5.0)+0.5f), int(bubblePos.Y+18*sinf(i/5.0)+0.5f), PT_SOAP);
+		rem2 = sim->create_part_outer(-1, int(bubblePos.X+18*cosf(i/5.0)+0.5f), int(bubblePos.Y+18*sinf(i/5.0)+0.5f), PT_SOAP);
 
 		sim->parts[rem1].ctype = 7;
 		sim->parts[rem1].tmp = rem2;

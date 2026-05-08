@@ -5,7 +5,7 @@ static int graphics(GRAPHICS_FUNC_ARGS);
 static void create(ELEMENT_CREATE_FUNC_ARGS);
 static int trymovetron(Simulation * sim, int x, int y, int dir, int i, int len);
 static bool canmovetron(Simulation * sim, int r, int len);
-static int new_tronhead(Simulation * sim, int x, int y, int i, int direction);
+static int new_tronhead(auto *sim, int x, int y, int i, int direction);
 
 void Element::Element_TRON()
 {
@@ -48,9 +48,9 @@ void Element::Element_TRON()
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 /* TRON element is meant to resemble a tron bike (or worm) moving around and trying to avoid obstacles itself.
@@ -202,7 +202,7 @@ static void create(ELEMENT_CREATE_FUNC_ARGS)
 	sim->parts[i].life = 5;
 }
 
-static int new_tronhead(Simulation * sim, int x, int y, int i, int direction)
+static int new_tronhead(auto *sim, int x, int y, int i, int direction)
 {
 	int np = sim->create_part(-1, x , y ,PT_TRON);
 	if (np==-1)

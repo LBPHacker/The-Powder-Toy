@@ -43,7 +43,7 @@ void Element::Element_CONV()
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	CtypeDraw = &Element::ctypeDrawVInCtype;
 }
 
