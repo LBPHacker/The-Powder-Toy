@@ -7,6 +7,8 @@
 #include "SimulationData.h"
 #include "client/GameSave.h"
 #include "common/tpt-rand.h"
+#include "common/ThreadIndex.h"
+#include "common/ThreadPool.h"
 #include "common/Defer.h"
 #include "FrameTime.h"
 #include "gui/game/Brush.h"
@@ -24,6 +26,55 @@
 
 namespace
 {
+	struct DeferredId
+	{
+		int id;
+		enum class When
+		{
+			beforeTransition,
+			beforeUpdate,
+			beforeMovement,
+		};
+		When when;
+	};
+
+	struct ThreadContext
+	{
+		RNG rng;
+		int pfree;
+		int freeListLength;
+		std::array<int, PT_NUM> elementCount;
+		int NUM_PARTS;
+		std::vector<Vec2<int>> emapActivation;
+		std::vector<DeferredId> deferredIds;
+	};
+
+	class TileSchedule
+	{
+	public:
+		using Index = Vec2<int>;
+
+	private:
+		enum class State
+		{
+			waiting,
+			working,
+			done,
+		};
+		TilePlane<State> states;
+		int doneCount;
+		std::mutex mx;
+		std::condition_variable cv;
+		std::vector<Index> tileOrder;
+
+	public:
+		TileSchedule();
+
+		std::optional<Index> Exchange(std::optional<Index> markReady);
+		void Reset();
+		void Permute(RNG &rng);
+	};
+
 	struct Neighbourhood
 	{
 		std::array<int, 8> surround;
@@ -44,6 +95,25 @@ namespace
 	template<>
 	struct PrivateData<ParallelVariant>
 	{
+		ThreadPool threadPool;
+
+		struct Tile
+		{
+			struct ToUpdatePerThread
+			{
+				std::vector<int> ids;
+			};
+			std::vector<ToUpdatePerThread> toUpdate;
+			std::vector<DeferredId> deferredIds;
+		};
+		TilePlane<Tile> tiles;
+		TileSchedule tileSchedule;
+
+		std::vector<ThreadContext> threadContexts;
+		bool useThreadContext = false;
+
+		std::mutex pfreeMx;
+		int pfreeMxLockedTimes = 0;
 	};
 
 	template<class Variant>
@@ -58,7 +128,7 @@ namespace
 		Neighbourhood GetNeighbourhood(int i) const;
 		bool TransitionPhase(RNG &rng, int i, const Neighbourhood &neighbourhood);
 
-		void UpdateOne(RNG &rng, int i);
+		std::optional<DeferredId::When> UpdateOne(RNG &rng, int i, bool runtimeParallel);
 
 		bool UpdatePhase(RNG &rng, int i, const Neighbourhood &neighbourhood);
 
@@ -96,6 +166,10 @@ namespace
 		void PartsFree(int i);
 		int PartsAlloc();
 		void PartsFlatten();
+
+		int *GetElementCount();
+		int &GetNumParts();
+		RNG &GetRng();
 
 		void UpdateParticles(int start, int end) final override;
 
@@ -142,6 +216,51 @@ template<class Variant> int  SimVariant<Variant>::eval_move(int pt, int nx, int 
 #define DEFINE_SIMIMPL(Impl) template class SimVariant<Impl>;
 ALL_SIM_IMPLS(DEFINE_SIMIMPL)
 #undef DEFINE_SIMIMPL
+
+template<class Variant>
+int *SimVariantImpl<Variant>::GetElementCount()
+{
+	constexpr auto Parallel = std::is_same_v<Variant, ParallelVariant>;
+	if constexpr (Parallel)
+	{
+		auto &parallelSim = static_cast<ParallelSim &>(*this);
+		if (parallelSim.useThreadContext)
+		{
+			return parallelSim.threadContexts[ThreadIndex()].elementCount.data();
+		}
+	}
+	return elementCount;
+}
+
+template<class Variant>
+int &SimVariantImpl<Variant>::GetNumParts()
+{
+	constexpr auto Parallel = std::is_same_v<Variant, ParallelVariant>;
+	if constexpr (Parallel)
+	{
+		auto &parallelSim = static_cast<ParallelSim &>(*this);
+		if (parallelSim.useThreadContext)
+		{
+			return parallelSim.threadContexts[ThreadIndex()].NUM_PARTS;
+		}
+	}
+	return NUM_PARTS;
+}
+
+template<class Variant>
+RNG &SimVariantImpl<Variant>::GetRng()
+{
+	constexpr auto Parallel = std::is_same_v<Variant, ParallelVariant>;
+	if constexpr (Parallel)
+	{
+		auto &parallelSim = static_cast<ParallelSim &>(*this);
+		if (parallelSim.useThreadContext)
+		{
+			return parallelSim.threadContexts[ThreadIndex()].rng;
+		}
+	}
+	return sharedRng;
+}
 
 static float remainder_p(float x, float y)
 {
@@ -1034,6 +1153,17 @@ static int get_wavelength_bin(RNG &rng, int *wm)
 template<class Variant>
 void SimVariantImpl<Variant>::set_emap(int x, int y)
 {
+	constexpr auto Parallel = std::is_same_v<Variant, ParallelVariant>;
+	if constexpr (Parallel)
+	{
+		auto &parallelSim = static_cast<ParallelSim &>(*this);
+		if (parallelSim.useThreadContext)
+		{
+			parallelSim.threadContexts[ThreadIndex()].emapActivation.push_back({ x, y });
+			return;
+		}
+	}
+
 	int x1, x2;
 
 	if (!is_wire_off(x, y))
@@ -1899,16 +2029,49 @@ void SimVariantImpl<Variant>::kill_part(int i)//kills particle number i
 	if (t == PT_NONE)
 		return;
 
-	elementCount[t]--;
+	GetElementCount()[t]--;
 
 	PartsFree(i);
-	NUM_PARTS -= 1;
+	GetNumParts() -= 1;
 }
 
+constexpr int freeListTargetLength = 64; // TODO-TILES: tune, adjust NPART to account for threadCount * 2 * freeListTargetLength ids lost in the worst case
 template<class Variant>
 void SimVariantImpl<Variant>::PartsFree(int i)
 {
 	parts.data[i].type = PT_NONE;
+	constexpr auto Parallel = std::is_same_v<Variant, ParallelVariant>;
+	if constexpr (Parallel)
+	{
+		auto &parallelSim = static_cast<ParallelSim &>(*this);
+		if (parallelSim.useThreadContext)
+		{
+			auto &threadContext = parallelSim.threadContexts[ThreadIndex()];
+			if (threadContext.freeListLength >= 2 * freeListTargetLength)
+			{
+				auto oldHead = threadContext.pfree;
+				auto newHead = oldHead;
+				int toLink;
+				for (int j = 0; j < freeListTargetLength; ++j)
+				{
+					toLink = newHead;
+					newHead = parts.data[newHead].life;
+				}
+				threadContext.pfree = newHead;
+				{
+					std::lock_guard lk(parallelSim.pfreeMx);
+					parallelSim.pfreeMxLockedTimes += 1;
+					parts.data[toLink].life = parts.pfree;
+					parts.pfree = oldHead;
+				}
+				threadContext.freeListLength -= freeListTargetLength;
+			}
+			threadContext.freeListLength += 1;
+			parts.data[i].life = threadContext.pfree;
+			threadContext.pfree = i;
+			return;
+		}
+	}
 	parts.data[i].life = parts.pfree;
 	parts.pfree = i;
 }
@@ -1939,9 +2102,10 @@ bool SimVariantImpl<Variant>::part_change_type(int i, int x, int y, int t)
 	if (elements[t].ChangeType)
 		(*(elements[t].ChangeType))(this, i, x, y, parts[i].type, t);
 
-	if (parts[i].type > 0 && parts[i].type < PT_NUM && elementCount[parts[i].type])
-		elementCount[parts[i].type]--;
-	elementCount[t]++;
+	auto *elementCountRef = GetElementCount();
+	if (parts[i].type > 0 && parts[i].type < PT_NUM)
+		elementCountRef[parts[i].type]--;
+	elementCountRef[t]++;
 
 	parts[i].type = t;
 	if (elements[t].Properties & TYPE_ENERGY)
@@ -1964,7 +2128,7 @@ bool SimVariantImpl<Variant>::part_change_type(int i, int x, int y, int t)
 template<class Variant>
 int SimVariantImpl<Variant>::create_part(int p, int x, int y, int t, int v)
 {
-	auto &rng = sharedRng;
+	auto &rng = GetRng();
 
 	int i, oldType = PT_NONE;
 
@@ -2019,6 +2183,7 @@ int SimVariantImpl<Variant>::create_part(int p, int x, int y, int t, int v)
 			return -1;
 	}
 
+	auto *elementCountRef = GetElementCount();
 	if (p == -1 || //creating from anything but brush
 	    p == -2 || //creating from brush
 	    p == -3) //skip pmap checks, e.g. for sing explosion
@@ -2039,7 +2204,7 @@ int SimVariantImpl<Variant>::create_part(int p, int x, int y, int t, int v)
 		{
 			return -1;
 		}
-		NUM_PARTS += 1;
+		GetNumParts() += 1;
 	}
 	else
 	{
@@ -2055,7 +2220,7 @@ int SimVariantImpl<Variant>::create_part(int p, int x, int y, int t, int v)
 		if (elements[oldType].ChangeType)
 			(*(elements[oldType].ChangeType))(this, p, oldX, oldY, oldType, t);
 		if (oldType)
-			elementCount[oldType]--;
+			elementCountRef[oldType]--;
 
 		i = p;
 	}
@@ -2094,7 +2259,7 @@ int SimVariantImpl<Variant>::create_part(int p, int x, int y, int t, int v)
 	if (elements[t].ChangeType)
 		(*(elements[t].ChangeType))(this, i, x, y, oldType, t);
 
-	elementCount[t]++;
+	elementCountRef[t]++;
 	return i;
 }
 
@@ -2121,6 +2286,52 @@ int SimVariantImpl<Variant>::createPartTempVel(int i, int x, int y, int t)
 template<class Variant>
 int SimVariantImpl<Variant>::PartsAlloc()
 {
+	constexpr auto Parallel = std::is_same_v<Variant, ParallelVariant>;
+	if constexpr (Parallel)
+	{
+		auto &parallelSim = static_cast<ParallelSim &>(*this);
+		if (parallelSim.useThreadContext)
+		{
+			auto &threadContext = parallelSim.threadContexts[ThreadIndex()];
+			if (threadContext.pfree == -1)
+			{
+				std::lock_guard lk(parallelSim.pfreeMx);
+				parallelSim.pfreeMxLockedTimes += 1;
+				// TODO: in theory this could be done with one traversal through the global free list and two relinks;
+				//       but I'm lazy and don't feel like wasting time debugging an inevitably buggy implementation
+				//       of this smarter method, so the dumber one has to suffice for now.
+				while (threadContext.freeListLength < freeListTargetLength)
+				{
+					if (parts.pfree != -1)
+					{
+						auto oldPfree = parts.pfree;
+						parts.pfree = parts.data[oldPfree].life;
+						parts.data[oldPfree].life = threadContext.pfree;
+						threadContext.pfree = oldPfree;
+					}
+					else if (parts.active < NPART)
+					{
+						parts.data[parts.active].life = threadContext.pfree;
+						threadContext.pfree = parts.active;
+						parts.active += 1;
+					}
+					else
+					{
+						break;
+					}
+					threadContext.freeListLength += 1;
+				}
+			}
+			if (threadContext.pfree != -1)
+			{
+				threadContext.freeListLength -= 1;
+				auto i = threadContext.pfree;
+				threadContext.pfree = parts.data[i].life;
+				return i;
+			}
+			return -1;
+		}
+	}
 	if (parts.pfree != -1)
 	{
 		auto i = parts.pfree;
@@ -2388,7 +2599,7 @@ std::unique_ptr<Simulation> Simulation::LegacyFactory()
 
 std::unique_ptr<Simulation> Simulation::ParallelFactory()
 {
-	return std::make_unique<SimVariantImpl<ParallelVariant>>();
+	return std::make_unique<ParallelSim>();
 }
 
 template<class Variant>
@@ -2422,8 +2633,11 @@ Neighbourhood SimVariantImpl<Variant>::GetNeighbourhood(int i) const
 	return n;
 }
 
+constexpr auto TILE_SIZE_FINE = TILE_SIZE * CELL;
+
+
 template<class Variant>
-void SimVariantImpl<Variant>::UpdateOne(RNG &rng, int i)
+std::optional<DeferredId::When> SimVariantImpl<Variant>::UpdateOne(RNG &rng, int i, bool runtimeParallel)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
@@ -2431,19 +2645,21 @@ void SimVariantImpl<Variant>::UpdateOne(RNG &rng, int i)
 	auto t = parts[i].type;
 	if (!t)
 	{
-		return;
+		return std::nullopt;
 	}
 
+	Vec2<int> pTile{ 0, 0 };
 	Neighbourhood neighbourhood;
 	{
 		auto x = int(parts[i].x + 0.5f);
 		auto y = int(parts[i].y + 0.5f);
+		pTile = { x / TILE_SIZE_FINE, y / TILE_SIZE_FINE };
 
 		// Kill a particle off screen
 		if (x<CELL || y<CELL || x>=XRES-CELL || y>=YRES-CELL)
 		{
 			kill_part(i);
-			return;
+			return std::nullopt;
 		}
 
 		// Kill a particle in a wall where it isn't supposed to go
@@ -2459,12 +2675,12 @@ void SimVariantImpl<Variant>::UpdateOne(RNG &rng, int i)
 		    (bmap[y/CELL][x/CELL]==WL_EWALL && !emap[y/CELL][x/CELL])) && (t!=PT_STKM) && (t!=PT_STKM2) && (t!=PT_FIGH))
 		{
 			kill_part(i);
-			return;
+			return std::nullopt;
 		}
 
 		// Make sure that STASIS'd particles don't tick.
 		if (bmap[y/CELL][x/CELL] == WL_STASIS && emap[y/CELL][x/CELL]<8) {
-			return;
+			return std::nullopt;
 		}
 
 		if (bmap[y/CELL][x/CELL]==WL_DETECT && emap[y/CELL][x/CELL]<8)
@@ -2509,31 +2725,138 @@ void SimVariantImpl<Variant>::UpdateOne(RNG &rng, int i)
 	auto transitionOccurred = TransitionPhase(rng, i, neighbourhood);
 	if (!parts[i].type)
 	{
-		return;
+		return std::nullopt;
 	}
 	if (transitionOccurred)
 	{
 		t = parts[i].type;
 	}
+
+	constexpr auto Parallel = std::is_same_v<Variant, ParallelVariant>;
+	if (Parallel && runtimeParallel)
+	{
+		if (elements[t].InfiniteNeighborhood)
+		{
+			return DeferredId::When::beforeUpdate;
+		}
+		auto x = int(parts[i].x + 0.5f);
+		auto y = int(parts[i].y + 0.5f);
+		auto pTileBeforeUpdate = Vec2{ x / TILE_SIZE_FINE, y / TILE_SIZE_FINE };
+		if (pTileBeforeUpdate != pTile)
+		{
+			return DeferredId::When::beforeUpdate;
+		}
+	}
 	if (UpdatePhase(rng, i, neighbourhood))
 	{
-		return;
+		return std::nullopt;
 	}
 
 	if (parts[i].type == PT_NONE)//if its dead, skip to next particle
-		return;
+		return std::nullopt;
 
 	if (transitionOccurred)
-		return;
+		return std::nullopt;
 
 	if (!parts[i].vx&&!parts[i].vy)//if its not moving, skip to next particle, movement code it next
-		return;
+		return std::nullopt;
 
+	if (Parallel && runtimeParallel)
+	{
+		if (elements[parts[i].type].InfiniteNeighborhood)
+		{
+			return DeferredId::When::beforeMovement;
+		}
+		auto x = int(parts[i].x + 0.5f);
+		auto y = int(parts[i].y + 0.5f);
+		auto pTileBeforeMovement = Vec2{ x / TILE_SIZE_FINE, y / TILE_SIZE_FINE };
+		if (pTileBeforeMovement != pTile)
+		{
+			return DeferredId::When::beforeMovement;
+		}
+		auto maxVel = int(std::max(std::max(std::abs(parts[i].vx), std::abs(parts[i].vy)), 1.f));
+		if (maxVel > TILE_SIZE_FINE / 2)
+		{
+			return DeferredId::When::beforeMovement;
+		}
+	}
 	MovementPhase(rng, i, neighbourhood);
+	return std::nullopt;
 }
 
-template<class Variant>
-void SimVariantImpl<Variant>::UpdateParticles(int start, int end)
+std::optional<TileSchedule::Index> TileSchedule::Exchange(std::optional<Index> markReady)
+{
+	Defer notifyWhenDone([this]() {
+		cv.notify_all();
+	});
+	std::unique_lock lk(mx);
+	if (markReady)
+	{
+		states[*markReady] = State::done;
+		doneCount += 1;
+	}
+	auto allCount = states.Size().X * states.Size().Y;
+	while (doneCount < allCount)
+	{
+		for (auto pTile : tileOrder)
+		{
+			if (states[pTile] != State::waiting)
+			{
+				continue;
+			}
+			bool hasWorkingNeighbor = false;
+			for (auto pNeighbor : RectSized(pTile, { 1, 1 }).Inset(-1) & states.Size().OriginRect())
+			{
+				// checking self is ok because we made sure it's waiting
+				hasWorkingNeighbor |= states[pNeighbor] == State::working;
+			}
+			if (hasWorkingNeighbor)
+			{
+				continue;
+			}
+			states[pTile] = State::working;
+			return pTile;
+		}
+		// couldn't find an eligible tile, wait
+		cv.wait(lk, [
+			this,
+			lastDoneCount = doneCount
+		]() {
+			return doneCount > lastDoneCount;
+		});
+	}
+	return std::nullopt;
+}
+
+TileSchedule::TileSchedule()
+{
+	for (auto p : states.Size().OriginRect())
+	{
+		tileOrder.push_back(p);
+	}
+	Reset();
+}
+
+void TileSchedule::Reset()
+{
+	doneCount = 0;
+	for (auto &state : states.Base)
+	{
+		state = State::waiting;
+	}
+}
+
+void TileSchedule::Permute(RNG &rng)
+{
+	auto count = int(tileOrder.size());
+	for (auto i = 0; i < count; ++i)
+	{
+		std::swap(tileOrder[i], tileOrder[rng.between(i, count - 1)]);
+	}
+}
+
+template<>
+void SimVariantImpl<LegacyVariant>::UpdateParticles(int start, int end)
 {
 	FrameTime::Span span(frameTime, "Simulation::UpdateParticles");
 
@@ -2544,8 +2867,181 @@ void SimVariantImpl<Variant>::UpdateParticles(int start, int end)
 		{
 			debug_mostRecentlyUpdated = i;
 		}
-		UpdateOne(sharedRng, i);
+		UpdateOne(sharedRng, i, false);
 	}
+}
+
+template<>
+void SimVariantImpl<ParallelVariant>::UpdateParticles(int start, int end)
+{
+	FrameTime::Span span(frameTime, "Simulation::UpdateParticles");
+
+	threadPool.SetThreadCount(threadCount);
+	if (threadCount == 0 || water_equal_test || !(start == 0 && end == NPART))
+	{
+		//the main particle loop function, goes over all particles.
+		for (auto i = start; i < end && i < parts.active; i++)
+		{
+			if (parts[i].type)
+			{
+				debug_mostRecentlyUpdated = i;
+			}
+			UpdateOne(sharedRng, i, false);
+		}
+		return;
+	}
+
+	{
+		FrameTime::Span span(frameTime, "assignToTiles");
+		pfreeMxLockedTimes = 0; // TODO-TILES: show in hud
+		threadContexts.resize(threadCount);
+		for (auto &ctx : threadContexts)
+		{
+			ctx.rng.seed(sharedRng());
+			ctx.pfree = -1;
+			ctx.freeListLength = 0;
+			for (auto &item : ctx.elementCount)
+			{
+				item = 0;
+			}
+			ctx.NUM_PARTS = 0;
+		}
+		for (auto &tile : tiles.Base)
+		{
+			tile.toUpdate.resize(threadCount);
+		}
+		constexpr int chunkSize = 10000; // TODO-TILES: tune
+		for (int i = 0; i < parts.active; i += chunkSize)
+		{
+			threadPool.PushWorkItem([
+				this,
+				itemStart = i,
+				itemEnd   = std::min(i + chunkSize, NPART)
+			]() {
+				auto &sd = SimulationData::CRef();
+				auto &elements = sd.elements;
+				auto threadIndex = ThreadIndex();
+				auto &ctx = threadContexts[threadIndex];
+				for (auto i = itemStart; i < itemEnd; i++)
+				{
+					auto t = parts[i].type;
+					if (!t)
+					{
+						continue;
+					}
+					if (elements[t].InfiniteNeighborhood)
+					{
+						ctx.deferredIds.push_back({ i, DeferredId::When::beforeTransition });
+					}
+					else
+					{
+						auto x = int(parts[i].x + 0.5f);
+						auto y = int(parts[i].y + 0.5f);
+						tiles[{ x / TILE_SIZE_FINE, y / TILE_SIZE_FINE }].toUpdate[threadIndex].ids.push_back(i);
+					}
+				}
+			});
+		}
+		threadPool.Flush();
+	}
+
+	tileSchedule.Permute(sharedRng);
+	{
+		FrameTime::Span span(frameTime, "parallelUpdate");
+		useThreadContext = true;
+		Defer stopUsingThreadContext([this]() {
+			useThreadContext = false;
+		});
+		threadPool.DoFirstOnAllThreads([this]() {
+			auto &rng = threadContexts[ThreadIndex()].rng;
+			std::optional<TileSchedule::Index> current;
+			while (true)
+			{
+				current = tileSchedule.Exchange(current);
+				if (!current)
+				{
+					break;
+				}
+				auto pTile = *current;
+				auto &tile = tiles[pTile];
+				for (auto &toUpdatePerThread : tile.toUpdate)
+				{
+					for (auto i : toUpdatePerThread.ids)
+					{
+						auto t = parts[i].type;
+						if (!t)
+						{
+							continue;
+						}
+						auto x = int(parts[i].x + 0.5f);
+						auto y = int(parts[i].y + 0.5f);
+						if (pTile != Vec2{ x / TILE_SIZE_FINE, y / TILE_SIZE_FINE })
+						{
+							tile.deferredIds.push_back({ i, DeferredId::When::beforeTransition });
+							continue;
+						}
+						if (auto deferred = UpdateOne(rng, i, true))
+						{
+							tile.deferredIds.push_back({ i, *deferred });
+						}
+					}
+				}
+			}
+		});
+		threadPool.Flush();
+	}
+
+	auto handleDeferred = [this](std::span<DeferredId> ids) {
+		for (auto &item : ids)
+		{
+			switch (item.when)
+			{
+			case DeferredId::When::beforeTransition:
+				UpdateOne(sharedRng, item.id, false);
+				break;
+
+			case DeferredId::When::beforeUpdate:
+				// don't call MovementPhase, it would have been skipped due to transitionOccurred anyway
+				UpdatePhase(sharedRng, item.id, GetNeighbourhood(item.id));
+				break;
+
+			case DeferredId::When::beforeMovement:
+				MovementPhase(sharedRng, item.id, GetNeighbourhood(item.id));
+				break;
+			}
+		}
+	};
+	{
+		FrameTime::Span span(frameTime, "handleDeferredFromTiles");
+		for (auto &tile : tiles.Base)
+		{
+			for (auto &toUpdatePerThread : tile.toUpdate)
+			{
+				toUpdatePerThread.ids.clear();
+			}
+			handleDeferred(tile.deferredIds);
+			tile.deferredIds.clear();
+		}
+	}
+	{
+		FrameTime::Span span(frameTime, "handleDeferredEarly");
+		for (auto &ctx : threadContexts)
+		{
+			handleDeferred(ctx.deferredIds);
+			ctx.deferredIds.clear();
+			for (int j = 0; j < PT_NUM; ++j)
+			{
+				elementCount[j] += ctx.elementCount[j];
+			}
+			NUM_PARTS += ctx.NUM_PARTS;
+			for (auto p : ctx.emapActivation)
+			{
+				PublicBase::set_emap(p.X, p.Y);
+			}
+			ctx.emapActivation.clear();
+		}
+	}
+	tileSchedule.Reset();
 }
 
 template<class Variant>
