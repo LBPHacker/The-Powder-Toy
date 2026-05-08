@@ -67,7 +67,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 			case PT_WATR:
 				//@ NEUT + WATR -> NEUT + DSTW
-				if (sim->rng.chance(3, 20))
+				if (rng.chance(3, 20))
 					sim->part_change_type(ID(r),x+rx,y+ry,PT_DSTW);
 			case PT_ICEI:
 			case PT_SNOW:
@@ -75,12 +75,12 @@ static int update(UPDATE_FUNC_ARGS)
 				parts[i].vy *= 0.995f;
 				break;
 			case PT_PLUT:
-				if (sim->rng.chance(pressureFactor, 1000))
+				if (rng.chance(pressureFactor, 1000))
 				{
-					if (sim->rng.chance(1, 3))
+					if (rng.chance(1, 3))
 					{
 						//@ NEUT + PLUT -> NEUT + URAN/LAVA(PLUT)
-						sim->create_part(ID(r), x+rx, y+ry, sim->rng.chance(2, 3) ? PT_LAVA : PT_URAN);
+						sim->create_part(ID(r), x+rx, y+ry, rng.chance(2, 3) ? PT_LAVA : PT_URAN);
 						parts[ID(r)].temp = MAX_TEMP;
 						if (parts[ID(r)].type==PT_LAVA) {
 							parts[ID(r)].tmp = 100;
@@ -99,7 +99,7 @@ static int update(UPDATE_FUNC_ARGS)
 				}
 				break;
 			case PT_DEUT:
-				if (sim->rng.chance(pressureFactor + 1 + (parts[ID(r)].life/100), 1000))
+				if (rng.chance(pressureFactor + 1 + (parts[ID(r)].life/100), 1000))
 				{
 					//@ NEUT + DEUT -> 2xNEUT
 					DeutExplosion(sim, parts[ID(r)].life, x+rx, y+ry, restrict_flt(parts[ID(r)].temp + parts[ID(r)].life*500.0f, MIN_TEMP, MAX_TEMP), PT_NEUT);
@@ -108,12 +108,12 @@ static int update(UPDATE_FUNC_ARGS)
 				break;
 			case PT_GUNP:
 				//@ NEUT + GUNP -> NEUT + DUST
-				if (sim->rng.chance(3, 200))
+				if (rng.chance(3, 200))
 					sim->part_change_type(ID(r),x+rx,y+ry,PT_DUST);
 				break;
 			case PT_DYST:
 				//@ NEUT + DYST -> NEUT + YEST
-				if (sim->rng.chance(3, 200))
+				if (rng.chance(3, 200))
 					sim->part_change_type(ID(r),x+rx,y+ry,PT_YEST);
 				break;
 			case PT_YEST:
@@ -122,63 +122,63 @@ static int update(UPDATE_FUNC_ARGS)
 				break;
 			case PT_PLEX:
 				//@ NEUT + PLEX -> NEUT + GOO
-				if (sim->rng.chance(3, 200))
+				if (rng.chance(3, 200))
 					sim->part_change_type(ID(r),x+rx,y+ry,PT_GOO);
 				break;
 			case PT_NITR:
 				//@ NEUT + NITR -> NEUT + DESL
-				if (sim->rng.chance(3, 200))
+				if (rng.chance(3, 200))
 					sim->part_change_type(ID(r),x+rx,y+ry,PT_DESL);
 				break;
 			case PT_PLNT:
 				//@ NEUT + PLNT -> NEUT + WOOD
-				if (sim->rng.chance(1, 20))
+				if (rng.chance(1, 20))
 					sim->create_part(ID(r), x+rx, y+ry, PT_WOOD);
 				break;
 			case PT_DESL:
 			case PT_OIL:
 				//@ NEUT + DESL/OIL -> NEUT + GAS
-				if (sim->rng.chance(3, 200))
+				if (rng.chance(3, 200))
 					sim->part_change_type(ID(r),x+rx,y+ry,PT_GAS);
 				break;
 			case PT_COAL:
 				//@ NEUT + COAL -> NEUT + WOOD
-				if (sim->rng.chance(1, 20))
+				if (rng.chance(1, 20))
 					sim->create_part(ID(r), x+rx, y+ry, PT_WOOD);
 				break;
 			case PT_BCOL:
 				//@ NEUT + BCOL -> NEUT + SAWD
-				if (sim->rng.chance(1, 20))
+				if (rng.chance(1, 20))
 					sim->create_part(ID(r), x+rx, y+ry, PT_SAWD);
 				break;
 			case PT_DUST:
 				//@ NEUT + DUST -> NEUT + FWRK
-				if (sim->rng.chance(1, 20))
+				if (rng.chance(1, 20))
 					sim->part_change_type(ID(r), x+rx, y+ry, PT_FWRK);
 				break;
 			case PT_FWRK:
-				if (sim->rng.chance(1, 20))
+				if (rng.chance(1, 20))
 					parts[ID(r)].ctype = PT_DUST;
 				break;
 			case PT_ACID:
 				//@ NEUT + ACID -> NEUT + ISOZ
-				if (sim->rng.chance(1, 20))
+				if (rng.chance(1, 20))
 					sim->create_part(ID(r), x+rx, y+ry, PT_ISOZ);
 				break;
 			case PT_TTAN:
-				if (sim->rng.chance(1, 20))
+				if (rng.chance(1, 20))
 				{
 					sim->kill_part(i);
 					return 1;
 				}
 				break;
 			case PT_EXOT:
-				if (sim->rng.chance(1, 20))
+				if (rng.chance(1, 20))
 					parts[ID(r)].life = 1500;
 				break;
 			case PT_RFRG:
 				//@ NEUT + RFRG -> NEUT + GAS/CAUS
-				if (sim->rng.chance(1, 2))
+				if (rng.chance(1, 2))
 					sim->create_part(ID(r), x+rx, y+ry, PT_GAS);
 				else
 					sim->create_part(ID(r), x+rx, y+ry, PT_CAUS);
@@ -211,29 +211,29 @@ static int update(UPDATE_FUNC_ARGS)
 				break;
 			case PT_BASE:
 				//@ NEUT + BASE -> NEUT + LRBD
-				if (parts[ID(r)].temp > (50 + 273.15) && sim->rng.chance(1, 35))
+				if (parts[ID(r)].temp > (50 + 273.15) && rng.chance(1, 35))
 					sim->create_part(ID(r), x+rx, y+ry, PT_LRBD);
 				break;
 			case PT_SEED:
 				if(!rx && !ry)
 				{
 					// Flip a random gene with 1/2 chance
-					switch (sim->rng.between(0, 9))
+					switch (rng.between(0, 9))
 					{
 						case 0:
-							parts[ID(r)].ctype ^= 1 << sim->rng.between(PLNT_COLOUR, PLNT_LIFE-1);
+							parts[ID(r)].ctype ^= 1 << rng.between(PLNT_COLOUR, PLNT_LIFE-1);
 							break;
 						case 1:
-							parts[ID(r)].tmp ^= 1 << sim->rng.between(0, PLNT_TOTAL_TMP-1);
+							parts[ID(r)].tmp ^= 1 << rng.between(0, PLNT_TOTAL_TMP-1);
 							break;
 						case 2:
-							parts[ID(r)].tmp2 ^= 1 << sim->rng.between(0, PLNT_TOTAL_TMP-1);
+							parts[ID(r)].tmp2 ^= 1 << rng.between(0, PLNT_TOTAL_TMP-1);
 							break;
 						case 3:
-							parts[ID(r)].tmp3 ^= 1 << sim->rng.between(0, PLNT_TOTAL_TMP-1);
+							parts[ID(r)].tmp3 ^= 1 << rng.between(0, PLNT_TOTAL_TMP-1);
 							break;
 						case 4:
-							parts[ID(r)].tmp4 ^= 1 << sim->rng.between(0, PLNT_TOTAL_TMP-1);
+							parts[ID(r)].tmp4 ^= 1 << rng.between(0, PLNT_TOTAL_TMP-1);
 							break;
 						default:
 							break;
@@ -261,9 +261,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
-	float r = sim->rng.between(128, 255) / 127.0f;
-	float a = sim->rng.between(0, 359) * std::numbers::pi_v<float> / 180.0f;
-	sim->parts[i].life = sim->rng.between(480, 959);
+	float r = rng.between(128, 255) / 127.0f;
+	float a = rng.between(0, 359) * std::numbers::pi_v<float> / 180.0f;
+	sim->parts[i].life = rng.between(480, 959);
 	sim->parts[i].vx = r * cosf(a);
 	sim->parts[i].vy = r * sinf(a);
 }

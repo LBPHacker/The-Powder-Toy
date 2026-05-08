@@ -102,7 +102,7 @@ struct RenderableSimulation
 
 struct CopiableSimulation : public RenderableSimulation
 {
-	RNG rng;
+	RNG sharedRng;
 
 	int replaceModeSelected = 0;
 	int replaceModeFlags = 0;

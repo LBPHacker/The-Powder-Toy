@@ -62,7 +62,7 @@ static int update(UPDATE_FUNC_ARGS)
 				{
 					//@ RIME -> FOG
 					sim->part_change_type(i,x,y,PT_FOG);
-					parts[i].life = sim->rng.between(60, 119);
+					parts[i].life = rng.between(60, 119);
 				}
 				// GAS increases acidity
 				else if (TYP(r) == PT_GAS && parts[i].tmp < 10)

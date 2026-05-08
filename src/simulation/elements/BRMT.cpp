@@ -62,9 +62,9 @@ static int update(UPDATE_FUNC_ARGS)
 					auto r = pmap[y+ry][x+rx];
 					if (!r)
 						continue;
-					if (TYP(r)==PT_BREC && sim->rng.chance(1, tempFactor))
+					if (TYP(r)==PT_BREC && rng.chance(1, tempFactor))
 					{
-						if (sim->rng.chance(1, 2))
+						if (rng.chance(1, 2))
 						{
 							//@ BRMT + BREC -> BRMT + THRM
 							sim->create_part(ID(r), x+rx, y+ry, PT_THRM);

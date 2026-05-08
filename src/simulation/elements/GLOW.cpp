@@ -60,7 +60,7 @@ static int update(UPDATE_FUNC_ARGS)
 				if (!r)
 					continue;
 
-				if (TYP(r)==PT_WATR && sim->rng.chance(1, 400))
+				if (TYP(r)==PT_WATR && rng.chance(1, 400))
 				{
 					//@ GLOW + WATR -> DEUT
 					sim->kill_part(i);

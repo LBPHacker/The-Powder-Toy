@@ -118,7 +118,7 @@ static int update(UPDATE_FUNC_ARGS)
 		if (parts[i].life<=1 && !(parts[i].tmp&0x1))
 		{
 			//@ NBLE -> PLSM(NBLE)
-			parts[i].life = sim->rng.between(50, 199);
+			parts[i].life = rng.between(50, 199);
 			sim->part_change_type(i,x,y,PT_PLSM);
 			parts[i].ctype = PT_NBLE;
 			if (parts[i].temp > 5273.15)
@@ -139,13 +139,13 @@ static int update(UPDATE_FUNC_ARGS)
 					auto r = pmap[y+ry][x+rx];
 					if (r)
 						continue;
-					if (parts[i].tmp>4 && sim->rng.chance(1, parts[i].tmp*parts[i].tmp/20+6))
+					if (parts[i].tmp>4 && rng.chance(1, parts[i].tmp*parts[i].tmp/20+6))
 					{
 						//@ TESC -> TESC + LIGH
 						int p = sim->create_part(-1, x+rx*2, y+ry*2, PT_LIGH);
 						if (p!=-1)
 						{
-							parts[p].life = sim->rng.between(0, 2+parts[i].tmp/15) + parts[i].tmp/7;
+							parts[p].life = rng.between(0, 2+parts[i].tmp/15) + parts[i].tmp/7;
 							if (parts[i].life>60)
 								parts[i].life=60;
 							parts[p].temp=parts[p].life*parts[i].tmp/2.5;
@@ -178,7 +178,7 @@ static int update(UPDATE_FUNC_ARGS)
 						continue;
 					if (TYP(r)==PT_DSTW || TYP(r)==PT_SLTW || TYP(r)==PT_WATR)
 					{
-						int rndstore = sim->rng.gen()%100;
+						int rndstore = rng.gen()%100;
 						//@ IRON + DSTW/SLTW/WATR -> IRON + O2/H2
 						if (!rndstore)
 							sim->part_change_type(ID(r),x+rx,y+ry,PT_O2);
@@ -191,7 +191,7 @@ static int update(UPDATE_FUNC_ARGS)
 		break;
 	case PT_TUNG:
 		if(parts[i].temp < 3595.0){
-			parts[i].temp += sim->rng.between(-4, 15);
+			parts[i].temp += rng.between(-4, 15);
 		}
 	default:
 		break;

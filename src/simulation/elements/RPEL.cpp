@@ -54,8 +54,8 @@ static int update(UPDATE_FUNC_ARGS)
 	int r, rx, ry, ri;
 	for(ri = 0; ri <= 10; ri++)
 	{
-		rx = sim->rng.between(-10, 10);
-		ry = sim->rng.between(-10, 10);
+		rx = rng.between(-10, 10);
+		ry = rng.between(-10, 10);
 		if (x+rx >= 0 && x+rx < XRES && y+ry >= 0 && y+ry < YRES && (rx || ry))
 		{
 			r = pmap[y+ry][x+rx];

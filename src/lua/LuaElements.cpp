@@ -485,7 +485,11 @@ ALL_SIM_IMPLS(WRAPPER)
 			if (lua_type(L, -1) == LUA_TFUNCTION)
 			{
 				customElements[id].createAllowed.Assign(L, -1);
-				elements[id].CreateAllowed = luaCreateAllowedWrapper;
+				elements[id].CreateAllowed = {
+#define WRAPPER(Var) luaCreateAllowedWrapper<SimVariant<Var>>,
+ALL_SIM_IMPLS(WRAPPER)
+#undef WRAPPER
+				};
 			}
 			else if (lua_type(L, -1) == LUA_TBOOLEAN && !lua_toboolean(L, -1))
 			{
@@ -498,7 +502,11 @@ ALL_SIM_IMPLS(WRAPPER)
 			if (lua_type(L, -1) == LUA_TFUNCTION)
 			{
 				customElements[id].changeType.Assign(L, -1);
-				elements[id].ChangeType = luaChangeTypeWrapper;
+				elements[id].ChangeType = {
+#define WRAPPER(Var) luaChangeTypeWrapper<SimVariant<Var>>,
+ALL_SIM_IMPLS(WRAPPER)
+#undef WRAPPER
+				};
 			}
 			else if (lua_type(L, -1) == LUA_TBOOLEAN && !lua_toboolean(L, -1))
 			{
@@ -666,7 +674,11 @@ ALL_SIM_IMPLS(WRAPPER)
 			if (lua_type(L, 3) == LUA_TFUNCTION)
 			{
 				customElements[id].createAllowed.Assign(L, 3);
-				elements[id].CreateAllowed = luaCreateAllowedWrapper;
+				elements[id].CreateAllowed = {
+#define WRAPPER(Var) luaCreateAllowedWrapper<SimVariant<Var>>,
+ALL_SIM_IMPLS(WRAPPER)
+#undef WRAPPER
+				};
 			}
 			else if (lua_type(L, 3) == LUA_TBOOLEAN && !lua_toboolean(L, 3))
 			{
@@ -679,7 +691,11 @@ ALL_SIM_IMPLS(WRAPPER)
 			if (lua_type(L, 3) == LUA_TFUNCTION)
 			{
 				customElements[id].changeType.Assign(L, 3);
-				elements[id].ChangeType = luaChangeTypeWrapper;
+				elements[id].ChangeType = {
+#define WRAPPER(Var) luaChangeTypeWrapper<SimVariant<Var>>,
+ALL_SIM_IMPLS(WRAPPER)
+#undef WRAPPER
+				};
 			}
 			else if (lua_type(L, 3) == LUA_TBOOLEAN && !lua_toboolean(L, 3))
 			{

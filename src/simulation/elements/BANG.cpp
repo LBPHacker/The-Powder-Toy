@@ -89,9 +89,9 @@ static int update(UPDATE_FUNC_ARGS)
 		//Explode!!
 		sim->pv[y/CELL][x/CELL] += 0.5f;
 		parts[i].tmp = 0;
-		if (sim->rng.chance(1, 3))
+		if (rng.chance(1, 3))
 		{
-			if (sim->rng.chance(1, 2))
+			if (rng.chance(1, 2))
 			{
 				//@ BANG -> FIRE
 				sim->create_part(i, x, y, PT_FIRE);
@@ -100,21 +100,21 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				//@ BANG -> SMKE
 				sim->create_part(i, x, y, PT_SMKE);
-				parts[i].life = sim->rng.between(500, 549);
+				parts[i].life = rng.between(500, 549);
 			}
 			parts[i].temp = restrict_flt((MAX_TEMP/4)+otemp, MIN_TEMP, MAX_TEMP);
 		}
 		else
 		{
-			if (sim->rng.chance(1, 15))
+			if (rng.chance(1, 15))
 			{
 				//@ BANG -> EMBR
 				sim->create_part(i, x, y, PT_EMBR);
 				parts[i].tmp = 0;
 				parts[i].life = 50;
 				parts[i].temp = restrict_flt((MAX_TEMP/3)+otemp, MIN_TEMP, MAX_TEMP);
-				parts[i].vx = float(sim->rng.between(-10, 10));
-				parts[i].vy = float(sim->rng.between(-10, 10));
+				parts[i].vx = float(rng.between(-10, 10));
+				parts[i].vy = float(rng.between(-10, 10));
 			}
 			else
 			{

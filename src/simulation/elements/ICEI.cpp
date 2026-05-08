@@ -68,7 +68,7 @@ static int update(UPDATE_FUNC_ARGS)
 					continue;
 				if (TYP(r)==PT_SALT || TYP(r)==PT_SLTW)
 				{
-					if (parts[i].temp > elements[PT_SLTW].LowTemperature && sim->rng.chance(1, 200))
+					if (parts[i].temp > elements[PT_SLTW].LowTemperature && rng.chance(1, 200))
 					{
 						//@ ICEI + SALT/SLTW -> 2xSLTW
 						sim->part_change_type(i,x,y,PT_SLTW);
@@ -76,7 +76,7 @@ static int update(UPDATE_FUNC_ARGS)
 						return 0;
 					}
 				}
-				else if ((TYP(r)==PT_FRZZ) && sim->rng.chance(1, 200))
+				else if ((TYP(r)==PT_FRZZ) && rng.chance(1, 200))
 				{
 					//@ ICEI + FRZZ -> ICEI + ICEI(FRZW)
 					sim->part_change_type(ID(r),x+rx,y+ry,PT_ICEI);

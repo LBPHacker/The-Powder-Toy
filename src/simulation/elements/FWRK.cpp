@@ -51,14 +51,14 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	if (parts[i].life == 0 && ((surround_space && parts[i].temp>400 && sim->rng.chance(int(9+parts[i].temp/40), 100000)) || parts[i].ctype == PT_DUST))
+	if (parts[i].life == 0 && ((surround_space && parts[i].temp>400 && rng.chance(int(9+parts[i].temp/40), 100000)) || parts[i].ctype == PT_DUST))
 	{
 		float gx, gy, multiplier, gmax;
 		int randTmp;
 		sim->GetGravityField(x, y, elements[PT_FWRK].Gravity, 1.0f, gx, gy);
 		if (gx*gx+gy*gy < 0.001f)
 		{
-			float angle = sim->rng.between(0, 6283) * 0.001f;//(in radians, between 0 and 2*pi)
+			float angle = rng.between(0, 6283) * 0.001f;//(in radians, between 0 and 2*pi)
 			gx += sinf(angle)*elements[PT_FWRK].Gravity*0.5f;
 			gy += cosf(angle)*elements[PT_FWRK].Gravity*0.5f;
 		}
@@ -68,15 +68,15 @@ static int update(UPDATE_FUNC_ARGS)
 			multiplier = 15.0f/sqrtf(gx*gx+gy*gy);
 
 			//Some variation in speed parallel to gravity direction
-			randTmp = sim->rng.between(-100, 100);
+			randTmp = rng.between(-100, 100);
 			gx += gx*randTmp*0.002f;
 			gy += gy*randTmp*0.002f;
 			//and a bit more variation in speed perpendicular to gravity direction
-			randTmp = sim->rng.between(-100, 100);
+			randTmp = rng.between(-100, 100);
 			gx += -gy*randTmp*0.005f;
 			gy += gx*randTmp*0.005f;
 
-			parts[i].life = sim->rng.between(18, 27);
+			parts[i].life = rng.between(18, 27);
 			parts[i].ctype=0;
 			parts[i].vx -= gx*multiplier;
 			parts[i].vy -= gy*multiplier;
@@ -85,9 +85,9 @@ static int update(UPDATE_FUNC_ARGS)
 	}
 	if (parts[i].life<3&&parts[i].life>0)
 	{
-		int r = sim->rng.between(11, 255);
-		int g = sim->rng.between(11, 255);
-		int b = sim->rng.between(11, 255);
+		int r = rng.between(11, 255);
+		int g = rng.between(11, 255);
+		int b = rng.between(11, 255);
 		int n;
 		float angle, magnitude;
 		unsigned col = (r<<16) | (g<<8) | b;
@@ -97,14 +97,14 @@ static int update(UPDATE_FUNC_ARGS)
 			int np = sim->create_part(-3, x, y, PT_EMBR);
 			if (np>-1)
 			{
-				magnitude = sim->rng.between(40, 99) * 0.05f;
-				angle = sim->rng.between(0, 6283) * 0.001f;//(in radians, between 0 and 2*pi)
+				magnitude = rng.between(40, 99) * 0.05f;
+				angle = rng.between(0, 6283) * 0.001f;//(in radians, between 0 and 2*pi)
 				parts[np].vx = parts[i].vx*0.5f + cosf(angle)*magnitude;
 				parts[np].vy = parts[i].vy*0.5f + sinf(angle)*magnitude;
 				parts[np].ctype = col;
 				parts[np].tmp = 1;
-				parts[np].life = sim->rng.between(70, 109);
-				parts[np].temp = float(sim->rng.between(5750, 6249));
+				parts[np].life = rng.between(70, 109);
+				parts[np].temp = float(rng.between(5750, 6249));
 				parts[np].dcolour = parts[i].dcolour;
 			}
 		}

@@ -65,10 +65,10 @@ static int update(UPDATE_FUNC_ARGS)
 
 	// Liquid nitrogen condenses on chemically strengthened glass
 	if ((strength > 200) && (parts[i].temp < 77.0f) && (sim->hv[y/CELL][x/CELL] < 77.0f)
-			&& (sim->pv[y/CELL][x/CELL] > 5.0f) && sim->rng.chance(1, 100))
+			&& (sim->pv[y/CELL][x/CELL] > 5.0f) && rng.chance(1, 100))
 	{
 		// Sample 4 adjacent cells
-		auto adj = sim->rng.between(0, 3);
+		auto adj = rng.between(0, 3);
 		auto rx = (1 - 2*(adj%2))*(1 - adj/2);
 		auto ry = (1 - 2*(adj%2))*(adj/2);
 

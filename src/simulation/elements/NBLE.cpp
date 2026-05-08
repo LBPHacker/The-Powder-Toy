@@ -55,7 +55,7 @@ static int update(UPDATE_FUNC_ARGS)
 	{
 		parts[i].tmp |= 0x1;
 		//@ NBLE -> CO2 + NEUT + PHOT + sometimes ELEC + PLSM
-		if (sim->rng.chance(1, 5))
+		if (rng.chance(1, 5))
 		{
 			int j;
 			float temp = parts[i].temp;
@@ -64,7 +64,7 @@ static int update(UPDATE_FUNC_ARGS)
 			j = sim->create_part(-3,x,y,PT_NEUT);
 			if (j != -1)
 				parts[j].temp = temp;
-			if (sim->rng.chance(1, 25))
+			if (rng.chance(1, 25))
 			{
 				j = sim->create_part(-3,x,y,PT_ELEC);
 				if (j != -1)
@@ -77,7 +77,7 @@ static int update(UPDATE_FUNC_ARGS)
 				parts[j].temp = temp;
 				parts[j].tmp = 0x1;
 			}
-			int rx = x + sim->rng.between(-1, 1), ry = y + sim->rng.between(-1, 1), rt = TYP(pmap[ry][rx]);
+			int rx = x + rng.between(-1, 1), ry = y + rng.between(-1, 1), rt = TYP(pmap[ry][rx]);
 			if (can_move[PT_PLSM][rt] || rt == PT_NBLE)
 			{
 				j = sim->create_part(-3,rx,ry,PT_PLSM);
@@ -87,7 +87,7 @@ static int update(UPDATE_FUNC_ARGS)
 					parts[j].tmp |= 4;
 				}
 			}
-			parts[i].temp = temp + 1750 + sim->rng.between(0, 499);
+			parts[i].temp = temp + 1750 + rng.between(0, 499);
 			sim->pv[y/CELL][x/CELL] += 50;
 		}
 	}

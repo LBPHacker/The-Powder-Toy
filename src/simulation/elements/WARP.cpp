@@ -56,13 +56,13 @@ static int update(UPDATE_FUNC_ARGS)
 		parts[i].temp = 10000;
 		sim->pv[y/CELL][x/CELL] = restrict_flt(sim->pv[y/CELL][x/CELL] + (parts[i].tmp2 / 5000) * CFDS, MIN_PRESSURE, MAX_PRESSURE);
 		//@ WARP -> WARP + ELEC
-		if (sim->rng.chance(1, 50))
+		if (rng.chance(1, 50))
 			sim->create_part(-3, x, y, PT_ELEC);
 	}
 	for (int trade = 0; trade < 5; trade ++)
 	{
-		int rx = sim->rng.between(-1, 1);
-		int ry = sim->rng.between(-1, 1);
+		int rx = rng.between(-1, 1);
+		int ry = rng.between(-1, 1);
 		if (rx || ry)
 		{
 			int r = pmap[y + ry][x + rx];
@@ -74,8 +74,8 @@ static int update(UPDATE_FUNC_ARGS)
 				parts[i].y = parts[ID(r)].y;
 				parts[ID(r)].x = float(x);
 				parts[ID(r)].y = float(y);
-				parts[ID(r)].vx = sim->rng.between(-2, 1) + 0.5f;
-				parts[ID(r)].vy = float(sim->rng.between(-2, 1));
+				parts[ID(r)].vx = rng.between(-2, 1) + 0.5f;
+				parts[ID(r)].vy = float(rng.between(-2, 1));
 				parts[i].life += 4;
 				pmap[y][x] = r;
 				pmap[y + ry][x + rx] = PMAP(i, parts[i].type);
@@ -95,5 +95,5 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
-	sim->parts[i].life = sim->rng.between(70, 164);
+	sim->parts[i].life = rng.between(70, 164);
 }

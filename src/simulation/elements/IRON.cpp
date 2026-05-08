@@ -61,22 +61,22 @@ static int update(UPDATE_FUNC_ARGS)
 					{
 					case PT_SALT:
 						//@ IRON + SALT -> BMTL + SALT
-						if (sim->rng.chance(1, 47))
+						if (rng.chance(1, 47))
 							return true;
 						break;
 					case PT_SLTW:
 						//@ IRON + SLTW -> BMTL + SLTW
-						if (sim->rng.chance(1, 67))
+						if (rng.chance(1, 67))
 							return true;
 						break;
 					case PT_WATR:
 						//@ IRON + WATR -> BMTL + WATR
-						if (sim->rng.chance(1, 1200))
+						if (rng.chance(1, 1200))
 							return true;
 						break;
 					case PT_O2:
 						//@ IRON + O2 -> BMTL + O2
-						if (sim->rng.chance(1, 250))
+						if (rng.chance(1, 250))
 							return true;
 						break;
 					case PT_LO2:
@@ -93,7 +93,7 @@ static int update(UPDATE_FUNC_ARGS)
 	if (tryBreak())
 	{
 		sim->part_change_type(i,x,y,PT_BMTL);
-		parts[i].tmp = sim->rng.between(20, 29);
+		parts[i].tmp = rng.between(20, 29);
 	}
 	return 0;
 }

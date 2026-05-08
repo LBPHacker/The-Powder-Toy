@@ -131,7 +131,7 @@ static int update(UPDATE_FUNC_ARGS)
 							{
 								if (parts[r].tmp != 6)
 								{
-									colored = Element_FILT_interactWavelengths(sim, &parts[r], colored);
+									colored = Element_FILT_interactWavelengths(rng, &parts[r], colored);
 									if (!colored)
 										break;
 								}

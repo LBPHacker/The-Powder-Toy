@@ -65,7 +65,7 @@ static int update(UPDATE_FUNC_ARGS)
 		return 1;
 	}
 	if (parts[i].temp > 506)
-		if (sim->rng.chance(1, 10))
+		if (rng.chance(1, 10))
 			Element_FIRE_update(UPDATE_FUNC_SUBCALL_ARGS);
 	for (auto rx = -1; rx <= 1; rx++)
 	{
@@ -76,18 +76,18 @@ static int update(UPDATE_FUNC_ARGS)
 				continue;
 			if (TYP(r)==PT_ISOZ || TYP(r)==PT_ISZS)
 			{
-				if (sim->rng.chance(1, 400))
+				if (rng.chance(1, 400))
 				{
 					parts[i].vx *= 0.90f;
 					parts[i].vy *= 0.90f;
 					//@ PHOT + ISOZ/ISZS -> 2xPHOT
 					sim->create_part(ID(r), x+rx, y+ry, PT_PHOT);
-					auto rrr = sim->rng.between(0, 359) * std::numbers::pi_v<float> / 180.0f;
+					auto rrr = rng.between(0, 359) * std::numbers::pi_v<float> / 180.0f;
 					int rr;
 					if (TYP(r) == PT_ISOZ)
-						rr = int(sim->rng.between(128, 255) / 127.0f);
+						rr = int(rng.between(128, 255) / 127.0f);
 					else
-						rr = int(sim->rng.between(128, 355) / 127.0f);
+						rr = int(rng.between(128, 355) / 127.0f);
 					parts[ID(r)].vx = rr*cosf(rrr);
 					parts[ID(r)].vy = rr*sinf(rrr);
 					sim->pv[y/CELL][x/CELL] -= 15.0f * CFDS;
@@ -95,17 +95,17 @@ static int update(UPDATE_FUNC_ARGS)
 			}
 			else if((TYP(r) == PT_QRTZ || TYP(r) == PT_PQRT) && !ry && !rx)//if on QRTZ
 			{
-				float a = sim->rng.between(0, 359) * std::numbers::pi_v<float> / 180.0f;
+				float a = rng.between(0, 359) * std::numbers::pi_v<float> / 180.0f;
 				parts[i].vx = 3.0f*cosf(a);
 				parts[i].vy = 3.0f*sinf(a);
 				if(parts[i].ctype == 0x3FFFFFFF)
-					parts[i].ctype = 0x1F << sim->rng.between(0, 25);
+					parts[i].ctype = 0x1F << rng.between(0, 25);
 				if (parts[i].life)
 					parts[i].life++; //Delay death
 			}
 			else if(TYP(r) == PT_BGLA && !ry && !rx)//if on BGLA
 			{
-				float a = sim->rng.between(-50, 50) * 0.001f;
+				float a = rng.between(-50, 50) * 0.001f;
 				float rx = cosf(a), ry = sinf(a), vx, vy;
 				vx = rx * parts[i].vx + ry * parts[i].vy;
 				vy = rx * parts[i].vy - ry * parts[i].vx;
@@ -138,8 +138,8 @@ static int update(UPDATE_FUNC_ARGS)
 			}
 			else if (TYP(r) == PT_FILT && parts[ID(r)].tmp==9)
 			{
-				parts[i].vx += ((float)sim->rng.between(-500, 500))/1000.0f;
-				parts[i].vy += ((float)sim->rng.between(-500, 500))/1000.0f;
+				parts[i].vx += ((float)rng.between(-500, 500))/1000.0f;
+				parts[i].vy += ((float)rng.between(-500, 500))/1000.0f;
 			}
 		}
 	}
@@ -177,9 +177,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
-	float a = sim->rng.between(0, 7) * 0.78540f;
+	float a = rng.between(0, 7) * 0.78540f;
 	sim->parts[i].vx = 3.0f * cosf(a);
 	sim->parts[i].vy = 3.0f * sinf(a);
 	if (TYP(sim->pmap[y][x]) == PT_FILT)
-		sim->parts[i].ctype = Element_FILT_interactWavelengths(sim, &sim->parts[ID(sim->pmap[y][x])], sim->parts[i].ctype);
+		sim->parts[i].ctype = Element_FILT_interactWavelengths(rng, &sim->parts[ID(sim->pmap[y][x])], sim->parts[i].ctype);
 }

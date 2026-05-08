@@ -56,7 +56,7 @@ static int update(UPDATE_FUNC_ARGS)
 				auto r = pmap[y+ry][x+rx];
 				if (!r)
 				{
-					if (sim->rng.chance(1, 5500))
+					if (rng.chance(1, 5500))
 					{
 						auto np = sim->create_part(-1,x+rx,y+ry,PT_SHLD1);
 						if (np<0) continue;

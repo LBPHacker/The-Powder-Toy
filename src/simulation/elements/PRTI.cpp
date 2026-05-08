@@ -123,22 +123,22 @@ static int update(UPDATE_FUNC_ARGS)
 	if (fe) {
 		int orbd[4] = {0, 0, 0, 0};	//Orbital distances
 		int orbl[4] = {0, 0, 0, 0};	//Orbital locations
-		if (!sim->parts[i].life) parts[i].life = sim->rng.gen();
-		if (!sim->parts[i].ctype) parts[i].ctype = sim->rng.gen();
+		if (!sim->parts[i].life) parts[i].life = rng.gen();
+		if (!sim->parts[i].ctype) parts[i].ctype = rng.gen();
 		orbitalparts_get(parts[i].life, parts[i].ctype, orbd, orbl);
 		for (int r = 0; r < 4; r++) {
 			if (orbd[r]>1) {
 				orbd[r] -= 12;
 				if (orbd[r]<1) {
-					orbd[r] = sim->rng.between(128, 255);
-					orbl[r] = sim->rng.between(0, 254);
+					orbd[r] = rng.between(128, 255);
+					orbl[r] = rng.between(0, 254);
 				} else {
 					orbl[r] += 2;
 					orbl[r] = orbl[r]%255;
 				}
 			} else {
-				orbd[r] = sim->rng.between(128, 255);
-				orbl[r] = sim->rng.between(0, 254);
+				orbd[r] = rng.between(128, 255);
+				orbl[r] = rng.between(0, 254);
 			}
 		}
 		orbitalparts_set(&parts[i].life, &parts[i].ctype, orbd, orbl);

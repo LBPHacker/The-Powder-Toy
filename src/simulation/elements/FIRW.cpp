@@ -69,12 +69,12 @@ static int update(UPDATE_FUNC_ARGS)
 						sim->GetGravityField(x, y, elements[PT_FIRW].Gravity, 1.0f, gx, gy);
 						if (gx*gx+gy*gy < 0.001f)
 						{
-							float angle = sim->rng.between(0, 6283) * 0.001f;//(in radians, between 0 and 2*pi)
+							float angle = rng.between(0, 6283) * 0.001f;//(in radians, between 0 and 2*pi)
 							gx += sinf(angle)*elements[PT_FIRW].Gravity*0.5f;
 							gy += cosf(angle)*elements[PT_FIRW].Gravity*0.5f;
 						}
 						parts[i].tmp = 1;
-						parts[i].life = sim->rng.between(20, 29);
+						parts[i].life = rng.between(20, 29);
 						multiplier = (parts[i].life+20)*0.2f/sqrtf(gx*gx+gy*gy);
 						parts[i].vx -= gx*multiplier;
 						parts[i].vy -= gy*multiplier;
@@ -93,21 +93,21 @@ static int update(UPDATE_FUNC_ARGS)
 	}
 	else //if (parts[i].tmp>=2)
 	{
-		unsigned col = Renderer::firwTableAt(sim->rng.between(0, 199)).Pack();
+		unsigned col = Renderer::firwTableAt(rng.between(0, 199)).Pack();
 		for (int n=0; n<40; n++)
 		{
 			//@ FIRW -> EMBR
 			auto np = sim->create_part(-3, x, y, PT_EMBR);
 			if (np>-1)
 			{
-				auto magnitude = sim->rng.between(40, 99) * 0.05f;
-				auto angle = sim->rng.between(0, 6283) * 0.001f;//(in radians, between 0 and 2*pi)
+				auto magnitude = rng.between(40, 99) * 0.05f;
+				auto angle = rng.between(0, 6283) * 0.001f;//(in radians, between 0 and 2*pi)
 				parts[np].vx = parts[i].vx*0.5f + cosf(angle)*magnitude;
 				parts[np].vy = parts[i].vy*0.5f + sinf(angle)*magnitude;
 				parts[np].ctype = col;
 				parts[np].tmp = 1;
-				parts[np].life = sim->rng.between(70, 109);
-				parts[np].temp = float(sim->rng.between(5750, 6249));
+				parts[np].life = rng.between(70, 109);
+				parts[np].temp = float(rng.between(5750, 6249));
 				parts[np].dcolour = parts[i].dcolour;
 			}
 		}

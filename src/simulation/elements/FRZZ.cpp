@@ -57,7 +57,7 @@ static int update(UPDATE_FUNC_ARGS)
 				auto r = pmap[y+ry][x+rx];
 				if (!r)
 					continue;
-				if (TYP(r)==PT_WATR && sim->rng.chance(1, 20))
+				if (TYP(r)==PT_WATR && rng.chance(1, 20))
 				{
 					//@ FRZZ + WATR -> FRZW
 					sim->part_change_type(ID(r),x+rx,y+ry,PT_FRZW);

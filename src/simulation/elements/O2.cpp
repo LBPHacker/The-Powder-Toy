@@ -61,21 +61,21 @@ static int update(UPDATE_FUNC_ARGS)
 
 				if (TYP(r)==PT_FIRE)
 				{
-					parts[ID(r)].temp += sim->rng.between(0, 99);
+					parts[ID(r)].temp += rng.between(0, 99);
 					if (parts[ID(r)].tmp & 0x01)
 						parts[ID(r)].temp = 3473;
 					parts[ID(r)].tmp |= 2;
 
 					//@ O2 + FIRE -> 2xFIRE
 					sim->create_part(i,x,y,PT_FIRE);
-					parts[i].temp += sim->rng.between(0, 99);
+					parts[i].temp += rng.between(0, 99);
 					parts[i].tmp |= 2;
 				}
 				else if (TYP(r)==PT_PLSM && !(parts[ID(r)].tmp&4))
 				{
 					//@ O2 + PLSM -> FIRE + PLSM
 					sim->create_part(i,x,y,PT_FIRE);
-					parts[i].temp += sim->rng.between(0, 99);
+					parts[i].temp += rng.between(0, 99);
 					parts[i].tmp |= 2;
 				}
 			}
@@ -88,7 +88,7 @@ static int update(UPDATE_FUNC_ARGS)
 		//@ O2 -> BRMT + NEUT + PHOT + GRVT + sometimes PLSM
 		if (gravx*gravx + gravy*gravy > 400)
 		{
-			if (sim->rng.chance(1, 5))
+			if (rng.chance(1, 5))
 			{
 				int j;
 				sim->create_part(i,x,y,PT_BRMT);
@@ -102,7 +102,7 @@ static int update(UPDATE_FUNC_ARGS)
 					parts[j].temp = MAX_TEMP;
 					parts[j].tmp = 0x1;
 				}
-				auto rx = x + sim->rng.between(-1, 1), ry = y + sim->rng.between(-1, 1), r = TYP(pmap[ry][rx]);
+				auto rx = x + rng.between(-1, 1), ry = y + rng.between(-1, 1), r = TYP(pmap[ry][rx]);
 				if (can_move[PT_PLSM][r] || r == PT_O2)
 				{
 					j = sim->create_part(-3,rx,ry,PT_PLSM);

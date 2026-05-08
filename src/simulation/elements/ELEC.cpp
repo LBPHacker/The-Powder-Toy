@@ -78,8 +78,8 @@ static int update(UPDATE_FUNC_ARGS)
 								parts[nb].tmp = 0;
 								parts[nb].life = 50;
 								parts[nb].temp = parts[i].temp*0.8f;
-								parts[nb].vx = float(sim->rng.between(-10, 10));
-								parts[nb].vy = float(sim->rng.between(-10, 10));
+								parts[nb].vx = float(rng.between(-10, 10));
+								parts[nb].vy = float(rng.between(-10, 10));
 							}
 						}
 					}
@@ -87,14 +87,14 @@ static int update(UPDATE_FUNC_ARGS)
 				sim->kill_part(i);
 				return 1;
 			case PT_LCRY:
-				parts[ID(r)].tmp2 = sim->rng.between(5, 9);
+				parts[ID(r)].tmp2 = rng.between(5, 9);
 				break;
 			case PT_WATR:
 			case PT_DSTW:
 			case PT_SLTW:
 			case PT_CBNW:
 				//@ ELEC + WATR/DSTW/SLTW/CBNW -> O2/H2
-				if (sim->rng.chance(1, 3))
+				if (rng.chance(1, 3))
 					sim->create_part(ID(r), x+rx, y+ry, PT_O2);
 				else
 					sim->create_part(ID(r), x+rx, y+ry, PT_H2);
@@ -158,7 +158,7 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
-	float a = sim->rng.between(0, 359) * std::numbers::pi_v<float> / 180.0f;
+	float a = rng.between(0, 359) * std::numbers::pi_v<float> / 180.0f;
 	sim->parts[i].life = 680;
 	sim->parts[i].vx = 2.0f * cosf(a);
 	sim->parts[i].vy = 2.0f * sinf(a);

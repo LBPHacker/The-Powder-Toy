@@ -76,15 +76,15 @@ static int update(UPDATE_FUNC_ARGS)
 					}
 					else if (rt == PT_WTRV)
 					{
-						if (sim->rng.chance(1, 250))
+						if (rng.chance(1, 250))
 						{
 							//@ ACID + WTRV -> CAUS
 							sim->part_change_type(i, x, y, PT_CAUS);
-							parts[i].life = sim->rng.between(25, 74);
+							parts[i].life = rng.between(25, 74);
 							sim->kill_part(ID(r));
 						}
 					}
-					else if (rt != PT_CLNE && rt != PT_PCLN && ((rt != PT_FOG && rt != PT_RIME) || parts[ID(r)].tmp <= 5) && parts[i].life > 50 && sim->rng.chance(elements[rt].Hardness, 1000))
+					else if (rt != PT_CLNE && rt != PT_PCLN && ((rt != PT_FOG && rt != PT_RIME) || parts[ID(r)].tmp <= 5) && parts[i].life > 50 && rng.chance(elements[rt].Hardness, 1000))
 					{
 						if (sim->parts_avg(i, ID(r),PT_GLAS)!= PT_GLAS)//GLAS protects stuff from acid
 						{
@@ -118,8 +118,8 @@ static int update(UPDATE_FUNC_ARGS)
 	}
 	for (auto trade = 0; trade<2; trade++)
 	{
-		auto rx = sim->rng.between(-2, 2);
-		auto ry = sim->rng.between(-2, 2);
+		auto rx = rng.between(-2, 2);
+		auto ry = rng.between(-2, 2);
 		if (rx || ry)
 		{
 			auto r = pmap[y+ry][x+rx];
