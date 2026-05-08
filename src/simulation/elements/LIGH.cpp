@@ -50,6 +50,8 @@ void Element::Element_LIGH()
 	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 	ASSIGN_SIM_CALLBACK(Create, create)
+
+	InfiniteNeighborhood = true;
 }
 
 constexpr float LIGHTING_POWER = 0.65f;

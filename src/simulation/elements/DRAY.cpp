@@ -46,6 +46,8 @@ void Element::Element_DRAY()
 	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = nullptr; // is this needed?
 	CtypeDraw = &Element::ctypeDrawVInCtype;
+
+	InfiniteNeighborhood = true;
 }
 
 static int update(UPDATE_FUNC_ARGS)

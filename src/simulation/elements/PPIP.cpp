@@ -47,6 +47,8 @@ void Element::Element_PPIP()
 
 	ASSIGN_SIM_CALLBACK(Update, Element_PIPE_update)
 	Graphics = &Element_PIPE_graphics;
+
+	InfiniteNeighborhood = true;
 }
 
 // parts[].tmp flags

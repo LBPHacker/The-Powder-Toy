@@ -53,6 +53,8 @@ void Element::Element_PSTN()
 	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 	CtypeDraw = &ctypeDraw;
+
+	InfiniteNeighborhood = true;
 }
 
 struct StackData

@@ -45,6 +45,8 @@ void Element::Element_SPAWN2()
 
 	ASSIGN_SIM_CALLBACK(CreateAllowed, createAllowed)
 	ASSIGN_SIM_CALLBACK(ChangeType, changeType)
+
+	InfiniteNeighborhood = true;
 }
 
 static bool createAllowed(ELEMENT_CREATE_ALLOWED_FUNC_ARGS)

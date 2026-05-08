@@ -60,6 +60,8 @@ void Element::Element_SOAP()
 	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 	ASSIGN_SIM_CALLBACK(ChangeType, changeType)
+
+	InfiniteNeighborhood = true;
 }
 
 static bool validIndex(int i)

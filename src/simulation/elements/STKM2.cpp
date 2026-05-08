@@ -56,6 +56,8 @@ void Element::Element_STKM2()
 	ASSIGN_SIM_CALLBACK(Create, create)
 	ASSIGN_SIM_CALLBACK(CreateAllowed, createAllowed)
 	ASSIGN_SIM_CALLBACK(ChangeType, changeType)
+
+	InfiniteNeighborhood = true;
 }
 
 static int update(UPDATE_FUNC_ARGS)

@@ -378,6 +378,7 @@ static int allocate(lua_State *L)
 			elements[newID] = Element();
 			elements[newID].Enabled = true;
 			elements[newID].Identifier = identifier;
+			elements[newID].InfiniteNeighborhood = true;
 		}
 
 		lua_getglobal(L, "elements");
@@ -442,12 +443,14 @@ static int element(lua_State *L)
 ALL_SIM_IMPLS(WRAPPER)
 #undef WRAPPER
 				};
+				elements[id].InfiniteNeighborhood = true;
 			}
 			else if (lua_type(L, -1) == LUA_TBOOLEAN && !lua_toboolean(L, -1))
 			{
 				customElements[id].update.Clear();
 				customElements[id].updateMode = UPDATE_AFTER;
 				elements[id].Update = builtinElements[id].Update;
+				elements[id].InfiniteNeighborhood = builtinElements[id].InfiniteNeighborhood;
 			}
 			lua_pop(L, 1);
 
@@ -630,12 +633,14 @@ static int property(lua_State *L)
 ALL_SIM_IMPLS(WRAPPER)
 #undef WRAPPER
 				};
+				elements[id].InfiniteNeighborhood = true;
 			}
 			else if (lua_type(L, 3) == LUA_TBOOLEAN && !lua_toboolean(L, 3))
 			{
 				customElements[id].update.Clear();
 				customElements[id].updateMode = UPDATE_AFTER;
 				elements[id].Update = builtinElements[id].Update;
+				elements[id].InfiniteNeighborhood = builtinElements[id].InfiniteNeighborhood;
 			}
 		}
 		else if (propertyName == "Graphics")

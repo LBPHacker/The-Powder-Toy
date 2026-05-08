@@ -45,6 +45,8 @@ Element::Element():
 	HighTemperature(ITH),
 	HighTemperatureTransition(NT),
 
+	InfiniteNeighborhood(false),
+
 	Graphics(&Element::defaultGraphics),
 	CtypeDraw(nullptr),
 	IconGenerator(nullptr)

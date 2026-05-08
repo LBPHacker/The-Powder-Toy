@@ -45,6 +45,8 @@ void Element::Element_TSNS()
 	DefaultProperties.tmp2 = 2;
 
 	ASSIGN_SIM_CALLBACK(Update, update)
+
+	InfiniteNeighborhood = true; // TODO-TILES: this is only for tmp=1
 }
 
 static int update(UPDATE_FUNC_ARGS)
