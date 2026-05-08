@@ -71,7 +71,7 @@ void Element_PPIP_flood_trigger(Simulation * sim, int x, int y, int sparkedBy)
 	int x1, x2;
 
 	Particle * parts = sim->parts;
-	int (*pmap)[XRES] = sim->pmap;
+	auto &pmap = sim->pmap;
 	int t = TYP(pmap[y][x]);
 	if (t != PT_PIPE && t != PT_PPIP)
 		return;

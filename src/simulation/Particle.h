@@ -2,6 +2,9 @@
 #include "StructProperty.h"
 #include <vector>
 
+// It's very tempting to make this alignas(64) but benchmarking shows that doing
+// that and so effectively increasing its size from 56B to 64B hurts performance more
+// than the occasional false sharing between threads does. Wild.
 struct Particle
 {
 	int type;
