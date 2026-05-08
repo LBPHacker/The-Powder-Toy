@@ -1795,3 +1795,8 @@ FrameTime *GameController::GetFrameTime() const
 {
 	return gameModel->frameTime.get();
 }
+
+void GameController::SetSimThreadCount(int newThreadCount)
+{
+	gameModel->SetSimThreadCount(newThreadCount);
+}
