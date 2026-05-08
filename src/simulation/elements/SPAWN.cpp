@@ -43,8 +43,8 @@ void Element::Element_SPAWN()
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
 
-	CreateAllowed = &createAllowed;
-	ChangeType = &changeType;
+	ASSIGN_SIM_CALLBACK(CreateAllowed, createAllowed)
+	ASSIGN_SIM_CALLBACK(ChangeType, changeType)
 }
 
 static bool createAllowed(ELEMENT_CREATE_ALLOWED_FUNC_ARGS)

@@ -45,7 +45,7 @@ void Element::Element_POLO()
 	HighTemperature = 526.95f;
 	HighTemperatureTransition = PT_LAVA; //@ POLO -> LAVA(POLO)
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 }
 

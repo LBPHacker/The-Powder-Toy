@@ -80,7 +80,7 @@ void Simulation::Restore(const Snapshot &snap)
 	frameCount = snap.FrameCount;
 	rng.state(snap.RngState);
 	parts.active = NPART;
-	RecalcFreeParticles(false);
+	RecalcFreeParticlesOuter(false);
 }
 
 void Simulation::clear_area(int area_x, int area_y, int area_w, int area_h)
@@ -95,7 +95,7 @@ void Simulation::clear_area(int area_x, int area_y, int area_w, int area_h)
 	{
 		if (parts[i].type)
 			if (parts[i].x >= fx && parts[i].x <= fx+area_w+1 && parts[i].y >= fy && parts[i].y <= fy+area_h+1)
-				kill_part(i);
+				kill_part_outer(i);
 	}
 	int cx1 = area_x/CELL, cy1 = area_y/CELL, cx2 = (area_x+area_w)/CELL, cy2 = (area_y+area_h)/CELL;
 	for (int y = cy1; y <= cy2; y++)
@@ -370,7 +370,7 @@ int Simulation::CreatePartFlags(int p, int x, int y, int c, int flags)
 			(photons[y][x] && TYP(photons[y][x]) == replaceModeSelected))
 		{
 			if (c)
-				create_part(photons[y][x] ? ID(photons[y][x]) : ID(pmap[y][x]), x, y, TYP(c), ID(c));
+				create_part_outer(photons[y][x] ? ID(photons[y][x]) : ID(pmap[y][x]), x, y, TYP(c), ID(c));
 			else
 				delete_part(x, y);
 		}
@@ -396,7 +396,7 @@ int Simulation::CreatePartFlags(int p, int x, int y, int c, int flags)
 	}
 	else
 	{
-		return (create_part(p, x, y, TYP(c), ID(c)) == -1);
+		return (create_part_outer(p, x, y, TYP(c), ID(c)) == -1);
 	}
 
 	// I'm sure at least one compiler exists that would complain if this wasn't here
@@ -963,13 +963,13 @@ int Simulation::FloodParts(int x, int y, int fullc, int cm, int flags)
 				{
 					if (photons[y][x])
 					{
-						kill_part(ID(photons[y][x]));
+						kill_part_outer(ID(photons[y][x]));
 						created_something = 1;
 					}
 				}
 				else if (pmap[y][x])
 				{
-					kill_part(ID(pmap[y][x]));
+					kill_part_outer(ID(pmap[y][x]));
 					created_something = 1;
 				}
 			}

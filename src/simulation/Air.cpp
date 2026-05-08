@@ -5,27 +5,19 @@
 #include <cmath>
 #include <algorithm>
 
-void Air::make_kernel(void) //used for velocity
-{
-	float s = 0.0f;
-	for (auto j=-1; j<2; j++)
-	{
-		for (auto i=-1; i<2; i++)
-		{
-			kernel[(i+1)+3*(j+1)] = expf(-2.0f*(i*i+j*j));
-			s += kernel[(i+1)+3*(j+1)];
-		}
-	}
-	s = 1.0f / s;
-	for (auto j=-1; j<2; j++)
-	{
-		for (auto i=-1; i<2; i++)
-		{
-			kernel[(i+1)+3*(j+1)] *= s;
-		}
-	}
-}
-
+static constexpr std::array<float, 9> kernel = {{
+	// import math; k = [ math.exp(-2*(i*i+j*j)) for i in range(-1, 2) for j in range(-1, 2) ]; print('\n'.join([ f'{i / sum(k)}f,' for i in k ]))
+	// TODO: maybe dig up the old troublesome implementation and make it constexpr once we're c++26 and get constexpr std::exp
+	0.011343736558495071f,
+	0.0838195058022106f,
+	0.011343736558495071f,
+	0.0838195058022106f,
+	0.6193470305571773f,
+	0.0838195058022106f,
+	0.011343736558495071f,
+	0.0838195058022106f,
+	0.011343736558495071f,
+}};
 
 float Air::vorticity(const RenderableSimulation & sm, int y, int x)
 {
@@ -541,7 +533,6 @@ Air::Air(Simulation & simulation):
 	convectionMode(AIRC_BOUSSINESQ)
 {
 	//Simulation should do this.
-	make_kernel();
 	std::fill(&bmap_blockair [0][0], &bmap_blockair [0][0] + NCELL, 0);
 	std::fill(&bmap_blockairh[0][0], &bmap_blockairh[0][0] + NCELL, 0);
 	std::fill(&sim.vx[0][0], &sim.vx[0][0] + NCELL, 0.0f);
@@ -552,4 +543,17 @@ Air::Air(Simulation & simulation):
 	std::fill(&ohv   [0][0], &ohv   [0][0] + NCELL, 0.0f);
 	std::fill(&sim.pv[0][0], &sim.pv[0][0] + NCELL, 0.0f);
 	std::fill(&opv   [0][0], &opv   [0][0] + NCELL, 0.0f);
+}
+
+void Air::CopyFrom(const Air &other)
+{
+	airMode        = other.airMode;
+	ambientAirTemp = other.ambientAirTemp;
+	edgePressure   = other.edgePressure;
+	edgeVelocityX  = other.edgeVelocityX;
+	edgeVelocityY  = other.edgeVelocityY;
+	vorticityCoeff = other.vorticityCoeff;
+	convectionMode = other.convectionMode;
+	std::copy(&other.bmap_blockair [0][0], &other.bmap_blockair [0][0] + NCELL, &bmap_blockair [0][0]);
+	std::copy(&other.bmap_blockairh[0][0], &other.bmap_blockairh[0][0] + NCELL, &bmap_blockairh[0][0]);
 }

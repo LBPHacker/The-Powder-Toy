@@ -42,7 +42,7 @@ void Element::Element_VIBR()
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
 
-	Update = &Element_VIBR_update;
+	ASSIGN_SIM_CALLBACK(Update, Element_VIBR_update)
 	Graphics = &Element_VIBR_graphics;
 }
 

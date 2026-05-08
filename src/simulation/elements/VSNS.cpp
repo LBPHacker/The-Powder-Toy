@@ -45,7 +45,7 @@ void Element::Element_VSNS()
 
 	DefaultProperties.tmp2 = 2;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

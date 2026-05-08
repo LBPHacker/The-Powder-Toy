@@ -43,7 +43,7 @@ void Element::Element_FRZZ()
 	HighTemperature = 273.15f;
 	HighTemperatureTransition = PT_FRZW;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

@@ -51,10 +51,10 @@ void Element::Element_FIGH()
 
 	DefaultProperties.life = 100;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &Element_STKM_graphics;
-	CreateAllowed = &createAllowed;
-	ChangeType = &changeType;
+	ASSIGN_SIM_CALLBACK(CreateAllowed, createAllowed)
+	ASSIGN_SIM_CALLBACK(ChangeType, changeType)
 }
 
 static int update(UPDATE_FUNC_ARGS)

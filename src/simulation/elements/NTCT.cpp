@@ -41,7 +41,7 @@ void Element::Element_NTCT()
 	HighTemperature = 1687.0f;
 	HighTemperatureTransition = PT_LAVA; //@ NTCT -> LAVA(NTCT)
 
-	Update = &Element_NTCT_update;
+	ASSIGN_SIM_CALLBACK(Update, Element_NTCT_update)
 }
 
 int Element_NTCT_update(UPDATE_FUNC_ARGS)

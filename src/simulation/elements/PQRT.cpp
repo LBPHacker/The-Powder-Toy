@@ -43,9 +43,9 @@ void Element::Element_PQRT()
 	HighTemperature = 2573.15f;
 	HighTemperatureTransition = PT_LAVA; //@ PQRT -> LAVA(QRTZ)
 
-	Update = &Element_QRTZ_update;
+	ASSIGN_SIM_CALLBACK(Update, Element_QRTZ_update)
 	Graphics = &Element_QRTZ_graphics;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)

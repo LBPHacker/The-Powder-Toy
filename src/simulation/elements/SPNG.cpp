@@ -43,7 +43,7 @@ void Element::Element_SPNG()
 	HighTemperature = 2730.0f;
 	HighTemperatureTransition = PT_FIRE; //@ SPNG -> FIRE
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 }
 
