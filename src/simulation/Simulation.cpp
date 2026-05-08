@@ -114,6 +114,8 @@ namespace
 
 		std::mutex pfreeMx;
 		int pfreeMxLockedTimes = 0;
+
+		Vec2<int> tileOffset{ 0, 0 };
 	};
 
 	template<class Variant>
@@ -2632,6 +2634,8 @@ constexpr auto TILE_SIZE_FINE = TILE_SIZE * CELL;
 template<class Variant>
 std::optional<DeferredId::When> SimVariantImpl<Variant>::UpdateOne(RNG &rng, int i, bool runtimeParallel)
 {
+	constexpr auto Parallel = std::is_same_v<Variant, ParallelVariant>;
+
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
 
@@ -2646,7 +2650,11 @@ std::optional<DeferredId::When> SimVariantImpl<Variant>::UpdateOne(RNG &rng, int
 	{
 		auto x = int(parts[i].x + 0.5f);
 		auto y = int(parts[i].y + 0.5f);
-		pTile = { x / TILE_SIZE_FINE, y / TILE_SIZE_FINE };
+		if constexpr (Parallel)
+		{
+			auto &parallelSim = static_cast<ParallelSim &>(*this);
+			pTile = { (x + parallelSim.tileOffset.X) / TILE_SIZE_FINE, (y + parallelSim.tileOffset.Y) / TILE_SIZE_FINE };
+		}
 
 		// Kill a particle off screen
 		if (x<CELL || y<CELL || x>=XRES-CELL || y>=YRES-CELL)
@@ -2725,16 +2733,16 @@ std::optional<DeferredId::When> SimVariantImpl<Variant>::UpdateOne(RNG &rng, int
 		t = parts[i].type;
 	}
 
-	constexpr auto Parallel = std::is_same_v<Variant, ParallelVariant>;
-	if (Parallel && runtimeParallel)
+	if constexpr (Parallel) if (runtimeParallel)
 	{
+		auto &parallelSim = static_cast<ParallelSim &>(*this);
 		if (elements[t].InfiniteNeighborhood)
 		{
 			return DeferredId::When::beforeUpdate;
 		}
 		auto x = int(parts[i].x + 0.5f);
 		auto y = int(parts[i].y + 0.5f);
-		auto pTileBeforeUpdate = Vec2{ x / TILE_SIZE_FINE, y / TILE_SIZE_FINE };
+		auto pTileBeforeUpdate = Vec2{ (x + parallelSim.tileOffset.X) / TILE_SIZE_FINE, (y + parallelSim.tileOffset.Y) / TILE_SIZE_FINE };
 		if (pTileBeforeUpdate != pTile)
 		{
 			return DeferredId::When::beforeUpdate;
@@ -2754,15 +2762,16 @@ std::optional<DeferredId::When> SimVariantImpl<Variant>::UpdateOne(RNG &rng, int
 	if (!parts[i].vx&&!parts[i].vy)//if its not moving, skip to next particle, movement code it next
 		return std::nullopt;
 
-	if (Parallel && runtimeParallel)
+	if constexpr (Parallel) if (runtimeParallel)
 	{
+		auto &parallelSim = static_cast<ParallelSim &>(*this);
 		if (elements[parts[i].type].InfiniteNeighborhood)
 		{
 			return DeferredId::When::beforeMovement;
 		}
 		auto x = int(parts[i].x + 0.5f);
 		auto y = int(parts[i].y + 0.5f);
-		auto pTileBeforeMovement = Vec2{ x / TILE_SIZE_FINE, y / TILE_SIZE_FINE };
+		auto pTileBeforeMovement = Vec2{ (x + parallelSim.tileOffset.X) / TILE_SIZE_FINE, (y + parallelSim.tileOffset.Y) / TILE_SIZE_FINE };
 		if (pTileBeforeMovement != pTile)
 		{
 			return DeferredId::When::beforeMovement;
@@ -2884,6 +2893,11 @@ void SimVariantImpl<ParallelVariant>::UpdateParticles(int start, int end)
 		return;
 	}
 
+	// TODO-TILES: figure out a way to prevent false sharing of pmap-like data (would need to lower offset resolution to 16)
+	// TODO-TILES: figure out a way to prevent false sharing of CELL data (would need to lower offset resolution to 64, i.e. to remove it)
+	// TODO-TILES: figure out whether these kinds of false sharing have a real perf impact
+	tileOffset.X = sharedRng.between(0, TILE_SIZE - 1) * CELL;
+	tileOffset.Y = sharedRng.between(0, TILE_SIZE - 1) * CELL;
 	{
 		FrameTime::Span span(frameTime, "assignToTiles");
 		pfreeMxLockedTimes = 0; // TODO-TILES: show in hud
@@ -2930,7 +2944,7 @@ void SimVariantImpl<ParallelVariant>::UpdateParticles(int start, int end)
 					{
 						auto x = int(parts[i].x + 0.5f);
 						auto y = int(parts[i].y + 0.5f);
-						tiles[{ x / TILE_SIZE_FINE, y / TILE_SIZE_FINE }].toUpdate[threadIndex].ids.push_back(i);
+						tiles[{ (x + tileOffset.X) / TILE_SIZE_FINE, (y + tileOffset.Y) / TILE_SIZE_FINE }].toUpdate[threadIndex].ids.push_back(i);
 					}
 				}
 			});
@@ -2968,7 +2982,7 @@ void SimVariantImpl<ParallelVariant>::UpdateParticles(int start, int end)
 						}
 						auto x = int(parts[i].x + 0.5f);
 						auto y = int(parts[i].y + 0.5f);
-						if (pTile != Vec2{ x / TILE_SIZE_FINE, y / TILE_SIZE_FINE })
+						if (pTile != Vec2{ (x + tileOffset.X) / TILE_SIZE_FINE, (y + tileOffset.Y) / TILE_SIZE_FINE })
 						{
 							tile.deferredIds.push_back({ i, DeferredId::When::beforeTransition });
 							continue;
