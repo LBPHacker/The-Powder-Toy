@@ -41,6 +41,11 @@ namespace
 	{
 	};
 
+	template<>
+	struct PrivateData<ParallelVariant>
+	{
+	};
+
 	template<class Variant>
 	struct SimVariantImpl : public SimVariant<Variant>, public PrivateData<Variant>, public virtual Simulation
 	{
@@ -118,6 +123,7 @@ namespace
 			return PlanMove<false>(*this, i, x, y);
 		}
 	};
+	using ParallelSim = SimVariantImpl<ParallelVariant>;
 }
 
 template<class Variant> static auto *ToImpl(      SimVariant<Variant> *self) { return static_cast<      SimVariantImpl<Variant> *>(self); }
@@ -2376,6 +2382,11 @@ Simulation::PlanMoveResult SimVariantImpl<Variant>::PlanMove(Sim &sim, int i, in
 std::unique_ptr<Simulation> Simulation::LegacyFactory()
 {
 	return std::make_unique<SimVariantImpl<LegacyVariant>>();
+}
+
+std::unique_ptr<Simulation> Simulation::ParallelFactory()
+{
+	return std::make_unique<SimVariantImpl<ParallelVariant>>();
 }
 
 template<class Variant>

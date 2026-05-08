@@ -1945,3 +1945,23 @@ void GameModel::BuildMenus()
 	notifyActiveToolsChanged();
 	notifyLastToolChanged();
 }
+
+void GameModel::SetSimThreadCount(int newThreadCount)
+{
+	if (!simThreadCount && newThreadCount)
+	{
+		auto newSim = Simulation::ParallelFactory();
+		newSim->CopyFrom(*sim);
+		std::swap(sim, newSim);
+		notifySimulationChanged();
+	}
+	if (simThreadCount && !newThreadCount)
+	{
+		auto newSim = Simulation::LegacyFactory();
+		newSim->CopyFrom(*sim);
+		std::swap(sim, newSim);
+		notifySimulationChanged();
+	}
+	simThreadCount = newThreadCount;
+	sim->threadCount = newThreadCount;
+}

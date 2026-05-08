@@ -146,6 +146,7 @@ private:
 	void SaveToSimParameters(const GameSave &saveData);
 
 	bool threadedRendering = false;
+	int simThreadCount = 0;
 
 	GameView *view;
 
@@ -351,4 +352,5 @@ public:
 	}
 
 	std::unique_ptr<FrameTime> frameTime;
+	void SetSimThreadCount(int newThreadCount);
 };
