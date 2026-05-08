@@ -71,5 +71,5 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
-	sim->parts[i].life = sim->rng.between(50, 199);
+	sim->parts[i].life = rng.between(50, 199);
 }

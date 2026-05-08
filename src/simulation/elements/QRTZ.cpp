@@ -77,7 +77,7 @@ int Element_QRTZ_update(UPDATE_FUNC_ARGS)
 					auto r = pmap[y+ry][x+rx];
 					if (!r)
 						continue;
-					else if (TYP(r)==PT_SLTW && sim->rng.chance(1, 500))
+					else if (TYP(r)==PT_SLTW && rng.chance(1, 500))
 					{
 						sim->kill_part(ID(r));
 						parts[i].tmp++;
@@ -92,7 +92,7 @@ int Element_QRTZ_update(UPDATE_FUNC_ARGS)
 		bool stopgrow = false;
 		for (auto trade = 0; trade < 9; trade++)
 		{
-			auto rnd = sim->rng.gen() % 0x3FF;
+			auto rnd = rng.gen() % 0x3FF;
 			auto rx = (rnd%5)-2;
 			auto srx = (rnd%3)-1;
 			rnd >>= 3;
@@ -110,9 +110,9 @@ int Element_QRTZ_update(UPDATE_FUNC_ARGS)
 						{
 							parts[np].temp = parts[i].temp;
 							parts[np].tmp2 = parts[i].tmp2;
-							if (sim->rng.chance(1, 2))
+							if (rng.chance(1, 2))
 							{
-								parts[np].tmp2 = std::clamp(parts[np].tmp2 + sim->rng.between(-1, 1), 0, 10);
+								parts[np].tmp2 = std::clamp(parts[np].tmp2 + rng.between(-1, 1), 0, 10);
 							}
 							parts[i].tmp--;
 							if (t == PT_PQRT)
@@ -120,11 +120,11 @@ int Element_QRTZ_update(UPDATE_FUNC_ARGS)
 								// If PQRT is stationary and has started growing particles of QRTZ, the PQRT is basically part of a new QRTZ crystal. So turn it back into QRTZ so that it behaves more like part of the crystal.
 								sim->part_change_type(i,x,y,PT_QRTZ);
 							}
-							if (sim->rng.chance(1, 2))
+							if (rng.chance(1, 2))
 							{
 								parts[np].tmp=-1;//dead qrtz
 							}
-							else if (!parts[i].tmp && sim->rng.chance(1, 15))
+							else if (!parts[i].tmp && rng.chance(1, 15))
 							{
 								parts[i].tmp=-1;
 							}
@@ -170,6 +170,6 @@ int Element_QRTZ_graphics(GRAPHICS_FUNC_ARGS)
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
-	sim->parts[i].tmp2 = sim->rng.between(0, 10);
+	sim->parts[i].tmp2 = rng.between(0, 10);
 	sim->parts[i].tmp3 = int(sim->pv[y/CELL][x/CELL] * 64);
 }

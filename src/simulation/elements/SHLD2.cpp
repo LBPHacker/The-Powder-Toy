@@ -62,7 +62,7 @@ static int update(UPDATE_FUNC_ARGS)
 				}
 				else if (TYP(r)==PT_SPRK&&parts[i].life==0)
 				{
-					if (sim->rng.chance(1, 8))
+					if (rng.chance(1, 8))
 					{
 						sim->part_change_type(i,x,y,PT_SHLD3);
 						parts[i].life = 7;
@@ -80,7 +80,7 @@ static int update(UPDATE_FUNC_ARGS)
 						}
 					}
 				}
-				else if (TYP(r) == PT_SHLD4 && sim->rng.chance(2, 5))
+				else if (TYP(r) == PT_SHLD4 && rng.chance(2, 5))
 				{
 					sim->part_change_type(i,x,y,PT_SHLD3);
 					parts[i].life = 7;

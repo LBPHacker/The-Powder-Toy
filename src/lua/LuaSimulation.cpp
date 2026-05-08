@@ -2057,13 +2057,13 @@ static int randomSeed(lua_State *L)
 	auto *sim = lsi->gameModel->GetSimulation();
 	if (lua_gettop(L))
 	{
-		sim->rng.state({
+		sim->sharedRng.state({
 			uint32_t(luaL_checkinteger(L, 1)) | (uint64_t(uint32_t(luaL_checkinteger(L, 2))) << 32),
 			uint32_t(luaL_checkinteger(L, 3)) | (uint64_t(uint32_t(luaL_checkinteger(L, 4))) << 32),
 		});
 		return 0;
 	}
-	auto s = sim->rng.state();
+	auto s = sim->sharedRng.state();
 	lua_pushinteger(L,  s[0]        & UINT32_C(0xFFFFFFFF));
 	lua_pushinteger(L, (s[0] >> 32) & UINT32_C(0xFFFFFFFF));
 	lua_pushinteger(L,  s[1]        & UINT32_C(0xFFFFFFFF));

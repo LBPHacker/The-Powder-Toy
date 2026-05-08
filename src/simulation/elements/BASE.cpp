@@ -70,10 +70,10 @@ static int update(UPDATE_FUNC_ARGS)
 	if (parts[i].life < 100 && pres < 10.0f && parts[i].temp > (120.0f + 273.15f))
 	{
 		//Slow down boiling
-		if (sim->rng.chance(1, 20))
+		if (rng.chance(1, 20))
 		{
 			//This way we preserve the total amount of concentrated BASE in the solution
-			if (sim->rng.chance(1, parts[i].life+1))
+			if (rng.chance(1, parts[i].life+1))
 			{
 				//@ BASE -> BOYL
 				sim->createPartTempVel(i, x, y, PT_BOYL);
@@ -120,7 +120,7 @@ static int update(UPDATE_FUNC_ARGS)
 					//Base is diluted by water
 					if (parts[i].life > 1 && (rt == PT_WATR || rt == PT_DSTW || rt == PT_CBNW))
 					{
-					       	if (sim->rng.chance(1, 20))
+					       	if (rng.chance(1, 20))
 						{
 							int saturh = parts[i].life/2;
 
@@ -162,7 +162,7 @@ static int update(UPDATE_FUNC_ARGS)
 						sim->createPartTempVel(ID(r), x+rx, y+ry, PT_GUNP);
 						parts[i].life--;
 					} //@ BASE + LAVA(ROCK) -> MERC
-				        else if (rt == PT_LAVA && parts[ID(r)].ctype == PT_ROCK && pres >= 10.0f && sim->rng.chance(1, 1000))
+				        else if (rt == PT_LAVA && parts[ID(r)].ctype == PT_ROCK && pres >= 10.0f && rng.chance(1, 1000))
 					{
 						sim->part_change_type(i, x, y, PT_MERC);
 						parts[i].life = 0;
@@ -172,17 +172,17 @@ static int update(UPDATE_FUNC_ARGS)
 						return 1;
 					} //Base rusts conductive solids
 					else if (parts[i].life >= 10 &&
-						       	(elements[rt].Properties & (TYPE_SOLID|PROP_CONDUCTS)) == (TYPE_SOLID|PROP_CONDUCTS) && sim->rng.chance(1, 10))
+						       	(elements[rt].Properties & (TYPE_SOLID|PROP_CONDUCTS)) == (TYPE_SOLID|PROP_CONDUCTS) && rng.chance(1, 10))
 					{
 						//@ BASE + conductive solid -> BASE + BMTL
 						sim->part_change_type(ID(r), x+rx, y+ry, PT_BMTL);
-						parts[ID(r)].tmp = sim->rng.between(20, 29);
+						parts[ID(r)].tmp = rng.between(20, 29);
 						parts[i].life--;
 						//Draw a spark effect
 						parts[i].tmp = 1;
 					} //Base destroys a substance slower if acid destroys it faster
 					else if (elements[rt].Hardness > 0 && elements[rt].Hardness < 50 &&
-							parts[i].life >= (2*elements[rt].Hardness) && sim->rng.chance(50-elements[rt].Hardness, 1000))
+							parts[i].life >= (2*elements[rt].Hardness) && rng.chance(50-elements[rt].Hardness, 1000))
 					{
 						sim->kill_part(ID(r));
 						parts[i].life -= 2;
@@ -197,8 +197,8 @@ static int update(UPDATE_FUNC_ARGS)
 	//Diffusion
 	for (auto trade = 0; trade<2; trade++)
 	{
-		auto rx = sim->rng.between(-1, 1);
-		auto ry = sim->rng.between(-1, 1);
+		auto rx = rng.between(-1, 1);
+		auto ry = rng.between(-1, 1);
 		if (rx || ry)
 		{
 			auto r = pmap[y+ry][x+rx];
