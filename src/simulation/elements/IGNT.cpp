@@ -71,22 +71,22 @@ static int update(UPDATE_FUNC_ARGS)
 	}
 	else if(parts[i].life > 0)
 	{
-		if (sim->rng.chance(2, 3))
+		if (rng.chance(2, 3))
 		{
 			//@ IGNT -> IGNT + EMBR
-			int nb = sim->create_part(-1, x + sim->rng.between(-1, 1), y + sim->rng.between(-1, 1), PT_EMBR);
+			int nb = sim->create_part(-1, x + rng.between(-1, 1), y + rng.between(-1, 1), PT_EMBR);
 			if (nb!=-1) {
 				parts[nb].tmp = 0;
 				parts[nb].life = 30;
-				parts[nb].vx = float(sim->rng.between(-10, 10));
-				parts[nb].vy = float(sim->rng.between(-10, 10));
+				parts[nb].vx = float(rng.between(-10, 10));
+				parts[nb].vy = float(rng.between(-10, 10));
 				parts[nb].temp = restrict_flt(parts[i].temp-273.15f+400.0f, MIN_TEMP, MAX_TEMP);
 			}
 		}
 		else
 		{
 			//@ IGNT -> IGNT + FIRE
-			sim->create_part(-1, x + sim->rng.between(-1, 1), y + sim->rng.between(-1, 1), PT_FIRE);
+			sim->create_part(-1, x + rng.between(-1, 1), y + rng.between(-1, 1), PT_FIRE);
 		}
 		parts[i].life--;
 	}

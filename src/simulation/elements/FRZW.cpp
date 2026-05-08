@@ -59,7 +59,7 @@ static int update(UPDATE_FUNC_ARGS)
 				auto r = pmap[y+ry][x+rx];
 				if (!r)
 					continue;
-				if (TYP(r)==PT_WATR && sim->rng.chance(1, 14))
+				if (TYP(r)==PT_WATR && rng.chance(1, 14))
 				{
 					//@ FRZW + WATR -> 2xFRZW
 					sim->part_change_type(ID(r),x+rx,y+ry,PT_FRZW);
@@ -67,7 +67,7 @@ static int update(UPDATE_FUNC_ARGS)
 			}
 		}
 	}
-	if ((parts[i].life==0 && sim->rng.chance(1, 192)) || sim->rng.chance(100-parts[i].life, 50000))
+	if ((parts[i].life==0 && rng.chance(1, 192)) || rng.chance(100-parts[i].life, 50000))
 	{
 		//@ FRZW -> ICEI(FRZW)
 		sim->part_change_type(i,x,y,PT_ICEI);

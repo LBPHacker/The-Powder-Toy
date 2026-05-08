@@ -79,7 +79,7 @@ static int update(UPDATE_FUNC_ARGS)
 			return 0;
 
 		// Slow things down
-		if (sim->rng.chance(9, 10))
+		if (rng.chance(9, 10))
 			return 0;
 
 		// Current phase, direction and life
@@ -230,7 +230,7 @@ static int update(UPDATE_FUNC_ARGS)
 		if (stopped)
 		{
 			// Shoot out a seed
-			if (sim->rng.chance(1, 10))
+			if (rng.chance(1, 10))
 			{
 				//@ PLNT -> PLNT + SEED
 				si = sim->create_part(-1, x+2*dir3x3[dir].X, y+2*dir3x3[dir].Y, PT_SEED);
@@ -272,7 +272,7 @@ static int update(UPDATE_FUNC_ARGS)
 					switch (TYP(r))
 					{
 						case PT_WATR:
-							if (sim->rng.chance(1, 50))
+							if (rng.chance(1, 50))
 							{
 								//@ PLNT + WATR -> 2xPLNT
 								auto np = sim->create_part(ID(r),x+rx,y+ry,PT_PLNT);
@@ -281,7 +281,7 @@ static int update(UPDATE_FUNC_ARGS)
 							}
 							break;
 						case PT_LAVA:
-							if (sim->rng.chance(1, 50))
+							if (rng.chance(1, 50))
 							{
 								//@ PLNT + LAVA -> FIRE + LAVA
 								sim->part_change_type(i,x,y,PT_FIRE);
@@ -290,15 +290,15 @@ static int update(UPDATE_FUNC_ARGS)
 							break;
 						case PT_SMKE:
 						case PT_CO2:
-							if (sim->rng.chance(1, 50))
+							if (rng.chance(1, 50))
 							{
 								sim->kill_part(ID(r));
-								parts[i].life = sim->rng.between(60, 119);
+								parts[i].life = rng.between(60, 119);
 							}
 							break;
 						case PT_WOOD:
 							{
-								auto rndstore = sim->rng.gen();
+								auto rndstore = rng.gen();
 								if (surround_space && !(rndstore%4) && parts[i].tmp==1)
 								{
 									rndstore >>= 3;

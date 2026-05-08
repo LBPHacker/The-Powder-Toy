@@ -85,7 +85,7 @@ static int update(UPDATE_FUNC_ARGS)
 				int neighborData = pmap[y + ry][x + rx];
 				if (!neighborData)
 				{
-					if (burnTimer > 1012 && sim->rng.chance(1, 10))
+					if (burnTimer > 1012 && rng.chance(1, 10))
 					{
 						//@ LITH -> LITH + FIRE
 						sim->create_part(-1, x + rx, y + ry, PT_FIRE);
@@ -168,7 +168,7 @@ static int update(UPDATE_FUNC_ARGS)
 					break;
 
 				case PT_FIRE:
-					if (self.temp > 440.f && sim->rng.chance(1, 40) && hydrogenationFactor < 6)
+					if (self.temp > 440.f && rng.chance(1, 40) && hydrogenationFactor < 6)
 					{
 						burnTimer = 1013;
 						hydrogenationFactor += 1;
@@ -176,7 +176,7 @@ static int update(UPDATE_FUNC_ARGS)
 					break;
 
 				case PT_O2:
-					if (burnTimer > 1000 && sim->rng.chance(1, 10))
+					if (burnTimer > 1000 && rng.chance(1, 10))
 					{
 						//@ LITH + O2 -> 2xPLSM
 						sim->part_change_type(i, x, y, PT_PLSM);
@@ -202,8 +202,8 @@ static int update(UPDATE_FUNC_ARGS)
 
 	for (int trade = 0; trade < 9; ++trade)
 	{
-		int rx = sim->rng.between(-3, 3);
-		int ry = sim->rng.between(-3, 3);
+		int rx = rng.between(-3, 3);
+		int ry = rng.between(-3, 3);
 		if (rx || ry)
 		{
 			int neighborData = pmap[y + ry][x + rx];

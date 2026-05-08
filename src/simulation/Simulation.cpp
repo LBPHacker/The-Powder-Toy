@@ -54,13 +54,13 @@ namespace
 		void BeforeSim(bool willUpdate) final override;
 		void AfterSim() final override;
 
-		void MovementPhase(int i, Neighbourhood neighbourhood);
+		void MovementPhase(RNG &rng, int i, Neighbourhood neighbourhood);
 		Neighbourhood GetNeighbourhood(int i) const;
-		bool TransitionPhase(int i, const Neighbourhood &neighbourhood);
+		bool TransitionPhase(RNG &rng, int i, const Neighbourhood &neighbourhood);
 
-		void UpdateOne(int i);
+		void UpdateOne(RNG &rng, int i);
 
-		bool UpdatePhase(int i, const Neighbourhood &neighbourhood);
+		bool UpdatePhase(RNG &rng, int i, const Neighbourhood &neighbourhood);
 
 		void set_emap(int x, int y);
 		void kill_part(int i);
@@ -68,17 +68,17 @@ namespace
 		int create_part(int p, int x, int y, int t, int v = -1);
 		int FloodINST(int x, int y);
 		void CreateLine(int x1, int y1, int x2, int y2, int c);
-		int try_move(int i, int x, int y, int nx, int ny);
-		int do_move(int i, int x, int y, float nxf, float nyf);
+		int try_move(RNG &rng, int i, int x, int y, int nx, int ny);
+		int do_move(RNG &rng, int i, int x, int y, float nxf, float nyf);
 		bool move(int i, int x, int y, float nxf, float nyf);
 		void photoelectric_effect(int nx, int ny);
 		int createPartTempVel(int i, int x, int y, int t);
-		void create_gain_photon(int pp);
-		void create_cherenkov_photon(int pp);
+		void create_gain_photon(RNG &rng, int pp);
+		void create_cherenkov_photon(RNG &rng, int pp);
 		void RecalcFreeParticles(bool do_life_dec);
 		void SimulateGoL();
-		void CheckStacking();
-		bool flood_water(int x, int y, int i);
+		void CheckStacking(RNG &rng);
+		bool flood_water(RNG &rng, int x, int y, int i);
 		int is_blocking(int t, int x, int y) const;
 		int is_boundary(int pt, int x, int y) const;
 		int find_next_boundary(int pt, int *x, int *y, int dm, int *em, bool reverse) const;
@@ -446,7 +446,7 @@ std::unique_ptr<GameSave> Simulation::Save(bool includePressure, Rect<int> partR
 
 	auto newSave = std::make_unique<GameSave>(blockR.size);
 	newSave->frameCount = frameCount;
-	newSave->rngState = rng.state();
+	newSave->rngState = sharedRng.state();
 
 	int storedParts = 0;
 	int elementCount[PT_NUM];
@@ -793,7 +793,7 @@ int SimVariantImpl<Variant>::FloodINST(int x, int y)
 }
 
 template<class Variant>
-bool SimVariantImpl<Variant>::flood_water(int x, int y, int i)
+bool SimVariantImpl<Variant>::flood_water(RNG &rng, int x, int y, int i)
 {
 	int x1, x2, originalX = x, originalY = y;
 	int r = pmap[y][x];
@@ -1304,7 +1304,7 @@ int SimVariantImpl<Variant>::eval_move(int pt, int nx, int ny, unsigned *rr) con
 }
 
 template<class Variant>
-int SimVariantImpl<Variant>::try_move(int i, int x, int y, int nx, int ny)
+int SimVariantImpl<Variant>::try_move(RNG &rng, int i, int x, int y, int nx, int ny)
 {
 	unsigned r = 0, e;
 
@@ -1381,11 +1381,11 @@ int SimVariantImpl<Variant>::try_move(int i, int x, int y, int nx, int ny)
 				if (!parts[ID(r)].life && rng.chance(1, 30))
 				{
 					parts[ID(r)].life = 120;
-					create_gain_photon(i);
+					create_gain_photon(rng, i);
 				}
 				break;
 			case PT_FILT:
-				parts[i].ctype = Element_FILT_interactWavelengths(this, &parts[ID(r)], parts[i].ctype);
+				parts[i].ctype = Element_FILT_interactWavelengths(rng, &parts[ID(r)], parts[i].ctype);
 				break;
 			case PT_C5:
 				if (parts[ID(r)].life > 0 && (parts[ID(r)].ctype & parts[i].ctype & 0xFFFFFFC0))
@@ -1471,7 +1471,7 @@ int SimVariantImpl<Variant>::try_move(int i, int x, int y, int nx, int ny)
 			//@ NEUT + GLAS/BGLA -> NEUT + GLAS/BGLA + PHOT
 			if (TYP(r) == PT_GLAS || TYP(r) == PT_BGLA)
 				if (rng.chance(1, 10))
-					create_cherenkov_photon(i);
+					create_cherenkov_photon(rng, i);
 			break;
 		case PT_ELEC:
 			if (TYP(r) == PT_GLOW)
@@ -1489,7 +1489,7 @@ int SimVariantImpl<Variant>::try_move(int i, int x, int y, int nx, int ny)
 		case PT_BIZR:
 		case PT_BIZRG:
 			if (TYP(r) == PT_FILT)
-				parts[i].ctype = Element_FILT_interactWavelengths(this, &parts[ID(r)], parts[i].ctype);
+				parts[i].ctype = Element_FILT_interactWavelengths(rng, &parts[ID(r)], parts[i].ctype);
 			break;
 		}
 		return 1;
@@ -1618,7 +1618,7 @@ int SimVariantImpl<Variant>::try_move(int i, int x, int y, int nx, int ny)
 
 // try to move particle, and if successful update pmap and parts[i].x,y
 template<class Variant>
-int SimVariantImpl<Variant>::do_move(int i, int x, int y, float nxf, float nyf)
+int SimVariantImpl<Variant>::do_move(RNG &rng, int i, int x, int y, float nxf, float nyf)
 {
 	int nx = (int)(nxf+0.5f), ny = (int)(nyf+0.5f), result;
 	if (edgeMode == EDGE_LOOP)
@@ -1642,7 +1642,7 @@ int SimVariantImpl<Variant>::do_move(int i, int x, int y, float nxf, float nyf)
 	}
 	if (parts[i].type == PT_NONE)
 		return 0;
-	result = try_move(i, x, y, nx, ny);
+	result = try_move(rng, i, x, y, nx, ny);
 	if (result)
 	{
 		if (!move(i, x, y, nxf, nyf))
@@ -1964,6 +1964,8 @@ bool SimVariantImpl<Variant>::part_change_type(int i, int x, int y, int t)
 template<class Variant>
 int SimVariantImpl<Variant>::create_part(int p, int x, int y, int t, int v)
 {
+	auto &rng = sharedRng;
+
 	int i, oldType = PT_NONE;
 
 	auto &sd = SimulationData::CRef();
@@ -2087,7 +2089,7 @@ int SimVariantImpl<Variant>::create_part(int p, int x, int y, int t, int v)
 	// Set non-static properties (such as randomly generated ones)
 	auto *create = std::get<VariantIndex<SimImpls, typename PublicBase::Variant>()>(elements[t].Create);
 	if (create)
-		(*(create))(this, i, x, y, t, v);
+		(*(create))(this, rng, i, x, y, t, v);
 
 	if (elements[t].ChangeType)
 		(*(elements[t].ChangeType))(this, i, x, y, oldType, t);
@@ -2135,7 +2137,7 @@ int SimVariantImpl<Variant>::PartsAlloc()
 }
 
 template<class Variant>
-void SimVariantImpl<Variant>::create_gain_photon(int pp)//photons from PHOT going through GLOW
+void SimVariantImpl<Variant>::create_gain_photon(RNG &rng, int pp)//photons from PHOT going through GLOW
 {
 	if (SimVariant<Variant>::MaxPartsReached())
 	{
@@ -2173,7 +2175,7 @@ void SimVariantImpl<Variant>::create_gain_photon(int pp)//photons from PHOT goin
 }
 
 template<class Variant>
-void SimVariantImpl<Variant>::create_cherenkov_photon(int pp)//photons from NEUT going through GLAS
+void SimVariantImpl<Variant>::create_cherenkov_photon(RNG &rng, int pp)//photons from NEUT going through GLAS
 {
 	if (SimVariant<Variant>::MaxPartsReached())
 	{
@@ -2421,7 +2423,7 @@ Neighbourhood SimVariantImpl<Variant>::GetNeighbourhood(int i) const
 }
 
 template<class Variant>
-void SimVariantImpl<Variant>::UpdateOne(int i)
+void SimVariantImpl<Variant>::UpdateOne(RNG &rng, int i)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
@@ -2521,7 +2523,7 @@ void SimVariantImpl<Variant>::UpdateOne(int i)
 		parts[i].vy += elements[t].Diffusion*(2.0f*rng.uniform01()-1.0f);
 	}
 
-	auto transitionOccurred = TransitionPhase(i, neighbourhood);
+	auto transitionOccurred = TransitionPhase(rng, i, neighbourhood);
 	if (!parts[i].type)
 	{
 		return;
@@ -2530,7 +2532,7 @@ void SimVariantImpl<Variant>::UpdateOne(int i)
 	{
 		t = parts[i].type;
 	}
-	if (UpdatePhase(i, neighbourhood))
+	if (UpdatePhase(rng, i, neighbourhood))
 	{
 		return;
 	}
@@ -2544,7 +2546,7 @@ void SimVariantImpl<Variant>::UpdateOne(int i)
 	if (!parts[i].vx&&!parts[i].vy)//if its not moving, skip to next particle, movement code it next
 		return;
 
-	MovementPhase(i, neighbourhood);
+	MovementPhase(rng, i, neighbourhood);
 }
 
 template<class Variant>
@@ -2559,12 +2561,12 @@ void SimVariantImpl<Variant>::UpdateParticles(int start, int end)
 		{
 			debug_mostRecentlyUpdated = i;
 		}
-		UpdateOne(i);
+		UpdateOne(sharedRng, i);
 	}
 }
 
 template<class Variant>
-bool SimVariantImpl<Variant>::TransitionPhase(int i, const Neighbourhood &neighbourhood)
+bool SimVariantImpl<Variant>::TransitionPhase(RNG &rng, int i, const Neighbourhood &neighbourhood)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
@@ -3013,7 +3015,7 @@ bool SimVariantImpl<Variant>::TransitionPhase(int i, const Neighbourhood &neighb
 }
 
 template<class Variant>
-bool SimVariantImpl<Variant>::UpdatePhase(int i, const Neighbourhood &neighbourhood)
+bool SimVariantImpl<Variant>::UpdatePhase(RNG &rng, int i, const Neighbourhood &neighbourhood)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
@@ -3026,7 +3028,7 @@ bool SimVariantImpl<Variant>::UpdatePhase(int i, const Neighbourhood &neighbourh
 	auto *update = std::get<VariantIndex<SimImpls, typename PublicBase::Variant>()>(elements[t].Update);
 	if (update)
 	{
-		if ((*update)(this, i, x, y, neighbourhood.surround_space, neighbourhood.nt, parts, pmap))
+		if ((*update)(this, rng, i, x, y, neighbourhood.surround_space, neighbourhood.nt, parts, pmap))
 			return true;
 		x = int(parts[i].x+0.5f);
 		y = int(parts[i].y+0.5f);
@@ -3034,12 +3036,12 @@ bool SimVariantImpl<Variant>::UpdatePhase(int i, const Neighbourhood &neighbourh
 
 	// TODO-TILES: we may need to verify tile assignment again
 	if(legacy_enable)//if heat sim is off
-		Element::legacyUpdate(static_cast<PublicBase *>(this), i,x,y,neighbourhood.surround_space,neighbourhood.nt, parts, pmap);
+		Element::legacyUpdate(static_cast<PublicBase *>(this), rng, i,x,y,neighbourhood.surround_space,neighbourhood.nt, parts, pmap);
 	return false;
 }
 
 template<class Variant>
-void SimVariantImpl<Variant>::MovementPhase(int i, Neighbourhood neighbourhood)
+void SimVariantImpl<Variant>::MovementPhase(RNG &rng, int i, Neighbourhood neighbourhood)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
@@ -3190,12 +3192,12 @@ void SimVariantImpl<Variant>::MovementPhase(int i, Neighbourhood neighbourhood)
 		if (stagnant)//FLAG_STAGNANT set, was reflected on previous frame
 		{
 			// cast coords as int then back to float for compatibility with existing saves
-			if (!do_move(i, x, y, (float)fin_x, (float)fin_y) && parts[i].type) {
+			if (!do_move(rng, i, x, y, (float)fin_x, (float)fin_y) && parts[i].type) {
 				kill_part(i);
 				return;
 			}
 		}
-		else if (!do_move(i, x, y, fin_xf, fin_yf))
+		else if (!do_move(rng, i, x, y, fin_xf, fin_yf))
 		{
 			if (parts[i].type == PT_NONE)
 				return;
@@ -3277,7 +3279,7 @@ void SimVariantImpl<Variant>::MovementPhase(int i, Neighbourhood neighbourhood)
 	else if (elements[t].Falldown==0)
 	{
 		// gasses and solids (but not powders)
-		if (!do_move(i, x, y, fin_xf, fin_yf))
+		if (!do_move(rng, i, x, y, fin_xf, fin_yf))
 		{
 			if (parts[i].type == PT_NONE)
 				return;
@@ -3286,11 +3288,11 @@ void SimVariantImpl<Variant>::MovementPhase(int i, Neighbourhood neighbourhood)
 			if (fin_x<x-ISTP) fin_x=x-ISTP;
 			if (fin_y>y+ISTP) fin_y=y+ISTP;
 			if (fin_y<y-ISTP) fin_y=y-ISTP;
-			if (do_move(i, x, y, float(2*x-fin_x), float(fin_y)))
+			if (do_move(rng, i, x, y, float(2*x-fin_x), float(fin_y)))
 			{
 				parts[i].vx *= elements[t].Collision;
 			}
-			else if (do_move(i, x, y, float(fin_x), float(2*y-fin_y)))
+			else if (do_move(rng, i, x, y, float(fin_x), float(2*y-fin_y)))
 			{
 				parts[i].vy *= elements[t].Collision;
 			}
@@ -3306,20 +3308,20 @@ void SimVariantImpl<Variant>::MovementPhase(int i, Neighbourhood neighbourhood)
 		// Checking stagnant is cool, but then it doesn't update when you change it later.
 		if (water_equal_test && elements[t].Falldown == 2 && rng.chance(1, 200))
 		{
-			if (flood_water(x, y, i))
+			if (flood_water(rng, x, y, i))
 				return;
 		}
 		// liquids and powders
-		if (!do_move(i, x, y, fin_xf, fin_yf))
+		if (!do_move(rng, i, x, y, fin_xf, fin_yf))
 		{
 			if (parts[i].type == PT_NONE)
 				return;
-			if (fin_x!=x && do_move(i, x, y, fin_xf, clear_yf))
+			if (fin_x!=x && do_move(rng, i, x, y, fin_xf, clear_yf))
 			{
 				parts[i].vx *= elements[t].Collision;
 				parts[i].vy *= elements[t].Collision;
 			}
-			else if (fin_y!=y && do_move(i, x, y, clear_xf, fin_yf))
+			else if (fin_y!=y && do_move(rng, i, x, y, clear_xf, fin_yf))
 			{
 				parts[i].vx *= elements[t].Collision;
 				parts[i].vy *= elements[t].Collision;
@@ -3340,7 +3342,7 @@ void SimVariantImpl<Variant>::MovementPhase(int i, Neighbourhood neighbourhood)
 					auto mv = std::max(fabsf(dx), fabsf(dy));
 					dx /= mv;
 					dy /= mv;
-					if (do_move(i, x, y, clear_xf+dx, clear_yf+dy))
+					if (do_move(rng, i, x, y, clear_xf+dx, clear_yf+dy))
 					{
 						parts[i].vx *= elements[t].Collision;
 						parts[i].vy *= elements[t].Collision;
@@ -3351,7 +3353,7 @@ void SimVariantImpl<Variant>::MovementPhase(int i, Neighbourhood neighbourhood)
 						dx = dy*r;
 						dy = -swappage*r;
 					}
-					if (do_move(i, x, y, clear_xf+dx, clear_yf+dy))
+					if (do_move(rng, i, x, y, clear_xf+dx, clear_yf+dy))
 					{
 						parts[i].vx *= elements[t].Collision;
 						parts[i].vy *= elements[t].Collision;
@@ -3375,14 +3377,14 @@ void SimVariantImpl<Variant>::MovementPhase(int i, Neighbourhood neighbourhood)
 					for (auto j=clear_x+r; j>=0 && j>=clear_x-rt && j<clear_x+rt && j<XRES; j+=r)
 					{
 						if ((TYP(pmap[fin_y][j])!=t || bmap[fin_y/CELL][j/CELL])
-							&& (s=do_move(i, x, y, (float)j, fin_yf)))
+							&& (s=do_move(rng, i, x, y, (float)j, fin_yf)))
 						{
 							nx = (int)(parts[i].x+0.5f);
 							ny = (int)(parts[i].y+0.5f);
 							break;
 						}
 						if (fin_y!=clear_y && (TYP(pmap[clear_y][j])!=t || bmap[clear_y/CELL][j/CELL])
-							&& (s=do_move(i, x, y, (float)j, clear_yf)))
+							&& (s=do_move(rng, i, x, y, (float)j, clear_yf)))
 						{
 							nx = (int)(parts[i].x+0.5f);
 							ny = (int)(parts[i].y+0.5f);
@@ -3397,13 +3399,13 @@ void SimVariantImpl<Variant>::MovementPhase(int i, Neighbourhood neighbourhood)
 					if (s==1)
 						for (auto j=ny+r; j>=0 && j<YRES && j>=ny-rt && j<ny+rt; j+=r)
 						{
-							if ((TYP(pmap[j][nx])!=t || bmap[j/CELL][nx/CELL]) && do_move(i, nx, ny, (float)nx, (float)j))
+							if ((TYP(pmap[j][nx])!=t || bmap[j/CELL][nx/CELL]) && do_move(rng, i, nx, ny, (float)nx, (float)j))
 								break;
 							if (TYP(pmap[j][nx])!=t || (bmap[j/CELL][nx/CELL] && bmap[j/CELL][nx/CELL]!=WL_STREAM))
 								break;
 						}
 					else if (s==-1) {} // particle is out of bounds
-					else if ((clear_x!=x||clear_y!=y) && do_move(i, x, y, clear_xf, clear_yf)) {}
+					else if ((clear_x!=x||clear_y!=y) && do_move(rng, i, x, y, clear_xf, clear_yf)) {}
 					else parts[i].flags |= FLAG_STAGNANT;
 					parts[i].vx *= elements[t].Collision;
 					parts[i].vy *= elements[t].Collision;
@@ -3456,7 +3458,7 @@ void SimVariantImpl<Variant>::MovementPhase(int i, Neighbourhood neighbourhood)
 							break;
 						if (TYP(pmap[ny][nx])!=t || bmap[ny/CELL][nx/CELL])
 						{
-							s = do_move(i, x, y, nxf, nyf);
+							s = do_move(rng, i, x, y, nxf, nyf);
 							if (s)
 							{
 								// Movement was successful
@@ -3494,14 +3496,14 @@ void SimVariantImpl<Variant>::MovementPhase(int i, Neighbourhood neighbourhood)
 							// If the space is anything except the same element (a wall, empty space, or occupied by a particle of a different element), try to move into it
 							if (TYP(pmap[ny][nx])!=t || bmap[ny/CELL][nx/CELL])
 							{
-								s = do_move(i, clear_x, clear_y, nxf, nyf);
+								s = do_move(rng, i, clear_x, clear_y, nxf, nyf);
 								if (s || TYP(pmap[ny][nx])!=t || bmap[ny/CELL][nx/CELL]!=WL_STREAM)
 									break; // found the edge of the liquid and movement into it succeeded, so stop moving down
 							}
 						}
 					}
 					else if (s==-1) {} // particle is out of bounds
-					else if ((clear_x!=x||clear_y!=y) && do_move(i, x, y, clear_xf, clear_yf)) {} // try moving to the last clear position
+					else if ((clear_x!=x||clear_y!=y) && do_move(rng, i, x, y, clear_xf, clear_yf)) {} // try moving to the last clear position
 					else parts[i].flags |= FLAG_STAGNANT;
 					parts[i].vx *= elements[t].Collision;
 					parts[i].vy *= elements[t].Collision;
@@ -3509,7 +3511,7 @@ void SimVariantImpl<Variant>::MovementPhase(int i, Neighbourhood neighbourhood)
 				else
 				{
 					// if interpolation was done, try moving to last clear position
-					if ((clear_x!=x||clear_y!=y) && do_move(i, x, y, clear_xf, clear_yf)) {}
+					if ((clear_x!=x||clear_y!=y) && do_move(rng, i, x, y, clear_xf, clear_yf)) {}
 					else parts[i].flags |= FLAG_STAGNANT;
 					parts[i].vx *= elements[t].Collision;
 					parts[i].vy *= elements[t].Collision;
@@ -3796,7 +3798,7 @@ void SimVariantImpl<Variant>::SimulateGoL()
 }
 
 template<class Variant>
-void SimVariantImpl<Variant>::CheckStacking()
+void SimVariantImpl<Variant>::CheckStacking(RNG &rng)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
@@ -3906,6 +3908,8 @@ void Simulation::UpdateGravityMask()
 template<class Variant>
 void SimVariantImpl<Variant>::BeforeSim(bool willUpdate)
 {
+	auto &rng = sharedRng;
+
 	if (willUpdate)
 	{
 		{
@@ -3966,7 +3970,7 @@ void SimVariantImpl<Variant>::BeforeSim(bool willUpdate)
 		// check for stacking and create BHOL if found
 		if (force_stacking_check || rng.chance(1, 10))
 		{
-			CheckStacking();
+			CheckStacking(rng);
 		}
 
 		// LOVE and LOLZ element handling
@@ -4105,7 +4109,7 @@ void SimVariantImpl<Variant>::AfterSim()
 	if (emp_trigger_count)
 	{
 		// pitiful attempt at trying to keep code relating to a given element in the same file
-		Element_EMP_Trigger(static_cast<PublicBase *>(this), emp_trigger_count);
+		Element_EMP_Trigger(static_cast<PublicBase *>(this), sharedRng, emp_trigger_count);
 		emp_trigger_count = 0;
 	}
 
