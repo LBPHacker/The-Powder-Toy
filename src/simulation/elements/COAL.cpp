@@ -45,7 +45,7 @@ void Element::Element_COAL()
 	DefaultProperties.life = 110;
 	DefaultProperties.tmp = 50;
 
-	Update = &Element_COAL_update;
+	ASSIGN_SIM_CALLBACK(Update, Element_COAL_update)
 	Graphics = &Element_COAL_graphics;
 }
 

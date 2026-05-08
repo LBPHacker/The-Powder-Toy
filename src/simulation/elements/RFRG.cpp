@@ -41,7 +41,7 @@ void Element::Element_RFRG()
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
 
-	Update = &Element_RFRG_update;
+	ASSIGN_SIM_CALLBACK(Update, Element_RFRG_update)
 }
 
 int Element_RFRG_update(UPDATE_FUNC_ARGS)

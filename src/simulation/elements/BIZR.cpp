@@ -43,7 +43,7 @@ void Element::Element_BIZR()
 
 	DefaultProperties.ctype = 0x47FFFF;
 
-	Update = &Element_BIZR_update;
+	ASSIGN_SIM_CALLBACK(Update, Element_BIZR_update)
 	Graphics = &Element_BIZR_graphics;
 }
 

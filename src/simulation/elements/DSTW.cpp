@@ -43,7 +43,7 @@ void Element::Element_DSTW()
 	HighTemperature = 373.0f;
 	HighTemperatureTransition = PT_WTRV; //@ DSTW -> WTRV
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

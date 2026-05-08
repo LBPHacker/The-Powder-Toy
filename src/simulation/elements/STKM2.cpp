@@ -51,11 +51,11 @@ void Element::Element_STKM2()
 
 	DefaultProperties.life = 100;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &Element_STKM_graphics;
-	Create = &create;
-	CreateAllowed = &createAllowed;
-	ChangeType = &changeType;
+	ASSIGN_SIM_CALLBACK(Create, create)
+	ASSIGN_SIM_CALLBACK(CreateAllowed, createAllowed)
+	ASSIGN_SIM_CALLBACK(ChangeType, changeType)
 }
 
 static int update(UPDATE_FUNC_ARGS)

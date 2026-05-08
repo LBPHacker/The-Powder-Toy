@@ -46,7 +46,7 @@ void Element::Element_ICEI()
 
 	DefaultProperties.ctype = PT_WATR;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

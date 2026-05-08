@@ -324,7 +324,7 @@ static int partChangeType(lua_State *L)
 	auto *sim = lsi->gameModel->GetSimulation();
 	if(partIndex < 0 || partIndex >= NPART || !sim->parts[partIndex].type)
 		return 0;
-	sim->part_change_type(partIndex, int(sim->parts[partIndex].x+0.5f), int(sim->parts[partIndex].y+0.5f), lua_tointeger(L, 2));
+	sim->part_change_type_outer(partIndex, int(sim->parts[partIndex].x+0.5f), int(sim->parts[partIndex].y+0.5f), lua_tointeger(L, 2));
 	return 0;
 }
 
@@ -359,7 +359,7 @@ static int partCreate(lua_State *L)
 		v = ID(type);
 		type = TYP(type);
 	}
-	lua_pushinteger(L, sim->create_part(newID, lua_tointeger(L, 2), lua_tointeger(L, 3), type, v));
+	lua_pushinteger(L, sim->create_part_outer(newID, lua_tointeger(L, 2), lua_tointeger(L, 3), type, v));
 	return 1;
 }
 
@@ -410,7 +410,7 @@ static int partPosition(lua_State *L)
 		lsi->AssertMonopartAccessEvent(-1);
 		float x = sim->parts[particleID].x;
 		float y = sim->parts[particleID].y;
-		sim->move(particleID, (int)(x + 0.5f), (int)(y + 0.5f), lua_tonumber(L, 2), lua_tonumber(L, 3));
+		sim->move_outer(particleID, (int)(x + 0.5f), (int)(y + 0.5f), lua_tonumber(L, 2), lua_tonumber(L, 3));
 
 		return 0;
 	}
@@ -496,7 +496,7 @@ static int partKill(lua_State *L)
 	{
 		int i = lua_tointeger(L, 1);
 		if (i>=0 && i<NPART)
-			sim->kill_part(i);
+			sim->kill_part_outer(i);
 	}
 	return 0;
 }
@@ -565,7 +565,7 @@ static int createLine(lua_State *L)
 	if (!(lsi->eventTraits & eventTraitInterface) && rx == 0 && ry == 0 && !lua_isnoneornil(L, 7) && brushID == BRUSH_CIRCLE && flags == 0)
 	{
 		int c = luaL_checkint(L, 7); // note: weird: has to be specified in a sim context but not in a ui context
-		sim->CreateLine(x1, y1, x2, y2, c);
+		sim->CreateLineOuter(x1, y1, x2, y2, c);
 		return 0;
 	}
 

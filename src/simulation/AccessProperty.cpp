@@ -8,7 +8,7 @@ void AccessProperty::Set(Simulation *sim, int i) const
 	auto *ptr = (reinterpret_cast<char *>(&part) + prop.Offset);
 	if (propertyIndex == FIELD_TYPE)
 	{
-		sim->part_change_type(i, int(part.x + 0.5f), int(part.y + 0.5f), std::get<int>(propertyValue));
+		sim->part_change_type_outer(i, int(part.x + 0.5f), int(part.y + 0.5f), std::get<int>(propertyValue));
 		return;
 	}
 	switch (prop.Type)

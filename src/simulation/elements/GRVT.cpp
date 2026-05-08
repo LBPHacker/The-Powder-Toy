@@ -46,9 +46,9 @@ void Element::Element_GRVT()
 
 	DefaultProperties.tmp = 7;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 static int update(UPDATE_FUNC_ARGS)

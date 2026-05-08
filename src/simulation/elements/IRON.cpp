@@ -42,7 +42,7 @@ void Element::Element_IRON()
 	HighTemperature = 1687.0f;
 	HighTemperatureTransition = PT_LAVA; //@ IRON -> LAVA(IRON)
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

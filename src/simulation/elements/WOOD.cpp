@@ -44,7 +44,7 @@ void Element::Element_WOOD()
 	HighTemperature = 873.0f;
 	HighTemperatureTransition = PT_FIRE; //@ WOOD -> FIRE
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 }
 

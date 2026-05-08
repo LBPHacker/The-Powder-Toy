@@ -46,7 +46,7 @@ void Element::Element_ACID()
 
 	DefaultProperties.life = 75;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 }
 

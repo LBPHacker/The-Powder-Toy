@@ -42,7 +42,7 @@ void Element::Element_SLTW()
 	HighTemperature = 383.0f;
 	HighTemperatureTransition = ST;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

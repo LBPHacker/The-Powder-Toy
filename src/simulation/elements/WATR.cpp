@@ -43,7 +43,7 @@ void Element::Element_WATR()
 	HighTemperature = 373.0f;
 	HighTemperatureTransition = PT_WTRV; //@ WATR -> WTRV
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

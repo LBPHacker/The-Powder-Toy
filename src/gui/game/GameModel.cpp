@@ -68,7 +68,7 @@ GameModel::GameModel(GameView *newView):
 	decoSpace(DECOSPACE_SRGB),
 	view(newView)
 {
-	sim = Simulation::Factory();
+	sim = Simulation::LegacyFactory();
 	sim->useLuaCallbacks = true;
 	ren = std::make_unique<Renderer>();
 

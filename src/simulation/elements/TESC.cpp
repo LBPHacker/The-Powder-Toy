@@ -42,7 +42,7 @@ void Element::Element_TESC()
 	HighTemperature = ITH;
 	HighTemperatureTransition = NT;
 
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)

@@ -48,7 +48,7 @@ void Element::Element_EXOT()
 	DefaultProperties.life = 1000;
 	DefaultProperties.tmp = 244;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 }
 
