@@ -44,6 +44,8 @@ void Element::Element_FRAY()
 	HighTemperatureTransition = NT;
 
 	ASSIGN_SIM_CALLBACK(Update, update)
+
+	InfiniteNeighborhood = true;
 }
 
 static int update(UPDATE_FUNC_ARGS)

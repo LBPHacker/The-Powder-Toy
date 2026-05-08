@@ -49,6 +49,8 @@ void Element::Element_PRTI()
 
 	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
+
+	InfiniteNeighborhood = true;
 }
 
 /*these are the count values of where the particle gets stored, depending on where it came from
