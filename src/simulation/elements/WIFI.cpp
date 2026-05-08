@@ -45,6 +45,8 @@ void Element::Element_WIFI()
 
 	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
+
+	InfiniteNeighborhood = true;
 }
 
 static int update(UPDATE_FUNC_ARGS)

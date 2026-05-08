@@ -76,6 +76,8 @@ public:
 	float HighTemperature;
 	int HighTemperatureTransition;
 
+	bool InfiniteNeighborhood;
+
 	CallbackHolder<UpdateFunc> Update;
 	int (*Graphics) (GRAPHICS_FUNC_ARGS);
 
