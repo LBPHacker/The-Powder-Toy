@@ -43,7 +43,7 @@ void Element::Element_BRMT()
 	HighTemperature = 1273.0f;
 	HighTemperatureTransition = ST; //@ BRMT -> LAVA(BMTL)
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

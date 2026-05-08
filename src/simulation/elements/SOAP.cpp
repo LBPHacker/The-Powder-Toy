@@ -49,7 +49,7 @@ void Element::Element_SOAP()
 	DefaultProperties.tmp = -1;
 	DefaultProperties.tmp2 = -1;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
 	ChangeType = &changeType;
 }

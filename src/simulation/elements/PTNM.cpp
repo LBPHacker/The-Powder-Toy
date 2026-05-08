@@ -43,9 +43,9 @@ void Element::Element_PTNM()
 	HighTemperature = 1768.0f + 273.15f;
 	HighTemperatureTransition = PT_LAVA; //@ PTNM -> LAVA(PTNM)
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics;
-	Create = &create;
+	ASSIGN_SIM_CALLBACK(Create, create)
 }
 
 static void wtrv_reactions(int wtrv1_id, UPDATE_FUNC_ARGS)

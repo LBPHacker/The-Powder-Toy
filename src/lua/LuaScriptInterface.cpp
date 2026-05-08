@@ -319,7 +319,7 @@ void LuaSetParticleProperty(lua_State *L, int particleID, StructProperty propert
 	if (property.Name == "type")
 	{
 		lsi->AssertMonopartAccessEvent(-1);
-		sim->part_change_type(particleID, int(sim->parts[particleID].x+0.5f), int(sim->parts[particleID].y+0.5f), luaL_checkinteger(L, 3));
+		sim->part_change_type_outer(particleID, int(sim->parts[particleID].x+0.5f), int(sim->parts[particleID].y+0.5f), luaL_checkinteger(L, 3));
 	}
 	else if (property.Name == "x" || property.Name == "y")
 	{
@@ -329,7 +329,7 @@ void LuaSetParticleProperty(lua_State *L, int particleID, StructProperty propert
 		float y = sim->parts[particleID].y;
 		float nx = property.Name == "x" ? val : x;
 		float ny = property.Name == "y" ? val : y;
-		sim->move(particleID, (int)(x + 0.5f), (int)(y + 0.5f), nx, ny);
+		sim->move_outer(particleID, (int)(x + 0.5f), (int)(y + 0.5f), nx, ny);
 	}
 	else
 	{

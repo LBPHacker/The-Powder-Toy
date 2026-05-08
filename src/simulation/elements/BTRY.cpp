@@ -42,7 +42,7 @@ void Element::Element_BTRY()
 	HighTemperature = 2273.0f;
 	HighTemperatureTransition = PT_PLSM; //@ BTRY -> PLSM
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 }
 
 static int update(UPDATE_FUNC_ARGS)

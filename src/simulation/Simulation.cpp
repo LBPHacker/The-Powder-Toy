@@ -24,23 +24,118 @@
 
 namespace
 {
-	struct SimulationImpl : public Simulation
+	struct Neighbourhood
 	{
-		struct Neighbourhood
-		{
-			std::array<int, 8> surround;
-			int surround_space = 0;
-			int nt = 0; //if nt is greater than 1 after this, then there is a particle around the current particle, that is NOT the current particle's type, for water movement.
-			float pGravX = 0;
-			float pGravY = 0;
-		};
+		std::array<int, 8> surround;
+		int surround_space = 0;
+		int nt = 0; //if nt is greater than 1 after this, then there is a particle around the current particle, that is NOT the current particle's type, for water movement.
+		float pGravX = 0;
+		float pGravY = 0;
+	};
+
+	template<class Variant>
+	struct PrivateData;
+
+	template<>
+	struct PrivateData<LegacyVariant>
+	{
+	};
+
+	template<class Variant>
+	struct SimVariantImpl : public SimVariant<Variant>, public PrivateData<Variant>, public virtual Simulation
+	{
+		using PublicBase = SimVariant<Variant>;
+
+		void BeforeSim(bool willUpdate) final override;
+		void AfterSim() final override;
+
 		void MovementPhase(int i, Neighbourhood neighbourhood);
 		Neighbourhood GetNeighbourhood(int i) const;
 		bool TransitionPhase(int i, const Neighbourhood &neighbourhood);
 
+		void UpdateOne(int i);
+
+		bool UpdatePhase(int i, const Neighbourhood &neighbourhood);
+
+		void set_emap(int x, int y);
+		void kill_part(int i);
+		bool part_change_type(int i, int x, int y, int t);
+		int create_part(int p, int x, int y, int t, int v = -1);
+		int FloodINST(int x, int y);
+		void CreateLine(int x1, int y1, int x2, int y2, int c);
+		int try_move(int i, int x, int y, int nx, int ny);
+		int do_move(int i, int x, int y, float nxf, float nyf);
+		bool move(int i, int x, int y, float nxf, float nyf);
+		void photoelectric_effect(int nx, int ny);
+		int createPartTempVel(int i, int x, int y, int t);
+		void create_gain_photon(int pp);
+		void create_cherenkov_photon(int pp);
+		void RecalcFreeParticles(bool do_life_dec);
+		void SimulateGoL();
+		void CheckStacking();
+		bool flood_water(int x, int y, int i);
+		int is_blocking(int t, int x, int y) const;
+		int is_boundary(int pt, int x, int y) const;
+		int find_next_boundary(int pt, int *x, int *y, int dm, int *em, bool reverse) const;
+		int eval_move(int pt, int nx, int ny, unsigned *rr) const;
+		int is_wire(int x, int y);
+		int is_wire_off(int x, int y);
+
+		GetNormalResult get_normal(int pt, int x, int y, float dx, float dy) const;
+		template<bool PhotoelectricEffect, class Sim>
+		static GetNormalResult get_normal_interp(Sim &sim, int pt, float x0, float y0, float dx, float dy);
+
+		template<bool UpdateEmap, class Sim>
+		static PlanMoveResult PlanMove(Sim &sim, int i, int x, int y);
+
+		void PartsFree(int i);
+		int PartsAlloc();
+		void PartsFlatten();
+
 		void UpdateParticles(int start, int end) final override;
+
+		// Trivial forwarder functions whose sole purpose is to make their counterparts available
+		// to users of Simulation even if those users don't know about SimVariantImpl. Ideally, we should
+		// be able to instead mark those counterparts the final overrides, but that would require the
+		// again similarly named templates in Simulation.cpp to be named differently. Replacing e.g. move of
+		// SimulationImpl<MostDerivedBase> with move_something everywhere is a bigger pain than replacing move
+		// of Simulation with move_outer everywhere, and the _outer suffix also carries the useful meaning that
+		// move is being called virtually, which should not be done in hot code.
+		bool move_outer(int i, int x, int y, float nxf, float nyf)      final override { return move(i, x, y, nxf, nyf);      }
+		int eval_move_outer(int pt, int nx, int ny, unsigned *rr) const final override { return eval_move(pt, nx, ny, rr);    }
+		void kill_part_outer(int i)                                     final override { kill_part(i);                        }
+		bool part_change_type_outer(int i, int x, int y, int t)         final override { return part_change_type(i, x, y, t); }
+		int  create_part_outer(int p, int x, int y, int t, int v)       final override { return create_part(p, x, y, t, v);   }
+		void set_emap_outer(int x, int y)                               final override { set_emap(x, y);                      }
+		void CreateLineOuter(int x1, int y1, int x2, int y2, int c)     final override { CreateLine(x1, y1, x2, y2, c);       }
+		void RecalcFreeParticlesOuter(bool do_life_dec)                 final override { RecalcFreeParticles(do_life_dec);    }
+		GetNormalResult get_normal_interp_outer(int pt, float x0, float y0, float dx, float dy) const final override
+		{
+			return get_normal_interp<false>(*this, pt, x0, y0, dx, dy);
+		}
+		PlanMoveResult PlanMoveOuter(int i, int x, int y) const final override
+		{
+			return PlanMove<false>(*this, i, x, y);
+		}
 	};
 }
+
+template<class Variant> static auto *ToImpl(      SimVariant<Variant> *self) { return static_cast<      SimVariantImpl<Variant> *>(self); }
+template<class Variant> static auto *ToImpl(const SimVariant<Variant> *self) { return static_cast<const SimVariantImpl<Variant> *>(self); }
+
+template<class Variant> void SimVariant<Variant>::set_emap(int x, int y)                                { ToImpl(this)->set_emap(x, y);                       }
+template<class Variant> void SimVariant<Variant>::kill_part(int i)                                      { ToImpl(this)->kill_part(i);                         }
+template<class Variant> bool SimVariant<Variant>::part_change_type(int i, int x, int y, int t)          { return ToImpl(this)->part_change_type(i, x, y, t);  }
+template<class Variant> int  SimVariant<Variant>::create_part(int p, int x, int y, int t, int v)        { return ToImpl(this)->create_part(p, x, y, t, v);    }
+template<class Variant> int  SimVariant<Variant>::FloodINST(int x, int y)                               { return ToImpl(this)->FloodINST(x, y);               }
+template<class Variant> void SimVariant<Variant>::CreateLine(int x1, int y1, int x2, int y2, int c)     { ToImpl(this)->CreateLine(x1, y1, x2, y2, c);        }
+template<class Variant> bool SimVariant<Variant>::move(int i, int x, int y, float nxf, float nyf)       { return ToImpl(this)->move(i, x, y, nxf, nyf);       }
+template<class Variant> int  SimVariant<Variant>::createPartTempVel(int i, int x, int y, int t)         { return ToImpl(this)->createPartTempVel(i, x, y, t); }
+template<class Variant> int  SimVariant<Variant>::eval_move(int pt, int nx, int ny, unsigned *rr) const { return ToImpl(this)->eval_move(pt, nx, ny, rr);     };
+
+#define DEFINE_SIMIMPL(Impl) template class SimVariant<Impl>;
+ALL_SIM_IMPLS(DEFINE_SIMIMPL)
+#undef DEFINE_SIMIMPL
 
 static float remainder_p(float x, float y)
 {
@@ -54,7 +149,7 @@ void Simulation::Load(const GameSave *save, bool includePressure, Vec2<int> bloc
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
 
-	RecalcFreeParticles(false);
+	RecalcFreeParticlesOuter(false);
 
 	struct ExistingParticle
 	{
@@ -96,7 +191,7 @@ void Simulation::Load(const GameSave *save, bool includePressure, Vec2<int> bloc
 			auto index = existingParticleIndices[rp];
 			for (auto it = existingParticles.begin() + index; it != existingParticles.end() && it->pos == p; ++it)
 			{
-				kill_part(it->id);
+				kill_part_outer(it->id);
 			}
 			existingParticleIndices[rp] = existingParticles.size();
 		}
@@ -156,7 +251,7 @@ void Simulation::Load(const GameSave *save, bool includePressure, Vec2<int> bloc
 		removeExistingParticles({ x, y });
 
 		// Allocate particle (this location is guaranteed to be empty due to "full scan" logic above)
-		auto i = create_part(-3, x, y, tempPart.type);
+		auto i = create_part_outer(-3, x, y, tempPart.type);
 		if (i == -1)
 		{
 			continue;
@@ -250,7 +345,7 @@ void Simulation::Load(const GameSave *save, bool includePressure, Vec2<int> bloc
 	Element_PPIP_ppip_changed = 1;
 
 	// Sort out pmap, just to be on the safe side.
-	RecalcFreeParticles(false);
+	RecalcFreeParticlesOuter(false);
 
 	// fix SOAP links using soapList, a map of old particle ID -> new particle ID
 	// loop through every old particle (loaded from save), and convert .tmp / .tmp2
@@ -583,7 +678,8 @@ int Simulation::flood_prop(int x, int y, const AccessProperty &changeProperty)
 	return did_something;
 }
 
-int Simulation::FloodINST(int x, int y)
+template<class Variant>
+int SimVariantImpl<Variant>::FloodINST(int x, int y)
 {
 	int x1, x2;
 	int created_something = 0;
@@ -690,7 +786,8 @@ int Simulation::FloodINST(int x, int y)
 	return created_something;
 }
 
-bool Simulation::flood_water(int x, int y, int i)
+template<class Variant>
+bool SimVariantImpl<Variant>::flood_water(int x, int y, int i)
 {
 	int x1, x2, originalX = x, originalY = y;
 	int r = pmap[y][x];
@@ -800,7 +897,8 @@ void Simulation::SetEdgeMode(int newEdgeMode)
 
 // Now simply creates a 0 pixel radius line without all the complicated flags / other checks
 // Would make sense to move to Editing.cpp but SPRK needs it.
-void Simulation::CreateLine(int x1, int y1, int x2, int y2, int c)
+template<class Variant>
+void SimVariantImpl<Variant>::CreateLine(int x1, int y1, int x2, int y2, int c)
 {
 	bool reverseXY = abs(y2-y1) > abs(x2-x1);
 	int x, y, dx, dy, sy;
@@ -853,12 +951,14 @@ void Simulation::CreateLine(int x1, int y1, int x2, int y2, int c)
 	}
 }
 
-inline int Simulation::is_wire(int x, int y)
+template<class Variant>
+int SimVariantImpl<Variant>::is_wire(int x, int y)
 {
 	return bmap[y][x]==WL_DETECT || bmap[y][x]==WL_EWALL || bmap[y][x]==WL_ALLOWLIQUID || bmap[y][x]==WL_WALLELEC || bmap[y][x]==WL_ALLOWALLELEC || bmap[y][x]==WL_EHOLE || bmap[y][x]==WL_STASIS;
 }
 
-inline int Simulation::is_wire_off(int x, int y)
+template<class Variant>
+int SimVariantImpl<Variant>::is_wire_off(int x, int y)
 {
 	return (bmap[y][x]==WL_DETECT || bmap[y][x]==WL_EWALL || bmap[y][x]==WL_ALLOWLIQUID || bmap[y][x]==WL_WALLELEC || bmap[y][x]==WL_ALLOWALLELEC || bmap[y][x]==WL_EHOLE || bmap[y][x]==WL_STASIS) && emap[y][x]<8;
 }
@@ -883,7 +983,7 @@ unsigned msvc_clz(unsigned a)
 #define __builtin_clz msvc_clz
 #endif
 
-int Simulation::get_wavelength_bin(int *wm)
+static int get_wavelength_bin(RNG &rng, int *wm)
 {
 	int i, w0, wM, r;
 
@@ -925,7 +1025,8 @@ int Simulation::get_wavelength_bin(int *wm)
 	}
 }
 
-void Simulation::set_emap(int x, int y)
+template<class Variant>
+void SimVariantImpl<Variant>::set_emap(int x, int y)
 {
 	int x1, x2;
 
@@ -1006,6 +1107,11 @@ int Simulation::parts_avg(int ci, int ni,int t)
 	return PT_NONE;
 }
 
+Parts::Parts()
+{
+	Reset();
+}
+
 void Parts::Reset()
 {
 	memset(data.data(), 0, sizeof(Particle)*NPART);
@@ -1019,7 +1125,7 @@ void Simulation::clear_sim(void)
 	{
 		if (parts[i].type)
 		{
-			kill_part(i);
+			kill_part_outer(i);
 		}
 	}
 	ensureDeterminism = false;
@@ -1104,7 +1210,8 @@ bool Simulation::IsWallBlocking(int x, int y, int type) const
 0 = No move/Bounce
 2 = Both particles occupy the same space.
  */
-int Simulation::eval_move(int pt, int nx, int ny, unsigned *rr) const
+template<class Variant>
+int SimVariantImpl<Variant>::eval_move(int pt, int nx, int ny, unsigned *rr) const
 {
 	unsigned r;
 	int result;
@@ -1190,7 +1297,8 @@ int Simulation::eval_move(int pt, int nx, int ny, unsigned *rr) const
 	return result;
 }
 
-int Simulation::try_move(int i, int x, int y, int nx, int ny)
+template<class Variant>
+int SimVariantImpl<Variant>::try_move(int i, int x, int y, int nx, int ny)
 {
 	unsigned r = 0, e;
 
@@ -1503,7 +1611,8 @@ int Simulation::try_move(int i, int x, int y, int nx, int ny)
 }
 
 // try to move particle, and if successful update pmap and parts[i].x,y
-int Simulation::do_move(int i, int x, int y, float nxf, float nyf)
+template<class Variant>
+int SimVariantImpl<Variant>::do_move(int i, int x, int y, float nxf, float nyf)
 {
 	int nx = (int)(nxf+0.5f), ny = (int)(nyf+0.5f), result;
 	if (edgeMode == EDGE_LOOP)
@@ -1536,7 +1645,8 @@ int Simulation::do_move(int i, int x, int y, float nxf, float nyf)
 	return result;
 }
 
-bool Simulation::move(int i, int x, int y, float nxf, float nyf)
+template<class Variant>
+bool SimVariantImpl<Variant>::move(int i, int x, int y, float nxf, float nyf)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
@@ -1565,7 +1675,8 @@ bool Simulation::move(int i, int x, int y, float nxf, float nyf)
 	return true;
 }
 
-void Simulation::photoelectric_effect(int nx, int ny)//create sparks from PHOT when hitting PSCN and NSCN
+template<class Variant>
+void SimVariantImpl<Variant>::photoelectric_effect(int nx, int ny)//create sparks from PHOT when hitting PSCN and NSCN
 {
 	unsigned r = pmap[ny][nx];
 
@@ -1610,7 +1721,8 @@ unsigned static direction_to_map(float dx, float dy, int t)
 	}*/
 }
 
-int Simulation::is_blocking(int t, int x, int y) const
+template<class Variant>
+int SimVariantImpl<Variant>::is_blocking(int t, int x, int y) const
 {
 	if (t & REFRACT) {
 		if (x<0 || y<0 || x>=XRES || y>=YRES)
@@ -1623,7 +1735,8 @@ int Simulation::is_blocking(int t, int x, int y) const
 	return !eval_move(t, x, y, nullptr);
 }
 
-int Simulation::is_boundary(int pt, int x, int y) const
+template<class Variant>
+int SimVariantImpl<Variant>::is_boundary(int pt, int x, int y) const
 {
 	if (!is_blocking(pt,x,y))
 		return 0;
@@ -1632,7 +1745,8 @@ int Simulation::is_boundary(int pt, int x, int y) const
 	return 1;
 }
 
-int Simulation::find_next_boundary(int pt, int *x, int *y, int dm, int *em, bool reverse) const
+template<class Variant>
+int SimVariantImpl<Variant>::find_next_boundary(int pt, int *x, int *y, int dm, int *em, bool reverse) const
 {
 	static int dx[8] = {1,1,0,-1,-1,-1,0,1};
 	static int dy[8] = {0,1,1,1,0,-1,-1,-1};
@@ -1671,7 +1785,8 @@ int Simulation::find_next_boundary(int pt, int *x, int *y, int dm, int *em, bool
 	return 0;
 }
 
-Simulation::GetNormalResult Simulation::get_normal(int pt, int x, int y, float dx, float dy) const
+template<class Variant>
+Simulation::GetNormalResult SimVariantImpl<Variant>::get_normal(int pt, int x, int y, float dx, float dy) const
 {
 	int ldm, rdm, lm, rm;
 	int lx, ly, lv, rx, ry, rv;
@@ -1716,8 +1831,9 @@ Simulation::GetNormalResult Simulation::get_normal(int pt, int x, int y, float d
 	return { true, nx, ny, lx, ly, rx, ry };
 }
 
+template<class Variant>
 template<bool PhotoelectricEffect, class Sim>
-Simulation::GetNormalResult Simulation::get_normal_interp(Sim &sim, int pt, float x0, float y0, float dx, float dy)
+Simulation::GetNormalResult SimVariantImpl<Variant>::get_normal_interp(Sim &sim, int pt, float x0, float y0, float dx, float dy)
 {
 	int x, y, i;
 
@@ -1748,10 +1864,8 @@ Simulation::GetNormalResult Simulation::get_normal_interp(Sim &sim, int pt, floa
 	return sim.get_normal(pt, x, y, dx, dy);
 }
 
-template
-Simulation::GetNormalResult Simulation::get_normal_interp<false, const Simulation>(const Simulation &sim, int pt, float x0, float y0, float dx, float dy);
-
-void Simulation::kill_part(int i)//kills particle number i
+template<class Variant>
+void SimVariantImpl<Variant>::kill_part(int i)//kills particle number i
 {
 	if (i < 0 || i >= NPART)
 		return;
@@ -1781,20 +1895,22 @@ void Simulation::kill_part(int i)//kills particle number i
 
 	elementCount[t]--;
 
-	parts.Free(i);
+	PartsFree(i);
 	NUM_PARTS -= 1;
 }
 
-void Parts::Free(int i)
+template<class Variant>
+void SimVariantImpl<Variant>::PartsFree(int i)
 {
-	data[i].type = PT_NONE;
-	data[i].life = pfree;
-	pfree = i;
+	parts.data[i].type = PT_NONE;
+	parts.data[i].life = parts.pfree;
+	parts.pfree = i;
 }
 
 // Changes the type of particle number i, to t.  This also changes pmap at the same time
 // Returns true if the particle was killed
-bool Simulation::part_change_type(int i, int x, int y, int t)
+template<class Variant>
+bool SimVariantImpl<Variant>::part_change_type(int i, int x, int y, int t)
 {
 	if (x<0 || y<0 || x>=XRES || y>=YRES || i>=NPART || t<0 || t>=PT_NUM || !parts[i].type)
 		return false;
@@ -1839,7 +1955,8 @@ bool Simulation::part_change_type(int i, int x, int y, int t)
 
 //the function for creating a particle, use p=-1 for creating a new particle, -2 is from a brush, or a particle number to replace a particle.
 //tv = Type (PMAPBITS bits) + Var (32-PMAPBITS bits), var is usually 0
-int Simulation::create_part(int p, int x, int y, int t, int v)
+template<class Variant>
+int SimVariantImpl<Variant>::create_part(int p, int x, int y, int t, int v)
 {
 	int i, oldType = PT_NONE;
 
@@ -1909,7 +2026,7 @@ int Simulation::create_part(int p, int x, int y, int t, int v)
 				return -1;
 			}
 		}
-		i = parts.Alloc();
+		i = PartsAlloc();
 		if (i == -1)
 		{
 			return -1;
@@ -1962,8 +2079,9 @@ int Simulation::create_part(int p, int x, int y, int t, int v)
 	}
 
 	// Set non-static properties (such as randomly generated ones)
-	if (elements[t].Create)
-		(*(elements[t].Create))(this, i, x, y, t, v);
+	auto *create = std::get<VariantIndex<SimImpls, typename PublicBase::Variant>()>(elements[t].Create);
+	if (create)
+		(*(create))(this, i, x, y, t, v);
 
 	if (elements[t].ChangeType)
 		(*(elements[t].ChangeType))(this, i, x, y, oldType, t);
@@ -1974,7 +2092,8 @@ int Simulation::create_part(int p, int x, int y, int t, int v)
 
 // Change part type but preserve temperature and velocity.
 // May fail if i isn't an existing particle id.
-int Simulation::createPartTempVel(int i, int x, int y, int t)
+template<class Variant>
+int SimVariantImpl<Variant>::createPartTempVel(int i, int x, int y, int t)
 {
 	auto temp = parts[i].temp;
 	auto vx = parts[i].vx;
@@ -1991,26 +2110,28 @@ int Simulation::createPartTempVel(int i, int x, int y, int t)
 	return np;
 }
 
-int Parts::Alloc()
+template<class Variant>
+int SimVariantImpl<Variant>::PartsAlloc()
 {
-	if (pfree != -1)
+	if (parts.pfree != -1)
 	{
-		auto i = pfree;
-		pfree = data[i].life;
+		auto i = parts.pfree;
+		parts.pfree = parts.data[i].life;
 		return i;
 	}
-	if (active < NPART)
+	if (parts.active < NPART)
 	{
-		auto i = active;
-		active += 1;
+		auto i = parts.active;
+		parts.active += 1;
 		return i;
 	}
 	return -1;
 }
 
-void Simulation::create_gain_photon(int pp)//photons from PHOT going through GLOW
+template<class Variant>
+void SimVariantImpl<Variant>::create_gain_photon(int pp)//photons from PHOT going through GLOW
 {
-	if (parts.MaxPartsReached())
+	if (SimVariant<Variant>::MaxPartsReached())
 	{
 		return;
 	}
@@ -2045,9 +2166,10 @@ void Simulation::create_gain_photon(int pp)//photons from PHOT going through GLO
 	parts[i].ctype = 0x1F << temp_bin;
 }
 
-void Simulation::create_cherenkov_photon(int pp)//photons from NEUT going through GLAS
+template<class Variant>
+void SimVariantImpl<Variant>::create_cherenkov_photon(int pp)//photons from NEUT going through GLAS
 {
-	if (parts.MaxPartsReached())
+	if (SimVariant<Variant>::MaxPartsReached())
 	{
 		return;
 	}
@@ -2131,11 +2253,12 @@ void Simulation::delete_part(int x, int y)//calls kill_part with the particle lo
 
 	if (!i)
 		return;
-	kill_part(ID(i));
+	kill_part_outer(ID(i));
 }
 
+template<class Variant>
 template<bool UpdateEmap, class Sim>
-Simulation::PlanMoveResult Simulation::PlanMove(Sim &sim, int i, int x, int y)
+Simulation::PlanMoveResult SimVariantImpl<Variant>::PlanMove(Sim &sim, int i, int x, int y)
 {
 	auto &parts = sim.parts;
 	auto &bmap = sim.bmap;
@@ -2250,15 +2373,13 @@ Simulation::PlanMoveResult Simulation::PlanMove(Sim &sim, int i, int x, int y)
 	};
 }
 
-template
-Simulation::PlanMoveResult Simulation::PlanMove<false, const Simulation>(const Simulation &sim, int i, int x, int y);
-
-std::unique_ptr<Simulation> Simulation::Factory()
+std::unique_ptr<Simulation> Simulation::LegacyFactory()
 {
-	return std::make_unique<SimulationImpl>();
+	return std::make_unique<SimVariantImpl<LegacyVariant>>();
 }
 
-SimulationImpl::Neighbourhood SimulationImpl::GetNeighbourhood(int i) const
+template<class Variant>
+Neighbourhood SimVariantImpl<Variant>::GetNeighbourhood(int i) const
 {
 	auto t = parts[i].type;
 	auto x = int(parts[i].x + 0.5f);
@@ -2288,28 +2409,28 @@ SimulationImpl::Neighbourhood SimulationImpl::GetNeighbourhood(int i) const
 	return n;
 }
 
-void SimulationImpl::UpdateParticles(int start, int end)
+template<class Variant>
+void SimVariantImpl<Variant>::UpdateOne(int i)
 {
-	//the main particle loop function, goes over all particles.
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	for (auto i = start; i < end && i < parts.active; i++)
-	{
-		auto t = parts[i].type;
-		if (!t)
-		{
-			continue;
-		}
-		debug_mostRecentlyUpdated = i;
 
-		auto x = int(parts[i].x+0.5f);
-		auto y = int(parts[i].y+0.5f);
+	auto t = parts[i].type;
+	if (!t)
+	{
+		return;
+	}
+
+	Neighbourhood neighbourhood;
+	{
+		auto x = int(parts[i].x + 0.5f);
+		auto y = int(parts[i].y + 0.5f);
 
 		// Kill a particle off screen
 		if (x<CELL || y<CELL || x>=XRES-CELL || y>=YRES-CELL)
 		{
 			kill_part(i);
-			continue;
+			return;
 		}
 
 		// Kill a particle in a wall where it isn't supposed to go
@@ -2325,12 +2446,12 @@ void SimulationImpl::UpdateParticles(int start, int end)
 		    (bmap[y/CELL][x/CELL]==WL_EWALL && !emap[y/CELL][x/CELL])) && (t!=PT_STKM) && (t!=PT_STKM2) && (t!=PT_FIGH))
 		{
 			kill_part(i);
-			continue;
+			return;
 		}
 
 		// Make sure that STASIS'd particles don't tick.
 		if (bmap[y/CELL][x/CELL] == WL_STASIS && emap[y/CELL][x/CELL]<8) {
-			continue;
+			return;
 		}
 
 		if (bmap[y/CELL][x/CELL]==WL_DETECT && emap[y/CELL][x/CELL]<8)
@@ -2370,7 +2491,7 @@ void SimulationImpl::UpdateParticles(int start, int end)
 			}
 		}
 
-		auto neighbourhood = GetNeighbourhood(i);
+		neighbourhood = GetNeighbourhood(i);
 
 		//velocity updates for the particle
 		if (t != PT_SPNG || !(parts[i].flags&FLAG_MOVABLE))
@@ -2381,50 +2502,58 @@ void SimulationImpl::UpdateParticles(int start, int end)
 		//particle gets velocity from the vx and vy maps
 		parts[i].vx += elements[t].Advection*vx[y/CELL][x/CELL] + neighbourhood.pGravX;
 		parts[i].vy += elements[t].Advection*vy[y/CELL][x/CELL] + neighbourhood.pGravY;
+	}
 
+	if (elements[t].Diffusion)//the random diffusion that gasses have
+	{
+		parts[i].vx += elements[t].Diffusion*(2.0f*rng.uniform01()-1.0f);
+		parts[i].vy += elements[t].Diffusion*(2.0f*rng.uniform01()-1.0f);
+	}
 
-		if (elements[t].Diffusion)//the random diffusion that gasses have
+	auto transitionOccurred = TransitionPhase(i, neighbourhood);
+	if (!parts[i].type)
+	{
+		return;
+	}
+	if (transitionOccurred)
+	{
+		t = parts[i].type;
+	}
+	if (UpdatePhase(i, neighbourhood))
+	{
+		return;
+	}
+
+	if (parts[i].type == PT_NONE)//if its dead, skip to next particle
+		return;
+
+	if (transitionOccurred)
+		return;
+
+	if (!parts[i].vx&&!parts[i].vy)//if its not moving, skip to next particle, movement code it next
+		return;
+
+	MovementPhase(i, neighbourhood);
+}
+
+template<class Variant>
+void SimVariantImpl<Variant>::UpdateParticles(int start, int end)
+{
+	FrameTime::Span span(frameTime, "Simulation::UpdateParticles");
+
+	//the main particle loop function, goes over all particles.
+	for (auto i = start; i < end && i < parts.active; i++)
+	{
+		if (parts[i].type)
 		{
-			parts[i].vx += elements[t].Diffusion*(2.0f*rng.uniform01()-1.0f);
-			parts[i].vy += elements[t].Diffusion*(2.0f*rng.uniform01()-1.0f);
+			debug_mostRecentlyUpdated = i;
 		}
-
-		auto transitionOccurred = TransitionPhase(i, neighbourhood);
-		if (!parts[i].type)
-		{
-			continue;
-		}
-		if (transitionOccurred)
-		{
-			t = parts[i].type;
-		}
-
-		//call the particle update function, if there is one
-		if (elements[t].Update)
-		{
-			if ((*(elements[t].Update))(this, i, x, y, neighbourhood.surround_space, neighbourhood.nt, parts, pmap))
-				continue;
-			x = int(parts[i].x+0.5f);
-			y = int(parts[i].y+0.5f);
-		}
-
-		if(legacy_enable)//if heat sim is off
-			Element::legacyUpdate(this, i,x,y,neighbourhood.surround_space,neighbourhood.nt, parts, pmap);
-
-		if (parts[i].type == PT_NONE)//if its dead, skip to next particle
-			continue;
-
-		if (transitionOccurred)
-			continue;
-
-		if (!parts[i].vx&&!parts[i].vy)//if its not moving, skip to next particle, movement code it next
-			continue;
-
-		MovementPhase(i, neighbourhood);
+		UpdateOne(i);
 	}
 }
 
-bool SimulationImpl::TransitionPhase(int i, const Neighbourhood &neighbourhood)
+template<class Variant>
+bool SimVariantImpl<Variant>::TransitionPhase(int i, const Neighbourhood &neighbourhood)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
@@ -2872,7 +3001,34 @@ bool SimulationImpl::TransitionPhase(int i, const Neighbourhood &neighbourhood)
 	return transitionOccurred;
 }
 
-void SimulationImpl::MovementPhase(int i, Neighbourhood neighbourhood)
+template<class Variant>
+bool SimVariantImpl<Variant>::UpdatePhase(int i, const Neighbourhood &neighbourhood)
+{
+	auto &sd = SimulationData::CRef();
+	auto &elements = sd.elements;
+
+	auto t = parts[i].type;
+	auto x = int(parts[i].x+0.5f);
+	auto y = int(parts[i].y+0.5f);
+
+	//call the particle update function, if there is one
+	auto *update = std::get<VariantIndex<SimImpls, typename PublicBase::Variant>()>(elements[t].Update);
+	if (update)
+	{
+		if ((*update)(this, i, x, y, neighbourhood.surround_space, neighbourhood.nt, parts, pmap))
+			return true;
+		x = int(parts[i].x+0.5f);
+		y = int(parts[i].y+0.5f);
+	}
+
+	// TODO-TILES: we may need to verify tile assignment again
+	if(legacy_enable)//if heat sim is off
+		Element::legacyUpdate(static_cast<PublicBase *>(this), i,x,y,neighbourhood.surround_space,neighbourhood.nt, parts, pmap);
+	return false;
+}
+
+template<class Variant>
+void SimVariantImpl<Variant>::MovementPhase(int i, Neighbourhood neighbourhood)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
@@ -2987,7 +3143,7 @@ void SimulationImpl::MovementPhase(int i, Neighbourhood neighbourhood)
 					}
 					auto nrx = gn.nx;
 					auto nry = gn.ny;
-					auto r = get_wavelength_bin(&parts[i].ctype);
+					auto r = get_wavelength_bin(rng, &parts[i].ctype);
 					if (r == -1 || !(parts[i].ctype&0x3FFFFFFF))
 					{
 						kill_part(i);
@@ -3352,7 +3508,8 @@ void SimulationImpl::MovementPhase(int i, Neighbourhood neighbourhood)
 	}
 }
 
-void Simulation::RecalcFreeParticles(bool do_life_dec)
+template<class Variant>
+void SimVariantImpl<Variant>::RecalcFreeParticles(bool do_life_dec)
 {
 	FrameTime::Span span(frameTime, "Simulation::RecalcFreeParticles");
 	memset(pmap, 0, sizeof(pmap));
@@ -3423,32 +3580,34 @@ void Simulation::RecalcFreeParticles(bool do_life_dec)
 			}
 		}
 	}
-	parts.Flatten();
+	PartsFlatten();
 	if (elementRecount)
 		elementRecount = false;
 }
 
-void Parts::Flatten()
+template<class Variant>
+void SimVariantImpl<Variant>::PartsFlatten()
 {
 	int newActive = 0;
-	auto *ppfree = &pfree;
-	for (int i = 0; i < active; i++)
+	auto *ppfree = &parts.pfree;
+	for (int i = 0; i < parts.active; i++)
 	{
-		if (data[i].type)
+		if (parts.data[i].type)
 		{
 			for (auto j = newActive; j < i; ++j)
 			{
 				*ppfree = j;
-				ppfree = &data[j].life;
+				ppfree = &parts.data[j].life;
 			}
 			newActive = i + 1;
 		}
 	}
 	*ppfree = -1;
-	active = newActive;
+	parts.active = newActive;
 }
 
-void Simulation::SimulateGoL()
+template<class Variant>
+void SimVariantImpl<Variant>::SimulateGoL()
 {
 	auto &builtinGol = SimulationData::builtinGol;
 	CGOL = 0;
@@ -3625,7 +3784,8 @@ void Simulation::SimulateGoL()
 	}
 }
 
-void Simulation::CheckStacking()
+template<class Variant>
+void SimVariantImpl<Variant>::CheckStacking()
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
@@ -3732,7 +3892,8 @@ void Simulation::UpdateGravityMask()
 }
 
 //updates pmap, gol, and some other simulation stuff (but not particles)
-void Simulation::BeforeSim(bool willUpdate)
+template<class Variant>
+void SimVariantImpl<Variant>::BeforeSim(bool willUpdate)
 {
 	if (willUpdate)
 	{
@@ -3925,14 +4086,15 @@ void Simulation::BeforeSim(bool willUpdate)
 	}
 }
 
-void Simulation::AfterSim()
+template<class Variant>
+void SimVariantImpl<Variant>::AfterSim()
 {
 	debug_mostRecentlyUpdated = -1;
 
 	if (emp_trigger_count)
 	{
 		// pitiful attempt at trying to keep code relating to a given element in the same file
-		Element_EMP_Trigger(this, emp_trigger_count);
+		Element_EMP_Trigger(static_cast<PublicBase *>(this), emp_trigger_count);
 		emp_trigger_count = 0;
 	}
 
@@ -3996,6 +4158,16 @@ void Simulation::EnableNewtonianGravity(bool enable)
 		// gravIn is now potentially garbage, set it again
 		gravIn = std::move(oldGravIn);
 	}
+}
+
+void Simulation::CopyFrom(const Simulation &other)
+{
+	static_cast<CopiableSimulation &>(*this) = static_cast<const CopiableSimulation &>(other);
+	if (other.grav)
+	{
+		EnableNewtonianGravity(true);
+	}
+	air->CopyFrom(*other.air);
 }
 
 // we want XRES * YRES <= (1 << (31 - PMAPBITS)), but we do a division because multiplication could silently overflow

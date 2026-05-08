@@ -3,11 +3,32 @@
 #include "graphics/Pixel.h"
 #include "ElementDefs.h"
 #include "Particle.h"
+#include "Simulation.h"
 #include "StructProperty.h"
 #include "ElementNumbers.h"
+#include "SimImpls.h"
 #include <memory>
 
-class Simulation;
+template<class, class ...Args>
+struct CallbackTupleHelper
+{
+	using Type = std::tuple<Args...>;
+};
+
+#define auto Simulation
+using UpdateFunc = int (*)(UPDATE_FUNC_ARGS);
+#undef auto
+#define auto Simulation
+using CreateFunc = void (*)(ELEMENT_CREATE_FUNC_ARGS);
+#undef auto
+
+template<class Func>
+using CallbackHolder = CallbackTupleHelper<int
+#define CALLBACK_TYPE(Var) , typename RewriteArg1<SimVariant<Var> *, Func>::Type
+ALL_SIM_IMPLS(CALLBACK_TYPE)
+#undef CALLBACK_TYPE
+>::Type;
+
 class Renderer;
 struct GraphicsFuncContext;
 class VideoBuffer;
@@ -55,10 +76,10 @@ public:
 	float HighTemperature;
 	int HighTemperatureTransition;
 
-	int (*Update) (UPDATE_FUNC_ARGS);
+	CallbackHolder<UpdateFunc> Update;
 	int (*Graphics) (GRAPHICS_FUNC_ARGS);
 
-	void (*Create)(ELEMENT_CREATE_FUNC_ARGS) = nullptr;
+	CallbackHolder<CreateFunc> Create;
 	bool (*CreateAllowed)(ELEMENT_CREATE_ALLOWED_FUNC_ARGS) = nullptr;
 	void (*ChangeType)(ELEMENT_CHANGETYPE_FUNC_ARGS) = nullptr;
 
@@ -83,3 +104,6 @@ public:
 	ELEMENT_NUMBERS(ELEMENT_NUMBERS_DECLARE)
 #undef ELEMENT_NUMBERS_DECLARE
 };
+
+#define ASSIGN_SIM_CALLBACK_INNER(Var, Callback, Template) std::get<VariantIndex<SimImpls, Var>()>(Callback) = Template;
+#define ASSIGN_SIM_CALLBACK(Callback, Template) ALL_SIM_IMPLS(ASSIGN_SIM_CALLBACK_INNER, Callback, Template)

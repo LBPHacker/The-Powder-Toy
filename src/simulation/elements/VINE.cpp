@@ -46,7 +46,7 @@ void Element::Element_VINE()
 
 	DefaultProperties.tmp = 1;
 
-	Update = &update;
+	ASSIGN_SIM_CALLBACK(Update, update)
 	Graphics = &graphics; // this used to be missing, maybe for a reason?
 }
 
