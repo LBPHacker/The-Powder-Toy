@@ -14,6 +14,7 @@ struct RewriteArg1<NewArg1, R (*)(Arg1, Args...)>
 
 #define ALL_SIM_IMPLS(X, ...) \
 	X(LegacyVariant __VA_OPT__(,) __VA_ARGS__) \
+	X(ParallelVariant __VA_OPT__(,) __VA_ARGS__) \
 	// last line of the macro, don't remove
 
 #define DECLARE_VARIANT(Var) struct Var;

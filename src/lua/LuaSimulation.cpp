@@ -1654,6 +1654,23 @@ static int golSpeedRatio(lua_State *L)
 	return 0;
 }
 
+static int threads(lua_State *L)
+{
+	auto *lsi = GetLSI();
+	auto *sim = lsi->gameModel->GetSimulation();
+	lsi->AssertInterfaceEvent();
+	if (lua_gettop(L) == 0)
+	{
+		lua_pushinteger(L, sim->threadCount);
+		return 1;
+	}
+	int threads = luaL_checkinteger(L, 1);
+	if (threads < 0 || threads > 100)
+		return luaL_error(L, "out of bounds");
+	lsi->gameController->SetSimThreadCount(threads);
+	return 0;
+}
+
 static int takeSnapshot(lua_State *L)
 {
 	auto *lsi = GetLSI();
@@ -2189,6 +2206,7 @@ void LuaSimulation::Open(lua_State *L)
 		LFUNC(fanVelocityX),
 		LFUNC(fanVelocityY),
 		LFUNC(listDefaultGol),
+		LFUNC(threads),
 #undef LFUNC
 		{ nullptr, nullptr }
 	};
