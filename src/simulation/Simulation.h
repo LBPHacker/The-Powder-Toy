@@ -252,7 +252,7 @@ public:
 	virtual bool CreateAllowedOuter(int i, int x, int y, int t) = 0;
 
 protected:
-	CoordStack& getCoordStackSingleton();
+	std::unique_ptr<CoordStack> coordStack;
 
 	void ResetNewtonianGravity(GravityInput newGravIn, GravityOutput newGravOut);
 	void DispatchNewtonianGravity();
