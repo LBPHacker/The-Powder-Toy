@@ -24,6 +24,17 @@
 #include <set>
 #include <stack>
 
+#ifdef __has_cpp_attribute
+# if __has_cpp_attribute(gnu::noinline)
+#  define NOINLINE [[gnu::noinline]]
+# elif __has_cpp_attribute(msvc::noinline)
+#  define NOINLINE [[msvc::noinline]]
+# endif
+#endif
+#ifndef NOINLINE
+# define NOINLINE
+#endif
+
 namespace
 {
 	struct DeferredId
@@ -192,8 +203,8 @@ namespace
 		Neighbourhood GetNeighbourhood(int i) const;
 		bool TransitionPhase(RNG &rng, int i, const Neighbourhood &neighbourhood);
 
-		// gets faster if prevented from being inlined e.g. with __atttribute__((noinline)) >_>
-		std::optional<DeferredId::When> UpdateOne(RNG &rng, int i, bool runtimeParallel);
+		// TODO-TILES: figure out why inlining this is a perf hit
+		NOINLINE std::optional<DeferredId::When> UpdateOne(RNG &rng, int i, bool runtimeParallel);
 
 		bool UpdatePhase(RNG &rng, int i, const Neighbourhood &neighbourhood);
 
