@@ -1407,8 +1407,7 @@ void Simulation::clear_sim(void)
 	memset(&player2, 0, sizeof(player2));
 	memset(&Element_PSTN_tempParts, 0, sizeof(Element_PSTN_tempParts));
 	Element_PPIP_ppip_changed = 0;
-	std::fill(elementCount, elementCount+PT_NUM, 0);
-	elementRecount = true;
+	RequestElementRecount();
 	fighcount = 0;
 	player.spwn = 0;
 	player.spawnID = -1;
@@ -4170,6 +4169,12 @@ void SimVariantImpl<Variant>::MovementPhase(RNG &rng, int i, Neighbourhood neigh
 	}
 }
 
+void Simulation::RequestElementRecount()
+{
+	std::fill(elementCount, elementCount + PT_NUM, 0);
+	elementRecount = true;
+}
+
 template<class Variant>
 void SimVariantImpl<Variant>::RecalcFreeParticles(bool do_life_dec)
 {
@@ -4585,9 +4590,10 @@ void SimVariantImpl<Variant>::BeforeSim(bool willUpdate)
 
 		currentTick++;
 
-		elementRecount |= !(currentTick%180);
-		if (elementRecount)
-			std::fill(elementCount, elementCount+PT_NUM, 0);
+		if (!(currentTick%180))
+		{
+			Simulation::RequestElementRecount();
+		}
 	}
 	sandcolour_interface = int(20.0f*sin(float(sandcolour_frame)*std::numbers::pi_v<float>/180.0f));
 	sandcolour_frame = (sandcolour_frame+1)%360;
@@ -4779,8 +4785,7 @@ Simulation::Simulation()
 {
 	coordStack = std::make_unique<CoordStack>();
 
-	std::fill(elementCount, elementCount+PT_NUM, 0);
-	elementRecount = true;
+	RequestElementRecount();
 
 	//Create and attach air simulation
 	air = std::make_unique<Air>(*this);
