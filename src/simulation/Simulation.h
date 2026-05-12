@@ -200,6 +200,7 @@ public:
 	int parts_avg(int ci, int ni, int t);
 	virtual void UpdateParticles(int start, int end) = 0; // Dispatches an update to the range [start, end).
 	virtual void RecalcFreeParticlesOuter(bool do_life_dec) = 0;
+	void RequestElementRecount();
 	virtual void BeforeSim(bool willUpdate) = 0;
 	virtual void AfterSim() = 0;
 	void clear_area(int area_x, int area_y, int area_w, int area_h);
