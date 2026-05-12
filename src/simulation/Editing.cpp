@@ -42,8 +42,7 @@ std::unique_ptr<Snapshot> Simulation::CreateSnapshot() const
 
 void Simulation::Restore(const Snapshot &snap)
 {
-	std::fill(elementCount, elementCount + PT_NUM, 0);
-	elementRecount = true;
+	RequestElementRecount();
 	force_stacking_check = true;
 	for (auto &part : parts.data)
 	{
