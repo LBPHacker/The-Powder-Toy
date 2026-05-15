@@ -19,6 +19,7 @@
 #include "elements/FILT.h"
 #include "elements/PRTI.h"
 #include "elements/PLNT.h"
+#include "elements/SOAP.h"
 #include <iostream>
 #include <numbers>
 #include <set>
@@ -58,6 +59,11 @@ namespace
 		int NUM_PARTS;
 		std::vector<Vec2<int>> emapActivation;
 		std::vector<DeferredId> deferredIds;
+		struct DeferredSoapDetach
+		{
+			int prev, next;
+		};
+		std::vector<DeferredSoapDetach> deferredSoapDetaches;
 	};
 
 	class TileSchedule
@@ -122,6 +128,8 @@ namespace
 
 		std::vector<ThreadContext> threadContexts;
 		bool useThreadContext = false;
+
+		std::mutex stickmanMx;
 
 		std::mutex pfreeMx;
 		int pfreeMxLockedTimes = 0;
@@ -283,8 +291,43 @@ namespace
 			}
 			return true;
 		}
+
+		void DeferSoapDetach(int i);
 	};
 	using ParallelSim = SimVariantImpl<ParallelVariant>;
+
+	template<class Sim>
+	struct StickmanLock
+	{
+		StickmanLock(Sim &)
+		{
+		}
+
+		void LockIfNeeded(int)
+		{
+		}
+	};
+
+	template<>
+	struct StickmanLock<ParallelSim>
+	{
+		std::unique_lock<std::mutex> lk;
+
+		StickmanLock(ParallelSim &sim) : lk(sim.stickmanMx, std::defer_lock)
+		{
+		}
+
+		void LockIfNeeded(int t)
+		{
+			if (t == PT_SPAWN || t == PT_SPAWN2 || t == PT_STKM || t == PT_STKM2 || t == PT_FIGH)
+			{
+				if (!lk.owns_lock())
+				{
+					lk.lock();
+				}
+			}
+		}
+	};
 }
 
 template<class Variant> static auto *ToImpl(      SimVariant<Variant> *self) { return static_cast<      SimVariantImpl<Variant> *>(self); }
@@ -2086,9 +2129,13 @@ void SimVariantImpl<Variant>::kill_part(int i)//kills particle number i
 
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
+
+	StickmanLock sl(*this);
+
 	int t = parts[i].type;
 	if (t)
 	{
+		sl.LockIfNeeded(t);
 		auto *changeType = std::get<VariantIndex<SimImpls, typename PublicBase::Variant>()>(elements[t].ChangeType);
 		if (changeType)
 		{
@@ -2170,6 +2217,10 @@ bool SimVariantImpl<Variant>::part_change_type(int i, int x, int y, int t)
 		kill_part(i);
 		return true;
 	}
+
+	StickmanLock sl(*this);
+
+	sl.LockIfNeeded(t);
 	auto *createAllowed = std::get<VariantIndex<SimImpls, typename PublicBase::Variant>()>(elements[t].CreateAllowed);
 	if (createAllowed)
 	{
@@ -2177,16 +2228,19 @@ bool SimVariantImpl<Variant>::part_change_type(int i, int x, int y, int t)
 			return false;
 	}
 
-	auto *changeTypeFrom = std::get<VariantIndex<SimImpls, typename PublicBase::Variant>()>(elements[parts[i].type].ChangeType);
+	auto oldType = parts[i].type;
+	sl.LockIfNeeded(oldType);
+
+	auto *changeTypeFrom = std::get<VariantIndex<SimImpls, typename PublicBase::Variant>()>(elements[oldType].ChangeType);
 	if (changeTypeFrom)
-		changeTypeFrom(this, i, x, y, parts[i].type, t);
+		changeTypeFrom(this, i, x, y, oldType, t);
 	auto *changeTypeTo = std::get<VariantIndex<SimImpls, typename PublicBase::Variant>()>(elements[t].ChangeType);
 	if (changeTypeTo)
-		changeTypeTo(this, i, x, y, parts[i].type, t);
+		changeTypeTo(this, i, x, y, oldType, t);
 
 	auto *elementCountRef = GetElementCount();
-	if (parts[i].type > 0 && parts[i].type < PT_NUM)
-		elementCountRef[parts[i].type]--;
+	if (oldType > 0 && oldType < PT_NUM)
+		elementCountRef[oldType]--;
 	elementCountRef[t]++;
 
 	parts[i].type = t;
@@ -2259,6 +2313,9 @@ int SimVariantImpl<Variant>::create_part(int p, int x, int y, int t, int v)
 			return -1;
 	}
 
+	StickmanLock sl(*this);
+
+	sl.LockIfNeeded(t);
 	auto *createAllowed = std::get<VariantIndex<SimImpls, typename PublicBase::Variant>()>(elements[t].CreateAllowed);
 	if (createAllowed)
 	{
@@ -2299,6 +2356,7 @@ int SimVariantImpl<Variant>::create_part(int p, int x, int y, int t, int v)
 			photons[oldY][oldX] = 0;
 
 		oldType = parts[p].type;
+		sl.LockIfNeeded(oldType);
 
 		auto *changeTypeFrom = std::get<VariantIndex<SimImpls, typename PublicBase::Variant>()>(elements[oldType].ChangeType);
 		if (changeTypeFrom)
@@ -3136,6 +3194,21 @@ void SimVariantImpl<ParallelVariant>::UpdateParticles(int start, int end)
 				PublicBase::set_emap(p.X, p.Y);
 			}
 			ctx.emapActivation.clear();
+			{
+				for (auto [ prev, next ] : ctx.deferredSoapDetaches)
+				{
+					int delegate = 0;
+					if (prev == delegate || next == delegate) delegate += 1;
+					if (prev == delegate || next == delegate) delegate += 1;
+					auto pd = parts[delegate];
+					parts[delegate].ctype = 6;
+					parts[delegate].tmp = prev;
+					parts[delegate].tmp2 = next;
+					Element_SOAP_detach(this, delegate);
+					parts[delegate] = pd;
+				}
+			}
+			ctx.deferredSoapDetaches.clear();
 		}
 	}
 	tileSchedule.Reset();
@@ -4774,6 +4847,25 @@ void Simulation::CopyFrom(const Simulation &other)
 		EnableNewtonianGravity(true);
 	}
 	air->CopyFrom(*other.air);
+}
+
+template<>
+void SimVariantImpl<ParallelVariant>::DeferSoapDetach(int i)
+{
+	if (!useThreadContext)
+	{
+		Element_SOAP_detach(this, i);
+		return;
+	}
+	int prev = (parts[i].ctype & 2) ? parts[i].tmp  : -1;
+	int next = (parts[i].ctype & 4) ? parts[i].tmp2 : -1;
+	threadContexts[ThreadIndex()].deferredSoapDetaches.push_back({ prev, next });
+}
+
+template<>
+void SimVariant<ParallelVariant>::DeferSoapDetach(int i)
+{
+	ToImpl(this)->DeferSoapDetach(i);
 }
 
 // we want XRES * YRES <= (1 << (31 - PMAPBITS)), but we do a division because multiplication could silently overflow

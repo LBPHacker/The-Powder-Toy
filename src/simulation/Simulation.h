@@ -275,6 +275,8 @@ public:
 
 	inline bool MaxPartsReached() const;
 
+	void DeferSoapDetach(int i);
+
 	using Variant = VariantParam;
 };
 
