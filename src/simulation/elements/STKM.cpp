@@ -75,9 +75,13 @@ int Element_STKM_graphics(GRAPHICS_FUNC_ARGS)
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
-	int spawnID = sim->create_part(-3, x, y, PT_SPAWN);
-	if (spawnID >= 0)
-		sim->player.spawnID = spawnID;
+	constexpr auto Parallel = std::is_same_v<decltype(sim), SimVariant<ParallelVariant> *>;
+	if constexpr (!Parallel)
+	{
+		int spawnID = sim->create_part(-3, x, y, PT_SPAWN);
+		if (spawnID >= 0)
+			sim->player.spawnID = spawnID;
+	}
 }
 
 static bool createAllowed(ELEMENT_CREATE_ALLOWED_FUNC_ARGS)
