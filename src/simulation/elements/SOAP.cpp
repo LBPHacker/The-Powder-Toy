@@ -329,6 +329,15 @@ static void changeType(ELEMENT_CHANGETYPE_FUNC_ARGS)
 {
 	if (from == PT_SOAP && to != PT_SOAP)
 	{
+		constexpr auto Parallel = std::is_same_v<decltype(sim), SimVariant<ParallelVariant> *>;
+		if constexpr (Parallel)
+		{
+			if (sim->parts[i].ctype & 6)
+			{
+				sim->DeferSoapDetach(i);
+			}
+			return;
+		}
 		Element_SOAP_detach(sim, i);
 	}
 }

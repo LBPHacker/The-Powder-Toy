@@ -108,7 +108,8 @@ int Element_ETRD_nearestSparkablePart(Simulation *sim, int targetId)
 	int foundI = -1;
 	ui::Point targetPos = ui::Point(int(parts[targetId].x), int(parts[targetId].y));
 
-	if (sim->etrd_count_valid)
+	constexpr auto Parallel = std::is_same_v<decltype(sim), SimVariant<ParallelVariant> *>;
+	if (!Parallel && sim->etrd_count_valid)
 	{
 		// countLife0 doesn't need recalculating, so just focus on finding the nearest particle
 
@@ -177,8 +178,11 @@ int Element_ETRD_nearestSparkablePart(Simulation *sim, int targetId)
 				}
 			}
 		}
-		sim->etrd_life0_count = countLife0;
-		sim->etrd_count_valid = true;
+		if (!Parallel)
+		{
+			sim->etrd_life0_count = countLife0;
+			sim->etrd_count_valid = true;
+		}
 	}
 	return foundI;
 }
