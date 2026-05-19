@@ -277,6 +277,7 @@ public:
 	inline bool MaxPartsReached() const;
 
 	void DeferSoapDetach(int i);
+	void SetAllowThreadedSimulation(bool newValue);
 
 	using Variant = VariantParam;
 };

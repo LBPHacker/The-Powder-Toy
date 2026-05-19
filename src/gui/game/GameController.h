@@ -214,10 +214,12 @@ public:
 	void BeforeSimDraw();
 	void AfterSimDraw();
 	bool ThreadedRenderingAllowed();
+	bool ThreadedSimulationAllowed() const;
 
 	void SetToolIndex(ByteString identifier, std::optional<int> index);
 	void InitCommandInterface();
 
 	FrameTime *GetFrameTime() const;
 	void SetSimThreadCount(int newThreadCount);
+	int GetSimThreadCount() const;
 };

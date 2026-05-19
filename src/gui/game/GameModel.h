@@ -355,4 +355,8 @@ public:
 
 	std::unique_ptr<FrameTime> frameTime;
 	void SetSimThreadCount(int newThreadCount);
+	int GetSimThreadCount() const
+	{
+		return simThreadCount;
+	}
 };
