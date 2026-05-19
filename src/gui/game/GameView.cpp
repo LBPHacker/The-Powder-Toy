@@ -2581,6 +2581,19 @@ void GameView::OnDraw()
 			{
 				fpsInfo << std::get<FpsLimitExplicit>(simFpsLimit).value;
 			}
+			fpsInfo << "\n  Variant: ";
+			if (c->GetSimThreadCount())
+			{
+				fpsInfo << "parallel, threads: " << c->GetSimThreadCount();
+				if (!c->ThreadedSimulationAllowed())
+				{
+					fpsInfo << ", hindered";
+				}
+			}
+			else
+			{
+				fpsInfo << "legacy";
+			}
 		}
 		if (c->GetDebugFlags() & DEBUG_RENHUD)
 		{

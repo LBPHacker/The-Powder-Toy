@@ -524,6 +524,19 @@ bool CommandInterface::HaveSimGraphicsEventHandlers()
 	return HaveSimGraphicsEventHandlersHelper<0>(lsi->gameControllerEventHandlers);
 }
 
+bool CommandInterface::HaveUnparallelizableCallbacks()
+{
+	auto *lsi = static_cast<LuaScriptInterface *>(this);
+	for (int i = 0; i < int(lsi->customElements.size()); ++i)
+	{
+		if (lsi->customElements[i].createAllowed || lsi->customElements[i].changeType)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void CommandInterface::OnTick()
 {
 	auto *lsi = static_cast<LuaScriptInterface *>(this);
