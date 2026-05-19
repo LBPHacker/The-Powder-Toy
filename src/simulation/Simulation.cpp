@@ -128,6 +128,8 @@ namespace
 
 		std::vector<ThreadContext> threadContexts;
 		bool useThreadContext = false;
+		bool allowThreadedSimulation = false;
+		bool allowThreadedSimulationInternal = false;
 
 		std::mutex stickmanMx;
 
@@ -3025,8 +3027,7 @@ void SimVariantImpl<ParallelVariant>::UpdateParticles(int start, int end)
 {
 	FrameTime::Span span(frameTime, "Simulation::UpdateParticles");
 
-	threadPool.SetThreadCount(threadCount);
-	if (threadCount == 0 || water_equal_test || !(start == 0 && end == NPART))
+	if (!allowThreadedSimulationInternal || !(start == 0 && end == NPART))
 	{
 		//the main particle loop function, goes over all particles.
 		for (auto i = start; i < end && i < parts.active; i++)
@@ -3040,11 +3041,6 @@ void SimVariantImpl<ParallelVariant>::UpdateParticles(int start, int end)
 		return;
 	}
 
-	// TODO-TILES: figure out a way to prevent false sharing of pmap-like data (would need to lower offset resolution to 16)
-	// TODO-TILES: figure out a way to prevent false sharing of CELL data (would need to lower offset resolution to 64, i.e. to remove it)
-	// TODO-TILES: figure out whether these kinds of false sharing have a real perf impact
-	tileOffset.X = sharedRng.between(0, TILE_SIZE - 1) * CELL;
-	tileOffset.Y = sharedRng.between(0, TILE_SIZE - 1) * CELL;
 	{
 		FrameTime::Span span(frameTime, "assignToTiles");
 		pfreeMxLockedTimes = 0; // TODO-TILES: show in hud
@@ -4566,6 +4562,19 @@ void SimVariantImpl<Variant>::BeforeSim(bool willUpdate)
 
 	if (willUpdate)
 	{
+		constexpr auto Parallel = std::is_same_v<Variant, ParallelVariant>;
+		if constexpr (Parallel)
+		{
+			auto &parallelSim = static_cast<ParallelSim &>(*this);
+			parallelSim.threadPool.SetThreadCount(parallelSim.threadCount);
+			parallelSim.allowThreadedSimulationInternal = parallelSim.allowThreadedSimulation && !water_equal_test;
+			// TODO-TILES: figure out a way to prevent false sharing of pmap-like data (would need to lower offset resolution to 16)
+			// TODO-TILES: figure out a way to prevent false sharing of CELL data (would need to lower offset resolution to 64, i.e. to remove it)
+			// TODO-TILES: figure out whether these kinds of false sharing have a real perf impact
+			parallelSim.tileOffset.X = sharedRng.between(0, TILE_SIZE - 1) * CELL;
+			parallelSim.tileOffset.Y = sharedRng.between(0, TILE_SIZE - 1) * CELL;
+		}
+
 		{
 			FrameTime::Span span(frameTime, "Air::update_air");
 			air->update_air();
@@ -4866,6 +4875,12 @@ template<>
 void SimVariant<ParallelVariant>::DeferSoapDetach(int i)
 {
 	ToImpl(this)->DeferSoapDetach(i);
+}
+
+template<>
+void SimVariant<ParallelVariant>::SetAllowThreadedSimulation(bool newValue)
+{
+	ToImpl(this)->allowThreadedSimulation = newValue;
 }
 
 // we want XRES * YRES <= (1 << (31 - PMAPBITS)), but we do a division because multiplication could silently overflow

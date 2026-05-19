@@ -35,6 +35,7 @@ public:
 
 	bool HandleEvent(const GameControllerEvent &event);
 	bool HaveSimGraphicsEventHandlers();
+	bool HaveUnparallelizableCallbacks();
 
 	int Command(String command);
 	String FormatCommand(String command);
