@@ -28,6 +28,11 @@ bool CommandInterface::HaveSimGraphicsEventHandlers()
 	return false;
 }
 
+bool CommandInterface::HaveUnparallelizableCallbacks()
+{
+	return false;
+}
+
 int CommandInterface::Command(String command)
 {
 	return PlainCommand(command);

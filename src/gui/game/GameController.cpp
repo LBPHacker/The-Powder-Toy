@@ -922,6 +922,10 @@ void GameController::Update()
 		gameView->SetSample(gameModel->GetSimulation()->GetSample(pos.X, pos.Y));
 
 	Simulation * sim = gameModel->GetSimulation();
+	if (gameModel->GetSimThreadCount())
+	{
+		static_cast<SimVariant<ParallelVariant> *>(sim)->SetAllowThreadedSimulation(ThreadedSimulationAllowed());
+	}
 	if (gameModel->IsSimRunning())
 	{
 		gameModel->UpdateUpTo(NPART);
@@ -1783,6 +1787,11 @@ bool GameController::ThreadedRenderingAllowed()
 	return gameModel->GetThreadedRendering() && !GetPaused() && !commandInterface->HaveSimGraphicsEventHandlers();
 }
 
+bool GameController::ThreadedSimulationAllowed() const
+{
+	return !commandInterface->HaveUnparallelizableCallbacks();
+}
+
 void GameController::SetToolIndex(ByteString identifier, std::optional<int> index)
 {
 	if (commandInterface)
@@ -1799,4 +1808,9 @@ FrameTime *GameController::GetFrameTime() const
 void GameController::SetSimThreadCount(int newThreadCount)
 {
 	gameModel->SetSimThreadCount(newThreadCount);
+}
+
+int GameController::GetSimThreadCount() const
+{
+	return gameModel->GetSimThreadCount();
 }
