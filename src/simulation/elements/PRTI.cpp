@@ -77,12 +77,12 @@ static int update(UPDATE_FUNC_ARGS)
 		int ry = portal_ry[count];
 		if (rx || ry)
 		{
-			int r = pmap[{ x+rx, y+ry }];
+			int r = pmap.at(x+rx, y+ry );
 			if (!r || TYP(r) == PT_STOR)
 				fe = 1;
 			if (!r || (!(elements[TYP(r)].Properties & (TYPE_PART | TYPE_LIQUID | TYPE_GAS | TYPE_ENERGY)) && TYP(r)!=PT_SPRK && TYP(r)!=PT_STOR))
 			{
-				r = sim->photons[{ x+rx, y+ry }];
+				r = sim->photons.at(x+rx, y+ry );
 				if (!r)
 					continue;
 			}

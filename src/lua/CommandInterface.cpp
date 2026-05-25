@@ -602,7 +602,7 @@ AnyType CommandInterface::tptS_reset(std::deque<String> * words)
 		for (int nx = 0; nx < XCELLS; nx++)
 			for (int ny = 0; ny < YCELLS; ny++)
 			{
-				sim->pv[{ nx, ny }] = 0;
+				sim->pv.at(nx, ny ) = 0;
 			}
 	}
 	else if (resetStr == "velocity")
@@ -610,8 +610,8 @@ AnyType CommandInterface::tptS_reset(std::deque<String> * words)
 		for (int nx = 0; nx < XCELLS; nx++)
 			for (int ny = 0; ny < YCELLS; ny++)
 			{
-				sim->vx[{ nx, ny }] = 0;
-				sim->vy[{ nx, ny }] = 0;
+				sim->vx.at(nx, ny ) = 0;
+				sim->vy.at(nx, ny ) = 0;
 			}
 	}
 	else if (resetStr == "sparks")

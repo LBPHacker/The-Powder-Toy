@@ -279,9 +279,9 @@ static int partNeighbors(lua_State *L)
 			for (ry = -r; ry <= r; ry++)
 				if (x+rx >= 0 && y+ry >= 0 && x+rx < XRES && y+ry < YRES && (rx || ry))
 				{
-					n = sim->pmap[{ x+rx, y+ry }];
+					n = sim->pmap.at(x+rx, y+ry );
 					if (!n || TYP(n) != t)
-						n = sim->photons[{ x+rx, y+ry }];
+						n = sim->photons.at(x+rx, y+ry );
 					if (n && TYP(n) == t)
 					{
 						lua_pushinteger(L, ID(n));
@@ -296,9 +296,9 @@ static int partNeighbors(lua_State *L)
 			for (ry = -r; ry <= r; ry++)
 				if (x+rx >= 0 && y+ry >= 0 && x+rx < XRES && y+ry < YRES && (rx || ry))
 				{
-					n = sim->pmap[{ x+rx, y+ry }];
+					n = sim->pmap.at(x+rx, y+ry );
 					if (!n)
-						n = sim->photons[{ x+rx, y+ry }];
+						n = sim->photons.at(x+rx, y+ry );
 					if (n)
 					{
 						lua_pushinteger(L, ID(n));
@@ -366,9 +366,9 @@ static int partID(lua_State *L)
 		return 1;
 	}
 
-	int amalgam = lsi->sim->pmap[{ x, y }];
+	int amalgam = lsi->sim->pmap.at(x, y );
 	if(!amalgam)
-		amalgam = lsi->sim->photons[{ x, y }];
+		amalgam = lsi->sim->photons.at(x, y );
 	if (!amalgam)
 		lua_pushnil(L);
 	else
@@ -899,7 +899,7 @@ static int floodDeco(lua_State *L)
 
 	// hilariously broken, intersects with console and all Lua graphics
 	auto &rendererFrame = lsi->gameModel->GetView()->GetRendererFrame();
-	auto loc = RGB::Unpack(rendererFrame[{ x, y }]);
+	auto loc = RGB::Unpack(rendererFrame.at(x, y ));
 	lsi->sim->ApplyDecorationFill(rendererFrame, x, y, r, g, b, a, loc.Red, loc.Green, loc.Blue);
 	return 0;
 }
@@ -970,7 +970,7 @@ static int resetPressure(lua_State *L)
 	for (int nx = x1; nx<x1+width; nx++)
 		for (int ny = y1; ny<y1+height; ny++)
 		{
-			lsi->sim->pv[{ nx, ny }] = 0;
+			lsi->sim->pv.at(nx, ny ) = 0;
 		}
 	return 0;
 }
@@ -1420,14 +1420,14 @@ static int neighboursClosure(lua_State *L)
 			x = cx - rx;
 			y += 1;
 		}
-		int r = lsi->sim->pmap[{ px, py }];
+		int r = lsi->sim->pmap.at(px, py );
 		if (!(r && (!t || TYP(r) == t))) // * If not [exists and is of the correct type]
 		{
 			r = 0;
 		}
 		if (!r)
 		{
-			r = lsi->sim->photons[{ px, py }];
+			r = lsi->sim->photons.at(px, py );
 			if (!(r && (!t || TYP(r) == t))) // * If not [exists and is of the correct type]
 			{
 				r = 0;
@@ -1488,7 +1488,7 @@ static int pmap(lua_State *L)
 	int y = luaL_checkint(L, 2);
 	if (x < 0 || x >= XRES || y < 0 || y >= YRES)
 		return luaL_error(L, "coordinates out of range (%d,%d)", x, y);
-	int r = lsi->sim->pmap[{ x, y }];
+	int r = lsi->sim->pmap.at(x, y );
 	if (!TYP(r))
 		return 0;
 	lua_pushnumber(L, ID(r));
@@ -1502,7 +1502,7 @@ static int photons(lua_State *L)
 	int y = luaL_checkint(L, 2);
 	if (x < 0 || x >= XRES || y < 0 || y >= YRES)
 		return luaL_error(L, "coordinates out of range (%d,%d)", x, y);
-	int r = lsi->sim->photons[{ x, y }];
+	int r = lsi->sim->photons.at(x, y );
 	if (!TYP(r))
 		return 0;
 	lua_pushnumber(L, ID(r));
@@ -1916,8 +1916,8 @@ static int resetVelocity(lua_State *L)
 	for (nx = x1; nx<x1+width; nx++)
 		for (ny = y1; ny<y1+height; ny++)
 		{
-			lsi->sim->vx[{ nx, ny }] = 0;
-			lsi->sim->vy[{ nx, ny }] = 0;
+			lsi->sim->vx.at(nx, ny ) = 0;
+			lsi->sim->vy.at(nx, ny ) = 0;
 		}
 	return 0;
 }

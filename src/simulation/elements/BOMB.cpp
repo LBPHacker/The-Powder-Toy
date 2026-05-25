@@ -56,7 +56,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[{ x+rx, y+ry }];
+				auto r = pmap.at(x+rx, y+ry );
 				if (!r)
 					continue;
 				auto rt = TYP(r);
@@ -75,12 +75,12 @@ static int update(UPDATE_FUNC_ARGS)
 								if ((ynxj < 0) || (ynxj >= YRES) || (xnxi <= 0) || (xnxi >= XRES))
 									continue;
 
-								nt = TYP(pmap[{ xnxi, ynxj }]);
+								nt = TYP(pmap.at(xnxi, ynxj ));
 								if (nt!=PT_DMND && nt!=PT_CLNE && nt!=PT_PCLN && nt!=PT_BCLN && nt!=PT_VIBR)
 								{
 									if (nt)
-										sim->kill_part(ID(pmap[{ xnxi, ynxj }]));
-									sim->pv[{ (xnxi)/CELL, (ynxj)/CELL }] += 0.1f;
+										sim->kill_part(ID(pmap.at(xnxi, ynxj )));
+									sim->pv.at((xnxi)/CELL, (ynxj)/CELL ) += 0.1f;
 									auto nb = sim->create_part(-3, xnxi, ynxj, PT_EMBR);
 									if (nb!=-1)
 									{
@@ -96,7 +96,7 @@ static int update(UPDATE_FUNC_ARGS)
 					{
 						for (auto nxi=-(rad+1); nxi<=(rad+1); nxi++)
 						{
-							if ((pow((float)nxi,2))/(pow((float)(rad+1),2))+(pow((float)nxj,2))/(pow((float)(rad+1),2))<=1 && !TYP(pmap[{ x+nxi, y+nxj }]))
+							if ((pow((float)nxi,2))/(pow((float)(rad+1),2))+(pow((float)nxj,2))/(pow((float)(rad+1),2))<=1 && !TYP(pmap.at(x+nxi, y+nxj )))
 							{
 								auto nb = sim->create_part(-3, x+nxi, y+nxj, PT_EMBR);
 								if (nb!=-1)

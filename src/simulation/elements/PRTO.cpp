@@ -69,7 +69,7 @@ static int update(UPDATE_FUNC_ARGS)
 		auto ry = portal_ry[count];
 		if (rx || ry)
 		{
-			auto r = pmap[{ x+rx, y+ry }];
+			auto r = pmap.at(x+rx, y+ry );
 			if (!r)
 			{
 				fe = 1;

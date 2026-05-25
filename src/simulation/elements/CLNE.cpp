@@ -57,9 +57,9 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			for (auto ry = -1; ry <= 1; ry++)
 			{
-				auto r = sim->photons[{ x+rx, y+ry }];
+				auto r = sim->photons.at(x+rx, y+ry );
 				if (!r)
-					r = pmap[{ x+rx, y+ry }];
+					r = pmap.at(x+rx, y+ry );
 				if (!r)
 					continue;
 				auto rt = TYP(r);

@@ -87,7 +87,7 @@ int Element_VIRS_update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[{ x+rx, y+ry }];
+				auto r = pmap.at(x+rx, y+ry );
 				if (!r)
 					continue;
 
@@ -107,7 +107,7 @@ int Element_VIRS_update(UPDATE_FUNC_ARGS)
 				}
 				else if (TYP(r) == PT_PLSM)
 				{
-					if (surround_space && sim->rng.chance(10 + int(sim->pv[{ (x+rx)/CELL, (y+ry)/CELL }]), 100))
+					if (surround_space && sim->rng.chance(10 + int(sim->pv.at((x+rx)/CELL, (y+ry)/CELL )), 100))
 					{
 						sim->create_part(i, x, y, PT_PLSM);
 						return 1;
@@ -134,7 +134,7 @@ int Element_VIRS_update(UPDATE_FUNC_ARGS)
 					rndstore >>= 3;
 				}
 				//protons make VIRS last forever
-				else if (TYP(sim->photons[{ x+rx, y+ry }]) == PT_PROT)
+				else if (TYP(sim->photons.at(x+rx, y+ry )) == PT_PROT)
 				{
 					parts[i].tmp4 = 0;
 				}

@@ -18,7 +18,7 @@ static int perform(SimTool *tool, Simulation * sim, Particle * cpart, int x, int
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	int thisPart = sim->pmap[{ x, y }];
+	int thisPart = sim->pmap.at(x, y );
 	if(!thisPart)
 		return 0;
 
@@ -36,18 +36,18 @@ static int perform(SimTool *tool, Simulation * sim, Particle * cpart, int x, int
 	if(newX < 0 || newY < 0 || newX >= XRES || newY >= YRES)
 		return 0;
 
-	int thatPart = sim->pmap[{ newX, newY }];
+	int thatPart = sim->pmap.at(newX, newY );
 	if(!thatPart)
 		return 0;
 
 	if ((elements[TYP(thisPart)].Properties&STATE_FLAGS) != (elements[TYP(thatPart)].Properties&STATE_FLAGS))
 		return 0;
 
-	sim->pmap[{ x, y }] = thatPart;
+	sim->pmap.at(x, y ) = thatPart;
 	sim->parts[ID(thatPart)].x = float(x);
 	sim->parts[ID(thatPart)].y = float(y);
 
-	sim->pmap[{ newX, newY }] = thisPart;
+	sim->pmap.at(newX, newY ) = thisPart;
 	sim->parts[ID(thisPart)].x = float(newX);
 	sim->parts[ID(thisPart)].y = float(newY);
 

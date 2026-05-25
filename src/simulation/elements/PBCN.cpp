@@ -56,12 +56,12 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	if (!parts[i].tmp2 && sim->pv[{ x/CELL, y/CELL }]>4.0f)
+	if (!parts[i].tmp2 && sim->pv.at(x/CELL, y/CELL )>4.0f)
 		parts[i].tmp2 = sim->rng.between(80, 119);
 	if (parts[i].tmp2)
 	{
-		parts[i].vx += ADVECTION*sim->vx[{ x/CELL, y/CELL }];
-		parts[i].vy += ADVECTION*sim->vy[{ x/CELL, y/CELL }];
+		parts[i].vx += ADVECTION*sim->vx.at(x/CELL, y/CELL );
+		parts[i].vy += ADVECTION*sim->vy.at(x/CELL, y/CELL );
 		parts[i].tmp2--;
 		if(!parts[i].tmp2){
 			sim->kill_part(i);
@@ -74,9 +74,9 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			for (auto ry = -1; ry <= 1; ry++)
 			{
-				auto r = sim->photons[{ x+rx, y+ry }];
+				auto r = sim->photons.at(x+rx, y+ry );
 				if (!r)
-					r = pmap[{ x+rx, y+ry }];
+					r = pmap.at(x+rx, y+ry );
 				if (!r)
 					continue;
 				auto rt = TYP(r);
@@ -106,7 +106,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[{ x+rx, y+ry }];
+					auto r = pmap.at(x+rx, y+ry );
 					if (!r)
 						continue;
 					if (TYP(r)==PT_PBCN)

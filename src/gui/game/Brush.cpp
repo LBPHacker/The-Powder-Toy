@@ -16,20 +16,20 @@ void Brush::InitOutline()
 		for (int i = 0; i < bounds.X; i++)
 		{
 			bool value = false;
-			if (bitmap[{ i, j }])
+			if (bitmap.at(i, j ))
 			{
 				if (i == 0 || j == 0 || i == bounds.X - 1 || j == bounds.Y - 1)
 					value = true;
-				else if (!bitmap[{ i + 1, j }])
+				else if (!bitmap.at(i + 1, j ))
 					value = true;
-				else if (!bitmap[{ i - 1, j }])
+				else if (!bitmap.at(i - 1, j ))
 					value = true;
-				else if (!bitmap[{ i, j + 1 }])
+				else if (!bitmap.at(i, j + 1 ))
 					value = true;
-				else if (!bitmap[{ i, j - 1 }])
+				else if (!bitmap.at(i, j - 1 ))
 					value = true;
 			}
-			outline[{ i, j }] = value ? 0xFF : 0;
+			outline.at(i, j ) = value ? 0xFF : 0;
 		}
 	}
 }

@@ -17,7 +17,7 @@ BitmapBrush::BitmapBrush(ui::Point inputSize, unsigned char const *inputBitmap)
 	origBitmap = PlaneAdapter<std::vector<unsigned char>>(newSize, 0);
 	for (int y = 0; y < inputSize.Y; y++)
 		for (int x = 0; x < inputSize.X; x++)
-			origBitmap[{ x, y }] = inputBitmap[x + y * inputSize.X];
+			origBitmap.at(x, y ) = inputBitmap[x + y * inputSize.X];
 }
 
 BitmapBrush::BitmapBrush(const BitmapBrush &other) : BitmapBrush(other.origSize, other.origBitmap.data())
@@ -48,14 +48,14 @@ PlaneAdapter<std::vector<unsigned char>> BitmapBrush::GenerateBitmap() const
 				auto lowerY = int(std::floor(originalY));
 				auto upperY = int(std::min((float)(origSize.Y-1), std::floor(originalY+1.0f)));
 
-				unsigned char topRight = origBitmap[{ upperX, lowerY }];
-				unsigned char topLeft = origBitmap[{ lowerX, lowerY }];
-				unsigned char bottomRight = origBitmap[{ upperX, upperY }];
-				unsigned char bottomLeft = origBitmap[{ lowerX, upperY }];
+				unsigned char topRight = origBitmap.at(upperX, lowerY );
+				unsigned char topLeft = origBitmap.at(lowerX, lowerY );
+				unsigned char bottomRight = origBitmap.at(upperX, upperY );
+				unsigned char bottomLeft = origBitmap.at(lowerX, upperY );
 				float top = LinearInterpolate<float>(topLeft, topRight, float(lowerX), float(upperX), originalX);
 				float bottom = LinearInterpolate<float>(bottomLeft, bottomRight, float(lowerX), float(upperX), originalX);
 				float mid = LinearInterpolate<float>(top, bottom, float(lowerY), float(upperY), originalY);
-				bitmap[{ x, y }] = mid > 128 ? 255 : 0;
+				bitmap.at(x, y ) = mid > 128 ? 255 : 0;
 			}
 		}
 	}

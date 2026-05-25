@@ -66,7 +66,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				int r = pmap[{ x+rx, y+ry }];
+				int r = pmap.at(x+rx, y+ry );
 				if (TYP(r) == PT_SPRK && parts[ID(r)].life == 3) //spark found, start creating
 				{
 					bool overwrite = parts[ID(r)].ctype == PT_PSCN;
@@ -89,10 +89,10 @@ static int update(UPDATE_FUNC_ARGS)
 						// the first particle it sees decides whether it will copy energy particles or not
 						if (!foundParticle)
 						{
-							rr = pmap[{ xCurrent, yCurrent }];
+							rr = pmap.at(xCurrent, yCurrent );
 							if (!rr)
 							{
-								rr = sim->photons[{ xCurrent, yCurrent }];
+								rr = sim->photons.at(xCurrent, yCurrent );
 								if (rr)
 									foundParticle = isEnergy = true;
 							}
@@ -101,9 +101,9 @@ static int update(UPDATE_FUNC_ARGS)
 						}
 						// now that it knows what kind of particle it is copying, do some extra stuff here so we can determine when to stop
 						if ((ctype && elements[ctype].Properties&TYPE_ENERGY) || isEnergy)
-							rr = sim->photons[{ xCurrent, yCurrent }];
+							rr = sim->photons.at(xCurrent, yCurrent );
 						else
-							rr = pmap[{ xCurrent, yCurrent }];
+							rr = pmap.at(xCurrent, yCurrent );
 
 						// Checks for when to stop:
 						//  1: if .tmp isn't set, and the element in this spot is the ctype, then stop
@@ -125,22 +125,22 @@ static int update(UPDATE_FUNC_ARGS)
 					{
 						// get particle to copy
 						if (isEnergy)
-							type = TYP(sim->photons[{ xCurrent, yCurrent }]);
+							type = TYP(sim->photons.at(xCurrent, yCurrent ));
 						else
-							type = TYP(pmap[{ xCurrent, yCurrent }]);
+							type = TYP(pmap.at(xCurrent, yCurrent ));
 
 						// if sparked by PSCN, overwrite whatever is in the target location, instead of just ignoring it
 						if (overwrite)
 						{
 							if (isEnergy)
 							{
-								if (sim->photons[{ xCopyTo, yCopyTo }])
-									sim->kill_part(ID(sim->photons[{ xCopyTo, yCopyTo }]));
+								if (sim->photons.at(xCopyTo, yCopyTo ))
+									sim->kill_part(ID(sim->photons.at(xCopyTo, yCopyTo )));
 							}
 							else
 							{
-								if (pmap[{ xCopyTo, yCopyTo }])
-									sim->kill_part(ID(pmap[{ xCopyTo, yCopyTo }]));
+								if (pmap.at(xCopyTo, yCopyTo ))
+									sim->kill_part(ID(pmap.at(xCopyTo, yCopyTo )));
 							}
 						}
 						if (type == PT_SPRK) // spark hack
@@ -156,9 +156,9 @@ static int update(UPDATE_FUNC_ARGS)
 							if (type == PT_SPRK) // spark hack
 								sim->part_change_type(p, xCopyTo, yCopyTo, PT_SPRK);
 							if (isEnergy)
-								parts[p] = parts[ID(sim->photons[{ xCurrent, yCurrent }])];
+								parts[p] = parts[ID(sim->photons.at(xCurrent, yCurrent ))];
 							else
-								parts[p] = parts[ID(pmap[{ xCurrent, yCurrent }])];
+								parts[p] = parts[ID(pmap.at(xCurrent, yCurrent ))];
 							parts[p].x = float(xCopyTo);
 							parts[p].y = float(yCopyTo);
 						}

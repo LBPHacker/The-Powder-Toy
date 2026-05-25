@@ -51,17 +51,17 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	int singularity = -parts[i].life;
 
-	if (sim->pv[{ x/CELL, y/CELL }]<singularity)
-		sim->pv[{ x/CELL, y/CELL }] += 0.1f*(singularity-sim->pv[{ x/CELL, y/CELL }]);
-	if (sim->pv[{ x/CELL, y/CELL+1 }]<singularity)
-		sim->pv[{ x/CELL, y/CELL+1 }] += 0.1f*(singularity-sim->pv[{ x/CELL, y/CELL+1 }]);
-	if (sim->pv[{ x/CELL, y/CELL-1 }]<singularity)
-		sim->pv[{ x/CELL, y/CELL-1 }] += 0.1f*(singularity-sim->pv[{ x/CELL, y/CELL-1 }]);
+	if (sim->pv.at(x/CELL, y/CELL )<singularity)
+		sim->pv.at(x/CELL, y/CELL ) += 0.1f*(singularity-sim->pv.at(x/CELL, y/CELL ));
+	if (sim->pv.at(x/CELL, y/CELL+1 )<singularity)
+		sim->pv.at(x/CELL, y/CELL+1 ) += 0.1f*(singularity-sim->pv.at(x/CELL, y/CELL+1 ));
+	if (sim->pv.at(x/CELL, y/CELL-1 )<singularity)
+		sim->pv.at(x/CELL, y/CELL-1 ) += 0.1f*(singularity-sim->pv.at(x/CELL, y/CELL-1 ));
 
-	sim->pv[{ x/CELL+1, y/CELL }] += 0.1f*(singularity-sim->pv[{ x/CELL+1, y/CELL }]);
-	sim->pv[{ x/CELL+1, y/CELL+1 }] += 0.1f*(singularity-sim->pv[{ x/CELL+1, y/CELL+1 }]);
-	sim->pv[{ x/CELL-1, y/CELL }] += 0.1f*(singularity-sim->pv[{ x/CELL-1, y/CELL }]);
-	sim->pv[{ x/CELL-1, y/CELL-1 }] += 0.1f*(singularity-sim->pv[{ x/CELL-1, y/CELL-1 }]);
+	sim->pv.at(x/CELL+1, y/CELL ) += 0.1f*(singularity-sim->pv.at(x/CELL+1, y/CELL ));
+	sim->pv.at(x/CELL+1, y/CELL+1 ) += 0.1f*(singularity-sim->pv.at(x/CELL+1, y/CELL+1 ));
+	sim->pv.at(x/CELL-1, y/CELL ) += 0.1f*(singularity-sim->pv.at(x/CELL-1, y/CELL ));
+	sim->pv.at(x/CELL-1, y/CELL-1 ) += 0.1f*(singularity-sim->pv.at(x/CELL-1, y/CELL-1 ));
 
 	if (parts[i].life<1) {
 		//Pop!
@@ -72,7 +72,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				auto cry = (y/CELL)+ry;
 				if (cry >= 0 && crx >= 0 && crx < XCELLS && cry < YCELLS) {
-					sim->pv[{ crx, cry }] += (float)parts[i].tmp;
+					sim->pv.at(crx, cry ) += (float)parts[i].tmp;
 				}
 			}
 		}
@@ -113,7 +113,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[{ x+rx, y+ry }];
+				auto r = pmap.at(x+rx, y+ry );
 				if (!r)
 					continue;
 				if (TYP(r)!=PT_DMND&& sim->rng.chance(1, 3))

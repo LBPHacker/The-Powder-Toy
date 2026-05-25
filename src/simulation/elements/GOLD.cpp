@@ -61,7 +61,7 @@ static int update(UPDATE_FUNC_ARGS)
 		rndstore >>= 4;
 		auto ry = int(rndstore % 9)-4;
 		if ((!rx != !ry)) {
-			auto r = pmap[{ x+rx, y+ry }];
+			auto r = pmap.at(x+rx, y+ry );
 			if(!r) continue;
 			if(TYP(r)==PT_BMTL && parts[ID(r)].tmp)
 			{
@@ -77,7 +77,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			auto rx = checkCoordsX[j];
 			auto ry = checkCoordsY[j];
-			auto r = pmap[{ x+rx, y+ry }];
+			auto r = pmap.at(x+rx, y+ry );
 			if(!r) continue;
 			if(TYP(r)==PT_SPRK && parts[ID(r)].life && parts[ID(r)].life<4)
 			{
@@ -87,11 +87,11 @@ static int update(UPDATE_FUNC_ARGS)
 			}
 		}
 	}
-	if (TYP(sim->photons[{ x, y }]) == PT_NEUT)
+	if (TYP(sim->photons.at(x, y )) == PT_NEUT)
 	{
 		if (sim->rng.chance(1, 7))
 		{
-			sim->kill_part(ID(sim->photons[{ x, y }]));
+			sim->kill_part(ID(sim->photons.at(x, y )));
 		}
 	}
 	return 0;

@@ -103,10 +103,10 @@ void Simulation::clear_area(int area_x, int area_y, int area_w, int area_h)
 	{
 		for (int x = cx1; x <= cx2; x++)
 		{
-			if (bmap[{ x, y }] == WL_GRAV)
+			if (bmap.at(x, y ) == WL_GRAV)
 				gravWallChanged = true;
-			bmap[{ x, y }] = 0;
-			emap[{ x, y }] = 0;
+			bmap.at(x, y ) = 0;
+			emap.at(x, y ) = 0;
 		}
 	}
 	for( int i = signs.size()-1; i >= 0; i--)
@@ -126,24 +126,24 @@ SimulationSample Simulation::GetSample(int x, int y)
 	sample.PositionY = y;
 	if (x >= 0 && x < XRES && y >= 0 && y < YRES)
 	{
-		if (photons[{ x, y }])
+		if (photons.at(x, y ))
 		{
-			sample.particle = parts[ID(photons[{ x, y }])];
-			sample.ParticleID = ID(photons[{ x, y }]);
+			sample.particle = parts[ID(photons.at(x, y ))];
+			sample.ParticleID = ID(photons.at(x, y ));
 		}
-		else if (pmap[{ x, y }])
+		else if (pmap.at(x, y ))
 		{
-			sample.particle = parts[ID(pmap[{ x, y }])];
-			sample.ParticleID = ID(pmap[{ x, y }]);
+			sample.particle = parts[ID(pmap.at(x, y ))];
+			sample.ParticleID = ID(pmap.at(x, y ));
 		}
-		if (bmap[{ x/CELL, y/CELL }])
+		if (bmap.at(x/CELL, y/CELL ))
 		{
-			sample.WallType = bmap[{ x/CELL, y/CELL }];
+			sample.WallType = bmap.at(x/CELL, y/CELL );
 		}
-		sample.AirPressure = pv[{ x/CELL, y/CELL }];
-		sample.AirTemperature = hv[{ x/CELL, y/CELL }];
-		sample.AirVelocityX = vx[{ x/CELL, y/CELL }];
-		sample.AirVelocityY = vy[{ x/CELL, y/CELL }];
+		sample.AirPressure = pv.at(x/CELL, y/CELL );
+		sample.AirTemperature = hv.at(x/CELL, y/CELL );
+		sample.AirVelocityX = vx.at(x/CELL, y/CELL );
+		sample.AirVelocityY = vy.at(x/CELL, y/CELL );
 
 		if (grav)
 		{
@@ -189,8 +189,8 @@ int Simulation::CreateWalls(int x, int y, int rx, int ry, int wall, Brush const 
 			{
 				if (wall == WL_FAN)
 				{
-					fvx[{ wallX, wallY }] = 0.0f;
-					fvy[{ wallX, wallY }] = 0.0f;
+					fvx.at(wallX, wallY ) = 0.0f;
+					fvy.at(wallX, wallY ) = 0.0f;
 				}
 				else if (wall == WL_STREAM)
 				{
@@ -200,11 +200,11 @@ int Simulation::CreateWalls(int x, int y, int rx, int ry, int wall, Brush const 
 					for (int tempY = wallY-1; tempY < wallY+2; tempY++)
 						for (int tempX = wallX-1; tempX < wallX+2; tempX++)
 						{
-							if (tempX >= 0 && tempX < XCELLS && tempY >= 0 && tempY < YCELLS && bmap[{ tempX, tempY }] == WL_STREAM)
+							if (tempX >= 0 && tempX < XCELLS && tempY >= 0 && tempY < YCELLS && bmap.at(tempX, tempY ) == WL_STREAM)
 								return 1;
 						}
 				}
-				if (wall == WL_GRAV || bmap[{ wallX, wallY }] == WL_GRAV)
+				if (wall == WL_GRAV || bmap.at(wallX, wallY ) == WL_GRAV)
 					gravWallChanged = true;
 
 				if (wall == WL_ERASEALL)
@@ -217,10 +217,10 @@ int Simulation::CreateWalls(int x, int y, int rx, int ry, int wall, Brush const 
 					for (int i = signs.size()-1; i >= 0; i--)
 						if (signs[i].x >= wallX*CELL && signs[i].y >= wallY*CELL && signs[i].x <= (wallX+1)*CELL && signs[i].y <= (wallY+1)*CELL)
 							signs.erase(signs.begin()+i);
-					bmap[{ wallX, wallY }] = 0;
+					bmap.at(wallX, wallY ) = 0;
 				}
 				else
-					bmap[{ wallX, wallY }] = wall;
+					bmap.at(wallX, wallY ) = wall;
 			}
 		}
 	}
@@ -304,7 +304,7 @@ int Simulation::FloodWalls(int x, int y, int wall, int bm)
 	{
 		if (wall==WL_ERASE || wall==WL_ERASEALL)
 		{
-			bm = bmap[{ x/CELL, y/CELL }];
+			bm = bmap.at(x/CELL, y/CELL );
 			if (!bm)
 				return 0;
 		}
@@ -312,14 +312,14 @@ int Simulation::FloodWalls(int x, int y, int wall, int bm)
 			bm = 0;
 	}
 
-	if (bmap[{ x/CELL, y/CELL }]!=bm)
+	if (bmap.at(x/CELL, y/CELL )!=bm)
 		return 1;
 
 	// go left as far as possible
 	x1 = x2 = x;
 	while (x1>=CELL)
 	{
-		if (bmap[{ (x1-1)/CELL, y/CELL }]!=bm)
+		if (bmap.at((x1-1)/CELL, y/CELL )!=bm)
 		{
 			break;
 		}
@@ -327,7 +327,7 @@ int Simulation::FloodWalls(int x, int y, int wall, int bm)
 	}
 	while (x2<XRES-CELL)
 	{
-		if (bmap[{ (x2+1)/CELL, y/CELL }]!=bm)
+		if (bmap.at((x2+1)/CELL, y/CELL )!=bm)
 		{
 			break;
 		}
@@ -343,12 +343,12 @@ int Simulation::FloodWalls(int x, int y, int wall, int bm)
 	// fill children
 	if (y>=CELL)
 		for (x=x1; x<=x2; x++)
-			if (bmap[{ x/CELL, (y-dy)/CELL }]==bm)
+			if (bmap.at(x/CELL, (y-dy)/CELL )==bm)
 				if (!FloodWalls(x, y-dy, wall, bm))
 					return 0;
 	if (y<YRES-CELL)
 		for (x=x1; x<=x2; x++)
-			if (bmap[{ x/CELL, (y+dy)/CELL }]==bm)
+			if (bmap.at(x/CELL, (y+dy)/CELL )==bm)
 				if (!FloodWalls(x, y+dy, wall, bm))
 					return 0;
 	return 1;
@@ -366,12 +366,12 @@ int Simulation::CreatePartFlags(int p, int x, int y, int c, int flags)
 		// if replace whatever and there's something to replace
 		// or replace X and there's a non-energy particle on top with type X
 		// or replace X and there's an energy particle on top with type X
-		if ((!replaceModeSelected && (photons[{ x, y }] || pmap[{ x, y }])) ||
-			(!photons[{ x, y }] && pmap[{ x, y }] && TYP(pmap[{ x, y }]) == replaceModeSelected) ||
-			(photons[{ x, y }] && TYP(photons[{ x, y }]) == replaceModeSelected))
+		if ((!replaceModeSelected && (photons.at(x, y ) || pmap.at(x, y ))) ||
+			(!photons.at(x, y ) && pmap.at(x, y ) && TYP(pmap.at(x, y )) == replaceModeSelected) ||
+			(photons.at(x, y ) && TYP(photons.at(x, y )) == replaceModeSelected))
 		{
 			if (c)
-				create_part(photons[{ x, y }] ? ID(photons[{ x, y }]) : ID(pmap[{ x, y }]), x, y, TYP(c), ID(c));
+				create_part(photons.at(x, y ) ? ID(photons.at(x, y )) : ID(pmap.at(x, y )), x, y, TYP(c), ID(c));
 			else
 				delete_part(x, y);
 		}
@@ -387,9 +387,9 @@ int Simulation::CreatePartFlags(int p, int x, int y, int c, int flags)
 		// if delete whatever and there's something to delete
 		// or delete X and there's a non-energy particle on top with type X
 		// or delete X and there's an energy particle on top with type X
-		if ((!replaceModeSelected && (photons[{ x, y }] || pmap[{ x, y }])) ||
-			(!photons[{ x, y }] && pmap[{ x, y }] && TYP(pmap[{ x, y }]) == replaceModeSelected) ||
-			(photons[{ x, y }] && TYP(photons[{ x, y }]) == replaceModeSelected))
+		if ((!replaceModeSelected && (photons.at(x, y ) || pmap.at(x, y ))) ||
+			(!photons.at(x, y ) && pmap.at(x, y ) && TYP(pmap.at(x, y )) == replaceModeSelected) ||
+			(photons.at(x, y ) && TYP(photons.at(x, y )) == replaceModeSelected))
 		{
 			delete_part(x, y);
 		}
@@ -409,9 +409,9 @@ void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, 
 	int rp;
 	float tr, tg, tb, ta, colR = float(colR_), colG = float(colG_), colB = float(colB_), colA = float(colA_);
 	float strength = 0.01f;
-	rp = pmap[{ x, y }];
+	rp = pmap.at(x, y );
 	if (!rp)
-		rp = photons[{ x, y }];
+		rp = photons.at(x, y );
 	if (!rp)
 		return;
 
@@ -471,9 +471,9 @@ void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, 
 			for (rx=-2; rx<3; rx++)
 				for (ry=-2; ry<3; ry++)
 				{
-					if (abs(rx)+abs(ry) > 2 && TYP(pmap[{ x+rx, y+ry }]) && parts[ID(pmap[{ x+rx, y+ry }])].dcolour)
+					if (abs(rx)+abs(ry) > 2 && TYP(pmap.at(x+rx, y+ry )) && parts[ID(pmap.at(x+rx, y+ry ))].dcolour)
 					{
-						Particle part = parts[ID(pmap[{ x+rx, y+ry }])];
+						Particle part = parts[ID(pmap.at(x+rx, y+ry ))];
 						num += 1.0f;
 						float pa = ((float)((part.dcolour>>24)&0xFF)) / 255.f;
 						float pr = ((float)((part.dcolour>>16)&0xFF)) / 255.f;
@@ -662,7 +662,7 @@ void Simulation::ApplyDecorationBox(int x1, int y1, int x2, int y2, int colR, in
 
 bool Simulation::ColorCompare(const RendererFrame &frame, int x, int y, int replaceR, int replaceG, int replaceB)
 {
-	auto pix = RGB::Unpack(frame[{ x, y }]);
+	auto pix = RGB::Unpack(frame.at(x, y ));
 	int r = pix.Red;
 	int g = pix.Green;
 	int b = pix.Blue;
@@ -692,7 +692,7 @@ void Simulation::ApplyDecorationFill(const RendererFrame &frame, int x, int y, i
 			// go left as far as possible
 			while (x1>0)
 			{
-				if (bitmap[{ x1 - 1, y }] || !ColorCompare(frame, x1-1, y, replaceR, replaceG, replaceB))
+				if (bitmap.at(x1 - 1, y ) || !ColorCompare(frame, x1-1, y, replaceR, replaceG, replaceB))
 				{
 					break;
 				}
@@ -701,7 +701,7 @@ void Simulation::ApplyDecorationFill(const RendererFrame &frame, int x, int y, i
 			// go right as far as possible
 			while (x2<XRES-1)
 			{
-				if (bitmap[{ x1 + 1, y }] || !ColorCompare(frame, x2+1, y, replaceR, replaceG, replaceB))
+				if (bitmap.at(x1 + 1, y ) || !ColorCompare(frame, x2+1, y, replaceR, replaceG, replaceB))
 				{
 					break;
 				}
@@ -711,17 +711,17 @@ void Simulation::ApplyDecorationFill(const RendererFrame &frame, int x, int y, i
 			for (x=x1; x<=x2; x++)
 			{
 				ApplyDecoration(x, y, colR, colG, colB, colA, DECO_DRAW);
-				bitmap[{ x, y }] = 1;
+				bitmap.at(x, y ) = 1;
 			}
 
 			if (y >= 1)
 				for (x=x1; x<=x2; x++)
-					if (!bitmap[{ x, y - 1 }] && ColorCompare(frame, x, y-1, replaceR, replaceG, replaceB))
+					if (!bitmap.at(x, y - 1 ) && ColorCompare(frame, x, y-1, replaceR, replaceG, replaceB))
 						cs.push(x, y-1);
 
 			if (y < YRES-1)
 				for (x=x1; x<=x2; x++)
-					if (!bitmap[{ x, y + 1 }] && ColorCompare(frame, x, y+1, replaceR, replaceG, replaceB))
+					if (!bitmap.at(x, y + 1 ) && ColorCompare(frame, x, y+1, replaceR, replaceG, replaceB))
 						cs.push(x, y+1);
 		} while (cs.getSize() > 0);
 	}
@@ -893,13 +893,13 @@ int Simulation::FloodParts(int x, int y, int fullc, int cm, int flags)
 		
 		if (c == 0)
 		{
-			cm = TYP(pmap[{ x, y }]);
+			cm = TYP(pmap.at(x, y ));
 			if (!cm)
 			{
-				cm = TYP(photons[{ x, y }]);
+				cm = TYP(photons.at(x, y ));
 				if (!cm)
 				{
-					if (bmap[{ x/CELL, y/CELL }])
+					if (bmap.at(x/CELL, y/CELL ))
 						return FloodWalls(x, y, WL_ERASE, -1);
 					else
 						return -1;
@@ -932,7 +932,7 @@ int Simulation::FloodParts(int x, int y, int fullc, int cm, int flags)
 		// go left as far as possible
 		while (c?x1>CELL:x1>0)
 		{
-			if (bitmap[{ x1 - 1, y }] || !FloodFillPmapCheck(x1-1, y, cm) || (c != 0 && IsWallBlocking(x1-1, y, c)))
+			if (bitmap.at(x1 - 1, y ) || !FloodFillPmapCheck(x1-1, y, cm) || (c != 0 && IsWallBlocking(x1-1, y, c)))
 			{
 				break;
 			}
@@ -941,7 +941,7 @@ int Simulation::FloodParts(int x, int y, int fullc, int cm, int flags)
 		// go right as far as possible
 		while (c?x2<XRES-CELL-1:x2<XRES-1)
 		{
-			if (bitmap[{ x2 + 1, y }] || !FloodFillPmapCheck(x2+1, y, cm) || (c != 0 && IsWallBlocking(x2+1, y, c)))
+			if (bitmap.at(x2 + 1, y ) || !FloodFillPmapCheck(x2+1, y, cm) || (c != 0 && IsWallBlocking(x2+1, y, c)))
 			{
 				break;
 			}
@@ -954,26 +954,26 @@ int Simulation::FloodParts(int x, int y, int fullc, int cm, int flags)
 			{
 				if (elements[cm].Properties&TYPE_ENERGY)
 				{
-					if (photons[{ x, y }])
+					if (photons.at(x, y ))
 					{
-						kill_part(ID(photons[{ x, y }]));
+						kill_part(ID(photons.at(x, y )));
 						created_something = 1;
 					}
 				}
-				else if (pmap[{ x, y }])
+				else if (pmap.at(x, y ))
 				{
-					kill_part(ID(pmap[{ x, y }]));
+					kill_part(ID(pmap.at(x, y )));
 					created_something = 1;
 				}
 			}
 			else if (CreateParts(-2, x, y, 0, 0, fullc, flags))
 				created_something = 1;
-			bitmap[{ x, y }] = 1;
+			bitmap.at(x, y ) = 1;
 		}
 
 		if (c?y>=CELL+dy:y>=dy)
 			for (x=x1; x<=x2; x++)
-				if (!bitmap[{ x, y - dy }] && FloodFillPmapCheck(x, y-dy, cm) && (c == 0 || !IsWallBlocking(x, y-dy, c)))
+				if (!bitmap.at(x, y - dy ) && FloodFillPmapCheck(x, y-dy, cm) && (c == 0 || !IsWallBlocking(x, y-dy, c)))
 				{
 					coord_stack[coord_stack_size][0] = x;
 					coord_stack[coord_stack_size][1] = y-dy;
@@ -987,7 +987,7 @@ int Simulation::FloodParts(int x, int y, int fullc, int cm, int flags)
 
 		if (c?y<YRES-CELL-dy:y<YRES-dy)
 			for (x=x1; x<=x2; x++)
-				if (!bitmap[{ x, y + dy }] && FloodFillPmapCheck(x, y+dy, cm) && (c == 0 || !IsWallBlocking(x, y+dy, c)))
+				if (!bitmap.at(x, y + dy ) && FloodFillPmapCheck(x, y+dy, cm) && (c == 0 || !IsWallBlocking(x, y+dy, c)))
 				{
 					coord_stack[coord_stack_size][0] = x;
 					coord_stack[coord_stack_size][1] = y+dy;

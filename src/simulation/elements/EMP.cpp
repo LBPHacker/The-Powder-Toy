@@ -131,7 +131,7 @@ void Element_EMP_Trigger(Simulation *sim, int triggerCount)
 				for (int ny =-2; ny <= 2; ny++)
 					if (rx+nx>=0 && ry+ny>=0 && rx+nx<XRES && ry+ny<YRES && (rx || ry))
 					{
-						int n = sim->pmap[{ rx+nx, ry+ny }];
+						int n = sim->pmap.at(rx+nx, ry+ny );
 						if (!n)
 							continue;
 						int ntype = TYP(n);

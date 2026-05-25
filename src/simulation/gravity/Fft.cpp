@@ -232,8 +232,8 @@ void Gravity::Exchange(GravityOutput &gravOut, GravityInput &gravIn, bool forceR
 
 	// pass input (but same input => same output)
 	if (forceRecalc ||
-	    std::memcmp(&fftGravity->gravIn.mass[{ 0, 0 }], &gravIn.mass[{ 0, 0 }], NCELL * sizeof(float)) ||
-	    std::memcmp(&fftGravity->gravIn.mask[{ 0, 0 }], &gravIn.mask[{ 0, 0 }], NCELL * sizeof(float)))
+	    std::memcmp(&fftGravity->gravIn.mass.at(0, 0 ), &gravIn.mass.at(0, 0 ), NCELL * sizeof(float)) ||
+	    std::memcmp(&fftGravity->gravIn.mask.at(0, 0 ), &gravIn.mask.at(0, 0 ), NCELL * sizeof(float)))
 	{
 		fftGravity->copyGravOut = true;
 		std::swap(gravIn.mass, fftGravity->gravIn.mass);

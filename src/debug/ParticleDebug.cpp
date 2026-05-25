@@ -34,13 +34,13 @@ void ParticleDebug::Debug(int mode, int x, int y)
 		i = NPART - 1;
 		if (x >= 0 && x < XRES && y >= 0 && y < YRES)
 		{
-			if (sim->pmap[{ x, y }] && ID(sim->pmap[{ x, y }]) >= sim->debug_nextToUpdate)
+			if (sim->pmap.at(x, y ) && ID(sim->pmap.at(x, y )) >= sim->debug_nextToUpdate)
 			{
-				i = ID(sim->pmap[{ x, y }]);
+				i = ID(sim->pmap.at(x, y ));
 			}
-			else if (sim->photons[{ x, y }] && ID(sim->photons[{ x, y }]) >= sim->debug_nextToUpdate)
+			else if (sim->photons.at(x, y ) && ID(sim->photons.at(x, y )) >= sim->debug_nextToUpdate)
 			{
-				i = ID(sim->photons[{ x, y }]);
+				i = ID(sim->photons.at(x, y ));
 			}
 		}
 	}

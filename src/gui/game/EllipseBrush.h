@@ -25,7 +25,7 @@ public:
 		{
 			for (int j = 0; j <= 2*ry; j++)
 			{
-				bitmap[{ rx, j }] = 255;
+				bitmap.at(rx, j ) = 255;
 			}
 		}
 		else
@@ -48,18 +48,18 @@ public:
 				{
 					if (j > yBottom && j < yTop)
 					{
-						bitmap[{ i, j }] = 255;
-						bitmap[{ 2*rx-i, j }] = 255;
+						bitmap.at(i, j ) = 255;
+						bitmap.at(2*rx-i, j ) = 255;
 					}
 					else
 					{
-						bitmap[{ i, j }] = 0;
-						bitmap[{ 2*rx-i, j }] = 0;
+						bitmap.at(i, j ) = 0;
+						bitmap.at(2*rx-i, j ) = 0;
 					}
 				}
 			}
-			bitmap[{ size.X/2, 0 }] = 255;
-			bitmap[{ size.X/2, size.Y-1 }] = 255;
+			bitmap.at(size.X/2, 0 ) = 255;
+			bitmap.at(size.X/2, size.Y-1 ) = 255;
 		}
 		return bitmap;
 	}

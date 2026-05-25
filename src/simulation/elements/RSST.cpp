@@ -53,7 +53,7 @@ int update(UPDATE_FUNC_ARGS)
 	{
 		for(int ry = -1; ry < 2; ry++)
 		{
-			auto r = pmap[{ x+rx, y+ry }];
+			auto r = pmap.at(x+rx, y+ry );
 
 			if (!r)
 				continue;

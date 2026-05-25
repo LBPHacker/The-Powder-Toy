@@ -59,7 +59,7 @@ static int update(UPDATE_FUNC_ARGS)
 				{
 					if (rx || ry)
 					{
-						auto r = pmap[{ x+rx, y+ry }];
+						auto r = pmap.at(x+rx, y+ry );
 						if (!r)
 							continue;
 						if (TYP(r)==PT_FIRE || TYP(r)==PT_PLSM || TYP(r)==PT_SPRK || TYP(r)==PT_LIGH)
@@ -73,7 +73,7 @@ static int update(UPDATE_FUNC_ARGS)
 	}
 	else if(parts[i].tmp==1)
 	{
-		if (pmap[{ x, y }] && ID(pmap[{ x, y }]) == i)
+		if (pmap.at(x, y ) && ID(pmap.at(x, y )) == i)
 		{
 			sim->flood_prop(x, y, AccessProperty{ FIELD_TMP, 2 });
 		}
@@ -87,7 +87,7 @@ static int update(UPDATE_FUNC_ARGS)
 	{
 		float otemp = parts[i].temp-273.15f;
 		//Explode!!
-		sim->pv[{ x/CELL, y/CELL }] += 0.5f;
+		sim->pv.at(x/CELL, y/CELL ) += 0.5f;
 		parts[i].tmp = 0;
 		if (sim->rng.chance(1, 3))
 		{

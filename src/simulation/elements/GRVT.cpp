@@ -59,7 +59,7 @@ static int update(UPDATE_FUNC_ARGS)
 	if (parts[i].tmp <= -100)
 		parts[i].tmp = -100;
 
-	int under = pmap[{ x, y }];
+	int under = pmap.at(x, y );
 	int utype = TYP(under);
 
 	//Randomly kill GRVT inside RSSS

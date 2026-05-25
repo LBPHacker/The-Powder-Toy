@@ -19,7 +19,7 @@ uint32_t Snapshot::Hash() const
 	};
 	auto takePlane = [&take](auto &plane) {
 		auto size = plane.Size();
-		take(reinterpret_cast<const uint8_t *>(plane.data()), size.X * size.Y * sizeof(plane[{ 0, 0 }]));
+		take(reinterpret_cast<const uint8_t *>(plane.data()), size.X * size.Y * sizeof(plane.at(0, 0 )));
 	};
 	takePlane(AirPressure);
 	takePlane(AirVelocityX);

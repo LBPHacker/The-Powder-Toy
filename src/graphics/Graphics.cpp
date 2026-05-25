@@ -478,10 +478,10 @@ void Graphics::RenderZoom()
 		for (j=0; j<zoomScopeSize; j++)
 			for (i=0; i<zoomScopeSize; i++)
 			{
-				pix = video[{ i + zoomScopePosition.X, j + zoomScopePosition.Y }];
+				pix = video.at(i + zoomScopePosition.X, j + zoomScopePosition.Y );
 				for (y=0; y<ZFACTOR-1; y++)
 					for (x=0; x<ZFACTOR-1; x++)
-						video[{ i * ZFACTOR + x + zoomWindowPosition.X, j * ZFACTOR + y + zoomWindowPosition.Y }] = pix;
+						video.at(i * ZFACTOR + x + zoomWindowPosition.X, j * ZFACTOR + y + zoomWindowPosition.Y ) = pix;
 			}
 		if (zoomEnabled)
 		{

@@ -38,8 +38,8 @@ void SurfaceNormals::Draw()
 		}
 		if (sim->eval_move(PT_PHOT, mr.fin_x, mr.fin_y, nullptr))
 		{
-			int rt = TYP(sim->pmap[{ mr.fin_x, mr.fin_y }]);
-			int lt = TYP(sim->pmap[{ x, y }]);
+			int rt = TYP(sim->pmap.at(mr.fin_x, mr.fin_y ));
+			int lt = TYP(sim->pmap.at(x, y ));
 			int rt_glas = (rt == PT_GLAS) || (rt == PT_BGLA);
 			int lt_glas = (lt == PT_GLAS) || (lt == PT_BGLA);
 			if ((rt_glas && !lt_glas) || (lt_glas && !rt_glas))

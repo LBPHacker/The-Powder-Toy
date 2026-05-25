@@ -53,7 +53,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[{ x+rx, y+ry }];
+				auto r = pmap.at(x+rx, y+ry );
 				if (!r)
 					continue;
 				else if (TYP(r)==PT_SPRK&&parts[i].life==0)
@@ -67,10 +67,10 @@ static int update(UPDATE_FUNC_ARGS)
 					{
 						for (auto nny = -1; nny <= 1; nny++)
 						{
-							if (!pmap[{ x+rx+nnx, y+ry+nny }])
+							if (!pmap.at(x+rx+nnx, y+ry+nny ))
 							{
 								sim->create_part(-1,x+rx+nnx,y+ry+nny,PT_SHLD1);
-								//parts[ID(pmap[{ x+nx+nnx, y+ny+nny }])].life=7;
+								//parts[ID(pmap.at(x+nx+nnx, y+ny+nny ))].life=7;
 							}
 						}
 					}

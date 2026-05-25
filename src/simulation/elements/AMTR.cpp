@@ -55,7 +55,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[{ x+rx, y+ry }];
+				auto r = pmap.at(x+rx, y+ry );
 				if (!r)
 					continue;
 				auto rt = TYP(r);
@@ -71,7 +71,7 @@ static int update(UPDATE_FUNC_ARGS)
 						sim->create_part(ID(r), x+rx, y+ry, PT_PHOT);
 					else
 						sim->kill_part(ID(r));
-					sim->pv[{ x/CELL, y/CELL }] -= 2.0f;
+					sim->pv.at(x/CELL, y/CELL ) -= 2.0f;
 				}
 			}
 		}

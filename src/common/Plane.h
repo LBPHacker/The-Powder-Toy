@@ -229,6 +229,18 @@ public:
 		return std::data(getBase());
 	}
 
+	// Fast-path 2D index: at(x, y) avoids Vec2<int> temporary construction.
+	// Prefer this over operator[]({x, y}) in performance-critical loops.
+	value_type &at(int x, int y)
+	{
+		return getBase()[x + y * getWidth()];
+	}
+
+	value_type const &at(int x, int y) const
+	{
+		return getBase()[x + y * getWidth()];
+	}
+
 	value_type &operator[](Vec2<int> p)
 	{
 		return getBase()[p.X + p.Y * getWidth()];

@@ -59,7 +59,7 @@ static int update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[{ x+rx, y+ry }];
+					auto r = pmap.at(x+rx, y+ry );
 					if (!r)
 						continue;
 					auto rt = TYP(r);
@@ -110,7 +110,7 @@ static int update(UPDATE_FUNC_ARGS)
 				parts[np].dcolour = parts[i].dcolour;
 			}
 		}
-		sim->pv[{ x/CELL, y/CELL }] += 8.0f;
+		sim->pv.at(x/CELL, y/CELL ) += 8.0f;
 		sim->kill_part(i);
 		return 1;
 	}

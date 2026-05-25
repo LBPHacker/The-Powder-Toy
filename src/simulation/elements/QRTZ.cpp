@@ -53,7 +53,7 @@ int Element_QRTZ_update(UPDATE_FUNC_ARGS)
 	int t = parts[i].type;
 	if (t == PT_QRTZ)
 	{
-		auto press = int(sim->pv[{ x/CELL, y/CELL }] * 64);
+		auto press = int(sim->pv.at(x/CELL, y/CELL ) * 64);
 		auto diffTolerance = parts[i].temp * 1.0666f;
 		if (press - parts[i].tmp3 > diffTolerance || press - parts[i].tmp3 < -diffTolerance)
 		{
@@ -73,7 +73,7 @@ int Element_QRTZ_update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[{ x+rx, y+ry }];
+					auto r = pmap.at(x+rx, y+ry );
 					if (!r)
 						continue;
 					else if (TYP(r)==PT_SLTW && sim->rng.chance(1, 500))
@@ -101,7 +101,7 @@ int Element_QRTZ_update(UPDATE_FUNC_ARGS)
 			{
 				if (!stopgrow)//try to grow
 				{
-					if (!pmap[{ x+srx, y+sry }] && parts[i].tmp!=0)
+					if (!pmap.at(x+srx, y+sry ) && parts[i].tmp!=0)
 					{
 						auto np = sim->create_part(-1,x+srx,y+sry,PT_QRTZ);
 						if (np>-1)
@@ -131,7 +131,7 @@ int Element_QRTZ_update(UPDATE_FUNC_ARGS)
 					}
 				}
 				//diffusion
-				auto r = pmap[{ x+rx, y+ry }];
+				auto r = pmap.at(x+rx, y+ry );
 				if (!r)
 					continue;
 				else if (TYP(r)==PT_QRTZ && (parts[i].tmp>parts[ID(r)].tmp) && parts[ID(r)].tmp>=0)
@@ -169,5 +169,5 @@ int Element_QRTZ_graphics(GRAPHICS_FUNC_ARGS)
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
 	sim->parts[i].tmp2 = sim->rng.between(0, 10);
-	sim->parts[i].tmp3 = int(sim->pv[{ x/CELL, y/CELL }] * 64);
+	sim->parts[i].tmp3 = int(sim->pv.at(x/CELL, y/CELL ) * 64);
 }

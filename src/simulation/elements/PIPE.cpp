@@ -131,7 +131,7 @@ int Element_PIPE_update(UPDATE_FUNC_ARGS)
 				{
 					if (rx || ry)
 					{
-						auto r = pmap[{ x+rx, y+ry }];
+						auto r = pmap.at(x+rx, y+ry );
 						if (TYP(r) == PT_BRCK)
 						{
 							if (parts[i].tmp & PPIP_TMPFLAG_PAUSED)
@@ -178,7 +178,7 @@ int Element_PIPE_update(UPDATE_FUNC_ARGS)
 					if (rx || ry)
 					{
 						count++;
-						auto r = pmap[{ x+rx, y+ry }];
+						auto r = pmap.at(x+rx, y+ry );
 						if (!r)
 							continue;
 						if (TYP(r) == PT_HEAC)
@@ -238,9 +238,9 @@ int Element_PIPE_update(UPDATE_FUNC_ARGS)
 				auto rnd = rndstore&7;
 				auto rx = Element_PIPE_offsets[rnd].X;
 				auto ry = Element_PIPE_offsets[rnd].Y;
-				auto r = pmap[{ x+rx, y+ry }];
+				auto r = pmap.at(x+rx, y+ry );
 				if(!r)
-					r = sim->photons[{ x+rx, y+ry }];
+					r = sim->photons.at(x+rx, y+ry );
 				if (surround_space && !r && TYP(parts[i].ctype))  //creating at end
 				{
 					auto np = sim->create_part(-1, x+rx, y+ry, TYP(parts[i].ctype));
@@ -274,7 +274,7 @@ int Element_PIPE_update(UPDATE_FUNC_ARGS)
 			{
 				if (rx || ry)
 				{
-					auto r = pmap[{ x+rx, y+ry }];
+					auto r = pmap.at(x+rx, y+ry );
 					if (!r)
 					{
 						// BRCK border
@@ -299,7 +299,7 @@ int Element_PIPE_update(UPDATE_FUNC_ARGS)
 				{
 					if (rx || ry)
 					{
-						if (!pmap[{ x+rx, y+ry }] && sim->bmap[{ (x+rx)/CELL, (y+ry)/CELL }]!=WL_ALLOWAIR && sim->bmap[{ (x+rx)/CELL, (y+ry)/CELL }]!=WL_WALL && sim->bmap[{ (x+rx)/CELL, (y+ry)/CELL }]!=WL_WALLELEC && (sim->bmap[{ (x+rx)/CELL, (y+ry)/CELL }]!=WL_EWALL || sim->emap[{ (x+rx)/CELL, (y+ry)/CELL }]))
+						if (!pmap.at(x+rx, y+ry ) && sim->bmap.at((x+rx)/CELL, (y+ry)/CELL )!=WL_ALLOWAIR && sim->bmap.at((x+rx)/CELL, (y+ry)/CELL )!=WL_WALL && sim->bmap.at((x+rx)/CELL, (y+ry)/CELL )!=WL_WALLELEC && (sim->bmap.at((x+rx)/CELL, (y+ry)/CELL )!=WL_EWALL || sim->emap.at((x+rx)/CELL, (y+ry)/CELL )))
 							parts[i].life=50;
 					}
 				}
@@ -314,7 +314,7 @@ int Element_PIPE_update(UPDATE_FUNC_ARGS)
 				{
 					if (rx || ry)
 					{
-						auto r = pmap[{ x+rx, y+ry }];
+						auto r = pmap.at(x+rx, y+ry );
 						if ((TYP(r)==PT_PIPE || TYP(r) == PT_PPIP) && parts[i].life)
 							issingle = 0;
 					}
@@ -542,7 +542,7 @@ static void pushParticle(Simulation * sim, int i, int count, int original)
 			rndstore = rndstore>>3;
 			auto rx = Element_PIPE_offsets[rnd].X;
 			auto ry = Element_PIPE_offsets[rnd].Y;
-			auto r = sim->pmap[{ x+rx, y+ry }];
+			auto r = sim->pmap.at(x+rx, y+ry );
 			if (!r)
 				continue;
 			else if ((TYP(r) == PT_PIPE || TYP(r) == PT_PPIP) && (sim->parts[ID(r)].tmp&PFLAG_COLORS) != notctype && !TYP(sim->parts[ID(r)].ctype))

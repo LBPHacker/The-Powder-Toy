@@ -20,11 +20,11 @@ public:
 			{
 				if ((abs((rx+2*x)*ry+rx*y) + abs(2*rx*(y-ry)) + abs((rx-2*x)*ry+rx*y))<=(4*rx*ry))
 				{
-					bitmap[{ x+rx, y+ry }] = 255;
+					bitmap.at(x+rx, y+ry ) = 255;
 				}
 				else
 				{
-					bitmap[{ x+rx, y+ry }] = 0;
+					bitmap.at(x+rx, y+ry ) = 0;
 				}
 			}
 		}

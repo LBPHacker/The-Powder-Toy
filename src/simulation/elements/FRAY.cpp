@@ -61,7 +61,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[{ x+rx, y+ry }];
+				auto r = pmap.at(x+rx, y+ry );
 				if (!r)
 					continue;
 				if (TYP(r)==PT_SPRK)
@@ -72,9 +72,9 @@ static int update(UPDATE_FUNC_ARGS)
 						{
 							break;
 						}
-						r = pmap[{ x+nxi+nxx, y+nyi+nyy }];
+						r = pmap.at(x+nxi+nxx, y+nyi+nyy );
 						if (!r)
-							r = sim->photons[{ x+nxi+nxx, y+nyi+nyy }];
+							r = sim->photons.at(x+nxi+nxx, y+nyi+nyy );
 						if (r && !(elements[TYP(r)].Properties & TYPE_SOLID)){
 							parts[ID(r)].vx += nxi*((parts[i].temp-273.15f)/10.0f);
 							parts[ID(r)].vy += nyi*((parts[i].temp-273.15f)/10.0f);

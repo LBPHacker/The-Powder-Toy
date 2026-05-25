@@ -118,7 +118,7 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 				if (x+rx>=0 && y+ry>0 &&
 				        x+rx<XRES && y+ry<YRES && (rx || ry))
 				{
-					r = pmap[{ x+rx, y+ry }];
+					r = pmap.at(x+rx, y+ry );
 					if (!r)
 						continue;
 					if ((TYP(r)==PT_WATR||TYP(r)==PT_DSTW||TYP(r)==PT_SLTW) && sim->rng.chance(1, 1000))
@@ -140,7 +140,7 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 				if (x+rx>=0 && y+ry>0 &&
 				        x+rx<XRES && y+ry<YRES && (rx || ry))
 				{
-					r = pmap[{ x+rx, y+ry }];
+					r = pmap.at(x+rx, y+ry );
 					if (!r)
 						continue;
 					if ((TYP(r)==PT_FIRE || TYP(r)==PT_LAVA) && sim->rng.chance(1, 10))
@@ -155,7 +155,7 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 				if (x+rx>=0 && y+ry>0 &&
 				        x+rx<XRES && y+ry<YRES && (rx || ry))
 				{
-					r = pmap[{ x+rx, y+ry }];
+					r = pmap.at(x+rx, y+ry );
 					if (!r)
 						continue;
 					if ((TYP(r)==PT_FIRE || TYP(r)==PT_LAVA) && sim->rng.chance(1, 10))
@@ -173,7 +173,7 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 				if (x+rx>=0 && y+ry>0 &&
 				        x+rx<XRES && y+ry<YRES && (rx || ry))
 				{
-					r = pmap[{ x+rx, y+ry }];
+					r = pmap.at(x+rx, y+ry );
 					if (!r)
 						continue;
 					if ((TYP(r)==PT_FIRE || TYP(r)==PT_LAVA) && sim->rng.chance(1, 10))
@@ -187,7 +187,7 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 			for (ry=-2; ry<3; ry++)
 				if (x+rx>=0 && y+ry>0 && x+rx<XRES && y+ry<YRES && (rx || ry))
 				{
-					r = pmap[{ x+rx, y+ry }];
+					r = pmap.at(x+rx, y+ry );
 					if (!r)
 						continue;
 					if ((TYP(r)==PT_WATR || TYP(r)==PT_DSTW) && sim->rng.chance(1, 1000))
@@ -202,7 +202,7 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 			for (ry=-2; ry<3; ry++)
 				if (x+rx>=0 && y+ry>0 && x+rx<XRES && y+ry<YRES && (rx || ry))
 				{
-					r = pmap[{ x+rx, y+ry }];
+					r = pmap.at(x+rx, y+ry );
 					if (!r)
 						continue;
 					if ((TYP(r)==PT_WATR || TYP(r)==PT_DSTW) && sim->rng.chance(1, 1000))
@@ -214,13 +214,13 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 						sim->part_change_type(i,x,y,PT_WATR);
 				}
 	}
-	if (t==PT_WTRV && sim->pv[{ x/CELL, y/CELL }]>4.0f)
+	if (t==PT_WTRV && sim->pv.at(x/CELL, y/CELL )>4.0f)
 		sim->part_change_type(i,x,y,PT_DSTW);
-	if (t==PT_OIL && sim->pv[{ x/CELL, y/CELL }]<-6.0f)
+	if (t==PT_OIL && sim->pv.at(x/CELL, y/CELL )<-6.0f)
 		sim->part_change_type(i,x,y,PT_GAS);
-	if (t==PT_GAS && sim->pv[{ x/CELL, y/CELL }]>6.0f)
+	if (t==PT_GAS && sim->pv.at(x/CELL, y/CELL )>6.0f)
 		sim->part_change_type(i,x,y,PT_OIL);
-	if (t==PT_DESL && sim->pv[{ x/CELL, y/CELL }]>12.0f)
+	if (t==PT_DESL && sim->pv.at(x/CELL, y/CELL )>12.0f)
 	{
 		sim->part_change_type(i,x,y,PT_FIRE);
 		parts[i].life = sim->rng.between(120, 169);

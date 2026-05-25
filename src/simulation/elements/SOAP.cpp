@@ -162,7 +162,7 @@ static int update(UPDATE_FUNC_ARGS)
 				{
 					if (rx || ry)
 					{
-						auto r = pmap[{ x+rx, y+ry }];
+						auto r = pmap.at(x+rx, y+ry );
 						if (!r)
 							continue;
 						if ((parts[ID(r)].type == PT_SOAP) && (parts[ID(r)].ctype&1) && !(parts[ID(r)].ctype&4))
@@ -181,12 +181,12 @@ static int update(UPDATE_FUNC_ARGS)
 					{
 						if (rx || ry)
 						{
-							auto r = pmap[{ x+rx, y+ry }];
-							if (!r && !sim->bmap[{ (x+rx)/CELL, (y+ry)/CELL }])
+							auto r = pmap.at(x+rx, y+ry );
+							if (!r && !sim->bmap.at((x+rx)/CELL, (y+ry)/CELL ))
 								continue;
 							if (parts[i].temp>FREEZING)
 							{
-								if (sim->bmap[{ (x+rx)/CELL, (y+ry)/CELL }]
+								if (sim->bmap.at((x+rx)/CELL, (y+ry)/CELL )
 									|| (r && !(elements[TYP(r)].Properties&TYPE_GAS)
 								    && TYP(r) != PT_SOAP && TYP(r) != PT_GLAS))
 								{
@@ -252,7 +252,7 @@ static int update(UPDATE_FUNC_ARGS)
 	}
 	else
 	{
-		if (sim->pv[{ x/CELL, y/CELL }]>0.5f || sim->pv[{ x/CELL, y/CELL }]<(-0.5f))
+		if (sim->pv.at(x/CELL, y/CELL )>0.5f || sim->pv.at(x/CELL, y/CELL )<(-0.5f))
 		{
 			parts[i].ctype = 1;
 			parts[i].life = 10;
@@ -263,7 +263,7 @@ static int update(UPDATE_FUNC_ARGS)
 			for (auto ry=-2; ry<3; ry++)
 				if (rx || ry)
 				{
-					auto r = pmap[{ x+rx, y+ry }];
+					auto r = pmap.at(x+rx, y+ry );
 					if (!r)
 						continue;
 					if (TYP(r) == PT_OIL)
@@ -285,7 +285,7 @@ static int update(UPDATE_FUNC_ARGS)
 		{
 			if (rx || ry)
 			{
-				auto r = pmap[{ x+rx, y+ry }];
+				auto r = pmap.at(x+rx, y+ry );
 				if (!r)
 					continue;
 				if (TYP(r)!=PT_SOAP)
