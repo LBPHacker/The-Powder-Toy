@@ -13,12 +13,12 @@ int ThumbnailRendererTask::QueueSize()
 	return queueSize;
 }
 
-ThumbnailRendererTask::ThumbnailRendererTask(GameSave const &save, Vec2<int> size, RendererSettings::DecorationLevel newDecorationLevel, bool fire):
-	save(std::make_unique<GameSave>(save)),
+ThumbnailRendererTask::ThumbnailRendererTask(GameSave const &originalSave, Vec2<int> size, RendererSettings::DecorationLevel newDecorationLevel, bool fire):
 	size(size),
 	decorationLevel(newDecorationLevel),
 	fire(fire)
 {
+	save = std::make_unique<GameSave>(originalSave);
 	queueSize += 1;
 }
 
