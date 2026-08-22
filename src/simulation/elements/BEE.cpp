@@ -269,7 +269,7 @@ static int update(UPDATE_FUNC_ARGS)
 
 							if (rt == PT_PLNT && sim->rng.chance(1, 500)) // Pollinate PLNT (makes it grow)
 							{
-								sim->part_change_type(ID(r), parts[ID(r)].x, parts[ID(r)].y, PT_VINE);
+								sim->part_change_type(ID(r), x + rx, y + ry, PT_VINE);
 							}
 							else if ((rt == PT_SUGR || rt == PT_SWTR || rt == PT_WATR) && sim->rng.chance(2, 100)) // Consume SUGR or SWTR
 							{

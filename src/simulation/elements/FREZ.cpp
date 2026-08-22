@@ -86,7 +86,7 @@ static int update(UPDATE_FUNC_ARGS)
 				{
 					parts[i].life = 100;
 					parts[ID(r)].temp = 0.0f;
-					sim->part_change_type(i, parts[i].x, parts[i].y, PT_CFLM);
+					sim->part_change_type(i, x, y, PT_CFLM);
 				}
 			}
 		}

@@ -67,7 +67,7 @@ static int update(UPDATE_FUNC_ARGS)
 	// Die
 	if (parts[i].life == 1)
 	{
-		sim->part_change_type(i, parts[i].x, parts[i].y, PT_CO2);
+		sim->part_change_type(i, x, y, PT_CO2);
 		return 0;
 	}
 

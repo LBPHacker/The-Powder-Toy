@@ -105,7 +105,7 @@ static int update(UPDATE_FUNC_ARGS)
 				switch(rt)
 				{
 					case PT_GLOW:
-						sim->part_change_type(ID(r), x, y, PT_LCRY);
+						sim->part_change_type(ID(r), x+rx, y+ry, PT_LCRY);
 						break;
 
 					case PT_FIRE:

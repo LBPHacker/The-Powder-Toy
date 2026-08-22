@@ -74,7 +74,7 @@ static int update(UPDATE_FUNC_ARGS)
 	// Freezing
 	if (parts[i].temp < 273.15f)
 	{
-		sim->part_change_type(i, parts[i].x, parts[i].y, PT_ICEI);
+		sim->part_change_type(i, x, y, PT_ICEI);
 		parts[i].ctype = PT_BLOD;
 		parts[i].dcolour = elements[PT_BLOD].Colour.Pack() + 0x77000000;
 		return 0;
@@ -85,11 +85,11 @@ static int update(UPDATE_FUNC_ARGS)
 	{
 		if (sim->rng.chance(1, 500))
 		{
-			sim->part_change_type(i, parts[i].x, parts[i].y, PT_BRMT);
+			sim->part_change_type(i, x, y, PT_BRMT);
 		}
 		else
 		{
-			sim->part_change_type(i, parts[i].x, parts[i].y, PT_WTRV);
+			sim->part_change_type(i, x, y, PT_WTRV);
 			parts[i].dcolour = elements[PT_BLOD].Colour.Pack() + 0x44000000;
 		}
 	}

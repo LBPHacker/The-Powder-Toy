@@ -100,12 +100,13 @@ static int update(UPDATE_FUNC_ARGS)
 		auto r = pmap[ty][tx];
 		if (r && (elements[TYP(r)].Properties & TYPE_LIQUID || elements[TYP(r)].Properties & TYPE_GAS))
 		{
-			parts[i].x = parts[ID(r)].x;
-			parts[i].y = parts[ID(r)].y;
-			parts[ID(r)].x = x;
-			parts[ID(r)].y = y;
-			pmap[y][x] = r;
-			pmap[ty][tx] = PMAP(i, parts[i].type);
+			auto nxf = parts[ID(r)].x;
+			auto nyf = parts[ID(r)].y;
+			sim->move(ID(r), tx, ty, parts[i].x, parts[i].y);
+			if (!sim->move(i, x, y, nxf, nyf))
+			{
+				return 1;
+			}
 			return 0;
 		}
 	}

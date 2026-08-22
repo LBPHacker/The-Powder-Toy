@@ -79,7 +79,7 @@ static int update(UPDATE_FUNC_ARGS)
 
 					if (TYP(r) == PT_WATR || TYP(r) == PT_DSTW) // Dissolve
 					{
-						sim->part_change_type(ID(r), parts[ID(r)].x, parts[ID(r)].y, PT_SWTR);
+						sim->part_change_type(ID(r), x + rx, y + ry, PT_SWTR);
 						if (sim->rng.chance(1, 2))
 						{
 							sim->kill_part(i);
@@ -88,13 +88,13 @@ static int update(UPDATE_FUNC_ARGS)
 					}
 					else if (TYP(r) == PT_YEST && sim->rng.chance(1, 300)) // Grow YEST
 					{
-						sim->part_change_type(i, parts[i].x, parts[i].y, PT_YEST);
+						sim->part_change_type(i, x, y, PT_YEST);
 						return 1;
 					}
 					else if (TYP(r) == PT_ACID || TYP(r) == PT_CAUS) // React with acid to form carbon
 					{
 						parts[i].temp += 120.0f;
-						sim->part_change_type(ID(r), parts[ID(r)].x, parts[ID(r)].y, sim->rng.chance(1, 2) ? PT_CRBN : PT_WTRV);
+						sim->part_change_type(ID(r), x + rx, y + ry, sim->rng.chance(1, 2) ? PT_CRBN : PT_WTRV);
 						if (sim->rng.chance(1, 2))
 						{
 							sim->kill_part(i);

@@ -179,7 +179,7 @@ static int update(UPDATE_FUNC_ARGS)
 
 		if (parts[i].tmp2 && sim->rng.chance(1, 50)) // Turn to ash
 		{
-			sim->part_change_type(i, parts[i].x, parts[i].y, PT_BCOL);
+			sim->part_change_type(i, x, y, PT_BCOL);
 		}
 		else // Actual BALI disappears
 		{

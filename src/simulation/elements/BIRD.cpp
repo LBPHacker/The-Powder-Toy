@@ -223,12 +223,12 @@ static int update(UPDATE_FUNC_ARGS)
 				{
 					if (rt == PT_GLAS && std::hypot(parts[i].vx, parts[i].vy) > 0.5f) // Die upon colliding with glass
 					{
-						sim->part_change_type(i, parts[i].x, parts[i].y, PT_BLOD);
+						sim->part_change_type(i, x, y, PT_BLOD);
 						return 0;
 					}
 					else if (rt == PT_SPRK || rt == PT_LIGH) // Fried by electricity
 					{
-						sim->part_change_type(i, parts[i].x, parts[i].y, PT_DUST);
+						sim->part_change_type(i, x, y, PT_DUST);
 						parts[i].temp += 100.0f;
 						return 0;
 					}

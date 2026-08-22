@@ -202,10 +202,10 @@ static int update(UPDATE_FUNC_ARGS)
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
 
-	auto eat = [sim, i, &parts](int r, int other) {
+	auto eat = [sim, i, &parts](int r, int xr, int yr, int other) {
 		if (other != PT_NONE && sim->rng.chance(1, 30))
 		{
-			sim->part_change_type(ID(r), parts[ID(r)].x, parts[ID(r)].y, other);
+			sim->part_change_type(ID(r), xr, yr, other);
 		}
 		else
 		{
@@ -219,7 +219,7 @@ static int update(UPDATE_FUNC_ARGS)
 	{
 		if (parts[i].temp < 273.15f)
 		{
-			sim->part_change_type(i, parts[i].x, parts[i].y, PT_ICEI);
+			sim->part_change_type(i, x, y, PT_ICEI);
 			parts[i].ctype = PT_BCTR;
 			return 1;
 		}
@@ -233,7 +233,7 @@ static int update(UPDATE_FUNC_ARGS)
 				// Burn
 				if (TYP(r) == PT_FIRE || TYP(r) == PT_PLSM)
 				{
-					sim->part_change_type(i, parts[i].x, parts[i].y, PT_FIRE);
+					sim->part_change_type(i, x, y, PT_FIRE);
 					parts[i].life = sim->rng.between(0, 200);
 					parts[i].temp += 50.0f;
 					return 1;
@@ -253,7 +253,7 @@ static int update(UPDATE_FUNC_ARGS)
 	// If all genes somehow become 1 become sing :D
 	if (parts[i].ctype == ~0)
 	{
-		sim->part_change_type(i, parts[i].x, parts[i].y, PT_SING);
+		sim->part_change_type(i, x, y, PT_SING);
 		return 1;
 	}
 
@@ -321,7 +321,7 @@ static int update(UPDATE_FUNC_ARGS)
 	float minTemp = 273.15f - BCTR_TEMP_RES_MULTI * (resType == 2) * resVal;
 	if (parts[i].temp < minTemp)
 	{
-		sim->part_change_type(i, parts[i].x, parts[i].y, PT_ICEI);
+		sim->part_change_type(i, x, y, PT_ICEI);
 		parts[i].ctype = PT_BCTR;
 		parts[i].tmp2 = 1;
 		return 1;
@@ -339,7 +339,7 @@ static int update(UPDATE_FUNC_ARGS)
 				// Burn
 				if ((rt == PT_FIRE || rt == PT_PLSM) && sim->rng.chance(1, 80) && (resType != 1 || resVal < 8))
 				{
-					sim->part_change_type(i, parts[i].x, parts[i].y, PT_FIRE);
+					sim->part_change_type(i, x, y, PT_FIRE);
 					parts[i].life = sim->rng.between(0, 100);
 					parts[i].temp += 30.0f;
 					return 1;
@@ -356,7 +356,7 @@ static int update(UPDATE_FUNC_ARGS)
 						{
 							parts[ID(i)].ctype |= 1 << 26;
 						}
-						eat(r, PT_NONE);
+						eat(r, x + rx, y + ry, PT_NONE);
 						return 0;
 					}
 				}
@@ -373,14 +373,13 @@ static int update(UPDATE_FUNC_ARGS)
 				}
 				else if (r && move == 3 && elements[rt].Properties & TYPE_LIQUID && sim->rng.chance(move, 20)) // 3 = Swap with liquid particles
 				{
-					parts[i].x = parts[ID(r)].x;
-					parts[i].y = parts[ID(r)].y;
-					parts[ID(r)].x = x;
-					parts[ID(r)].y = y;
-					pmap[y][x] = r;
-					pmap[y + ry][x + rx] = PMAP(i, parts[i].type);
-					x = x + rx;
-					y = y + ry;
+					auto nxf = parts[ID(r)].x;
+					auto nyf = parts[ID(r)].y;
+					sim->move(ID(r), x + rx, y + ry, parts[i].x, parts[i].y);
+					if (!sim->move(i, x, y, nxf, nyf))
+					{
+						return 1;
+					}
 					return 0;
 				}
 				else if (r && move == 4 && TYP(r) == PT_BCTR && parts[i].life > BCTR_START_LIFE && sim->rng.chance(1, 100)) // 4 = Reproduce by injecting DNA into other BCTR
@@ -425,13 +424,13 @@ static int update(UPDATE_FUNC_ARGS)
 						(foodType == 4 && (rt == PT_NEUT || rt == PT_PROT))
 					)
 					{
-						eat(r, PT_GAS);
+						eat(r, x + rx, y + ry, PT_GAS);
 						return 0;
 					}
 					else if (foodType == 3 && (rt == PT_PHOT || rt == PT_BRAY))
 					{
 						parts[i].temp += 2.0f;
-						eat(r, PT_NONE);
+						eat(r, x + rx, y + ry, PT_NONE);
 						return 0;
 					}
 					else if (foodType == 6 && r && parts[i].temp < parts[ID(r)].temp) // Absorb thermal energy
@@ -442,7 +441,7 @@ static int update(UPDATE_FUNC_ARGS)
 					}
 					else if ((foodType < 1 || foodType > 6) && (TYP(r) == PT_SWTR || TYP(r) == PT_SUGR))
 					{
-						eat(r, PT_GAS);
+						eat(r, x + rx, y + ry, PT_GAS);
 						return 0;
 					}
 				}

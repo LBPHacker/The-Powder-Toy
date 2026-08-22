@@ -59,7 +59,7 @@ static int update(UPDATE_FUNC_ARGS)
 					case PT_SUGR: // Grow sugar crystals
 						if (sim->rng.chance(1, 2000))
 						{
-							sim->part_change_type(i, parts[i].x, parts[i].y, PT_SUGR);
+							sim->part_change_type(i, x, y, PT_SUGR);
 							return 1;
 						}
 						break;
@@ -67,7 +67,7 @@ static int update(UPDATE_FUNC_ARGS)
 					case PT_PLNT:
 						if (sim->rng.chance(1, 2000))
 						{
-							sim->part_change_type(i, parts[i].x, parts[i].y, PT_PLNT);
+							sim->part_change_type(i, x, y, PT_PLNT);
 							return 1;
 						}
 						break;
@@ -98,7 +98,7 @@ static int update(UPDATE_FUNC_ARGS)
 					case PT_YEST:
 						if (sim->rng.chance(1, 300))
 						{
-							sim->part_change_type(i, parts[i].x, parts[i].y, PT_YEST);
+							sim->part_change_type(i, x, y, PT_YEST);
 							return 1;
 						}
 				}

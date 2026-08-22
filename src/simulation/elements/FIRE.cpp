@@ -332,7 +332,7 @@ int Element_FIRE_update(UPDATE_FUNC_ARGS)
 						)
 					) // Molten LEAD destroys nearby electronics
 					{
-						sim->part_change_type(ID(r), x, y, PT_BREC);
+						sim->part_change_type(ID(r), x + rx, y + ry, PT_BREC);
 					}
 				}
 

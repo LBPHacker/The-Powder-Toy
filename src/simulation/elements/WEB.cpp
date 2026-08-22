@@ -124,7 +124,7 @@ static int update(UPDATE_FUNC_ARGS)
 			// Capture BIRD, ANT and BEE as WEB randomly
 			if (sim->rng.chance(1, 100) && isAlive && rt != PT_SPDR)
 			{
-				sim->part_change_type(ID(r), parts[ID(r)].x, parts[ID(r)].y, PT_WEB);
+				sim->part_change_type(ID(r), x + rx, y + ry, PT_WEB);
 				parts[ID(r)].ctype = rt;
 				parts[ID(r)].vx = parts[ID(r)].vy = 0.0f;
 			}

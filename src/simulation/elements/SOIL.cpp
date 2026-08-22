@@ -84,20 +84,20 @@ static int update(UPDATE_FUNC_ARGS)
 				{
 					if (rt == PT_SLTW && sim->rng.chance(1, 5))
 					{
-						sim->part_change_type(ID(r), parts[ID(r)].x, parts[ID(r)].y, PT_SALT);
-						sim->part_change_type(i, parts[i].x, parts[i].y, PT_MUD);
+						sim->part_change_type(ID(r), x + rx, y + ry, PT_SALT);
+						sim->part_change_type(i, x, y, PT_MUD);
 						return 0;
 					}
 					else if (rt == PT_SWTR && sim->rng.chance(1, 5))
 					{
-						sim->part_change_type(ID(r), parts[ID(r)].x, parts[ID(r)].y, PT_SUGR);
-						sim->part_change_type(i, parts[i].x, parts[i].y, PT_MUD);
+						sim->part_change_type(ID(r), x + rx, y + ry, PT_SUGR);
+						sim->part_change_type(i, x, y, PT_MUD);
 						return 0;
 					}
 					else if (elements[rt].Properties & PROP_WATER)
 					{
 						sim->kill_part(ID(r));
-						sim->part_change_type(i, parts[i].x, parts[i].y, PT_MUD);
+						sim->part_change_type(i, x, y, PT_MUD);
 						return 0;
 					}
 				}

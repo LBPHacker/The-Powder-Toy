@@ -63,7 +63,7 @@ static int update(UPDATE_FUNC_ARGS)
 	// Solidify into realistic diamond
 	if (parts[i].temp > 2500.0f + 273.15f && sim->pv[y / CELL][x / CELL] > 100.0f && sim->rng.chance(1, 20))
 	{
-		sim->part_change_type(i, parts[i].x, parts[i].y, PT_RDMD);
+		sim->part_change_type(i, x, y, PT_RDMD);
 		Element_RDMD_create(sim, i, x, y, PT_RDMD, -1);
 		return 0;
 	}
@@ -95,11 +95,11 @@ static int update(UPDATE_FUNC_ARGS)
 				}
 				else if (rt == PT_WATR) // Purify water
 				{
-					sim->part_change_type(ID(r), parts[ID(r)].x, parts[ID(r)].y, PT_DSTW);
+					sim->part_change_type(ID(r), x + rx, y + ry, PT_DSTW);
 				}
 				else if (rt == PT_SLTW)
 				{
-					sim->part_change_type(ID(r), parts[ID(r)].x, parts[ID(r)].y, sim->rng.chance(1, 12) ? PT_SALT : PT_DSTW);
+					sim->part_change_type(ID(r), x + rx, y + ry, sim->rng.chance(1, 12) ? PT_SALT : PT_DSTW);
 				}
 				else if (rt == PT_LAVA && parts[ID(r)].ctype == PT_IRON) // Convert molten IRON into METL (steel)
 				{
@@ -170,11 +170,11 @@ static int update(UPDATE_FUNC_ARGS)
 	if (seenH2 && (seenFIRE || (parts[i].temp > 10.0f + 273.15f && sim->rng.chance(1, 200)))) // H2 + FIRE + CRBN = GAS
 	{
 		parts[i].temp += 5.0f;
-		sim->part_change_type(i, parts[i].x, parts[i].y, PT_GAS);
+		sim->part_change_type(i, x, y, PT_GAS);
 	}
 	else if (seenFIRE && sim->rng.chance(1, 20)) // FIRE + CRBN = CO2
 	{
-		sim->part_change_type(i, parts[i].x, parts[i].y, PT_CO2);
+		sim->part_change_type(i, x, y, PT_CO2);
 	}
 	else if (parts[i].temp < 100.0f && seenSPRK && CRBNCount <= 2 && xorCheck != 3) // Thin wires superconduct
 	{

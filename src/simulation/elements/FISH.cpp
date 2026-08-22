@@ -120,7 +120,7 @@ static int update(UPDATE_FUNC_ARGS)
 	// Chance to die if not touching water
 	if (!touching_water && sim->rng.chance(1, 600))
 	{
-		sim->part_change_type(i, parts[i].x, parts[i].y, PT_DUST);
+		sim->part_change_type(i, x, y, PT_DUST);
 		return 0;
 	}
 
@@ -142,12 +142,13 @@ static int update(UPDATE_FUNC_ARGS)
 
 		if (elements[rt].Properties & TYPE_LIQUID)
 		{
-			parts[i].x = parts[ID(r)].x;
-			parts[i].y = parts[ID(r)].y;
-			parts[ID(r)].x = x;
-			parts[ID(r)].y = y;
-			pmap[y][x] = r;
-			pmap[ny][nx] = PMAP(i, parts[i].type);
+			auto nxf = parts[ID(r)].x;
+			auto nyf = parts[ID(r)].y;
+			sim->move(ID(r), nx, ny, parts[i].x, parts[i].y);
+			if (!sim->move(i, x, y, nxf, nyf))
+			{
+				return 1;
+			}
 			return 0;
 		}
 	}

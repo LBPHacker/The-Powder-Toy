@@ -83,7 +83,7 @@ static int update(UPDATE_FUNC_ARGS)
 				// Melt when too hot
 				if (parts[i].temp > 7000.0f)
 				{
-					sim->part_change_type(i, parts[i].x, parts[i].y, PT_LAVA);
+					sim->part_change_type(i, x, y, PT_LAVA);
 					return 0;
 				}
 
@@ -91,7 +91,7 @@ static int update(UPDATE_FUNC_ARGS)
 				if (elements[rt].Properties & PROP_WATER)
 				{
 					parts[i].tmp = 0;
-					sim->part_change_type(i, parts[i].x, parts[i].y, parts[i].ctype);
+					sim->part_change_type(i, x, y, parts[i].ctype);
 					return 0;
 				}
 
@@ -107,7 +107,7 @@ static int update(UPDATE_FUNC_ARGS)
 				{
 					parts[ID(r)].ctype = rt;
 					parts[ID(r)].tmp = 1;
-					sim->part_change_type(ID(r), parts[ID(r)].x, parts[ID(r)].y, PT_PGEL);
+					sim->part_change_type(ID(r), x + rx, y + ry, PT_PGEL);
 					sim->kill_part(i);
 					return 0;
 				}
