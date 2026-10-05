@@ -7,7 +7,6 @@ void SimTool::Tool_NGRV()
 	Identifier = "DEFAULT_TOOL_NGRV";
 	Name = "NGRV";
 	Colour = 0xAACCFF_rgb;
-	Description = "Creates a short-lasting negative gravity well.";
 	Perform = &perform;
 }
 

@@ -27,7 +27,6 @@ void Element::Element_DYST()
 	Weight = 80;
 
 	HeatConduct = 70;
-	Description = "Dead Yeast.";
 
 	Properties = TYPE_PART;
 

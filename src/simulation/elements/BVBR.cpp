@@ -29,7 +29,6 @@ void Element::Element_BVBR()
 
 	DefaultProperties.temp = 273.15f;
 	HeatConduct = 164;
-	Description = "Broken vibranium.";
 
 	Properties = TYPE_PART|PROP_LIFE_DEC;
 

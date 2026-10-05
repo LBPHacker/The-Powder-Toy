@@ -6,8 +6,10 @@
 #include "gui/interface/Point.h"
 #include "simulation/StructProperty.h"
 #include "simulation/MenuSection.h"
+#include "Lang/Translation.hpp"
 #include <memory>
 #include <optional>
+#include <variant>
 
 class Simulation;
 class Brush;
@@ -20,8 +22,9 @@ public:
 
 	int ToolID = 0;
 	String Name = "NULL";
-	String Description = "NULL Tool, does NOTHING";
+	Powder::Lang::Translation Description;
 	ByteString Identifier = "DEFAULT_TOOL_INVALID";
+	std::optional<ByteString> descriptionOverride;
 	RGB Colour = 0xFFFFFF_rgb;
 	bool Blocky = false;
 	float Strength = 1.0f;
@@ -34,13 +37,12 @@ public:
 
 	Tool() = default;
 
-	Tool(int id, String name, String description,
+	Tool(int id, String name,
 		RGB colour, ByteString identifier, std::unique_ptr<VideoBuffer> (*textureGen)(int, Vec2<int>) = nullptr, bool blocky = false
 	):
 		textureGen(textureGen),
 		ToolID(id),
 		Name(name),
-		Description(description),
 		Identifier(identifier),
 		Colour(colour),
 		Blocky(blocky)
@@ -51,6 +53,8 @@ public:
 
 	virtual ~Tool()
 	{}
+
+	ByteString GetDescription();
 
 	std::unique_ptr<VideoBuffer> GetTexture(Vec2<int>);
 	virtual void Click(Simulation * sim, Brush const &brush, ui::Point position);

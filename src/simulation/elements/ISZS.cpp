@@ -30,7 +30,6 @@ void Element::Element_ISZS()
 
 	DefaultProperties.temp = 140.00f;
 	HeatConduct = 251;
-	Description = "Solid form of ISOZ, slowly decays into PHOT.";
 
 	Properties = TYPE_SOLID | PROP_PHOTPASS;
 

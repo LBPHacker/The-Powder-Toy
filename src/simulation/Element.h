@@ -42,7 +42,6 @@ public:
 	int Weight;
 	unsigned char HeatConduct;
 	float HeatCapacity; // Volumetric heat capacity per one pixel. Must be nonzero. The default value is 1.0f.
-	String Description;
 	unsigned int Properties;
 	unsigned int CarriesTypeIn;
 

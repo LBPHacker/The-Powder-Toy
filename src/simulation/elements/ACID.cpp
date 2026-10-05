@@ -31,7 +31,6 @@ void Element::Element_ACID()
 	Weight = 10;
 
 	HeatConduct = 34;
-	Description = "Dissolves almost everything.";
 
 	Properties = TYPE_LIQUID|PROP_DEADLY;
 

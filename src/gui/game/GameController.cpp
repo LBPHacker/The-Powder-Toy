@@ -888,7 +888,7 @@ void GameController::LoadRenderPreset(int presetNum)
 {
 	auto &settings = gameModel->GetRendererSettings();
 	RenderPreset preset = Renderer::renderModePresets[presetNum];
-	gameModel->SetInfoTip(preset.Name);
+	// gameModel->SetInfoTip(preset.Name); // TODO-REDO_UI-STUBBED
 	settings.renderMode = preset.renderMode;
 	settings.displayMode = preset.displayMode;
 	settings.colorMode = preset.colorMode;

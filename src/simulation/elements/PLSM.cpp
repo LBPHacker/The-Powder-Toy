@@ -32,7 +32,6 @@ void Element::Element_PLSM()
 
 	DefaultProperties.temp = MAX_TEMP;
 	HeatConduct = 5;
-	Description = "Plasma, extremely hot.";
 
 	Properties = TYPE_GAS|PROP_LIFE_DEC|PROP_LIFE_KILL;
 	CarriesTypeIn = 1U << FIELD_CTYPE;

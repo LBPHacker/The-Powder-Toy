@@ -14,7 +14,7 @@ class SignTool: public Tool
 
 public:
 	SignTool(Powder::Activity::Game &newGame):
-		Tool(0, "SIGN", "Sign. Displays text. Click on a sign to edit it or anywhere else to place a new one.",
+		Tool(0, "SIGN",
 			0x000000_rgb, "DEFAULT_UI_SIGN", SignTool::GetIcon
 		),
 		game(newGame)

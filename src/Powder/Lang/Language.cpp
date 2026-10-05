@@ -316,9 +316,12 @@ namespace
 	};
 }
 
-Language::Language()
+void Language::Load(std::span<const char> data)
 {
-	auto data = en_US_lang.AsString();
+	for (auto &[ key, holder ] : formatterHolders)
+	{
+		holder.formatter = std::make_unique<MissingFormatter>();
+	}
 	Parser parser{ data };
 	while (auto name = parser.GetName())
 	{
@@ -331,30 +334,32 @@ Language::Language()
 		if (method->second == "simple")
 		{
 			auto templ = parser.GetTemplate();
-			auto it = formatterHolders.insert(std::make_pair(name->second, FormatterHolder{})).first;
-			it->second.formatter = std::make_unique<SimpleFormatter>(templ.second);
+			GetFormatterHolder(name->second.c_str()).formatter = std::make_unique<SimpleFormatter>(templ.second);
 		}
 		else if (method->second == "plural2")
 		{
 			auto templOne = parser.GetTemplate();
 			auto templMore = parser.GetTemplate();
-			auto it = formatterHolders.insert(std::make_pair(name->second, FormatterHolder{})).first;
-			it->second.formatter = std::make_unique<Plural2Formatter>(templOne.second, templMore.second);
+			GetFormatterHolder(name->second.c_str()).formatter = std::make_unique<Plural2Formatter>(templOne.second, templMore.second);
 		}
 		else
 		{
 			parser.Die("unknown method", method->first);
 		}
 	}
-	missingFormatterHolder.formatter = std::make_unique<MissingFormatter>();
+}
+
+Language::Language()
+{
+	Load(en_US_lang.AsString());
 }
 
 FormatterHolder &Language::GetFormatterHolder(const char *name)
 {
-	auto it = formatterHolders.find(name);
-	if (it == formatterHolders.end())
+	auto [ it, inserted ] = formatterHolders.emplace(std::make_pair(name, FormatterHolder{}));
+	if (inserted)
 	{
-		return missingFormatterHolder;
+		it->second.formatter = std::make_unique<MissingFormatter>();
 	}
 	return it->second;
 }

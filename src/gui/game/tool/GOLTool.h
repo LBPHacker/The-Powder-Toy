@@ -11,7 +11,7 @@ class GOLTool: public Tool
 	Powder::Activity::Game &game;
 public:
 	GOLTool(Powder::Activity::Game &newGame):
-		Tool(0, "CUST", "Add a new custom GOL type. (Use ctrl+shift+rightclick to remove them)",
+		Tool(0, "CUST",
 			0xFEA900_rgb, "DEFAULT_UI_ADDLIFE", nullptr
 		),
 		game(newGame)

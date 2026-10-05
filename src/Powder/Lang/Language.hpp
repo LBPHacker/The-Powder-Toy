@@ -47,7 +47,8 @@ namespace Powder::Lang
 	class Language : public NoCopy, public ExplicitSingleton<Language>
 	{
 		std::map<std::string, FormatterHolder> formatterHolders;
-		FormatterHolder missingFormatterHolder;
+
+		void Load(std::span<const char> data);
 
 	public:
 		Language();

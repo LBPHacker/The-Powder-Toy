@@ -30,7 +30,6 @@ void Element::Element_PVOD()
 	Weight = 100;
 
 	HeatConduct = 251;
-	Description = "Powered VOID. When activated, destroys entering particles.";
 
 	Properties = TYPE_SOLID;
 

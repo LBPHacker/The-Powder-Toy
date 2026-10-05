@@ -123,7 +123,7 @@ void ElementSearchActivity::searchTools(String query)
 	for (int toolIndex = 0; toolIndex < (int)tools.size(); ++toolIndex)
 	{
 		pushIfMatches(tools[toolIndex]->Name.ToLower(), toolIndex, 0);
-		pushIfMatches(tools[toolIndex]->Description.ToLower(), toolIndex, 1);
+		pushIfMatches("", toolIndex, 1); // TODO-REDO_UI-STUBBED
 		auto it = menudescriptionLower.find(tools[toolIndex]);
 		if (it != menudescriptionLower.end())
 		{
@@ -147,9 +147,9 @@ void ElementSearchActivity::searchTools(String query)
 		ToolButton * tempButton;
 
 		if(tempTexture)
-			tempButton = new ToolButton(current+viewPosition, ui::Point(30, 18), "", tool->Identifier, tool->Description);
+			tempButton = new ToolButton(current+viewPosition, ui::Point(30, 18), "", tool->Identifier, ""); // TODO-REDO_UI-STUBBED
 		else
-			tempButton = new ToolButton(current+viewPosition, ui::Point(30, 18), tool->Name, tool->Identifier, tool->Description);
+			tempButton = new ToolButton(current+viewPosition, ui::Point(30, 18), tool->Name, tool->Identifier, ""); // TODO-REDO_UI-STUBBED
 
 		tempButton->Appearance.SetTexture(std::move(tempTexture));
 		tempButton->Appearance.BackgroundInactive = tool->Colour.WithAlpha(0xFF);

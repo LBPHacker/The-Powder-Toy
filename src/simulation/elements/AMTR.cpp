@@ -30,7 +30,6 @@ void Element::Element_AMTR()
 	Weight = 100;
 
 	HeatConduct = 70;
-	Description = "Anti-Matter, destroys a majority of particles.";
 
 	Properties = TYPE_GAS;
 

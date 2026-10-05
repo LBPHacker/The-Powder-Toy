@@ -18,8 +18,8 @@ public:
 
 	std::unique_ptr<VideoBuffer> GetIcon(int toolID, Vec2<int> size);
 
-	DecorationTool(Powder::Activity::Game &newGame, int decoMode, String name, String description, RGB colour, ByteString identifier):
-		Tool(decoMode, name, description, colour, identifier),
+	DecorationTool(Powder::Activity::Game &newGame, int decoMode, String name, RGB colour, ByteString identifier):
+		Tool(decoMode, name, colour, identifier),
 		game(newGame)
 	{
 		MenuSection = SC_DECO;

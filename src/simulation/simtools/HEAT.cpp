@@ -7,7 +7,6 @@ void SimTool::Tool_HEAT()
 	Identifier = "DEFAULT_TOOL_HEAT";
 	Name = "HEAT";
 	Colour = 0xFFDD00_rgb;
-	Description = "Heats the targeted element.";
 	Perform = &perform;
 }
 

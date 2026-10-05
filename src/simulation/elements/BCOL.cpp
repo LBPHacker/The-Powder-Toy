@@ -29,7 +29,6 @@ void Element::Element_BCOL()
 	Weight = 90;
 
 	HeatConduct = 150;
-	Description = "Broken Coal. Heavy particles, burns slowly.";
 
 	Properties = TYPE_PART;
 

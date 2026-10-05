@@ -392,7 +392,7 @@ namespace Powder::Activity
 			auto buttonComponent = ScopedComponent(buttonIndex);
 			if (GuiToolButton(*this, *info, *toolAtlasTexture, activeMenuSection != SC_FAVORITES))
 			{
-				QueueToolTip(info->tool->Description.ToUtf8(), r.pos + r.size, Gui::Alignment::right, Gui::Alignment::bottom);
+				QueueToolTip(info->tool->GetDescription(), r.pos + r.size, Gui::Alignment::right, Gui::Alignment::bottom);
 				lastHoveredTool = info->tool.get();
 			}
 			buttonIndex += 1;
@@ -498,7 +498,7 @@ namespace Powder::Activity
 			BeginButton(i, iconOverrides[i], activeMenuSection == i ? ButtonFlags::stuck : ButtonFlags::none);
 			SetSize(15);
 			SetTextPadding(0);
-			toolTip(sd.msections[i].name.ToUtf8());
+			toolTip(BuildString(sd.msections[i].name));
 			auto hovered = IsHovered();
 			auto activate = EndButton();
 			if (!(i == SC_DECO || menuSectionsNeedClick))
@@ -889,7 +889,7 @@ namespace Powder::Activity
 				BeginButton(componentKeyBase + i, rendererPresetIcons[i], ButtonFlags::none);
 				if (IsHoveredVisually())
 				{
-					QueueToolTip(Renderer::renderModePresets[i].Name.ToUtf8(), r.pos + r.size, Gui::Alignment::right, Gui::Alignment::bottom);
+					QueueToolTip(BuildString(Renderer::renderModePresets[i].Name), r.pos + r.size, Gui::Alignment::right, Gui::Alignment::bottom);
 				}
 				if (EndButton())
 				{

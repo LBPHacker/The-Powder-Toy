@@ -12,7 +12,7 @@ class SampleTool: public Tool
 
 public:
 	SampleTool(Powder::Activity::Game &newGame):
-		Tool(0, "SMPL", "Sample an element on the screen.",
+		Tool(0, "SMPL",
 			0x000000_rgb, "DEFAULT_UI_SAMPLE", SampleTool::GetIcon
 		),
 		game(newGame)

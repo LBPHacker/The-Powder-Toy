@@ -31,7 +31,6 @@ void Element::Element_GLOW()
 
 	DefaultProperties.temp = R_TEMP + 20.0f + 273.15f;
 	HeatConduct = 44;
-	Description = "Glow, Glows under pressure.";
 
 	Properties = TYPE_LIQUID | PROP_PHOTPASS | PROP_LIFE_DEC;
 

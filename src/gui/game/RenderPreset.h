@@ -3,9 +3,14 @@
 #include "graphics/RendererSettings.h"
 #include <cstdint>
 
+namespace Powder::Lang
+{
+	struct Translation;
+}
+
 struct RenderPreset
 {
-	String Name;
+	Powder::Lang::Translation &Name;
 	uint32_t renderMode;
 	uint32_t displayMode;
 	uint32_t colorMode;

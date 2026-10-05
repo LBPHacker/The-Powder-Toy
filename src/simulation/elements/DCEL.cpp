@@ -30,7 +30,6 @@ void Element::Element_DCEL()
 	Weight = 100;
 
 	HeatConduct = 251;
-	Description = "Decelerator, slows down nearby elements.";
 
 	Properties = TYPE_SOLID;
 

@@ -31,7 +31,6 @@ void Element::Element_EXOT()
 
 	DefaultProperties.temp = R_TEMP - 2.0f + 273.15f;
 	HeatConduct = 250;
-	Description = "Exotic matter. Explodes with excess exposure to electrons. Has many other odd reactions.";
 
 	Properties = TYPE_LIQUID|PROP_NEUTPASS;
 	CarriesTypeIn = 1U << FIELD_CTYPE;

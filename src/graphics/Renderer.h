@@ -1,7 +1,6 @@
 #pragma once
 #include "Icons.h"
 #include "RasterDrawMethods.h"
-#include "gui/game/RenderPreset.h"
 #include "RendererSettings.h"
 #include "common/tpt-rand.h"
 #include "RendererFrame.h"

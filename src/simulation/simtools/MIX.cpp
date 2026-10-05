@@ -10,7 +10,6 @@ void SimTool::Tool_MIX()
 	Identifier = "DEFAULT_TOOL_MIX";
 	Name = "MIX";
 	Colour = 0xFFD090_rgb;
-	Description = "Mixes particles.";
 	Perform = &perform;
 }
 

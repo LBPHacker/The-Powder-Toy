@@ -29,7 +29,6 @@ void Element::Element_YEST()
 	Weight = 80;
 
 	HeatConduct = 70;
-	Description = "Yeast, grows when warm (~37C).";
 
 	Properties = TYPE_PART;
 

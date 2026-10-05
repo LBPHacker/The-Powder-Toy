@@ -28,7 +28,6 @@ void Element::Element_DUST()
 	Weight = 85;
 
 	HeatConduct = 70;
-	Description = "Very light dust. Flammable.";
 
 	Properties = TYPE_PART;
 

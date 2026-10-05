@@ -29,7 +29,6 @@ void Element::Element_SHLD2()
 	Weight = 100;
 
 	HeatConduct = 0;
-	Description = "Shield lvl 2.";
 
 	Properties = TYPE_SOLID|PROP_LIFE_DEC;
 

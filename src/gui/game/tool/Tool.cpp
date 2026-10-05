@@ -10,3 +10,12 @@ void Tool::Draw(Simulation * sim, Brush const &brush, ui::Point position) {}
 void Tool::DrawLine(Simulation * sim, Brush const &brush, ui::Point position1, ui::Point position2, bool dragging) {}
 void Tool::DrawRect(Simulation * sim, Brush const &brush, ui::Point position1, ui::Point position2) {}
 void Tool::DrawFill(Simulation * sim, Brush const &brush, ui::Point position) {}
+
+ByteString Tool::GetDescription()
+{
+	if (descriptionOverride)
+	{
+		return Description(*descriptionOverride);
+	}
+	return Description();
+}

@@ -58,13 +58,13 @@ namespace Powder::Activity
 		}
 		for (int32_t i = 0; i < NGOL; ++i)
 		{
-			auto tool = std::make_unique<ElementTool>(PMAP(i, PT_LIFE), builtinGol[i].name, builtinGol[i].description, builtinGol[i].colour, "DEFAULT_PT_LIFE_" + builtinGol[i].name.ToAscii());
+			auto tool = std::make_unique<ElementTool>(PMAP(i, PT_LIFE), builtinGol[i].name, builtinGol[i].colour, "DEFAULT_PT_LIFE_" + builtinGol[i].name.ToAscii());
 			tool->MenuSection = SC_LIFE;
 			AllocTool(std::move(tool));
 		}
 		for (int32_t i = 0; i < UI_WALLCOUNT; ++i)
 		{
-			auto tool = std::make_unique<WallTool>(i, sd.wtypes[i].descs, sd.wtypes[i].colour, sd.wtypes[i].identifier, sd.wtypes[i].textureGen);
+			auto tool = std::make_unique<WallTool>(i, sd.wtypes[i].colour, sd.wtypes[i].identifier, sd.wtypes[i].textureGen);
 			tool->MenuSection = SC_WALL;
 			AllocTool(std::move(tool));
 		}
@@ -72,13 +72,13 @@ namespace Powder::Activity
 		{
 			AllocTool(std::make_unique<SimTool>(tool));
 		}
-		AllocTool(std::make_unique<DecorationTool>(*this, DECO_ADD     , "ADD" , "Color blending: Add."                          , 0x000000_rgb, "DEFAULT_DECOR_ADD" ));
-		AllocTool(std::make_unique<DecorationTool>(*this, DECO_SUBTRACT, "SUB" , "Color blending: Subtract."                     , 0x000000_rgb, "DEFAULT_DECOR_SUB" ));
-		AllocTool(std::make_unique<DecorationTool>(*this, DECO_MULTIPLY, "MUL" , "Color blending: Multiply."                     , 0x000000_rgb, "DEFAULT_DECOR_MUL" ));
-		AllocTool(std::make_unique<DecorationTool>(*this, DECO_DIVIDE  , "DIV" , "Color blending: Divide."                       , 0x000000_rgb, "DEFAULT_DECOR_DIV" ));
-		AllocTool(std::make_unique<DecorationTool>(*this, DECO_SMUDGE  , "SMDG", "Smudge tool, blends surrounding deco together.", 0x000000_rgb, "DEFAULT_DECOR_SMDG"));
-		AllocTool(std::make_unique<DecorationTool>(*this, DECO_CLEAR   , "CLR" , "Erase any set decoration."                     , 0x000000_rgb, "DEFAULT_DECOR_CLR" ));
-		AllocTool(std::make_unique<DecorationTool>(*this, DECO_DRAW    , "SET" , "Draw decoration (No blending)."                , 0x000000_rgb, "DEFAULT_DECOR_SET" ));
+		AllocTool(std::make_unique<DecorationTool>(*this, DECO_ADD     , "ADD" , 0x000000_rgb, "DEFAULT_DECOR_ADD" ));
+		AllocTool(std::make_unique<DecorationTool>(*this, DECO_SUBTRACT, "SUB" , 0x000000_rgb, "DEFAULT_DECOR_SUB" ));
+		AllocTool(std::make_unique<DecorationTool>(*this, DECO_MULTIPLY, "MUL" , 0x000000_rgb, "DEFAULT_DECOR_MUL" ));
+		AllocTool(std::make_unique<DecorationTool>(*this, DECO_DIVIDE  , "DIV" , 0x000000_rgb, "DEFAULT_DECOR_DIV" ));
+		AllocTool(std::make_unique<DecorationTool>(*this, DECO_SMUDGE  , "SMDG", 0x000000_rgb, "DEFAULT_DECOR_SMDG"));
+		AllocTool(std::make_unique<DecorationTool>(*this, DECO_CLEAR   , "CLR" , 0x000000_rgb, "DEFAULT_DECOR_CLR" ));
+		AllocTool(std::make_unique<DecorationTool>(*this, DECO_DRAW    , "SET" , 0x000000_rgb, "DEFAULT_DECOR_SET" ));
 		AllocTool(std::make_unique<PropertyTool>(*this));
 		AllocTool(std::make_unique<SignTool>(*this));
 		AllocTool(std::make_unique<SampleTool>(*this));
@@ -242,10 +242,12 @@ namespace Powder::Activity
 
 	Tool *Game::AllocCustomGolTool(const CustomGOLData &gd)
 	{
-		// "Custom GOL type: " + SerialiseGOLRule(gd.rule) // TODO-REDO_UI: handle these specially when rendering the description or dynamically update underlying translation or something
-		auto tool = std::make_unique<ElementTool>(PMAP(gd.rule, PT_LIFE), gd.nameString, "Custom GOL type: " + SerialiseGOLRule(gd.rule), gd.colour1, "DEFAULT_PT_LIFECUST_" + gd.nameString.ToAscii(), nullptr);
+		auto tool = std::make_unique<ElementTool>(PMAP(gd.rule, PT_LIFE), gd.nameString, gd.colour1, "DEFAULT_PT_LIFECUST_" + gd.nameString.ToAscii(), nullptr);
 		tool->MenuSection = SC_LIFE;
-		return AllocTool(std::move(tool));
+		auto ptr = AllocTool(std::move(tool));
+		ptr->Description.SetName("DEFAULT_LANG_GAME_LIFECUSTDESC");
+		ptr->descriptionOverride = SerialiseGOLRule(gd.rule).ToUtf8();
+		return ptr;
 	}
 
 	Tool *Game::AllocTool(std::unique_ptr<Tool> tool)
@@ -270,6 +272,7 @@ namespace Powder::Activity
 		auto *ptr = tool.get();
 		tools[*index]->tool = std::move(tool);
 		UpdateToolTexture(*index);
+		ptr->Description.SetName(ptr->Identifier.c_str());
 		return ptr;
 	}
 

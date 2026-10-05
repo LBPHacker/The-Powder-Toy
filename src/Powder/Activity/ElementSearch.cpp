@@ -126,11 +126,11 @@ namespace Powder::Activity
 				continue;
 			}
 			matchProperty(toLower(info->tool->Name.ToUtf8()), MatchingProperty::name, toolIndex);
-			matchProperty(toLower(info->tool->Description.ToUtf8()), MatchingProperty::description, toolIndex);
+			matchProperty(toLower(info->tool->GetDescription()), MatchingProperty::description, toolIndex);
 			auto menuSection = info->tool->MenuSection;
 			if (menuSection >= 0 && menuSection < int32_t(sd.msections.size()))
 			{
-				matchProperty(toLower(sd.msections[menuSection].name.ToUtf8()), MatchingProperty::menuDescription, toolIndex);
+				matchProperty(toLower(BuildString(sd.msections[menuSection].name)), MatchingProperty::menuDescription, toolIndex);
 			}
 		}
 

@@ -1837,7 +1837,7 @@ std::optional<int> GameModel::GetToolIndex(Tool *tool)
 
 void GameModel::AllocCustomGolTool(const CustomGOLData &gd)
 {
-	auto tool = std::make_unique<ElementTool>(PMAP(gd.rule, PT_LIFE), gd.nameString, "Custom GOL type: " + SerialiseGOLRule(gd.rule), gd.colour1, "DEFAULT_PT_LIFECUST_" + gd.nameString.ToAscii(), nullptr);
+	auto tool = std::make_unique<ElementTool>(PMAP(gd.rule, PT_LIFE), gd.nameString, gd.colour1, "DEFAULT_PT_LIFECUST_" + gd.nameString.ToAscii(), nullptr); // TODO-REDO_UI-STUBBED
 	tool->MenuSection = SC_LIFE;
 	AllocTool(std::move(tool));
 }
@@ -1849,7 +1849,7 @@ void GameModel::UpdateElementTool(int element)
 	auto &elem = elements[element];
 	auto *tool = GetToolFromIdentifier(elem.Identifier);
 	tool->Name = elem.Name;
-	tool->Description = elem.Description;
+	// tool->Description = elem.Description; // TODO-REDO_UI-STUBBED
 	tool->Colour = elem.Colour;
 	tool->textureGen = elem.IconGenerator;
 	tool->MenuSection = elem.MenuSection;
@@ -1899,13 +1899,13 @@ void GameModel::InitTools()
 	}
 	for (int i = 0; i < NGOL; ++i)
 	{
-		auto tool = std::make_unique<ElementTool>(PMAP(i, PT_LIFE), builtinGol[i].name, builtinGol[i].description, builtinGol[i].colour, "DEFAULT_PT_LIFE_" + builtinGol[i].name.ToAscii());
+		auto tool = std::make_unique<ElementTool>(PMAP(i, PT_LIFE), builtinGol[i].name, builtinGol[i].colour, "DEFAULT_PT_LIFE_" + builtinGol[i].name.ToAscii()); // TODO-REDO_UI-STUBBED
 		tool->MenuSection = SC_LIFE;
 		AllocTool(std::move(tool));
 	}
 	for (int i = 0; i < UI_WALLCOUNT; ++i)
 	{
-		auto tool = std::make_unique<WallTool>(i, sd.wtypes[i].descs, sd.wtypes[i].colour, sd.wtypes[i].identifier, sd.wtypes[i].textureGen);
+		auto tool = std::make_unique<WallTool>(i, sd.wtypes[i].colour, sd.wtypes[i].identifier, sd.wtypes[i].textureGen); // TODO-REDO_UI-STUBBED
 		tool->MenuSection = SC_WALL;
 		AllocTool(std::move(tool));
 	}
@@ -1936,10 +1936,10 @@ void GameModel::BuildMenus()
 	auto &sd = SimulationData::Ref();
 
 	menuList.clear();
-	for (auto &section : sd.msections)
-	{
-		menuList.push_back(std::make_unique<Menu>(section.icon, section.name, section.doshow));
-	}
+	// for (auto &section : sd.msections) // TODO-REDO_UI-STUBBED
+	// {
+	// 	menuList.push_back(std::make_unique<Menu>(section.icon, section.name, section.doshow));
+	// }
 
 	for (auto &tool : tools)
 	{

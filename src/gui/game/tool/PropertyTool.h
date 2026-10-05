@@ -31,7 +31,7 @@ private:
 
 public:
 	PropertyTool(Powder::Activity::Game &newGame):
-		Tool(0, "PROP", "Property Drawing Tool. Use to alter the properties of elements in the field.", 0xFEA900_rgb, "DEFAULT_UI_PROPERTY", nullptr), game(newGame)
+		Tool(0, "PROP", 0xFEA900_rgb, "DEFAULT_UI_PROPERTY", nullptr), game(newGame)
 	{}
 
 	void QueueTakePropertyFrom(int newTakePropertyFrom)

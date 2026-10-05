@@ -29,7 +29,6 @@ void Element::Element_SHLD1()
 	Weight = 100;
 
 	HeatConduct = 0;
-	Description = "Shield. Grows around spark, broken by pressure.";
 
 	Properties = TYPE_SOLID|PROP_LIFE_DEC;
 

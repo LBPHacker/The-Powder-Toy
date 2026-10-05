@@ -29,7 +29,6 @@ void Element::Element_CAUS()
 	Weight = 1;
 
 	HeatConduct = 70;
-	Description = "Caustic Gas, acts like ACID.";
 
 	Properties = TYPE_GAS|PROP_DEADLY;
 

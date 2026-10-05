@@ -27,7 +27,6 @@ void Element::Element_VOID()
 	Weight = 100;
 
 	HeatConduct = 251;
-	Description = "Hole, will drain away any particles.";
 
 	Properties = TYPE_SOLID;
 

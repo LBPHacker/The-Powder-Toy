@@ -184,13 +184,13 @@ namespace Powder::Activity
 
 		auto initRendererPreset = [&](int32_t index, std::optional<ScancodeWithModifiers> swm) {
 			auto action = std::make_shared<Action>();
-			action->name = BuildString(actionNamePrefix, "RENDERERPRESET", index);
+			action->name = Renderer::renderModePresets[index].Name.name;
 			action->displayIndex = int32_t(shortcutMapperInfo.actions.size());
 			action->group = rendererpresetGroup;
 			shortcutMapperInfo.actions.push_back(action);
 			action->begin = [this, index]() {
 				UseRendererPreset(index);
-				QueueInfoTip(Renderer::renderModePresets[index].Name.ToUtf8());
+				QueueInfoTip(BuildString(Renderer::renderModePresets[index].Name));
 				return InputDisposition::exclusive;
 			};
 			if (swm)
