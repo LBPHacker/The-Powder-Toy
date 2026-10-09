@@ -1,5 +1,7 @@
 #include "Language.hpp"
-#include "en_US_lang.h"
+#include "bzip2/bz2wrap.h"
+#include "prefs/GlobalPrefs.h"
+#include "LanguageDefs.h"
 #include <iomanip>
 
 using namespace Powder;
@@ -316,8 +318,30 @@ namespace
 	};
 }
 
-void Language::Load(std::span<const char> data)
+const Language::Available &Language::GetAvailable()
 {
+	struct DoOnce
+	{
+		Available languages;
+
+		DoOnce()
+		{
+#define LANGUAGE_DEFS_INIT(name, friendlyname) languages.push_back({ #name, friendlyname, LanguageDef_ ## name .AsCharSpan() });
+LANGUAGE_DEFS(LANGUAGE_DEFS_INIT)
+#undef LANGUAGE_DEFS_INIT
+		}
+	};
+
+	static DoOnce doOnce;
+	return doOnce.languages;
+}
+
+void Language::Load(int32_t index)
+{
+	auto &languages = GetAvailable();
+	assert(index >= 0 && index < int32_t(languages.size()));
+	std::vector<char> data;
+	assert(BZ2WDecompress(data, languages[index].data) == BZ2WDecompressOk);
 	for (auto &[ key, holder ] : formatterHolders)
 	{
 		holder.formatter = std::make_unique<MissingFormatter>();
@@ -347,11 +371,25 @@ void Language::Load(std::span<const char> data)
 			parser.Die("unknown method", method->first);
 		}
 	}
+	loadedIndex = index;
 }
 
 Language::Language()
 {
-	Load(en_US_lang.AsString());
+	ByteString defaultLanguageName = "en_US";
+	auto &languages = GetAvailable();
+	auto wantName = GlobalPrefs::Ref().Get("InterfaceLanguage", defaultLanguageName);
+	auto it = std::find_if(languages.begin(), languages.end(), [&](auto &item) {
+		return item.name == wantName;
+	});
+	if (it == languages.end())
+	{
+		it = std::find_if(languages.begin(), languages.end(), [&](auto &item) {
+			return item.name == defaultLanguageName;
+		});
+		assert(it != languages.end());
+	}
+	Load(int32_t(it - languages.begin()));
 }
 
 FormatterHolder &Language::GetFormatterHolder(const char *name)

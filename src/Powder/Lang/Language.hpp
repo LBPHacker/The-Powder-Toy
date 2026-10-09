@@ -46,12 +46,26 @@ namespace Powder::Lang
 
 	class Language : public NoCopy, public ExplicitSingleton<Language>
 	{
+		int32_t loadedIndex = -1;
 		std::map<std::string, FormatterHolder> formatterHolders;
-
-		void Load(std::span<const char> data);
 
 	public:
 		Language();
+
+		void Load(int32_t index);
+		int32_t GetLoadedIndex() const
+		{
+			return loadedIndex;
+		}
+
+		struct AvailableItem
+		{
+			ByteString name;
+			ByteString friendlyName;
+			std::span<const char> data;
+		};
+		using Available = std::vector<AvailableItem>;
+		static const Available &GetAvailable();
 
 		// TODO-REDO_UI: intern somewhere
 		std::string Format(Translation &templ);

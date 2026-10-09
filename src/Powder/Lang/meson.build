@@ -4,6 +4,11 @@ powder_src += files(
 	'Language.cpp',
 )
 
-embedded_files += [
-	[ 'en_US_lang', files('en_US.lang'), 'bzip2' ],
-]
+subdir('Defs')
+
+foreach language_def : language_defs
+	name = language_def[0]
+	embedded_files += [
+		[ 'LanguageDef_@0@'.format(name), files('Defs/@0@.lang'.format(name)), 'bzip2' ],
+	]
+endforeach

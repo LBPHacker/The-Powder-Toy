@@ -34,6 +34,7 @@ namespace Powder::Activity
 		void GuiSimulation();
 		void GuiAmbientAirTemp();
 		void GuiVideo();
+		void GuiInterface();
 		void GuiShortcuts();
 
 		Gui::NumberInputContext<float> ambientAirTempInput;

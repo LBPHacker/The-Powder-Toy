@@ -378,6 +378,9 @@ DEFAULT_LANG_SETTINGS_FEATURE_NEWTONIAN       simple "Newtonian gravity"
 DEFAULT_LANG_SETTINGS_FEATURE_WATEREQDETAIL   simple "May cause poor performance with a lot of water"
 DEFAULT_LANG_SETTINGS_FEATURE_WATEREQ         simple "Water equalization"
 
+DEFAULT_LANG_SETTINGS_LANG        simple "Language"
+DEFAULT_LANG_SETTINGS_LANG_SELECT simple "Interface language"
+
 DEFAULT_LANG_SETTINGS_SCALING                    simple "Scaling"
 DEFAULT_LANG_SETTINGS_SCALING_FIXED              simple "Fixed-size window"
 DEFAULT_LANG_SETTINGS_SCALING_RESIZABLE          simple "Resizable window"
@@ -387,7 +390,11 @@ DEFAULT_LANG_SETTINGS_SCALING_FORCEINTEGER       simple "Force integer scaling"
 DEFAULT_LANG_SETTINGS_SCALING_FORCEINTEGERDETAIL simple "Less blurry"
 DEFAULT_LANG_SETTINGS_SCALING_LINEAR             simple "Blurry scaling"
 DEFAULT_LANG_SETTINGS_SCALING_LINEARDETAIL       simple "More blurry, better on very big screens"
+DEFAULT_LANG_SETTINGS_SCALING_FACTOR             simple "Window scale factor for larger screens"
+DEFAULT_LANG_SETTINGS_SCALING_FACTORVALUE        simple "@0@" # @0@: exact value
+DEFAULT_LANG_SETTINGS_SCALING_FACTORCURRENT      simple "current"
 
+DEFAULT_LANG_SETTINGS_TAB_INTERFACE  simple "Interface"
 DEFAULT_LANG_SETTINGS_TAB_SHORTCUTS  simple "Shortcuts"
 DEFAULT_LANG_SETTINGS_TAB_SIMULATION simple "Simulation"
 DEFAULT_LANG_SETTINGS_TAB_VIDEO      simple "Video"

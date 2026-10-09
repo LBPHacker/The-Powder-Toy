@@ -8,6 +8,7 @@
 #include "Gui/Icons.hpp"
 #include "Gui/SdlAssert.hpp"
 #include "Gui/ViewUtil.hpp"
+#include "Lang/Language.hpp"
 #include "common/VariantIndex.h"
 #include "prefs/GlobalPrefs.h"
 #include "Format.h"
@@ -503,6 +504,29 @@ namespace Powder::Activity
 		}
 	}
 
+	void Settings::GuiInterface()
+	{
+		{
+			TextSeparator("language", "DEFAULT_LANG_SETTINGS_LANG"_St);
+			auto windowScale = ScopedHPanel("windowScale");
+			SetSize(Common{});
+			SetTextAlignment(Gui::Alignment::left, Gui::Alignment::center);
+			BeginText("title", "DEFAULT_LANG_SETTINGS_LANG_SELECT"_St, TextFlags::none);
+			EndText();
+			auto loadedIndex = Lang::Language::Ref().GetLoadedIndex();
+			BeginDropdown("dropdown", loadedIndex);
+			SetSize(150);
+			for (auto &item : Lang::Language::GetAvailable())
+			{
+				DropdownItem(item.friendlyName);
+			}
+			if (EndDropdown())
+			{
+				Lang::Language::Ref().Load(loadedIndex);
+			}
+		}
+	}
+
 	void Settings::GuiVideo()
 	{
 		auto &g = GetHost();
@@ -660,6 +684,7 @@ namespace Powder::Activity
 		const std::array categories = {
 			Category{ BuildString(Gui::iconPowder, " ", "DEFAULT_LANG_SETTINGS_TAB_SIMULATION"_St), &Settings::GuiSimulation },
 			Category{ BuildString(Gui::iconSolid , " ", "DEFAULT_LANG_SETTINGS_TAB_VIDEO"_St     ), &Settings::GuiVideo      },
+			Category{ BuildString(Gui::iconSolid , " ", "DEFAULT_LANG_SETTINGS_TAB_INTERFACE"_St ), &Settings::GuiInterface  },
 			Category{ BuildString(Gui::iconSolid , " ", "DEFAULT_LANG_SETTINGS_TAB_SHORTCUTS"_St ), &Settings::GuiShortcuts  },
 		};
 		{

@@ -250,3 +250,18 @@ configure_file(
 )
 
 subdir('Powder')
+
+language_defs_x = []
+language_incs = []
+foreach language_def : language_defs
+	language_defs_x += 'X(@0@, "@1@") \\'.format(language_def[0], language_def[1])
+	language_incs += '#include "LanguageDef_@0@.h" \\'.format(language_def[0])
+endforeach
+configure_file(
+	input: 'Powder/Lang/LanguageDefs.template.h',
+	output: 'LanguageDefs.h',
+	configuration: configuration_data({
+		'language_defs': '\n\t'.join(language_defs_x),
+		'language_incs': '\n\t'.join(language_incs),
+	}),
+)
