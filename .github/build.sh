@@ -87,7 +87,7 @@ if [[ -z ${BSH_NO_PACKAGES-} ]]; then
 			sdkmanager "platforms;$android_platform"
 		)
 		if [[ $BSH_LINT == yes ]]; then
-			sudo apt install clang-tidy
+			sudo apt install clang-tidy-20
 		fi
 		;;
 	windows)
@@ -120,7 +120,7 @@ if [[ -z ${BSH_NO_PACKAGES-} ]]; then
 			sudo apt install libfuse2
 		fi
 		if [[ $BSH_LINT == yes ]]; then
-			sudo apt install clang-tidy
+			sudo apt install clang-tidy-20
 		fi
 		;;
 	darwin)
